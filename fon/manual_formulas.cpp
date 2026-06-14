@@ -22,29 +22,29 @@ void manual_formulas_init (ManPages me);
 void manual_formulas_init (ManPages me) {
 
 MAN_BEGIN (U"Calculator", U"ppgb", 20210228)
-INTRO (U"A window that allows you to calculate all kinds of simple or complicated mathematical and string expressions. "
-	"To show the calculator, type @@Keyboard shortcuts|Command-U@ or choose the @@Calculator...@ command. "
-	"The result will appear in the Info window.")
-NORMAL (U"See the @Formulas tutorial for all the things that you can calculate with this command.")
+INTRO (U"一个允许您计算各种简单或复杂的数学与字符串表达式的窗口。 "
+	"要显示计算器，请键入 @@Keyboard shortcuts|Command-U@ 快捷键或选择 @@Calculator...|Calculator...（计算器...）@ 命令。 "
+	"计算结果将显示在 @@Info window|信息窗口@ 中。")
+NORMAL (U"有关您可以使用此命令计算的所有内容，请参阅 @Formulas 教程。")
 MAN_END
 
 MAN_BEGIN (U"Calculator...", U"ppgb", 20050822)
-INTRO (U"A command in the @Goodies submenu of the @@Praat menu@ of the @@Objects window@. Shortcut: @@Keyboard shortcuts|Command-U@. "
-	"Choosing this command brings up Praat's @calculator.")
+INTRO (U"@@Objects window|对象窗口@ 的 @@Praat menu|Praat 菜单@ 中 @Goodies 子菜单下的一个命令。快捷键：@@Keyboard shortcuts|Command-U@。 "
+	"选择此命令将启动 Praat 的 @calculator（计算器）。")
 MAN_END
 
 MAN_BEGIN (U"undefined", U"ppgb", 20170910)
-INTRO (U"When you give a query command for a numeric value, Praat sometimes writes the numeric value ##--undefined--# "
-	"into the @@Info window@ (two hyphens at both sides of the word). This happens if the value you ask for is not defined, "
-	"as in the following examples:")
-LIST_ITEM (U"\\bu You select a Sound with a finishing time of 1.0 seconds and ask for the minimum point in the wave form "
-	"between 1.5 and 2.0 seconds (with the query command ##Get minimum...#).")
-LIST_ITEM (U"\\bu You ask for a pitch value in a voiceless part of the sound (select a #Pitch, "
-	"then choose ##Get value at time...#).")
-LIST_ITEM (U"\\bu You type into the @Calculator the following formula: 10\\^ 400.")
+INTRO (U"当您发出查询数值的命令时，Praat 有时会在 @@Info window|信息窗口@ 中写入数值 ##--undefined--# "
+	"（单词两边有两个连字符，即“未定义”）。如果您所请求的数值未定义，就会发生这种情况， "
+	"例如以下示例：")
+LIST_ITEM (U"\\bu 您选择了一个结束时间为 1.0 秒的 Sound（声音），并请求 1.5 秒到 2.0 秒之间的波形最小值点 "
+	"（使用查询命令 ##Get minimum...#）。")
+LIST_ITEM (U"\\bu 您请求声音的无声（清音）部分的基频值（选择一个 #Pitch， "
+	"然后选择 ##Get value at time...#）。")
+LIST_ITEM (U"\\bu 您在 @calculator（计算器）中键入以下公式：10\\^ 400。")
 ENTRY (U"Usage in a script")
-NORMAL (U"In a Praat script, this value is simply represented as \"undefined\". You use it to test whether "
-	"a query command returned a valid number:")
+NORMAL (U"在 Praat 脚本中，此值直接表示为 \"undefined\"。您可以用它来测试 "
+	"查询命令是否返回了有效的数值：")
 CODE (U"selectObject: \"Pitch hallo\"")
 CODE (U"meanPitch = Get mean: 0.1, 0.2, \"Hertz\", \"Parabolic\"")
 CODE (U"if meanPitch = undefined")
@@ -53,137 +53,137 @@ CODE (U"else")
 	CODE1 (U"# Take the normal action.")
 CODE (U"endif")
 ENTRY (U"Details for hackers")
-NORMAL (U"In text files, this value is written as ##--undefined--#. "
-	"In binary files, it is written as a big-endian IEEE positive infinity. "
-	"In memory, it is usually a specific \"not-a-number\" (NaN), namely the result of dividing 0 by 0, "
-	"although other NaNs, and also infinities, will equally be reported as --undefined--.")
+NORMAL (U"在文本文件中，此值写入为 ##--undefined--#。 "
+	"在二进制文件中，它被写入为大端序 IEEE 正无穷大（positive infinity）。 "
+	"在内存中，它通常是一个特定的“非数”（Not-a-Number, NaN），即 0 除以 0 的结果， "
+	"尽管其他 NaN 以及无穷大也会同样被报告为 --undefined--。")
 MAN_END
 
 MAN_BEGIN (U"Formulas", U"ppgb", 20170916)
-INTRO (U"You can use numeric expressions and string (text) expressions in many places in Praat:")
-LIST_ITEM (U"\\bu in the @calculator in Praat’s @Goodies submenu;")
-LIST_ITEM (U"\\bu in the numeric fields of most settings windows;")
-LIST_ITEM (U"\\bu in a @@Praat script@.")
-NORMAL (U"For some types of objects (mainly Sound and Matrix), you can also apply formulas to all their contents at the same time:")
-LIST_ITEM (U"\\bu when you create a Sound or a Matrix from the @@New menu@;")
-LIST_ITEM (U"\\bu when you choose @@Formula...@ from the @Modify menu for a selected object.")
-NORMAL (U"You can read this tutorial sequentially with the help of the “##< 1#” and “##1 >#” buttons.")
-LIST_ITEM (U"1. @@Formulas 1. My first formulas|My first formulas@")
-LIST_ITEM1 (U"1.1. @@Formulas 1.1. Formulas in the calculator|Formulas in the calculator@")
-LIST_ITEM1 (U"1.2. @@Formulas 1.2. Numeric expressions|Numeric expressions@")
-LIST_ITEM1 (U"1.3. @@Formulas 1.3. String expressions|String expressions@")
-LIST_ITEM1 (U"1.4. @@Formulas 1.4. Array expressions|Array expressions@")
-LIST_ITEM1 (U"1.5. @@Formulas 1.5. Formulas in settings windows|Formulas in settings windows@")
-LIST_ITEM1 (U"1.6. @@Formulas 1.6. Formulas for creation|Formulas for creation@")
-LIST_ITEM1 (U"1.7. @@Formulas 1.7. Formulas for modification|Formulas for modification@")
-LIST_ITEM1 (U"1.8. @@Formulas 1.8. Formulas in scripts|Formulas in scripts@")
-LIST_ITEM (U"2. @@Formulas 2. Representations|Representations@")
-LIST_ITEM1 (U"2.1. @@Formulas 2.1. Representation of numbers|Representation of numbers@")
-LIST_ITEM1 (U"2.2. @@Formulas 2.2. Representation of strings|Representation of strings@")
-LIST_ITEM1 (U"2.3. @@Formulas 2.3. Representation of arrays|Representation of arrays@")
-LIST_ITEM (U"3. @@Formulas 3. Operators|Operators@ (`+`, `-`, `*`, `/`, `^`)")
-LIST_ITEM (U"4. @@Formulas 4. Constants|Constants@ (`pi`, `e`, `undefined`)")
-LIST_ITEM (U"5. @@Formulas 5. Mathematical functions|Mathematical functions@")
-LIST_ITEM (U"6. @@Formulas 6. String functions|String functions@")
-LIST_ITEM (U"7. @@Formulas 7. Control structures|Control structures@ (`if then else fi`, semicolon)")
-LIST_ITEM (U"8. @@Formulas 8. Attributes of objects|Attributes of objects@")
-LIST_ITEM (U"9. @@Formulas 9. Data in objects|Data in objects@")
+INTRO (U"您可以在 Praat 的许多地方使用数值表达式和字符串（文本）表达式：")
+LIST_ITEM (U"\\bu 在 Praat 的 @Goodies 子菜单下的 @calculator（计算器）中；")
+LIST_ITEM (U"\\bu 在大多数设置窗口的数值字段中；")
+LIST_ITEM (U"\\bu 在 @@Praat script|Praat 脚本@ 中。")
+NORMAL (U"对于某些类型的对象（主要是 Sound 和 Matrix），您也可以同时对其所有内容应用公式：")
+LIST_ITEM (U"\\bu 当您从 @@New menu|New 菜单@ 创建 Sound 或 Matrix 时；")
+LIST_ITEM (U"\\bu 当您为选定的对象从 @Modify 菜单中选择 @@Formula...|Formula...@ 时。")
+NORMAL (U"您可以在 “##< 1#” 和 “##1 >#” 按钮的帮助下按顺序阅读本教程。")
+LIST_ITEM (U"1. @@Formulas 1. My first formulas|我的第一个公式@")
+LIST_ITEM1 (U"1.1. @@Formulas 1.1. Formulas in the calculator|计算器中的公式@")
+LIST_ITEM1 (U"1.2. @@Formulas 1.2. Numeric expressions|数值表达式@")
+LIST_ITEM1 (U"1.3. @@Formulas 1.3. String expressions|字符串表达式@")
+LIST_ITEM1 (U"1.4. @@Formulas 1.4. Array expressions|数组表达式@")
+LIST_ITEM1 (U"1.5. @@Formulas 1.5. Formulas in settings windows|设置窗口中的公式@")
+LIST_ITEM1 (U"1.6. @@Formulas 1.6. Formulas for creation|用于创建的公式@")
+LIST_ITEM1 (U"1.7. @@Formulas 1.7. Formulas for modification|用于修改的公式@")
+LIST_ITEM1 (U"1.8. @@Formulas 1.8. Formulas in scripts|脚本中的公式@")
+LIST_ITEM (U"2. @@Formulas 2. Representations|表示方式@")
+LIST_ITEM1 (U"2.1. @@Formulas 2.1. Representation of numbers|数字的表示方式@")
+LIST_ITEM1 (U"2.2. @@Formulas 2.2. Representation of strings|字符串的表示方式@")
+LIST_ITEM1 (U"2.3. @@Formulas 2.3. Representation of arrays|数组的表示方式@")
+LIST_ITEM (U"3. @@Formulas 3. Operators|操作符@ (`+`, `-`, `*`, `/`, `^`)")
+LIST_ITEM (U"4. @@Formulas 4. Constants|常量@ (`pi`, `e`, `undefined`)")
+LIST_ITEM (U"5. @@Formulas 5. Mathematical functions|数学函数@")
+LIST_ITEM (U"6. @@Formulas 6. String functions|字符串函数@")
+LIST_ITEM (U"7. @@Formulas 7. Control structures|控制结构@ (`if then else fi`, 分号)")
+LIST_ITEM (U"8. @@Formulas 8. Attributes of objects|对象的属性@")
+LIST_ITEM (U"9. @@Formulas 9. Data in objects|对象中的数据@")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1. My first formulas", U"ppgb", 20170916)
-LIST_ITEM (U"1.1. @@Formulas 1.1. Formulas in the calculator|Formulas in the calculator@")
-LIST_ITEM (U"1.2. @@Formulas 1.2. Numeric expressions|Numeric expressions@")
-LIST_ITEM (U"1.3. @@Formulas 1.3. String expressions|String expressions@")
-LIST_ITEM (U"1.4. @@Formulas 1.4. Array expressions|Array expressions@")
-LIST_ITEM (U"1.5. @@Formulas 1.5. Formulas in settings windows|Formulas in settings windows@")
-LIST_ITEM (U"1.6. @@Formulas 1.6. Formulas for creation|Formulas for creation@")
-LIST_ITEM (U"1.7. @@Formulas 1.7. Formulas for modification|Formulas for modification@")
-LIST_ITEM (U"1.8. @@Formulas 1.8. Formulas in scripts|Formulas in scripts@")
+LIST_ITEM (U"1.1. @@Formulas 1.1. Formulas in the calculator|计算器中的公式@")
+LIST_ITEM (U"1.2. @@Formulas 1.2. Numeric expressions|数值表达式@")
+LIST_ITEM (U"1.3. @@Formulas 1.3. String expressions|字符串表达式@")
+LIST_ITEM (U"1.4. @@Formulas 1.4. Array expressions|数组表达式@")
+LIST_ITEM (U"1.5. @@Formulas 1.5. Formulas in settings windows|设置窗口中的公式@")
+LIST_ITEM (U"1.6. @@Formulas 1.6. Formulas for creation|用于创建的公式@")
+LIST_ITEM (U"1.7. @@Formulas 1.7. Formulas for modification|用于修改的公式@")
+LIST_ITEM (U"1.8. @@Formulas 1.8. Formulas in scripts|脚本中的公式@")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.1. Formulas in the calculator", U"ppgb", 20170916)
-INTRO (U"To use the Praat @calculator, go to the @@Praat menu@ "
-	"and choose @@Calculator...@ from the @Goodies submenu. Or simply type @@Keyboard shortcuts|Command-U@ anywhere in Praat.")
+INTRO (U"要使用 Praat @calculator（计算器），请转到 @@Praat menu|Praat 菜单@， "
+	"并从 @Goodies 子菜单中选择 @@Calculator...|Calculator...@。或者只需在 Praat 中的任何地方键入 @@Keyboard shortcuts|Command-U@。")
 ENTRY (U"Calculating numbers")
-NORMAL (U"You can do arithmetic computations. Type the formula")
+NORMAL (U"您可以进行算术计算。键入公式")
 CODE (U"8*17")
-NORMAL (U"and click OK. The Info window will pop up and show the result:")
+NORMAL (U"并点击 OK。信息窗口将弹出并显示结果：")
 CODE (U"136")
 ENTRY (U"Calculating strings")
-NORMAL (U"You can also do text computations. Type the formula")
+NORMAL (U"您还可以进行文本计算。键入公式")
 CODE (U"\"see\" + \"king\"")
-NORMAL (U"and click OK. The Info window will show the result:")
+NORMAL (U"并点击 OK。信息窗口将显示结果：")
 CODE (U"seeking")
 ENTRY (U"Calculating arrays")
-NORMAL (U"You can perform computations on vectors (arrays of numbers). Type the formula")
+NORMAL (U"您可以对向量（数值数组）进行计算。键入公式")
 CODE (U"{ 11, 13, 17 } + 0.5")
-NORMAL (U"and click OK. The Info window will show the result:")
+NORMAL (U"并点击 OK。信息窗口将显示结果：")
 CODE (U"11.5")
 CODE (U"13.5")
 CODE (U"17.5")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.2. Numeric expressions", U"ppgb", 20170916)
-INTRO (U"All the formulas whose outcome is a number are called numeric expressions. "
-	"For the following examples, all the outcomes can be checked with the @calculator.")
+INTRO (U"所有计算结果为数字的公式都称为数值表达式。 "
+	"对于以下示例，所有的结果都可以通过 @calculator（计算器）进行验证。")
 ENTRY (U"Examples with numbers")
-NORMAL (U"Some numeric expressions involve numbers only:")
+NORMAL (U"有些数值表达式仅涉及数字：")
 TERM (U"##8*17")
-DEFINITION (U"computes a multiplication. Outcome: 136.")
+DEFINITION (U"计算乘法。结果：136。")
 TERM (U"##2\\^ 10")
-DEFINITION (U"computes the tenth power of 2. Outcome: 1024.")
+DEFINITION (U"计算 2 的 10 次方。结果：1024。")
 TERM (U"##sqrt (2) / 2")
-DEFINITION (U"computes the square root of 2, and divides the result by 2. Outcome: 0.7071067811865476.")
+DEFINITION (U"计算 2 的平方根，并将结果除以 2。结果：0.7071067811865476。")
 TERM (U"##sin (1/4 * pi)")
-DEFINITION (U"computes the sine of %\\pi/4. Outcome: 0.7071067811865476 (again).")
+DEFINITION (U"计算 %\\pi/4 的正弦值。结果：（依然是）0.7071067811865476。")
 ENTRY (U"Examples with strings")
-NORMAL (U"Some numeric expressions compute numeric properties of strings:")
+NORMAL (U"有些数值表达式计算字符串的数值属性：")
 TERM (U"##length (\"internationalization\")")
-DEFINITION (U"computes the length of the string \"internationalization\". Outcome: 20.")
+DEFINITION (U"计算字符串 \"internationalization\" 的长度。结果：20。")
 TERM (U"##index (\"internationalization\", \"ation\")")
-DEFINITION (U"computes the location of the first occurrence of the string \"ation\" in the string \"internationalization\". Outcome: 7, "
-	"because the first letter of \"ation\" lines up with the seventh letter of \"internationalization\". "
-	"If the substring does not occur, the outcome is 0.")
+DEFINITION (U"计算字符串 \"ation\" 在字符串 \"internationalization\" 中首次出现的位置。结果：7， "
+	"因为 \"ation\" 的第一个字母与 \"internationalization\" 的第七个字母对齐。 "
+	"如果该子字符串未出现，结果为 0。")
 ENTRY (U"Examples with arrays")
-NORMAL (U"Some numeric expressions compute numeric properties of numeric vectors:")
+NORMAL (U"有些数值表达式计算数值向量的数值属性：")
 TERM (U"##size ({ 40, 70, 60, 50 })")
-DEFINITION (U"computes the length of the vector { 40, 70, 60, 50 }, i.e. the number of its elements. Outcome: 4.")
+DEFINITION (U"计算向量 { 40, 70, 60, 50 } 的大小，即其元素的数量。结果：4。")
 TERM (U"##mean ({ 40, 70, 60, 50 })")
-DEFINITION (U"computes the mean of the four numbers 40, 70, 60 and 50. Outcome: 55.")
+DEFINITION (U"计算 40, 70, 60 和 50 这四个数字的平均值。结果：55。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.3. String expressions", U"ppgb", 20170916)
-INTRO (U"All the formulas whose outcome is a text are called string expressions. "
-	"A %string is programming jargon for a text; think of a text as a “string” of characters (letters).")
-NORMAL (U"Again, the outcomes of the following examples can be checked with the @calculator.")
+INTRO (U"所有计算结果为文本的公式都称为字符串表达式。 "
+	"“字符串（string）”是文本的编程术语；把文本想象成一“串”字符（字母）。")
+NORMAL (U"同样，以下示例的结果可以通过 @calculator（计算器）进行验证。")
 TERM (U"##\"see\" + \"king\"")
-DEFINITION (U"concatenates two strings. Outcome: seeking.")
+DEFINITION (U"拼接两个字符串。结果：seeking。")
 TERM (U"##left\\$  (\"internationalization\", 6)")
-DEFINITION (U"computes the leftmost six letters of the string; the dollar sign is used for all functions whose result is a string. Outcome: intern.")
+DEFINITION (U"计算字符串最左边的六个字母；美元符号用于所有结果为字符串的函数。结果：intern。")
 TERM (U"##mid\\$  (\"internationalization\", 6, 8)")
-DEFINITION (U"computes the 8-letter substring that starts at the sixth letter of \"internationalization\". Outcome: national.")
+DEFINITION (U"计算从 \"internationalization\" 的第六个字母开始的 8 字符子字符串。结果：national。")
 TERM (U"##date\\$  ( )")
-DEFINITION (U"computes the current date and time. Outcome at the time I am writing this: Mon Dec  2 02:23:45 2002.")
+DEFINITION (U"计算当前的日期和时间。在我写下此内容时的结果：Mon Dec  2 02:23:45 2002。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.4. Array expressions", U"ppgb", 20170916)
-INTRO (U"A numeric vector expression is an expression whose value is a numeric vector.")
-NORMAL (U"You can check the outcomes of the following examples with the @calculator.")
+INTRO (U"数值向量表达式是其值为数值向量的表达式。")
+NORMAL (U"您可以通过 @calculator（计算器）来验证以下示例的结果。")
 TERM (U"##{ 11, 13, 17 } + 0.5")
-DEFINITION (U"adds 0.5 to each element of a vector with three elements, giving a new vector with three elements. "
-	"Praat writes the outcome to the Info window as three lines, containing the numbers 11.5, 13.5 and 17.5:")
+DEFINITION (U"给包含三个元素的向量的每个元素加上 0.5，从而得到一个包含三个元素的新向量。 "
+	"Praat 将结果作为三行写入信息窗口，包含数字 11.5, 13.5 和 17.5：")
 CODE (U"11.5")
 CODE (U"13.5")
 CODE (U"17.5")
 TERM (U"@`zero#` (5)")
-DEFINITION (U"creates a vector with 5 zeroes. Praat writes them on five lines:")
+DEFINITION (U"创建一个带有 5 个零的向量。Praat 将它们写入五行中：")
 CODE (U"0")
 CODE (U"0")
 CODE (U"0")
 CODE (U"0")
 CODE (U"0")
 TERM (U"@`repeat#` ({ 1, 5 }, 6)")
-DEFINITION (U"creates a vector with 12 elements, in which the sequence { 1, 5 } is repeated 6 times. Outcome:")
+DEFINITION (U"创建一个带有 12 个元素的向量，其中序列 { 1, 5 } 重复了 6 次。结果：")
 CODE (U"1")
 CODE (U"5")
 CODE (U"1")
@@ -199,191 +199,190 @@ CODE (U"5")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.5. Formulas in settings windows", U"ppgb", 20170916)
-INTRO (U"Into numeric fields in settings windows you usually simply type a number. "
-	"However, you can use any numeric expression instead.")
-NORMAL (U"For instance, suppose you want to create a Sound that contains exactly 10000 samples. "
-	"If the sampling frequency is 44100 Hz, the duration will be 10000/44100 seconds. "
-	"You can create such a Sound by choosing @@Create Sound from formula...@ from the @@New menu@, "
-	"then typing")
+INTRO (U"在设置窗口的数值字段中，您通常只需直接键入一个数字。 "
+	"然而，您也可以改用任何数值表达式。")
+NORMAL (U"例如，假设您想创建一个包含恰好 10000 个采样点的 Sound（声音）。 "
+	"如果采样频率是 44100 Hz，则时长将为 10000/44100秒。 "
+	"您可以通过从 @@New menu|New 菜单@ 中选择 @@Create Sound from formula...|Create Sound from formula...@ 来创建这样一个 Sound， "
+	"然后输入")
 CODE (U"10000/44100")
-NORMAL (U"into the ##End time# field.")
-NORMAL (U"Into text fields in settings windows, you can only type text directly; there is no way "
-	"to use string expressions (except if you use scripts; see @@Formulas 1.8. Formulas in scripts@).")
-NORMAL (U"Into numeric vector fields in settings windows, you can type any numeric vector (array) expression.")
+NORMAL (U"到 ##End time#（结束时间）字段中。")
+NORMAL (U"在设置窗口的文本字段中，您只能直接键入文本；无法 "
+	"使用字符串表达式（除非您使用脚本；参见 @@Formulas 1.8. Formulas in scripts|脚本中的公式@）。")
+NORMAL (U"在设置窗口的数值向量字段中，您可以键入任何数值向量（数组）表达式。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.6. Formulas for creation", U"ppgb", 20110128)
-INTRO (U"With some commands in the @@New menu@, you can supply a formula that Praat will apply to all elements of the new object.")
+INTRO (U"通过 @@New menu|New 菜单@ 中的某些命令，您可以提供一个公式，Praat 将把该公式应用于新对象的所有元素。")
 ENTRY (U"Creating a Sound from a formula")
-NORMAL (U"Choose @@Create Sound from formula...@ and type the following into the #%Formula field:")
+NORMAL (U"选择 @@Create Sound from formula...|Create Sound from formula...@ 并在 #%Formula 字段中键入以下内容：")
 CODE (U"1/2 * sin (2 * pi * 377 * x)")
-NORMAL (U"When you click #OK, a new @Sound object will appear in the list. "
-	"After you click ##View & Edit# and zoom in a couple of times, you will see that the sound is a sine wave "
-	"with a frequency of 377 hertz (cycles per second). This worked because the $x in the formula represents the time, "
-	"i.e. the formula was applied to every sample separately, with a different value of $x for each sample.")
+NORMAL (U"当您点击 #OK 时，列表中将出现一个新的 @Sound（声音）对象。 "
+	"在您点击 ##View & Edit# 并放大几次后，您会看到该声音是一个正弦波， "
+	"其频率为 377 赫兹（每秒周期数）。这能起作用是因为公式中的 $x 代表时间， "
+	"即该公式被分别应用于每个采样点，每个采样点都具有不同的 $x 值。")
 ENTRY (U"Creating a Matrix from a formula")
-NORMAL (U"Choose @@Create simple Matrix...@ and type the following into the #%Formula field:")
+NORMAL (U"选择 @@Create simple Matrix...|Create simple Matrix...@ 并在 #%Formula 字段中键入以下内容：")
 CODE (U"8")
-NORMAL (U"When you click OK, a new @Matrix object will appear in the list. When you click #Info, "
-	"you will see that it is a matrix with 10 rows and 10 columns, and that all the 100 cells contain the value 8 "
-	"(you can see this because both the minimum and the maximum are reported as being 8).")
-NORMAL (U"A more interesting example is the formula")
+NORMAL (U"当您点击 OK 时，列表中将出现一个新的 @Matrix（矩阵）对象。当您点击 #Info 时， "
+	"您将看到它是一个 10 行 10 列的矩阵，且所有 100 个单元格都包含值 8 "
+	"（您能看到这点是因为最小值和最大值都被报告为 8）。")
+NORMAL (U"一个更有趣的例子是公式")
 CODE (U"row * col")
-NORMAL (U"For the resulting Matrix, "
-	"choose @@Matrix: Paint cells...|Paint cells...@ and click #OK. The Picture window will show a 10\\xx10 "
-	"matrix whose elements are the product of the row and column numbers, i.e., they have values between "
-	"1 and 100. Beside $row and $col, you can use $x for the distance along the horizontal axis and $y for the "
-	"distance along the vertical axis; see the following page for examples.")
+NORMAL (U"对于生成的 Matrix， "
+	"选择 @@Matrix: Paint cells...|Paint cells...@ 并点击 #OK。画图窗口将显示一个 10\\xx10 "
+	"的矩阵，其元素是行号和列号的乘积，即它们的值介于 "
+	"1 到 100 之间。除了 $row 和 $col 之外，您还可以使用 $x 表示沿水平轴的距离，使用 $y 表示 "
+	"沿垂直轴的距离；参见下一页的示例。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.7. Formulas for modification", U"ppgb", 20170916)
-INTRO (U"Analogously to the formulas that you can use for creating new objects (see the previous page), "
-	"you can use formulas for modifying existing objects. You do this with the command ##Formula...# that you "
-	"can find in the @Modify menu when you select an object.")
+INTRO (U"与可用于创建新对象的公式类似（参见前一页）， "
+	"您可以使用公式来修改现有对象。您可以通过选择一个对象， "
+	"然后在 @Modify 菜单中找到 ##Formula...# 命令来执行此操作。")
 ENTRY (U"Modifying a Sound with a formula")
-NORMAL (U"Record a sound with your microphone and talk very lowly. If you don't know how to record a sound in Praat, "
-	"consult the @Intro. Once the Sound object is in the list, click #Play. The result will sound very soft. "
-	"Then choose ##Formula...# from the Modify menu and type")
+NORMAL (U"用麦克风录制一段声音，并用非常低的声音说话。如果您不知道如何在 Praat 中录制声音， "
+	"请咨询 @Intro 教程。一旦 Sound 对象出现在列表中，点击 #Play。声音听起来会非常小。 "
+	"然后从 Modify 菜单中选择 ##Formula...# 并键入")
 CODE (U"self * 3")
-NORMAL (U"Click OK, then click #Play again. The sound is much louder now. You have multiplied the amplitude of every sample "
-	"in the sound with a factor of 3.")
+NORMAL (U"点击 OK，然后再次点击 #Play。现在的声音大得多了。您已将声音中 "
+	"每个采样点的振幅乘了 3。")
 ENTRY (U"Replacing the contents of a Sound with a formula")
-NORMAL (U"If you don’t use `self` in your formula, the formula does not refer to the existing contents of the Sound. Hence, the formula ")
+NORMAL (U"如果您在公式中不使用 `self`，则该公式不会引用 Sound 的现有内容。因此，公式 ")
 CODE (U"1/2 * sin (2 * pi * 377 * x)")
-NORMAL (U"will simply replace your recorded speech with a 377-Hz sine wave.")
+NORMAL (U"将直接用 377-Hz 的正弦波替换您录制的语音。")
 ENTRY (U"Modifying a Matrix with a formula")
-NORMAL (U"Many objects can be thought of as matrices: "
-	"they consist of a number of rows and columns with data in every cell:")
-LIST_ITEM (U"@Sound: one row; columns represent samples.")
-LIST_ITEM (U"@Spectrum: two rows (first row is real part, second row is imaginary part); "
-	"columns represent frequencies.")
-LIST_ITEM (U"@Spectrogram, @Cochleagram: rows represent frequencies; columns represent times.")
-LIST_ITEM (U"@Excitation: one row; columns represent frequency bands.")
-LIST_ITEM (U"@Harmonicity: one row; columns represent time frames.")
-NORMAL (U"The formula is performed on every column of every row. The formula")
+NORMAL (U"许多对象都可以被看作是矩阵： "
+	"它们由许多行和列组成，每个单元格中都有数据：")
+LIST_ITEM (U"@Sound：单行；列代表采样点。")
+LIST_ITEM (U"@Spectrum：两行（第一行是实部，第二行是虚部）； "
+	"列代表频率。")
+LIST_ITEM (U"@Spectrogram、@Cochleagram：行代表频率；列代表时间。")
+LIST_ITEM (U"@Excitation：单行；列代表频带。")
+LIST_ITEM (U"@Harmonicity：单行；列代表时间帧。")
+NORMAL (U"该公式应用于每一行的每一列。公式")
 CODE (U"self^2")
-NORMAL (U"will square all matrix elements.")
-NORMAL (U"The formula first works on the first row, and in that row from the first column on; "
-	"this can work recursively. The formula")
+NORMAL (U"将把所有矩阵元素平方。")
+NORMAL (U"该公式首先作用于第一行，并在该行中从第一列开始； "
+	"这可以递归作用。公式")
 CODE (U"self + self [row, col - 1]")
-NORMAL (U"integrates each row.")
+NORMAL (U"对每一行进行积分。")
 ENTRY (U"Referring to the current position in the object")
-NORMAL (U"You can refer to the current position in a Matrix (or Sound, etc.) by index or by %x and %y values:")
+NORMAL (U"您可以通过索引或 %x 和 %y 值来引用 Matrix（或 Sound 等）中的当前位置：")
 TERM (U"#`row`")
-DEFINITION (U"the current row")
+DEFINITION (U"当前行")
 TERM (U"#`col`")
-DEFINITION (U"the current column")
+DEFINITION (U"当前列")
 TERM (U"#`x`")
-DEFINITION (U"the %x value associated with the current column:")
-	LIST_ITEM2 (U"for a Sound, Spectrogram, Cochleagram, or Harmonicity: time, as in the 377-Hz sine wave example above")
-	LIST_ITEM2 (U"for a Spectrum: frequency (Hz)")
-	LIST_ITEM2 (U"for an Excitation: frequency (Bark)")
+DEFINITION (U"与当前列相关联的 %x 值：")
+	LIST_ITEM2 (U"对于 Sound、Spectrogram、Cochleagram 或 Harmonicity：时间（time），如上述 377-Hz 正弦波示例所示")
+	LIST_ITEM2 (U"对于 Spectrum：频率（Hz）")
+	LIST_ITEM2 (U"对于 Excitation：频率（Bark）")
 TERM (U"#`y`")
-DEFINITION (U"the %y value associated with the current row:")
-	LIST_ITEM2 (U"for a Spectrogram: frequency (Hz)")
-	LIST_ITEM2 (U"for a Cochleagram: frequency (Bark)")
+DEFINITION (U"与当前行相关联 the %y 值：")
+	LIST_ITEM2 (U"对于 Spectrogram：频率（Hz）")
+	LIST_ITEM2 (U"对于 Cochleagram：频率（Bark）")
 ENTRY (U"Referring to the contents of the object itself")
-NORMAL (U"You can refer to values in the current Matrix (or Sound, etc.) by index.")
+NORMAL (U"您可以通过索引引用当前 Matrix（或 Sound 等）中的值。")
 TERM (U"#`self`")
-DEFINITION (U"refers to the value in the current Matrix at the current row and column, or to the value in the current Sound at the current sample.")
+DEFINITION (U"引用当前 Matrix 中当前行和列的值，或当前 Sound 中当前采样点的值。")
 TERM (U"#`self` [%`column-expression`]")
-DEFINITION (U"refers to the value in the current Sound (or Intensity etc.) at the current sample (or frame). "
-	"The %`column-expression` is rounded to the nearest integer. "
-	"If the index is out of range (less than 1 or greater than %n__%x_), the expression evaluates as 0.")
-NORMAL (U"#Example. An integrator is")
+DEFINITION (U"引用当前 Sound（或 Intensity 等）中当前采样点（或帧）的值。 "
+	"%`column-expression` 将被四舍五入为最接近的整数。 "
+	"如果索引超出范围（小于 1 或大于 %n__%x_），则表达式的值计算为 0。")
+NORMAL (U"#Example。积分器（integrator）为")
 CODE (U"   self [col - 1] + self * dx")
 TERM (U"#`self` [%`row-expression`, %`column-expression`]")
-DEFINITION (U"refers to the value in the current Matrix (or Spectrogram etc.) at the specified row and column. "
-	"The expressions are rounded to the nearest integers.")
-NORMAL (U"You can refer to values in the current Matrix (or Spectrogram, etc.) by %x and %y position:")
+DEFINITION (U"引用当前 Matrix（或 Spectrogram 等）中指定行和列的值。 "
+	"这些表达式将被四舍五入为最接近的整数。")
+NORMAL (U"您可以通过 %x 和 %y 位置引用当前 Matrix（或 Spectrogram 等）中的值：")
 TERM (U"#`self` (%`x-expression`, %`y-expression`)")
-DEFINITION (U"the expressions are linearly interpolated between the four nearest matrix points.")
-NORMAL (U"You can refer to values in the current Sound (or Intensity etc.) by %x position:")
+DEFINITION (U"在四个最接近的矩阵点之间对表达式进行线性插值。")
+NORMAL (U"您可以通过 %x 位置引用当前 Sound（或 Intensity 等）中的值：")
 TERM (U"#`self` (%`x-expression`)")
-DEFINITION (U"the expression is linearly interpolated between the two nearest samples (or frames).")
+DEFINITION (U"在两个最接近的采样点（或帧）之间对表达式进行线性插值。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 1.8. Formulas in scripts", U"ppgb", 20170916)
-INTRO (U"In scripts, you can assign numeric expressions to numeric variables, "
-	"string expressions to string variables, and array expressions to array variables. "
-	"You can also use numeric, string and array variables in expressions.")
+INTRO (U"在脚本中，您可以将数值表达式分配给数值变量， "
+	"将字符串表达式分配给字符串变量，以及将数组表达式分配给数组变量。 "
+	"您也可以在表达式中使用数值、字符串和数组变量。")
 ENTRY (U"Example: report a square")
-NORMAL (U"Choose @@New Praat script@ from the @@Praat menu@. A script editor window will become visible. "
-	"Type the following lines into that window:")
+NORMAL (U"从 @@Praat menu|Praat 菜单@ 中选择 @@New Praat script|新建 Praat 脚本@。脚本编辑器窗口将变得可见。 "
+	"在该窗口中键入以下几行：")
 CODE (U"x = 99")
 CODE (U"x2 = x * x")
 CODE (U"writeInfoLine: “The square of ”, x, “ is ”, x2, “.”")
-NORMAL (U"This is an example of a simple @@Praat script@; "
-	"it assigns the results of the numeric formulas `99` and `x * x` "
-	"to the numeric variables %`x` and %`x2`. Note that the formula `x * x` itself refers to the variable %`x`. "
-	"To run (execute) this script, type @@Keyboard shortcuts|Command-R@ or choose #Run from the Run menu. "
-	"Praat will then write the following text into the Info window:")
+NORMAL (U"这是一个简单的 @@Praat script|Praat 脚本@ 示例； "
+	"它将数值公式 `99` 和 `x * x` 的结果 "
+	"分配给数值变量 %`x` 和 %`x2`。注意，公式 `x * x` 本身引用了变量 %`x`。 "
+	"要运行（执行）此脚本，请键入 @@Keyboard shortcuts|Command-R@ 或从 Run 菜单中选择 #Run。 "
+	"Praat 将随后在信息窗口中写入以下文本：")
 CODE (U"The square of 99 is 9801.")
-NORMAL (U"For more information on scripts, see the @Scripting tutorial.")
+NORMAL (U"有关脚本的更多信息，请参阅 @Scripting 教程。")
 ENTRY (U"Example: rename the city of Washington")
-NORMAL (U"Type the following text into the script editor window:")
+NORMAL (U"在脚本编辑器窗口中键入以下文本：")
 CODE (U"current$ = “Bush”")
 CODE (U"previous$ = “Clinton”")
 CODE (U"famous$ = “Lincoln”")
 CODE (U"newCapital$ = current$ + mid$ (famous$, 2, 3) + right$ (previous$, 3)")
 CODE (U"writeInfoLine: “The new capital will be ”, newCapital$, “.”")
-NORMAL (U"This script assigns the results of four string expressions to the four string variables `current$`, "
-	"`previous$`, `famous$`, and `newCapital$`. The dollar sign is the notation for a string variable or "
-	"for a function whose result is a string (like `left$`). Note that the formula in the fourth line refers to three existing "
-	"variables.")
-NORMAL (U"To see what the new name of the capital will be, choose #Run.")
+NORMAL (U"该脚本将四个字符串表达式的结果分配给四个字符串变量 `current$`、 "
+	"`previous$`、`famous$` 和 `newCapital$`。美元符号是字符串变量 "
+	"或结果为字符串的函数（如 `left$`）的表示法。注意，第四行中的公式引用了三个现有的变量。")
+NORMAL (U"要查看首都的新名称是什么，请选择 #Run。")
 ENTRY (U"Example: report five squares")
-NORMAL (U"Type the following script:")
+NORMAL (U"键入以下脚本：")
 CODE (U"x# = { 1, 2, 3, 4, 5 }")
 CODE (U"x2# = x# * x#")
 CODE (U"writeInfoLine: “The squares of ”, x#, “ are ”, x2#, “.”")
-NORMAL (U"Praat will then write the following text into the Info window:")
+NORMAL (U"Praat 将随后在信息窗口中写入以下文本：")
 CODE (U"The squares of 1 2 3 4 5 are 1 4 9 16 25.")
 ENTRY (U"Example: numeric expressions in settings in scripts")
-NORMAL (U"As in real settings windows, you can use numeric expressions in all numeric fields. "
-	"The example of two pages back becomes:")
+NORMAL (U"正如在真实的设置窗口中一样，您可以在所有数值字段中使用数值表达式。 "
+	"两页前的示例如下：")
 CODE (U"Create Sound from formula: “sine”, 1, 0, 10000 / 44100, 44100, ~ 0.9 * sin (2*pi*377*x)")
 ENTRY (U"Example: string expressions in settings in scripts")
-NORMAL (U"As in real settings windows, you can use string expressions in all text fields:")
+NORMAL (U"正如在真实的设置窗口中一样，您可以在所有文本字段中使用字符串表达式：")
 CODE (U"soundName$ = “hello”")
 CODE (U"Read from file: soundName$ + “.wav”")
 ENTRY (U"Example: numeric expressions in creation in scripts")
-NORMAL (U"Suppose you want to generate a sine wave whose frequency is held in a variable. This is the way:")
+NORMAL (U"假设您想生成一个其频率保存在变量中的正弦波。以下是实现方法：")
 CODE (U"frequency = 377")
 CODE (U"Create Sound from formula: “sine”, 1, 0.0, 1.0, 44100, ~ 0.9 * sin (2*pi*frequency*x)")
-NORMAL (U"In this example, Praat will protest if `x` is a variable as well (%`x`), because that would be ambiguous "
-	"with the `x` that refers to the time in the sound (see @@Formulas 1.7. Formulas for modification@).")
+NORMAL (U"在此示例中，如果 `x` 也是一个变量（%`x`），Praat 将会报错，因为这会 "
+	"与 Sound 中代表时间的 `x` 产生歧义（参见 @@Formulas 1.7. Formulas for modification|用于修改的公式@）。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 2. Representations", U"ppgb", 20170916)
-LIST_ITEM (U"2.1. @@Formulas 2.1. Representation of numbers|Representation of numbers@")
-LIST_ITEM (U"2.2. @@Formulas 2.2. Representation of strings|Representation of strings@")
-LIST_ITEM (U"2.3. @@Formulas 2.3. Representation of arrays|Representation of arrays@")
+LIST_ITEM (U"2.1. @@Formulas 2.1. Representation of numbers|数字的表示方式@")
+LIST_ITEM (U"2.2. @@Formulas 2.2. Representation of strings|字符串的表示方式@")
+LIST_ITEM (U"2.3. @@Formulas 2.3. Representation of arrays|数组的表示方式@")
 MAN_END
 
 MAN_BEGIN (U"Formulas 2.1. Representation of numbers", U"ppgb", 20170916)
-INTRO (U"Formulas can work with integer numbers as well as with real numbers.")
+INTRO (U"公式可以处理整数，也可以处理实数。")
 ENTRY (U"Real numbers")
-NORMAL (U"You can type many real numbers by using a decimal notation, for instance 3.14159, 299792.5, or -0.000123456789. "
-	"For very large or small numbers, you can use the %e-notation: 6.022\\.c10^^23^ is typed as `6.022e23` or `6.022e+23`, "
-	"and -1.6021917\\.c10^^-19^ is typed as `-1.6021917e-19`. You can use also use the percent notation: 0.157 "
-	"can be typed as `15.7%`.")
-NORMAL (U"There are some limitations as to the values that real numbers can have in Praat. "
-	"The numbers must lie between -10^^308^ and +10^^308^. If you type")
+NORMAL (U"您可以通过使用十进制表示法来键入许多实数，例如 3.14159, 299792.5 或 -0.000123456789。 "
+	"对于非常大或非常小的数字，您可以使用 %e-表示法：6.022\\.c10^^23^ 可以键入为 `6.022e23` 或 `6.022e+23`， "
+	"而 -1.6021917\\.c10^^-19^ 键入为 `-1.6021917e-19`。您还可以使用百分比表示法：0.157 "
+	"可以键入为 `15.7%`。")
+NORMAL (U"在 Praat 中，实数可以具有的值存在一些局限性。 "
+	"这些数字必须介于 -10^^308^ 和 +10^^308^ 之间。如果您键入")
 CODE (U"1e200 * 1e100")
-NORMAL (U"the outcome will be")
+NORMAL (U"结果将是")
 CODE (U"1e+300")
-NORMAL (U"but if you type")
+NORMAL (U"但如果您键入")
 CODE (U"1e300 * 1e100")
-NORMAL (U"the outcome will be")
+NORMAL (U"结果将是")
 CODE (U"--undefined--")
-NORMAL (U"Another limitation is that the smallest non-zero numbers lie near -10^^-308^ and +10^^-308^. If you type")
+NORMAL (U"另一个局限性是，最接近 0 且非零的数字在 -10^^-308^ 和 +10^^-308^ 附近。如果您键入")
 CODE (U"1e-200 / 1e100")
-NORMAL (U"the outcome will be")
+NORMAL (U"结果将是")
 CODE (U"1e-300")
 NORMAL (U"but if you type")
 CODE (U"1e-300 / 1e100")
-NORMAL (U"the outcome will be")
+NORMAL (U"结果将是")
 CODE (U"0")
 NORMAL (U"Finally, the precision of real numbers is limited by the number of bits that every real number is stored with "
 	"in the computer, namely 64. For instance, if you type")
@@ -420,28 +419,28 @@ CODE (U"1e16")
 MAN_END
 
 MAN_BEGIN (U"Formulas 2.2. Representation of strings", U"ppgb", 20021203)
-INTRO (U"Formulas can work with strings that are put between two double quotes, "
-	"as in “goodbye” or “how are you doing?”.")
-NORMAL (U"If a string has to contain a double quote, "
-	"you have to type it twice. For instance, if you type")
+INTRO (U"公式可以处理置于两个双引号之间的字符串， "
+	"如 “goodbye” 或 “how are you doing?”。")
+NORMAL (U"如果字符串本身需要包含双引号， "
+	"您必须将其键入两次。例如，如果您键入")
 CODE (U"\"I asked: \"\"how are you doing?\"\"\"")
-NORMAL (U"into the calculator, the outcome will be")
+NORMAL (U"到计算器中，结果将是")
 CODE (U"I asked: \"how are you doing?\"")
 MAN_END
 
 MAN_BEGIN (U"Formulas 2.3. Representation of arrays", U"ppgb", 20170916)
-INTRO (U"Formulas can work with vectors that are put between opening and closing braces, "
-	"as in { 11, 17, 13.5 }. If you type this into the calculator, the outcome will be")
+INTRO (U"公式可以处理置于大括号之间的向量， "
+	"如 { 11, 17, 13.5 }。如果您在计算器中键入此公式，结果将是")
 CODE (U"11")
 CODE (U"17")
 CODE (U"13.5")
 MAN_END
 
 MAN_BEGIN (U"Formulas 3. Operators", U"ppgb", 20230124)
-NORMAL (U"In formulas you can use the numerical and logical operators that are described on this page. "
-	"The order of evaluation of the operators is the order that is most usual in programming languages. "
-	"To force a different order, you use parentheses.")
-NORMAL (U"The operators with the highest precedence are #negation (-) and #exponentation (\\^ ):")
+NORMAL (U"在公式中，您可以使用本页描述的数值和逻辑运算符。 "
+	"运算符的评估顺序是编程语言中最常用的顺序。 "
+	"要强制执行不同的顺序，请使用括号。")
+NORMAL (U"优先级最高的运算符是#负号 (-) 和#求幂 (\\^ )：")
 CODE (U"--6 \\-> 6")
 CODE (U"2^6 \\-> 64")
 /*@praat
@@ -450,23 +449,21 @@ CODE (U"2^6 \\-> 64")
 	assert --6 = 6
 	assert 2^6 = 64
 @*/
-NORMAL (U"Sequences of negation and exponentiation are evaluated from right to left:")
+NORMAL (U"负号和求幂的序列是自右向左进行评估的：")
 CODE (U"2^-6 \\-> 0.015625")                       //@praat assert 2^-6 = 0.015625
 CODE (U"-(1+1)^6 \\-> -64")                        //@praat assert -(1+1)^6 = -64
 CODE (U"4^3^2 \\-> 4^9 \\-> 262144")               //@praat assert 4^3^2 = 262144
-NORMAL (U"Note that changing the spacing does not change the meaning:")
+NORMAL (U"请注意，改变空格并不会改变其含义：")
 CODE (U"4^3 ^ 2 \\-> 262144")                      //@praat assert 4^3 ^ 2 = 262144
-NORMAL (U"To change the order of evaluation, you have to use parentheses:")
+NORMAL (U"要更改评估顺序，您必须使用括号：")
 CODE (U"(4 ^ 3) ^ 2 \\-> 4096")                    //@praat assert (4 ^ 3) ^ 2 = 4096
-NORMAL (U"The following construction is not allowed because of an ambiguity between a negative number "
-	"and negation of a positive number:")
+NORMAL (U"由于负数与正数的负号之间存在歧义，因此不允许使用以下结构：")
 CODE (U"-2^6 \\-> ?")
-NORMAL (U"Instead, you use any of the following:")
+NORMAL (U"相反，您可以使用以下任意一种结构：")
 CODE (U"(-2)^6 \\-> 64")                           //@praat assert (-2)^6 = 64
 CODE (U"-(2^6) \\-> -64")                          //@praat assert -(2^6) = -64
 CODE (U"-(2)^6 \\-> -64")                          //@praat assert -(2)^6 = -64
-NORMAL (U"The operators with the next highest precedence are #multiplication (*) and #division (/). They are evaluated "
-	"from left to right:")
+NORMAL (U"优先级次高的运算符是#乘法 (*) 和#除法 (/)。它们是自左向右评估的：")
 CODE (U"1/4*5 \\-> 1.25        (from left to right)")
 CODE (U"1 / 4*5 \\-> 1.25      (spacing does not help)")
 CODE (U"1 / (4*5) \\-> 0.05    (use parentheses to change the order)")
@@ -483,8 +480,8 @@ CODE (U"(3 * 2) ^ 4 \\-> 1296  (use parentheses to change the order)")
 	assert 3*2 ^ 4 = 48
 	assert (3 * 2) ^ 4 = 1296
 @*/
-NORMAL (U"##Integer division# operators (#div and #mod) have the same precedence as * and /, "
-	"and are likewise evaluated from left to right:")
+NORMAL (U"##整除# 运算符（#div 和 #mod）具有与 * 和 / 相同的优先级， "
+	"并且同样自左向右评估：")
 CODE (U"54 div 5 \\-> 10       (division rounded down)")                             //@praat assert 54 div 5 = 10
 CODE (U"54 mod 5 \\-> 4        (the remainder)")                                     //@praat assert 54 mod 5 = 4
 CODE (U"54.3 div 5.1 \\-> 10   (works for real numbers as well)")                    //@praat assert 54.3 div 5.1 = 10
@@ -501,8 +498,8 @@ CODE (U"54 div 5 * 3 \\-> 30   (from left to right)")                           
 CODE (U"54 div (5 * 3) \\-> 3")                                                      //@praat assert 54 div (5 * 3) = 3
 CODE (U"54 mod 5 * 3 \\-> 12")                                                       //@praat assert 54 mod 5 * 3 = 12
 CODE (U"54 mod (5 * 3) \\-> 9")                                                      //@praat assert 54 mod (5 * 3) = 9
-NORMAL (U"The operators with the next highest precedence are #addition (+) and #subtraction (-), "
-	"evaluated from left to right:")
+NORMAL (U"优先级次高的运算符是#加法 (+) 和#减法 (-)， "
+	"自left向右评估：")
 CODE (U"3 - 8 + 7 \\-> 2       (from left to right)")                                //@praat assert 3 - 8 + 7 = 2
 CODE (U"3 - (8 + 7) \\-> -12   (use parentheses to change the order)")               //@praat assert 3 - (8 + 7) = -12
 CODE (U"3 + 8 * 7 \\-> 59      (multiplication before addition)")                    //@praat assert 3 + 8 * 7 = 59
@@ -510,8 +507,8 @@ CODE (U"(3 + 8) * 7 \\-> 77    (use parentheses to change the order)")          
 CODE (U"3 + - (2 \\^  4) \\-> -13   (exponentiation, negation, addition)")           //@praat assert 3 + - (2 ^ 4) = -13
 CODE (U"3 + 5 / 2 + 3 \\-> 8.5")                                                     //@praat assert 3 + 5 / 2 + 3 = 8.5
 CODE (U"(3 + 5) / (2 + 3) \\-> 1.6")                                                 //@praat assert (3 + 5) / (2 + 3) = 1.6
-NORMAL (U"The operators with the next highest precedence are the #comparison operators "
-	"(`=, <>, <, >, <=, >=`). These operators always yield 0 (%false) or 1 (%true):")
+NORMAL (U"优先级次高的运算符是#比较运算符 "
+	"（`=, <>, <, >, <=, >=`）。这些运算符总是返回 0（%false）或 1（%true）：")
 CODE (U"5 + 6 = 10 \\-> 0      (equal)")                                             //@praat assert ( 5 + 6 = 10 ) = 0
 CODE (U"5 + 6 = 11 \\-> 1")                                                          //@praat assert ( 5 + 6 = 11 ) = 1
 CODE (U"5 + 6 <> 10 \\-> 1     (unequal)")                                           //@praat assert ( 5 + 6 <> 10 ) = 1
@@ -524,9 +521,9 @@ CODE (U"5 + 6 <= 10 \\-> 0     (less than or equal)")                           
 CODE (U"5 + 6 <= 11 \\-> 1")                                                         //@praat assert ( 5 + 6 <= 11 ) = 1
 CODE (U"5 + 6 >= 10 \\-> 1     (greater or equal)")                                  //@praat assert ( 5 + 6 >= 10 ) = 1
 CODE (U"5 + 6 >= 11 \\-> 1")                                                         //@praat assert ( 5 + 6 >= 11 ) = 1
-NORMAL (U"The comparison operators are mainly used in #if, #while, and #until conditions.")
-NORMAL (U"The operators of lowest precedence are the #logical operators (#not, #and, and #or), of which #not has the "
-	"highest precedence and #or the lowest:")
+NORMAL (U"比较运算符主要用于 #if、#while 和 #until 条件中。")
+NORMAL (U"最低优先级的运算符是#逻辑运算符（#not、#and 和 #or），其中 #not 的优先级 "
+	"最高，#or 的优先级最低：")
 CODE (U"not 5 + 6 = 10 \\-> 1")                                                      //@praat assert ( not 5 + 6 = 10 ) = 1
 CODE (U"x > 5 and x < 10               (is x between 5 and 10?)")
 CODE (U"not x <= 5 and not x >= 10     (means the same as the previous line, except if x is undefined)")
@@ -551,31 +548,31 @@ CODE (U"not (x <= 5 or x >= 10)        (again means the same, except if x is und
 @*/
 ENTRY (U"String comparison")
 TERM (U"#`a$ = b$`")
-DEFINITION (U"gives the value %true (= 1) if the strings are equal, and %false (= 0) otherwise.")
+DEFINITION (U"如果字符串相等，则返回 %true (= 1)，否则返回 %false (= 0)。")
 TERM (U"#`a$ <> b$`")
-DEFINITION (U"gives the value %true if the strings are unequal, and %false otherwise.")
+DEFINITION (U"如果字符串不相等，则返回 %true，否则返回 %false。")
 TERM (U"#`a$ < b$`")
-DEFINITION (U"gives %true if the string %`a$` precedes the string %`b$` in Unicode sorting order. "
-	"Thus, \"ha\" < \"hal\" and \"ha\" < \"ja\" are true, but \"ha\" < \"JA\" is false, "
-	"because all capitals precede all lower-case characters in the Unicode sorting order.")
+DEFINITION (U"如果字符串 %`a$` 在 Unicode 排序顺序中排在 %`b$` 之前，则返回 %true。 "
+	"因此，\"ha\" < \"hal\" 和 \"ha\" < \"ja\" 为真，但 \"ha\" < \"JA\" 为假， "
+	"因为在 Unicode 排序顺序中，所有大写字母都在所有小写字母之前。")
 TERM (U"#`a$ > b$`")
-DEFINITION (U"%true if %`a$` comes after %`b$` in Unicode sorting order. ")
+DEFINITION (U"如果 %`a$` 在 Unicode 排序顺序中排在 %`b$` 之后，则为 %true。")
 TERM (U"#`a$ <= b$`")
-DEFINITION (U"gives the value %true if the string %`a$` precedes the string %`b$` in Unicode sorting order, "
-	"or if the strings are equal.")
+DEFINITION (U"如果字符串 %`a$` 在 Unicode 排序顺序中排在 %`b$` 之前， "
+	"或者如果两个字符串相等，则返回 %true。")
 TERM (U"#`a$ >= b$`")
 DEFINITION (U"%true if %`a$` comes after %`b$` or the two are equal.")
 ENTRY (U"String concatenation and truncation")
 TERM (U"#`a$ + b$`")
-DEFINITION (U"concatenates the two strings. After")
+DEFINITION (U"拼接两个字符串。执行")
 	CODE1 (U"text$ = \"hallo\" + \"dag\"")
-DEFINITION (U"the variable %`text$` contains the string “hallodag”.")
+DEFINITION (U"之后，变量 %`text$` 包含字符串 “hallodag”。")
 TERM (U"#`a$ - b$`")
-DEFINITION (U"subtracts the second string from the end of the first. After")
+DEFINITION (U"从第一个字符串的末尾减去第二个字符串。执行")
 CODE2 (U"soundFileName$ = \"hallo.aifc\"")
 CODE2 (U"textgridFileName$ = soundFileName$ - \".aifc\" + \".TextGrid\"")
-DEFINITION (U"the variable %`textgridFileName$` contains the string \"hallo.TextGrid\". "
-	"If the first string %`a$` does not end in the string %`b$`, the result of the subtraction is the string %`a$`.")
+DEFINITION (U"之后，变量 %`textgridFileName$` 包含字符串 \"hallo.TextGrid\"。 "
+	"如果第一个字符串 %`a$` 不以字符串 %`b$` 结尾，则减法的结果是字符串 %`a$`。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 4. Constants", U"ppgb", 20080318)
@@ -584,485 +581,462 @@ DEFINITION (U"%\\pi, 3.14159265358979323846264338328")
 TERM (U"##e")
 DEFINITION (U"%e, 2.71828182845904523536028747135")
 TERM (U"##undefined")
-DEFINITION (U"a special value, see @undefined")
+DEFINITION (U"一个特殊的值，参见 @undefined")
 MAN_END
 
 MAN_BEGIN (U"Formulas 5. Mathematical functions", U"ppgb", 20200801)
 TERM (U"##abs (%x)")
-DEFINITION (U"absolute value")
+DEFINITION (U"绝对值")
 TERM (U"##round (%x)")
-DEFINITION (U"nearest integer; round (1.5) = 2")
+DEFINITION (U"最接近的整数；round (1.5) = 2")
 TERM (U"##floor (%x)")
-DEFINITION (U"round down: highest integer value not greater than %x")
+DEFINITION (U"向下取整：不大于 %x 的最大整数值")
 TERM (U"##ceiling (%x)")
-DEFINITION (U"round up: lowest integer value not less than %x")
+DEFINITION (U"向上取整：不小于 %x 的最小整数值")
 TERM (U"##sqrt (%x)")
-DEFINITION (U"square root: \\Vr%x, %x \\>_ 0")
+DEFINITION (U"平方根：\\Vr%x，%x \\>_ 0")
 TERM (U"##min (%x, ...)")
-DEFINITION (U"the minimum of a series of numbers, e.g. min (7.2, -5, 3) = -5")
+DEFINITION (U"一系列数中的最小值，例如 min (7.2, -5, 3) = -5")
 TERM (U"##max (%x, ...)")
-DEFINITION (U"the maximum of a series of numbers, e.g. max (7.2, -5, 3) = 7.2")
+DEFINITION (U"一系列数中的最大值，例如 max (7.2, -5, 3) = 7.2")
 TERM (U"##imin (%x, ...)")
-DEFINITION (U"the location of the minimum, e.g. imin (7.2, -5, 3) = 2")
+DEFINITION (U"最小值的位置，例如 imin (7.2, -5, 3) = 2")
 TERM (U"##imax (%x, ...)")
-DEFINITION (U"the location of the maximum, e.g. imax (7.2, -5, 3) = 1")
+DEFINITION (U"最大值的位置，例如 imax (7.2, -5, 3) = 1")
 TERM (U"##sin (%x)")
-DEFINITION (U"sine")
+DEFINITION (U"正弦")
 TERM (U"##cos (%x)")
-DEFINITION (U"cosine")
+DEFINITION (U"余弦")
 TERM (U"##tan (%x)")
-DEFINITION (U"tangent")
+DEFINITION (U"正切")
 TERM (U"##arcsin (%x)")
-DEFINITION (U"arcsine, -1 \\<_ %x \\<_ 1")
+DEFINITION (U"反正弦，-1 \\<_ %x \\<_ 1")
 TERM (U"##arccos (%x)")
-DEFINITION (U"arccosine, -1 \\<_ %x \\<_ 1")
+DEFINITION (U"反余弦，-1 \\<_ %x \\<_ 1")
 TERM (U"##arctan (%x)")
-DEFINITION (U"arctangent")
+DEFINITION (U"反正切")
 TERM (U"##arctan2 (%y, %x)")
-DEFINITION (U"argument angle")
+DEFINITION (U"幅角")
 TERM (U"##sinc (%x)")
-DEFINITION (U"sinus cardinalis: sin (%x) / %x")
+DEFINITION (U"辛格函数（归一化正弦）：sin (%x) / %x")
 TERM (U"##sincpi (%x)")
-DEFINITION (U"sinc__%\\pi_: sin (%\\pi%x) / (%\\pi%x)")
+DEFINITION (U"辛格函数__%\\pi_：sin (%\\pi%x) / (%\\pi%x)")
 TERM (U"##exp (%x)")
-DEFINITION (U"exponentiation: %e^%x; same as ##e\\^ %x")
+DEFINITION (U"指数：%e^%x；与 ##e\\^ %x 相同")
 TERM (U"##ln (%x)")
-DEFINITION (U"natural logarithm, base %e")
+DEFINITION (U"自然对数，以 %e 为底")
 TERM (U"##log10 (%x)")
-DEFINITION (U"logarithm, base 10")
+DEFINITION (U"对数，以 10 为底")
 TERM (U"##log2 (%x)")
-DEFINITION (U"logarithm, base 2")
+DEFINITION (U"对数，以 2 为底")
 TERM (U"##sinh (%x)")
-DEFINITION (U"hyperbolic sine: (%e^%x - %e^^-%x^) / 2")
+DEFINITION (U"双曲正弦：(%e^%x - %e^^-%x^) / 2")
 TERM (U"##cosh (%x)")
-DEFINITION (U"hyperbolic cosine: (%e^%x + %e^^-%x^) / 2")
+DEFINITION (U"双曲余弦：(%e^%x + %e^^-%x^) / 2")
 TERM (U"##tanh (%x)")
-DEFINITION (U"hyperbolic tangent: sinh (%x) / cosh (%x)")
+DEFINITION (U"双曲正切：sinh (%x) / cosh (%x)")
 TERM (U"##arcsinh (%x)")
-DEFINITION (U"inverse hyperbolic sine: ln (%x + \\Vr(1+%x^2))")
+DEFINITION (U"反双曲正弦：ln (%x + \\Vr(1+%x^2))")
 TERM (U"##arccosh (%x)")
-DEFINITION (U"inverse hyperbolic cosine: ln (%x + \\Vr(%x^2−1))")
+DEFINITION (U"反双曲余弦：ln (%x + \\Vr(%x^2−1))")
 TERM (U"##arctanh (%x)")
-DEFINITION (U"inverse hyperbolic tangent")
+DEFINITION (U"反双曲正切")
 TERM (U"##sigmoid (%x)")
-DEFINITION (U"#R \\-> (0,1): 1 / (1 + %e^^−%x^) or 1 − 1 / (1 + %e^%x)")
+DEFINITION (U"#R \\-> (0,1)：1 / (1 + %e^^−%x^) 或 1 − 1 / (1 + %e^%x)")
 TERM (U"##invSigmoid (%x)")
-DEFINITION (U"(0,1) \\-> #R: ln (%x / (1 − %x))")
+DEFINITION (U"(0,1) \\-> #R：ln (%x / (1 − %x))")
 TERM (U"##erf (%x)")
-DEFINITION (U"the error function: 2/\\Vr%\\pi __0_\\in^%x exp(-%t^2) %dt")
+DEFINITION (U"误差函数：2/\\Vr%\\pi __0_\\in^%x exp(-%t^2) %dt")
 TERM (U"##erfc (%x)")
-DEFINITION (U"the complement of the error function: 1 - erf (%x)")
+DEFINITION (U"互补误差函数：1 - erf (%x)")
 TERM (U"##randomUniform (%min, %max)")
-DEFINITION (U"a uniform random real number between %min (inclusive) and %max (exclusive)")
+DEFINITION (U"在 %min（闭区间）和 %max（开区间）之间的均匀分布随机实数")
 TERM (U"##randomInteger (%min, %max)")
-DEFINITION (U"a uniform random integer number between %min and %max (inclusive)")
+DEFINITION (U"在 %min 和 %max 之间的均匀分布随机整数（闭区间）")
 TERM (U"##randomGauss (%\\mu, %\\si)")
-DEFINITION (U"a Gaussian random real number with mean %\\mu and standard deviation %\\si")
+DEFINITION (U"以 %\\mu 为均值、%\\si 为标准差的高斯分布随机实数")
 TERM (U"##randomPoisson (%mean)")
-DEFINITION (U"a Poisson random real number")
+DEFINITION (U"泊松分布随机实数")
 TERM (U"##randomGamma (%%shape%, %%rate%)")
-DEFINITION (U"a random number drawn from a Gamma distribution with shape parameter %\\al "
-	"and rate parameter %\\be, which is defined as "
-	"%f(%x; %\\al, %\\be) = (1 / \\Ga (%\\al)) %\\be%^^%\\al^ %x^^%\\al−1^ %e^^−%\\be %x^, "
-	"for %x > 0, %\\al > 0 and %\\be > 0, following the method by @@Marsaglia & Tsang (2000)@")
+DEFINITION (U"从 Gamma 分布中抽取的随机数，其形状参数为 %\\al "
+	"且率参数为 %\\be，其定义为 "
+	"%f(%x; %\\al, %\\be) = (1 / \\Ga (%\\al)) %\\be%^^%\\al^ %x^^%\\al−1^ %e^^−%\\be %x^，"
+	"对于 %x > 0、%\\al > 0 且 %\\be > 0，遵循 @@Marsaglia & Tsang (2000)@ 的方法")
 TERM (U"##random\\_ initializeWithSeedUnsafelyButPredictably (%seed)")
-DEFINITION (U"can be used in a script to create a reproducible sequence of random numbers "
-	"(warning: this exceptional situation will continue to exist throughout Praat until you call the following function)")
+DEFINITION (U"可用于脚本中以创建可重复的随机数序列 "
+	"（警告：这种异常状态将在整个 Praat 中持续存在，直到您调用以下函数为止）")
 TERM (U"##random\\_ initializeSafelyAndUnpredictably ()")
-DEFINITION (U"undoes the exceptional situation caused by the previous function")
+DEFINITION (U"撤销由前一个函数引起的异常状态")
 TERM (U"##lnGamma (%x)")
-DEFINITION (U"logarithm of the \\Ga function")
+DEFINITION (U"\\Ga 函数的对数")
 TERM (U"##gaussP (%z)")
-DEFINITION (U"the area under the Gaussian distribution between −\\oo and %z")
+DEFINITION (U"从 −\\oo 到 %z 的高斯分布下的面积")
 TERM (U"##gaussQ (%z)")
-DEFINITION (U"the area under the Gaussian distribution between %z and +\\oo: "
-	"the one-tailed \"statistical significance %p\" of a value that is %z standard deviations "
-	"away from the mean of a Gaussian distribution")
+DEFINITION (U"在 %z 到 +\\oo 之间的高斯分布下面积："
+	"偏离高斯分布均值 %z 个标准差的数值的单尾\"统计显著性 %p\"")
 TERM (U"##invGaussQ (%q)")
-DEFINITION (U"the value of %z for which $gaussQ (%z) = %q")
+DEFINITION (U"使得 $gaussQ (%z) = %q 的 %z 值")
 TERM (U"##chiSquareP (%`chiSquare`, %`df`)")
-DEFINITION (U"the area under the %\\ci^2 distribution between 0 and %chiSquare, for %`df` degrees of freedom")
+DEFINITION (U"在 0 到 %chiSquare 之间的 %\\ci^2 分布下的面积，具有 %`df` 自由度")
 TERM (U"##chiSquareQ (%`chiSquare`, %`df`)")
-DEFINITION (U"the area under the %\\ci^2 distribution between %`chiSquare` and +\\oo, "
-	"for %df degrees of freedom: the \"statistical significance %p\" "
-	"of the %\\ci^2 difference between two distributions in %df+1 dimensions")
+DEFINITION (U"在 %`chiSquare` 到 +\\oo 之间的 %\\ci^2 分布下面积，"
+	"具有 %df 自由度：在 %df+1 维中两个分布之间的 %\\ci^2 差异的 \"统计显著性 %p\"")
 TERM (U"##invChiSquareQ (%q, %df)")
-DEFINITION (U"the value of %\\ci^2 for which $chiSquareQ (%\\ci^2, %df) = %q")
+DEFINITION (U"使得 $chiSquareQ (%\\ci^2, %df) = %q 的 %\\ci^2 值")
 TERM (U"##studentP (%t, %df)")
-DEFINITION (U"the area under the student T-distribution from -\\oo to %t")
+DEFINITION (U"从 -\\oo 到 %t 的学生 t-分布面积")
 TERM (U"##studentQ (%t, %df)")
-DEFINITION (U"the area under the student T-distribution from %t to +\\oo")
+DEFINITION (U"从 %t 到 +\\oo 的学生 t-分布面积")
 TERM (U"##invStudentQ (%q, %df)")
-DEFINITION (U"the value of %t for which $studentQ (%t, %df) = %q")
+DEFINITION (U"使得 $studentQ (%t, %df) = %q 的 %t 值")
 TERM (U"##fisherP (%f, %df1, %df2)")
-DEFINITION (U"the area under Fisher's F-distribution from 0 to %f")
+DEFINITION (U"从 0 到 %f 的费希尔 F-分布面积")
 TERM (U"##fisherQ (%f, %df1, %df2)")
-DEFINITION (U"the area under Fisher's F-distribution from %f to +\\oo")
+DEFINITION (U"从 %f 到 +\\oo 的费希尔 F-分布面积")
 TERM (U"##invFisherQ (%q, %df1, %df2)")
-DEFINITION (U"the value of %f for which $fisherQ (%f, %df1, %df2) = %q")
+DEFINITION (U"使得 $fisherQ (%f, %df1, %df2) = %q 的 %f 值")
 TERM (U"##binomialP (%p, %k, %n)")
-DEFINITION (U"the probability that in %n experiments, an event with probability %p will occur at most %k times")
+DEFINITION (U"在 %n 次试验中，发生概率为 %p 的事件最多发生 %k 次的概率")
 TERM (U"@`binomialQ` (%p, %k, %n)")
-DEFINITION (U"the probability that in %n experiments, an event with probability %p will occur at least %k times; equals 1 - $binomialP (%p, %k - 1, %n)")
+DEFINITION (U"在 %n 次试验中，发生概率为 %p 的事件最少发生 %k 次的概率；等于 1 - $binomialP (%p, %k - 1, %n)")
 TERM (U"##invBinomialP (%P, %k, %n)")
-DEFINITION (U"the value of %p for which $binomialP (%p, %k, %n) = %P")
+DEFINITION (U"使得 $binomialP (%p, %k, %n) = %P 的 %p 值")
 TERM (U"@`invBinomialQ` (%Q, %k, %n)")
-DEFINITION (U"the value of %p for which $binomialQ (%p, %k, %n) = %Q")
+DEFINITION (U"使得 $binomialQ (%p, %k, %n) = %Q 的 %p 值")
 TERM (U"##hertzToBark (%x)")
-DEFINITION (U"from acoustic frequency to Bark-rate (perceptual spectral frequency; place on basilar membrane): "
+DEFINITION (U"从声学频率到 Bark 频率（知觉频谱频率；基底膜上的位置）："
 	"7 ln (%x/650 + \\Vr(1 + (%x/650)^2))")
 TERM (U"##barkToHertz (%x)")
 DEFINITION (U"650 sinh (%x / 7)")
 TERM (U"##hertzToMel (%x)")
-DEFINITION (U"from acoustic frequency to perceptual pitch: 550 ln (1 + %x / 550)")
+DEFINITION (U"从声学频率到知觉音高：550 ln (1 + %x / 550)")
 TERM (U"##melToHertz (%x)")
 DEFINITION (U"550 (exp (%x / 550) - 1)")
 TERM (U"##hertzToSemitones (%x)")
-DEFINITION (U"from acoustic frequency to a logarithmic musical scale, relative to 100 Hz: 12 ln (%x / 100) / ln 2")
+DEFINITION (U"从声学频率到对数音乐音阶（相对于 100 Hz）：12 ln (%x / 100) / ln 2")
 TERM (U"##semitonesToHertz (%x)")
 DEFINITION (U"100 exp (%x ln 2 / 12)")
 TERM (U"##erb (%f)")
-DEFINITION (U"the perceptual %%equivalent rectangular bandwidth% (ERB) in hertz, for a specified acoustic frequency (also in hertz): "
+DEFINITION (U"对于指定的声学频率（也以赫兹为单位），以赫兹为单位的知觉 %%等效矩形带宽% (ERB)："
 	"6.23\\.c10^^-6^ %f^2 + 0.09339 %f + 28.52")
 TERM (U"##hertzToErb (%x)")
-DEFINITION (U"from acoustic frequency to ERB-rate: 11.17 ln ((%x + 312) / (%x + 14680)) + 43")
+DEFINITION (U"从声学频率到 ERB 频率：11.17 ln ((%x + 312) / (%x + 14680)) + 43")
 TERM (U"##erbToHertz (%x)")
-DEFINITION (U"(14680 %d - 312) / (1 - %d) where %d = exp ((%x - 43) / 11.17)")
+DEFINITION (U"(14680 %d - 312) / (1 - %d)，其中 %d = exp ((%x - 43) / 11.17)")
 TERM (U"@`phonToDifferenceLimens` (%x)")
-DEFINITION (U"from perceptual loudness (intensity sensation) level in phon, to the number of intensity "
-	"difference limens above threshold: 30 · ((61/60)^^ %x^ − 1).")
+DEFINITION (U"从以方（phon）为单位的知觉响度（音强感觉）水平，到阈值之上的音强差辨限数量：30 · ((61/60)^^ %x^ − 1)。")
 TERM (U"@`differenceLimensToPhon` (%x)")
-DEFINITION (U"the inverse of the previous: ln (1 + %x / 30) / ln (61 / 60).")
+DEFINITION (U"前者的逆函数：ln (1 + %x / 30) / ln (61 / 60)。")
 TERM (U"##beta (%x, %y)")
 TERM (U"##besselI (%n, %x)")
 TERM (U"##besselK (%n, %x)")
-NORMAL (U"For functions with arrays, see @@Scripting 5.7. Vectors and matrices@.")
+NORMAL (U"关于带有数组的函数，参见 @@Scripting 5.7. Vectors and matrices@。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 6. String functions", U"ppgb", 20180825)
-INTRO (U"String functions are functions that either return a text string or have at least one text string as an argument. "
-	"Since string computations are not very useful in the @calculator, in settings windows, or in creation and "
-	"modification formulas, this page only gives examples of strings in scripts, so that the example may contain "
-	"string variables.")
+INTRO (U"字符串函数是返回文本字符串或至少以一个文本字符串作为参数的函数。"
+	"由于字符串计算在 @calculator、设置窗口或创建和修改公式中不太有用，因此本页仅给出脚本中字符串的示例，以便示例可以包含字符串变量。")
 /*@praat
 	string$ = "hallo"
 	length = length (string$ + "dag")
 	assert length = 8
 @*/
 TERM (U"#`length (a$)")
-DEFINITION (U"gives the length of the string. After")
+DEFINITION (U"给出字符串的长度。在执行")
 		CODE2 (U"string$ = \"hallo\"")
 		CODE2 (U"length = length (string$ + \"dag\")")
-DEFINITION (U"the variable %`length` contains the number 8 (by the way, from this example "
-	"you see that variables can have the same names as functions, without any danger of confusing the interpreter).")
+DEFINITION (U"之后，变量 %`length` 包含数字 8（顺便提一下，从这个例子中您可以看到变量可以与函数同名，而不会有混淆解释器的危险）。")
 /*@praat
 	head$ = left$ ("hallo", 3)
 	assert head$ = "hal"
 @*/
 TERM (U"#`left$ (a$, n)")
-DEFINITION (U"gives a string consisting of the first %n characters of %`a$`. After")
+DEFINITION (U"给出一个由 %`a$` 的前 %n 个字符组成的字符串。在执行")
 		CODE2 (U"head$ = left$ (\"hallo\", 3)")
-DEFINITION (U"the variable %`head$` contains the string \"hal\".")
+DEFINITION (U"之后，变量 %`head$` 包含字符串 \"hal\"。")
 /*@praat
 	english$ = "he" + right$ ("hallo", 3)
 	assert english$ = "hello"
 @*/
 TERM (U"#`right$ (a$, n)")
-DEFINITION (U"gives a string consisting of the last %n characters of %`a$`. After")
+DEFINITION (U"给出一个由 %`a$` 的后 %n 个字符组成的字符串。在执行")
 		CODE2 (U"english$ = \"he\" + right$ (\"hallo\", 3)")
-DEFINITION (U"the variable %`english$` contains the string \"hello\".")
+DEFINITION (U"之后，变量 %`english$` 包含字符串 \"hello\"。")
 /*@praat
 	assert mid$ ("hello", 3, 2) = "ll"
 @*/
 TERM (U"#`mid$ (\"hello\" , 3, 2)")
-DEFINITION (U"gives a string consisting of 2 characters from “hello”, starting at the third character. Outcome: ll.")
+DEFINITION (U"给出一个由 “hello” 中从第三个字符开始的 2 个字符组成的字符串。结果为：ll。")
 /*@praat
 	where = index ("hallo allemaal", "al")
 	assert where = 2
 	assert index ("hallo allemaal", "fhjgfhj") = 0
 @*/
 TERM (U"#`index (a$, b$)")
-DEFINITION (U"gives the index of the first occurrence of the string %`b$` in the string %`a$`. After")
+DEFINITION (U"给出字符串 %`b$` 在字符串 %`a$` 中首次出现的位置索引。在执行")
 		CODE2 (U"where = index (\"hallo allemaal\", \"al\")")
-DEFINITION (U"the variable %`where` contains the number 2, because the first “al” starts at the second character of the longer string. "
-	"If the first string does not contain the second string, %`index` returns 0.")
+DEFINITION (U"之后，变量 %`where` 包含数字 2，因为第一个 “al” 从长字符串的第二个字符开始。"
+	"如果第一个字符串不包含第二个字符串，则 %`index` 返回 0。")
 /*@praat
 	where = rindex ("hallo allemaal", "al")
 	assert where = 13
 	assert rindex ("hallo allemaal", "fhjgfhj") = 0
 @*/
 TERM (U"#`rindex (a$, b$)")
-DEFINITION (U"gives the index of the last occurrence of the string %`b$` in the string %`a$`. After")
+DEFINITION (U"给出字符串 %`b$` 在字符串 %`a$` 中最后一次出现的位置索引。在执行")
 		CODE2 (U"where = rindex (\"hallo allemaal\", \"al\")")
-DEFINITION (U"the variable %`where` contains the number 13, because the last “al” starts at the 13th character. "
-	"If the first string does not contain the second string, %`rindex` returns 0.")
+DEFINITION (U"之后，变量 %`where` 包含数字 13，因为最后一个 “al” 从第 13 个字符开始。"
+	"如果第一个字符串不包含第二个字符串，则 %`rindex` 返回 0。")
 /*@praat
 	where = startsWith ("internationalization", "int")
 	assert where = 1
 @*/
 TERM (U"#`startsWith (a$, b$)")
-DEFINITION (U"determines whether the string %`a$` starts with the string %`b$`. After")
+DEFINITION (U"判断字符串 %`a$` 是否以字符串 %`b$` 开头。在执行")
 		CODE2 (U"where = startsWith (\"internationalization\", \"int\")")
-DEFINITION (U"the variable %`where` contains the number 1 (true).")
+DEFINITION (U"之后，变量 %`where` 包含数字 1（真）。")
 /*@praat
 	where = endsWith ("internationalization", "nation")
 	assert where = 0
 @*/
 TERM (U"#`endsWith (a$, b$)")
-DEFINITION (U"determines whether the string %`a$` ends with the string %`b$`. After")
+DEFINITION (U"判断字符串 %`a$` 是否以字符串 %`b$` 结尾。在执行")
 		CODE2 (U"where = endsWith (\"internationalization\", \"nation\")")
-DEFINITION (U"the variable %where contains the number 0 (false).")
+DEFINITION (U"之后，变量 %where 包含数字 0（假）。")
 TERM (U"#`replace$ (a$, b$, c$, n)")
-DEFINITION (U"gives a string that is like %`a$`, but where (at most %n) occurrences of %`b$` are replaced with the string %`c$`. After")
+DEFINITION (U"给出一个类似于 %`a$` 的字符串，但其中（最多 %n 处）出现的 %`b$` 被替换为字符串 %`c$`。在执行")
 		CODE2 (U"s$ = replace$ (\"hello\", \"l\", \"m\", 0)")
-DEFINITION (U"the variable %`s$` contains the string \"hemmo\". After")
+DEFINITION (U"之后，变量 %`s$` 包含字符串 \"hemmo\"。在执行")
 		CODE2 (U"s$ = replace$ (\"hello\", \"l\", \"m\", 1)")
-DEFINITION (U"the variable %`s$` contains the string \"hemlo\". The number %n determines the maximum number of occurrences of %`b$` "
-	"that can be replaced. If %n is 0, all occurrences are replaced.")
+DEFINITION (U"之后，变量 %`s$` 包含字符串 \"hemlo\"。数字 %n 决定了可以替换的 %`b$` 的最大出现次数。如果 %n 为 0，则替换所有出现的地方。")
 TERM (U"#`index_regex (a$, b$)")
-DEFINITION (U"determines where the string %`a$` first matches the @@regular expressions|regular expression@ %`b$`. After")
+DEFINITION (U"判断字符串 %`a$` 首次匹配 @@regular expressions|正则表达式@ %`b$` 的位置。在执行")
 		CODE2 (U"where = index_regex (\"internationalization\", \"a.*n\")")
-DEFINITION (U"the variable %`where` contains the number 7. If there is no match, the outcome is 0.")
+DEFINITION (U"之后，变量 %`where` 包含数字 7。如果没有匹配项，则结果为 0。")
 TERM (U"#`rindex_regex (a$, b$)")
-DEFINITION (U"determines where the string %`a$` last matches the @@regular expressions|regular expression@ %`b$`. After")
+DEFINITION (U"判断字符串 %`a$` 最后一次匹配 @@regular expressions|正则表达式@ %`b$` 的位置。在执行")
 		CODE2 (U"where = rindex_regex (\"internationalization\", \"a.*n\")")
-DEFINITION (U"the variable %`where` contains the number 16. If there is no match, the outcome is 0.")
+DEFINITION (U"之后，变量 %`where` 包含数字 16。如果没有匹配项，则结果为 0。")
 TERM (U"#`replace_regex$ (a$, b$, c$, n)")
-DEFINITION (U"gives a string that is like %`a$`, but where (at most %n) substrings that match the @@regular expressions|regular expression@ %`b$` "
-	"are replaced with the expression %`c$`. After")
+DEFINITION (U"给出一个类似于 %`a$` 的字符串，但其中（最多 %n 个）匹配 @@regular expressions|正则表达式@ %`b$` 的子字符串被替换为表达式 %`c$`。在执行")
 		CODE2 (U"s$ = replace_regex$ (\"hello\", \".\", \"&&\", 0)")
-DEFINITION (U"the variable %`s$` contains the string \"hheelllloo\". If there is no match, "
-	"the outcome is the original string %`a$`. After")
+DEFINITION (U"之后，变量 %`s$` 包含字符串 \"hheelllloo\"。如果没有匹配项，则结果为原始字符串 %`a$`。在执行")
 		CODE2 (U"s$ = replace_regex$ (\"hello\", \".\", \"&&\", 1)")
-DEFINITION (U"the variable %`s$` contains the string \"hhello\". The number %n determines the maximum number of text pieces "
-	"that can be replaced. If %n is 0, all matching text pieces are replaced.")
+DEFINITION (U"之后，变量 %`s$` 包含字符串 \"hhello\"。数字 %n 决定了可以替换的匹配文本片段的最大数量。如果 %n 为 0，则替换所有匹配的文本片段。")
 TERM (U"#`string$ (number)")
-DEFINITION (U"formats a number as a string. Thus, `string$ (5e6)` "
-	"becomes the string `5000000`, and `string$ (56%)` becomes the string `0.56`.")
+DEFINITION (U"将数字格式化为字符串。因此，`string$ (5e6)`"
+	"变成字符串 `5000000`，而 `string$ (56%)` 变成字符串 `0.56`。")
 TERM (U"#`fixed$ (number, precision)")
-DEFINITION (U"formats a number as a string with %precision digits after the decimal point. Thus, `fixed$ (72.65687, 3)` "
-	"becomes the string `72.657`, and `fixed$ (72.65001, 3)` becomes the string `72.650`. "
-	"In these examples, we see that the result can be rounded up and that trailing zeroes are kept. "
-	"At least one digit of precision is always given, e.g. `fixed$ (0.0000157, 3)` becomes the string `0.00002`. "
-	"The number 0 always becomes the string `0`.")
+DEFINITION (U"将数字格式化为在小数点后具有 %precision 位数字的字符串。因此，`fixed$ (72.65687, 3)`"
+	"变成字符串 `72.657`，而 `fixed$ (72.65001, 3)` 变成字符串 `72.650`。"
+	"在这些示例中，我们看到结果可以四舍五入，并且保留了末尾的零。"
+	"总是会给出至少一位精度的数字，例如 `fixed$ (0.0000157, 3)` 变成字符串 `0.00002`。"
+	"数字 0 总是变成字符串 `0`。")
 TERM (U"#`percent$ (number, precision)")
-DEFINITION (U"the same as `fixed$` (), but with a percent sign. For instance, `percent$ (0.157, 3)` becomes `15.700%`, "
-	"`percent$ (0.000157, 3)` becomes `0.016%`, and `percent$ (0.000000157, 3)` becomes `0.00002%`. "
-	"The number 0 always becomes the string `0`.")
+DEFINITION (U"与 `fixed$` () 相同，但带有百分号。例如，`percent$ (0.157, 3)` 变成 `15.700%`，"
+	"`percent$ (0.000157, 3)` 变成 `0.016%`，而 `percent$ (0.000000157, 3)` 变成 `0.00002%`。"
+	"数字 0 总是变成字符串 `0`。")
 /*@praat
 	string$ = "5e6"
 	assert 3 + number (string$) = 5000003
 @*/
 TERM (U"#`number (a$)")
-DEFINITION (U"interprets a string as a number. After")
+DEFINITION (U"将字符串解析为数字。在执行")
 		CODE2 (U"string$ = \"5e6\"")
 		CODE2 (U"writeInfoLine: 3 + number (string$)")
-DEFINITION (U"the Info window contains the number 5000003.")
+DEFINITION (U"之后，信息窗口（Info window）中包含数字 5000003。")
 TERM (U"#`date$ ( )")
-DEFINITION (U"gives the date and time in the following format:")
+DEFINITION (U"以以下格式给出日期和时间：")
 		CODE2 (U"Mon Jun 24 17:11:21 2002")
-DEFINITION (U"To write the day of the month into the Info window, you type:")
+DEFINITION (U"要在信息窗口中写入该月的第几天，您可以输入：")
 		CODE2 (U"date$ = date$ ()")
 		CODE2 (U"day$ = mid$ (date$, 9, 2)")
 		CODE2 (U"writeInfoLine: \"The month day is \", day$, \".\"")
 TERM (U"#`unicode$ (228)")
-DEFINITION (U"gives the 228th Unicode codepoint, i.e. \"ä\".")
+DEFINITION (U"给出第 228 个 Unicode 码点，即 \"ä\"。")
 TERM (U"#`unicode (\"ä\")")
-DEFINITION (U"gives the Unicode codepoint number of \"ä\", i.e. 228.")
+DEFINITION (U"给出 \"ä\" 的 Unicode 码点值，即 228。")
 TERM (U"#`extractNumber (\"Type: Sound\" + newline$ + \"Name: hello there\" + newline$ + \"Size: 44007\", \"Size:\")")
-DEFINITION (U"looks for a number after the first occurrence of “Size:” in the long string. Outcome: 44007. "
-	"This is useful in scripts that try to get information from long reports, as the following script that "
-	"runs in the Sound editor window:")
+DEFINITION (U"在长字符串中首次出现 “Size:” 之后寻找数字。结果：44007。"
+	"这在尝试从长报告中获取信息的脚本中非常有用，例如以下在声音编辑器窗口中运行的脚本：")
 		CODE2 (U"report$ = Editor info")
 		CODE2 (U"maximumFrequency = extractNumber (report$, \"Spectrogram window length:\")")
 TERM (U"#`extractWord$ (\"Type: Sound\" + newline$ + \"Name: hello there\" + newline$ + \"Size: 44007\", \"Type:\")")
-DEFINITION (U"looks for a word without spaces after the first occurrence of \"Type:\" in the long string. Outcome: Sound.")
+DEFINITION (U"在长字符串中首次出现 \"Type:\" 之后寻找不带空格的单词。结果：Sound。")
 TERM (U"#`extractLine$ (\"Type: Sound\" + newline$ + \"Name: hello there\" + newline$ + \"Size: 44007\", \"Name: \")")
-DEFINITION (U"looks for the rest of the line (including spaces) after the first occurrence of “Name: ” in the long string. "
-	"Outcome: hello there. Note how “Name: ” includes a space, so that the “rest of the line” starts with the %h.")
+DEFINITION (U"在长字符串中首次出现 “Name: ” 之后寻找该行的其余部分（包括空格）。"
+	"结果：hello there。请注意 “Name: ” 是如何包含一个空格的，因此 “该行的其余部分” 以 %h 开头。")
 TERM (U"#`backslashTrigraphsToUnicode$ (x$), unicodeToBackslashTrigraphs$ (x$)")
-DEFINITION (U"converts e.g. \\bsct to \\ct or the reverse. See @@Special symbols@.")
+DEFINITION (U"例如将 \\bsct 转换成 \\ct 或反向转换。参见 @@Special symbols@。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 7. Control structures", U"ppgb", 20031228)
 ENTRY (U"if ... then ... else ... fi")
-NORMAL (U"You can use conditional expressions in all formulas. For example, ")
+NORMAL (U"您可以在所有公式中使用条件表达式。例如，")
 CODE (U"3 * if 52% * 3908 > 2000 then 5 else 6 fi")
-NORMAL (U"evaluates to 15. Instead of #`fi`, you can also use #`endif`.")
-NORMAL (U"Another example: you can clip the absolute amplitude of a Sound to 0.5 by supplying the following formula:")
+NORMAL (U"的值为 15。除了 #`fi`，您也可以使用 #`endif`。")
+NORMAL (U"另一个例子：您可以通过提供以下公式将 @Sound（声音） 的绝对振幅限制在 0.5 内：")
 CODE (U"if abs(self)>0.5 then if self>0 then 0.5 else -0.5 fi else self fi")
-ENTRY (U"The semicolon")
-NORMAL (U"The semicolon ends the evaluation of the formula. This can be convenient "
-	"if you do not want to overwrite a long formula in your text field: the formula")
+ENTRY (U"分号")
+NORMAL (U"分号结束公式的计算。如果您不想覆盖文本框中的长公式，这会很方便：公式")
 CODE (U"800;sqrt(2)*sin(2*pi*103*0.5)+10^(-40/20)*randomGauss(0,1)")
-NORMAL (U"evaluates to 800.")
+NORMAL (U"的值为 800。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 8. Attributes of objects", U"ppgb", 20221202)
-NORMAL (U"You can refer to several attributes of objects that are visible in the @@List of Objects@. "
-	"To do so, use either the unique ID of the object, or the type and the name of the object. "
-	"Thus, `object[113]` refers to the object that has the number 113 in the list, "
-	"and `object[\"Sound hallo\"]` refers to an existing Sound object whose name is “hallo” "
-	"(if there is more than one such object, it refers to the one that was created last).")
-NORMAL (U"To refer to an attribute, you use the period (\".\"). "
-	"Thus, `object[\"Sound hallo\"].nx` is the number of samples of the Sound called `hallo`, and "
-	"`1/object[\"Sound hallo\"].dx` is its sampling frequency.")
-ENTRY (U"Attributes in the calculator")
-NORMAL (U"Record a Sound (read the @Intro if you do not know how to do that), "
-	"and name it `mysound` (or anything else). An object with a name like `3. Sound mysound` "
-	"will appear in the list. Then type into the @calculator the formula")
+NORMAL (U"您可以引用在 @@List of Objects|对象列表@ 中可见的对象的几个属性。"
+	"为此，可以使用该对象的唯一 ID，或者使用该对象的类型和名称。"
+	"因此，`object[113]` 指的是列表中编号为 113 的对象，"
+	"而 `object[\"Sound hallo\"]` 指的是名为 “hallo” 的现有 Sound（声音） 对象"
+	"（如果存在多个此类对象，则指的是最后创建的那个）。")
+NORMAL (U"要引用属性，可以使用点号 (\".\")。"
+	"因此，`object[\"Sound hallo\"].nx` 是名为 `hallo` 的 Sound（声音） 的采样数，而"
+	"`1/object[\"Sound hallo\"].dx` 是其采样频率。")
+ENTRY (U"在计算器中引用属性")
+NORMAL (U"录制一段 Sound（声音）（如果您不知道该怎么做，请阅读 @Intro ），"
+	"并将其命名为 `mysound`（或任何其他名称）。一个类似于 `3. Sound mysound` 的对象将出现在列表中。"
+	"然后在 @calculator 中输入公式")
 CODE (U"object[3].nx")
-NORMAL (U"or")
+NORMAL (U"或")
 CODE (U"object[\"Sound mysound\"].nx")
-NORMAL (U"After you click OK, the Info window will show the number of samples. Since you could have got this result "
-	"by simply selecting the object and choosing ##Get number of samples# from the @@Query submenu@, "
-	"these attribute tricks are not very useful in the calculator. "
-	"We will see that they are much more useful in creation and modification formulas and in scripts.")
-ENTRY (U"List of possible attributes")
-NORMAL (U"The following attributes are available:")
+NORMAL (U"单击“确定”（OK）后，信息窗口（Info window）将显示采样数。由于您只需选择对象并从 @@Query submenu|查询子菜单@ 中选择 ##Get number of samples# 即可获得此结果，"
+	"因此这些属性技巧在计算器中并不是很有用。"
+	"我们将看到它们在创建和修改公式以及脚本中要有用得多。")
+ENTRY (U"可能属性的列表")
+NORMAL (U"以下属性可用：")
 TERM (U"#`xmin`")
-DEFINITION (U"the start of the time domain (usually 0) for a @Sound, @Pitch, @Formant, "
-	"@Spectrogram, @Intensity, @Cochleagram, @PointProcess, or @Harmonicity object, in seconds; "
-	"the lowest frequency (always 0) for a @Spectrum object, in hertz; "
-	"the lowest frequency (usually 0) for an @Excitation object, in Bark; "
-	"the left edge of the %x domain for a @Matrix object.")
+DEFINITION (U"对于 @Sound（声音）、@Pitch（基频/音高）、@Formant（共振峰）、"
+	"@Spectrogram（声谱图）、@Intensity（音强）、@Cochleagram（耳蜗图）、@PointProcess（点过程） 或 @Harmonicity（谐噪比） 对象，为时间域的起点（通常为 0），以秒为单位；"
+	"对于 @Spectrum（频谱） 对象，为最低频率（总是 0），以赫兹为单位；"
+	"对于 @Excitation（激发图） 对象，为最低频率（通常为 0），以 Bark 为单位；"
+	"对于 @Matrix（矩阵） 对象，为 %x 域的左边界。")
 TERM (U"#`xmax`")
-DEFINITION (U"the end of the time domain (usually the duration, if %xmin is zero) for a Sound, Pitch, Formant, "
-	"Spectrogram, Intensity, Cochleagram, PointProcess, or Harmonicity object, in seconds; "
-	"the highest frequency (@@Nyquist frequency@) for a Spectrum object, e.g. 11025 hertz; "
-	"the highest frequency for an Excitation object, often 25.6 Bark; "
-	"the right edge of the %x domain for a Matrix object.")
+DEFINITION (U"对于 Sound（声音）、Pitch（基频/音高）、Formant（共振峰）、"
+	"Spectrogram（声谱图）、Intensity（音强）、Cochleagram（耳蜗图）、PointProcess（点过程） 或 Harmonicity（谐噪比） 对象，为时间域的终点（通常为时长，如果 %xmin 为零），以秒为单位；"
+	"对于 Spectrum（频谱） 对象，为最高频率（@@Nyquist frequency|奈奎斯特频率@），例如 11025 赫兹；"
+	"对于 Excitation（激发图） 对象，为最高频率，通常为 25.6 Bark；"
+	"对于 Matrix（矩阵） 对象，为 %x 域的右边界。")
 TERM (U"#`ncol`")
-DEFINITION (U"the number of columns in a @Matrix, @TableOfReal, or @Table object.")
+DEFINITION (U"在 @Matrix（矩阵）、@TableOfReal 或 @Table（表） 对象中的列数。")
 TERM (U"#`nrow`")
-DEFINITION (U"the number of rows in a @Matrix, @TableOfReal, or @Table object.")
+DEFINITION (U"在 @Matrix（矩阵）、@TableOfReal 或 @Table（表） 对象中的行数。")
 TERM (U"#`col$` [%`i`]")
-DEFINITION (U"the name of column %`i` in a @TableOfReal or @Table object.")
+DEFINITION (U"在 @TableOfReal 或 @Table（表） 对象中第 %`i` 列的名称。")
 TERM (U"#`row$` [%`i`]")
-DEFINITION (U"the name of row %`i` in a @TableOfReal object.")
+DEFINITION (U"在 @TableOfReal 对象中第 %`i` 行的名称。")
 TERM (U"#`nx`")
-DEFINITION (U"the number of samples in a Sound object; "
-	"the number of analysis frames in a Pitch, Formant, Spectrogram, Intensity, Cochleagram, or Harmonicity object; "
-	"the number of frequency bins in a Spectrum or Excitation object; "
-	"the number of divisions of the %x domain for a Matrix object (= %`ncol`).")
+DEFINITION (U"在 Sound（声音） 对象中的采样数；"
+	"在 Pitch（基频/音高）、Formant（共振峰）、Spectrogram（声谱图）、Intensity（音强）、Cochleagram（耳蜗图） 或 Harmonicity（谐噪比） 对象中的分析帧数；"
+	"在 Spectrum（频谱） 或 Excitation（激发图） 对象中的频率分量数（bins）；"
+	"在 Matrix（矩阵） 对象中对 %x 域的划分份数（= %`ncol`）。")
 TERM (U"#`dx`")
-DEFINITION (U"the sample period (time distance between consecutive samples) in a Sound object (the inverse of the sampling frequency), in seconds; "
-	"the time step between consecutive frames in a Pitch, Formant, Spectrogram, Intensity, Cochleagram, or Harmonicity object, in seconds; "
-	"the width of a frequency bin in a Spectrum object, in hertz; "
-	"the width of a frequency bin in an Excitation object, in Bark; "
-	"the horizontal distance between cells in a Matrix object.")
+DEFINITION (U"在 Sound（声音） 对象中的采样周期（连续采样之间的时间距离）（采样频率的倒数），以秒为单位；"
+	"在 Pitch（基频/音高）、Formant（共振峰）、Spectrogram（声谱图）、Intensity（音强）、Cochleagram（耳蜗图） 或 Harmonicity（谐噪比） 对象中的相邻帧时间步长，以秒为单位；"
+	"在 Spectrum（频谱） 对象中频率分量（bin）的宽度，以赫兹为单位；"
+	"在 Excitation（激发图） 对象中频率分量（bin）的宽度，以 Bark 为单位；"
+	"在 Matrix（矩阵） 对象中单元格之间的水平距离。")
 TERM (U"#`ymin`")
-DEFINITION (U"the lowest frequency (usually 0) for a Spectrogram object, in hertz; "
-	"the lowest frequency (usually 0) for a Cochleagram object, in Bark; "
-	"the bottom of the %y domain for a Matrix object.")
+DEFINITION (U"对于 Spectrogram（声谱图） 对象，为最低频率（通常为 0），以赫兹为单位；"
+	"对于 Cochleagram（耳蜗图） 对象，为最低频率（通常为 0），以 Bark 为单位；"
+	"对于 Matrix（矩阵） 对象，为 %y 域的下边界。")
 TERM (U"#`ymax`")
-DEFINITION (U"the highest frequency for a Spectrogram object, e.g. 5000 hertz; "
-	"the highest frequency for a Cochleagram object, often 25.6 Bark; "
-	"the top of the %y domain for a Matrix object.")
+DEFINITION (U"对于 Spectrogram（声谱图） 对象，为最高频率，例如 5000 赫兹；"
+	"对于 Cochleagram（耳蜗图） 对象，为最高频率，通常为 25.6 Bark；"
+	"对于 Matrix（矩阵） 对象，为 %y 域的上边界。")
 TERM (U"#`ny`")
-DEFINITION (U"the number of frequency bands in a Spectrogram or Cochleagram object; "
-	"for a Spectrum object: always 2 (first row is real part, second row is imaginary part) "
-	"the number of divisions of the %y domain for a Matrix object (= %`nrow`).")
+DEFINITION (U"在 Spectrogram（声谱图） 或 Cochleagram（耳蜗图） 对象中的频带数；"
+	"对于 Spectrum（频谱） 对象：总是 2（第一行为实部，第二行为虚部）；"
+	"在 Matrix（矩阵） 对象中对 %y 域的划分份数（= %`nrow`）。")
 TERM (U"#`dy`")
-DEFINITION (U"the distance between adjacent frequency bands in a Spectrogram object, in hertz; "
-	"the distance between adjacent frequency bands in a Cochleagram object, in Bark; "
-	"the vertical distance between cells in a Matrix object.")
-ENTRY (U"Attributes in a creation formula")
-NORMAL (U"In formulas for creating a new object, you can refer to the attributes of any object, "
-	"but you will often want to refer to the attributes of the object that is just being created. You can do that in two ways.")
-NORMAL (U"The first way is to use the name of the object, as above. Choose @@Create Sound from formula...@, supply %hello for its name, "
-	"supply arbitrary values for the starting and finishing time, and type the following formula:")
+DEFINITION (U"在 Spectrogram（声谱图） 对象中相邻频带之间的距离，以赫兹为单位；"
+	"在 Cochleagram（耳蜗图） 对象中相邻频带之间的距离，以 Bark 为单位；"
+	"在 Matrix（矩阵） 对象中单元格之间的垂直距离。")
+ENTRY (U"在创建公式中引用属性")
+NORMAL (U"在创建新对象的公式中，您可以引用任何对象的属性，但通常您会希望引用正在创建的对象的属性。您可以通过两种方式来做到这一点。")
+NORMAL (U"第一种方法是像上面一样使用对象的名称。选择 @@Create Sound from formula...|从公式创建声音...@，为其名称提供 %hello，"
+	"为起始时间和结束时间提供任意值，然后输入以下公式：")
 CODE (U"(x - object[\"Sound hello\"].xmin) / (object[\"Sound hello\"].xmax - object[\"Sound hello\"].xmin)")
-NORMAL (U"When you edit this sound, you can see that it creates a straight line that rises from 0 to 1 within the time domain.")
-NORMAL (U"The formula above will also work if the Sound under creation is called %goodbye, and a Sound called %hello already exists; "
-	"of course, in such a case `object[\"Sound hello\"].xmax` refers to a property of the already existing sound.")
-NORMAL (U"If a formula refers to an object under creation, there is a shorter way: you do not have to supply the name of the object at all, "
-	"so you can simply write")
+NORMAL (U"当您编辑此声音时，您可以看到它在时间域内创建了一条从 0 上升到 1 的直线。")
+NORMAL (U"如果正在创建的 Sound（声音） 称为 %goodbye，并且已经存在名为 %hello 的 Sound（声音），上面的公式也将起作用；"
+	"当然，在这种情况下，`object[\"Sound hello\"].xmax` 指的是已经存在的声音的属性。")
+NORMAL (U"如果公式引用正在创建的对象，则有更简短的方法：您根本不需要提供对象的名称，只需写为")
 CODE (U"(x - xmin) / (xmax - xmin)")
-NORMAL (U"The attributes that you can use in this implicit way are %xmin, %xmax, %ncol, %nrow, %nx, %dx, %ny, and %dy. "
-	"To disambiguate in case there exists a script variable %xmin as well "
-	"(Praat will complain if this is the case), you can write `Self.xmin`.")
-ENTRY (U"Attributes in a modification formula")
-NORMAL (U"In formulas for modifying an existing object, you refer to attributes in the same way as in creation formulas, "
-	"i.e., you do not have to specify the name of the object that is being modified. The formula")
+NORMAL (U"您可以以这种隐式方式使用的属性是 %xmin、%xmax, %ncol, %nrow, %nx, %dx, %ny 和 %dy。"
+	"为了消除由于同时存在脚本变量 %xmin 而引起的歧义（如果发生这种情况，Praat 会抱怨），您可以写为 `Self.xmin`。")
+ENTRY (U"在修改公式中引用属性")
+NORMAL (U"在修改现有对象的公式中，您以与创建公式相同的方式引用属性，"
+	"即您不必指定正在修改的对象的名称。公式")
 CODE (U"self * 20 ^ (- (x - xmin) / (xmax - xmin))")
-NORMAL (U"causes the sound to decay exponentially in such a way that it has only 5 percent of its initial amplitude at the end. "
-	"If you apply this formula to multiple Sound objects at the same time, $xmax will refer to the finishing time of each Sound separately "
-	"as that Sound is modified.")
-NORMAL (U"More examples of the use of attributes are on the next page.")
+NORMAL (U"导致声音呈指数衰减，使其在结束时仅有初始振幅的 5%。"
+	"如果您同时将此公式应用于多个 Sound（声音） 对象，则在修改每个 Sound（声音） 时，xmax 将分别引用该 Sound（声音） 的结束时间。")
+NORMAL (U"关于使用属性的更多示例，请参见下一页。")
 MAN_END
 
 MAN_BEGIN (U"Formulas 9. Data in objects", U"ppgb", 20170614)
-NORMAL (U"With square brackets, you can get the values inside some objects.")
-ENTRY (U"Object contents in the calculator")
-NORMAL (U"The outcomes of the following examples can be checked with the @calculator.")
+NORMAL (U"通过使用方括号，您可以获取一些对象内部的值。")
+ENTRY (U"在计算器中引用对象内容")
+NORMAL (U"以下示例的结果可以使用 @calculator 进行检查。")
 TERM (U"##object [%%objectName\\$  or id%, %rowNumber, %columnNumber]")
 TERM (U"$$object [\"Matrix hello\", 10, 3]")
-DEFINITION (U"gives the value in the cell at the third column of the 10th row of the Matrix called %hello.")
+DEFINITION (U"给出名为 %hello 的 Matrix（矩阵） 第 10 行第 3 列的单元格中的值。")
 TERM (U"$$object [5, 10, 3]")
-DEFINITION (U"gives the value in the cell at the third column of the 10th row of the Matrix whose unique ID is 5 "
-	"(i.e. that is labelled with the number 5 in the list of objects).")
+DEFINITION (U"给出唯一 ID 为 5 的 Matrix（矩阵）（即在对象列表中标有数字 5）的第 10 行第 3 列单元格中的值。")
 TERM (U"$$object [\"Sound hello\", 0, 10000]")
-DEFINITION (U"gives the value (in Pa) of the 10000th sample of the Sound %hello, averaged over the channels.")
+DEFINITION (U"给出 Sound（声音） %hello 的第 10000 个采样的值（以帕斯卡为单位），通道间取平均值。")
 TERM (U"$$object [23, 1, 10000]")
-DEFINITION (U"gives the value (in Pa) of the 10000th sample of the left channel of the Sound with ID 23.")
+DEFINITION (U"给出唯一 ID 为 23 的 Sound（声音） 左声道第 10000 个采样的值（以帕斯卡为单位）。")
 TERM (U"$$object [23, 2, 10000]")
-DEFINITION (U"gives the value (in Pa) of the 10000th sample of the right channel of the Sound with ID 23.")
+DEFINITION (U"给出唯一 ID 为 23 的 Sound（声音） 右声道第 10000 个采样的值（以帕斯卡为单位）。")
 TERM (U"$$object [\"TableOfReal tokens\", 5, 12]")
-DEFINITION (U"gives the value in the cell at the fifth row of the 12th column of the TableOfReal called %tokens.")
+DEFINITION (U"给出名为 %tokens 的 TableOfReal 第 5 行第 12 列单元格中的值。")
 TERM (U"$$object [\"TableOfReal tokens\", 5, \"F1\"]")
-DEFINITION (U"gives the value in the cell at the fifth row of the column labelled %F1 of the TableOfReal %tokens.")
+DEFINITION (U"给出名为 %tokens 的 TableOfReal 中标为 %F1 列的第 5 行单元格中的值。")
 TERM (U"$$object [\"TableOfReal tokens\", \"\\bsct\", \"F1\"]")
-DEFINITION (U"gives the value in the cell at the row labelled %%\\bsct% of column %F1 of the TableOfReal %tokens.")
+DEFINITION (U"给出名为 %tokens 的 TableOfReal 中第 %F1 列中标为 %%\\bsct% 行单元格中的值。")
 TERM (U"$$object [\"Table listeners\", 3, \"m3ae\"]")
-DEFINITION (U"gives the numeric value in the cell at the third row of column %m3ae of the Table %listeners.")
+DEFINITION (U"给出名为 %listeners 的 Table（表） 第 %m3ae 列第 3 行单元格中的数值。")
 TERM (U"$$object [\"Table listeners\", 3, 12]")
-DEFINITION (U"gives the numeric value in the cell at the third row of the 12th column of the Table %listeners.")
+DEFINITION (U"给出名为 %listeners 的 Table（表） 第 12 列第 3 行单元格中的数值。")
 TERM (U"$$object\\$  [\"Table results\", 3, \"response\"]")
-DEFINITION (U"gives the string value in the cell at the third row of column %response of the Table %results.")
+DEFINITION (U"给出名为 %results 的 Table（表） 第 %response 列第 3 行单元格中的字符串值。")
 TERM (U"$$object\\$  [\"Table results\", 3, 12]")
-DEFINITION (U"gives the string value in the cell at the third row of the 12th column of the Table %results.")
+DEFINITION (U"给出名为 %results 的 Table（表） 第 12 列第 3 行单元格中的字符串值。")
 TERM (U"$$object [\"PitchTier hello\", 8]")
-DEFINITION (U"gives the pitch (in Hertz) of the 8th point in the PitchTier %hello.")
-NORMAL (U"Cells (or samples, or points) outside the objects are considered to contain zeroes.")
-ENTRY (U"Interpolation")
-NORMAL (U"The values inside some objects can be interpolated.")
+DEFINITION (U"给出 PitchTier（音高层） %hello 中第 8 个点处的音高（以赫兹为单位）。")
+NORMAL (U"对象之外的单元格（或采样、或点）被认为包含零值。")
+ENTRY (U"插值")
+NORMAL (U"一些对象内部的值可以被插值。")
 TERM (U"$$object (\"Sound hello\", 0.7, 0)")
-DEFINITION (U"gives the value (in Pa) at a time of 0.7 seconds in the Sound %hello, by linear interpolation between "
-	"the two samples that are nearest to 0.7 seconds. The channels are averaged.")
+DEFINITION (U"给出 Sound（声音） %hello 在时间为 0.7 秒处的值（以帕斯卡为单位），通过距离 0.7 秒最近的两个采样之间的线性插值计算得出。声道间取平均值。")
 TERM (U"$$object (\"Sound hello\", 0.7, 1)")
-DEFINITION (U"gives the interpolated value (in Pa) at a time of 0.7 seconds in the left channel of the Sound %hello.")
+DEFINITION (U"给出 Sound（声音） %hello 的左声道在时间为 0.7 秒处的插值（以帕斯卡为单位）。")
 TERM (U"$$object (\"Sound hello\", 0.7, 2)")
-DEFINITION (U"gives the interpolated value (in Pa) at a time of 0.7 seconds in the right channel of the Sound %hello.")
+DEFINITION (U"给出 Sound（声音） %hello 的右声道在时间为 0.7 秒处的插值（以帕斯卡为单位）。")
 TERM (U"$$object (\"Spectrogram hallo\", 0.7, 2500)")
-DEFINITION (U"gives the value at a time of 0.7 seconds and at a frequency of 2500 Hz in the Spectrogram %hallo, "
-	"by linear interpolation between the four samples that are nearest to that point.")
+DEFINITION (U"给出 Spectrogram（声谱图） %hallo 在时间为 0.7 秒且频率为 2500 赫兹处的值，通过距离该点最近的四个采样之间的线性插值计算得出。")
 TERM (U"$$object (\"PitchTier hullo\", 0.7)")
-DEFINITION (U"gives the pitch (in Hertz) at a time of 0.7 seconds in the PitchTier %hullo.")
-NORMAL (U"In the interpolation, times outside the time domain of the objects are considered to contain zeroes (this does not apply to PitchTiers and the like, "
-	"which undergo @@constant extrapolation@).")
-ENTRY (U"Object contents in a modification formula")
-NORMAL (U"Suppose you want to do the difficult way of reversing the contents of a Sound called `hello` (the easy way is to choose #Reverse "
-	"from the @Modify menu). You select this sound, then choose @@Copy...@ to duplicate it to a new Sound, which you name `hello_reverse`. "
-	"You select this new Sound and choose ##Formula...# from the @Modify menu. The formula will be")
+DEFINITION (U"给出 PitchTier（音高层） %hullo 在时间为 0.7 秒处的音高（以赫兹为单位）。")
+NORMAL (U"在插值中，对象时间域之外的时间被认为包含零值（这不适用于 PitchTier（音高层） 等对象，它们将进行 @@constant extrapolation|常数外推@）。")
+ENTRY (U"在修改公式中引用对象内容")
+NORMAL (U"假设您想使用复杂的方法来反转名为 `hello` 的 Sound（声音） 的内容（简单的方法是自 @Modify（修改） 菜单中选择 #Reverse（反转） ）。"
+	"您选择此声音，然后选择 @@Copy...|复制...@ 以将其复制为一个新的 Sound（声音），并将其命名为 `hello_reverse`。"
+	"您选择这个新的 Sound（声音） 并自 @Modify（修改） 菜单中选择 ##Formula...# 。公式将为")
 CODE (U"object [\"Sound hello\", row, ncol + 1 - col]")
-NORMAL (U"From this example, you see that the indices between [ ] may be formulas themselves, and that you can use implicit attributes like %ncol "
-	"and position references like %col (also %row, which here means that the reversal is performed for each channel). "
-	"An alternative formula is")
+NORMAL (U"从此示例中，您可以看到 [ ] 之间的索引本身可以是公式，并且您可以使用隐式属性（例如 %ncol）和位置引用（例如 %col）（以及 %row，此处意味着对每个声道执行反转）。"
+	"另一个替代公式是")
 CODE (U"object (\"Sound hello\", xmax - x, y)")
-NORMAL (U"at least if %xmin is zero. The advantage of the second method is that it also works correctly if the two sounds have different sampling frequencies; "
-	"the disadvantage is that it may do some interpolation between the samples, which deteriorates the sound quality "
-	"(the use of %y here means that the reversal is done for all %y values, i.e. all channels).")
-ENTRY (U"Object contents in a script")
-NORMAL (U"In scripts, the indices between [ ] and the values between ( ) may be formulas themselves and contain variables. "
-	"The following script computes the sum of all the cells along the diagonal of a Matrix.")
+NORMAL (U"至少在 %xmin 为零时有效。第二种方法的优点是如果两个声音具有不同的采样频率，它也能正确工作；"
+	"缺点是它可能会在采样之间进行一些插值，这会降低声音质量（这里使用 %y 意味着对所有 %y values 执行反转，即所有声道）。")
+ENTRY (U"在脚本中引用对象内容")
+NORMAL (U"在脚本中，[ ] 之间的索引和 ( ) 之间的值本身可以是公式且包含变量。"
+	"以下脚本计算了 Matrix（矩阵） 沿对角线的所有单元格之和。")
 CODE (U"matrix = Create simple matrix: 10, 10, \"x*y\"")
 CODE (U"sumDiagonal = 0")
 CODE (U"for i to object[matrix].ncol")
 	CODE1 (U"sumDiagonal += object [matrix, i, i]")
 CODE (U"endfor")
 CODE (U"writeInfoLine: \"The sum of the cells along the diagonal is \", sumDiagonal, \".\"")
-NORMAL (U"This example could have been written completely with commands from the dynamic menu:")
+NORMAL (U"这个例子完全可以使用动态菜单中的命令来编写：")
 CODE (U"matrix = Create simple matrix: 10, 10, \"x*y\"")
 CODE (U"sumDiagonal = 0")
 CODE (U"ncol = Get number of columns")
@@ -1071,7 +1045,7 @@ CODE (U"for i to ncol")
 	CODE1 (U"sumDiagonal += value")
 CODE (U"endfor")
 CODE (U"writeInfoLine: \"The sum of the cells along the diagonal is \", sumDiagonal, \".\"")
-NORMAL (U"The first version, which accesses the contents directly, is not only two lines shorter, but also three times faster.")
+NORMAL (U"第一个直接访问内容的版本不仅短了两行，而且速度快了三倍。")
 MAN_END
 
 }

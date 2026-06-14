@@ -46,180 +46,173 @@ R"~~~(
 "Get high index from time..."
 © Paul Boersma 2010-12-30
 
-A @@Query submenu|query@ to ask the selected tier object
-(@DurationTier, @IntensityTier, @PitchTier)
-which point is nearest to, but no earlier than, the specified time.
+一个 @@Query submenu|查询@，向选定的层对象（@DurationTier、@IntensityTier、@PitchTier）询问
+哪个点距离指定时间最近，且不早于该时间。
 
-Setting
-=======
+设置
+====
 ##Time (s)
-:	the time from which you want to get the point index.
+:	您希望获取其点索引的时间。
 
-Return value
-============
-This query returns the index of the point with the lowest time greater than or equal to #Time.
-It is @undefined if there are no points.
-It is the number of points plus 1 (offright) if the specified time is greater than the time of the last point.
+返回值
+======
+此查询返回时间大于或等于 #Time 的最早（时间最小）的点的索引。
+如果没有点，则为 @undefined。
+如果指定的时间大于最后一个点的时间，则为总点数加 1（向右越界）。
 
 ################################################################################
 "Get low index from time..."
 © Paul Boersma 2010-12-30
 
-A @@Query submenu|query@ to ask the selected tier object
-(@DurationTier, @IntensityTier, @PitchTier)
-which point is nearest to, but no later than, the specified time.
+一个 @@Query submenu|查询@，向选定的层对象（@DurationTier、@IntensityTier、@PitchTier）询问
+哪个点距离指定时间最近，且不晚于该时间。
 
-Setting
-=======
+设置
+====
 ##Time (s)
-:	the time from which you want to get the point index.
+:	您希望获取其点索引的时间。
 
-Return value
-============
-This query returns the index of the point with the highest time less than or equal to #Time.
-It is @undefined if there are no points.
-It is 0 (offleft) if the specified time is less than the time of the first point.
+返回值
+======
+此查询返回时间小于或等于 #Time 的最迟（时间最大）的点的索引。
+如果没有点，则为 @undefined。
+如果指定的时间小于第一个点的时间，则为 0（向左越界）。
 
 ################################################################################
 "Get nearest index from time..."
 © Paul Boersma 2010, 2023-04-14
 
-A @@Query submenu|query@ to ask the selected tier object
-(@DurationTier, @IntensityTier, @PitchTier)
-which point is nearest to the specified time.
+一个 @@Query submenu|查询@，向选定的层对象（@DurationTier、@IntensityTier、@PitchTier）询问
+哪个点最靠近指定的时间。
 
-Setting
-=======
+设置
+====
 ##Time (s)
-:	the time near which you want to get the point index.
+:	您希望获取其点索引的邻近时间。
 
-Return value
-============
-This query returns the index of the point whose time is closest to #Time.
-It is @undefined if there are no points.
+返回值
+======
+此查询返回其时间最接近 #Time 的点的索引。
+如果没有点，则为 @undefined。
 
 ################################################################################
 "Remove point..."
 © Paul Boersma 2010-12-30
 
-A command to remove one point from every selected time-based tier object
-(@DurationTier, @IntensityTier, @PitchTier).
+从每个选中的基于时间的层对象（@DurationTier、@IntensityTier、@PitchTier）中移除一个点的命令。
 
-Setting
-=======
+设置
+====
 ##Point number
-:	the index of the point you want to remove.
+:	您要移除的点的索引。
 
-Behaviour
-=========
-If ##Point number# is 3, the third point counted from the start of the tier (if it exists)
-is removed from the tier.
+行为
+====
+如果 ##Point number#（点号）为 3，则将从该层中移除从起点开始计算的第三个点（如果存在）。
 
 ################################################################################
 "Remove point near..."
 © Paul Boersma 2010-12-30
 
-A command to remove one point from every selected time-based tier object
-(@DurationTier, @IntensityTier, @PitchTier).
+从每个选中的基于时间的层对象（@DurationTier、@IntensityTier、@PitchTier）中移除一个邻近点的命令。
 
-Setting
-=======
+设置
+====
 
 ##Time (s)
-:	the time near which you want to remove a point.
+:	您希望在其邻近移除点的时间。
 
-Behaviour
-=========
-The point nearest to #Time (if there is any point) is removed from the tier.
+行为
+====
+最靠近 #Time（时间）的点（如果存在任何点）将从该层中移除。
 
 ################################################################################
 "Remove points between..."
 © Paul Boersma 2010-12-30
 
-A command to remove some points from every selected time-based tier object
-(@DurationTier, @IntensityTier, @PitchTier).
+从每个选中的基于时间的层对象（@DurationTier、@IntensityTier、@PitchTier）中移除若干个点的命令。
 
-Settings
-========
+设置
+====
 ##From time (s), To time (s)
-:	the times between which you want to remove all points.
+:	您想要在其中移除所有点的时间范围起止。
 
-Behaviour
-=========
-Any points between ##From time# and ##To Time# (inclusive) are removed from the tier.
+行为
+====
+介于 ##From time#（起始时间）和 ##To Time#（结束时间）之间（包含首尾）的所有点都将从该层中移除。
 
 ################################################################################
 "AmplitudeTier"
 © Paul Boersma 2007
 
-One of the @@types of objects@ in Praat.
-An AmplitudeTier object represents a time-stamped amplitude contour,
-i.e., it contains a series of (%time, %amplitude) points.
-The amplitude values are in Pascal. To see some applications, consult the @IntensityTier information;
-the difference between an AmplitudeTier and an IntensityTier is that the former has values in Pascal
-which multiply linearly with a Sound (for instance), and the latter has values in dB,
-which multiply logarithmically with a Sound.
+Praat 中的@@types of objects|对象类型@之一。
+一个 AmplitudeTier（振幅层）对象表示一条带有时间戳的振幅曲线，
+也就是说，它包含一系列的（%time, %amplitude，即时间，振幅）点。
+振幅值的单位为帕斯卡（Pascal）。要查看一些应用，请参考 @IntensityTier（音强层）的信息；
+AmplitudeTier 与 IntensityTier 的区别在于，前者的值是以帕斯卡为单位的，
+它们与 Sound（例如）进行线性相乘，而后者的值是以分贝（dB）为单位的，
+它们与 Sound 进行对数相乘。
 
 ################################################################################
 "AmplitudeTier: Add point..."
 © Paul Boersma 2023
-I
-A command to add a point to each selected @AmplitudeTier.
 
-Settings
-========
+向每个选中的 @AmplitudeTier（振幅层）添加一个点的命令。
+
+设置
+====
 ##Time (s)
-: the time at which a point is to be added.
+: 要添加的点的时间。
 
 ##Sound pressure (Pa)
-: the amplitude value of the requested new point.
+: 请求的新点振幅值（声压）。
 
-Behaviour
-=========
-The tier is modified so that it contains the new point.
-If a point at the specified time was already present in the tier, nothing happens.
+行为
+====
+该层将被修改以包含新添加的点。
+如果该层在指定时间已存在一个点，则不执行任何操作。
 
 ################################################################################
 "Cochleagram"
 © Paul Boersma 2003-03-16
 
-One of the @@types of objects@ in Praat. It represents the excitation pattern
-of the basilar membrane in the inner ear (see @Excitation) as a function of time.
+Praat 中的@@types of objects|对象类型@之一。它表示内耳中耳蜗基底膜的激发模式
+（参见 @Excitation）随时间变化的关系。
 
 ################################################################################
 "Cochleagram: Formula..."
 © Paul Boersma 2002-12-06
 
-A command for changing the data in all selected @Cochleagram objects.
-See the @Formulas tutorial for examples and explanations.
+用于更改所有选定 @Cochleagram 对象中数据的命令。
+示例和说明请参见 @Formulas 教程。
 
 ################################################################################
 "Create AmplitudeTier..."
 © Paul Boersma 2023
 
-A command in the @@New menu@ to create an empty @AmplitudeTier object.
-The resulting object will have the specified name and time domain, but contain no amplitude points.
-To add some points to it, use @@AmplitudeTier: Add point...@.
+@@New menu|新建菜单@ 中的一个命令，用于创建一个空的 @AmplitudeTier（振幅层）对象。
+生成的对象将具有指定的名称和时间域，但不包含任何振幅点。
+要向其中添加一些点，请使用 @@AmplitudeTier: Add point...@。
 
 ################################################################################
 "Create DurationTier..."
 © Paul Boersma 2014-04-21, 2023-04-30
 
-A command in the @@New menu@ to create an empty @DurationTier object.
-The resulting object will have the specified name and time domain, but contain no duration points.
-To add some points to it, use @@DurationTier: Add point...@.
+@@New menu|新建菜单@ 中的一个命令，用于创建一个空的 @DurationTier（时长层）对象。
+生成的对象将具有指定的名称和时间域，但不包含任何时长点。
+要向其中添加一些点，请使用 @@DurationTier: Add point...@。
 
-Example
-=======
-To create a tier 0.9 seconds long, with an deceleration around 0.6 seconds,
-you do (either in a script or by choosing these 4 commands by hand):
+示例
+====
+要创建一个长度为 0.9 秒、且在 0.6 秒附近有减速的时长层，
+您可以做以下操作（无论是在脚本中还是手动选择这 4 个命令）：
 {
 	\#{Create DurationTier:} “dur”, 0, 0.9
 	\@{DurationTier: ||Add point:} 0.3, 1
 	Add point: 0.6, 2.3
 	Add point: 0.7, 1
 }
-The result will look like
+其结果看起来像：
 {- 5x2.5
 	x# = { 0.0, 0.3, 0.6, 0.7, 0.9 }
 	y# = { 1.0, 1.0, 2.3, 1.0, 1.0 }
@@ -233,84 +226,84 @@ The result will look like
 	Text bottom: "yes", "Time (s)"
 	Text left: "yes", "Relative duration"
 }
-The target duration will be the area under this curve, which is 0.9 + 1/2 · 1.3 · 0.4 = 1.16 seconds.
+目标时长将是该曲线下方的面积，即 0.9 + 1/2 · 1.3 · 0.4 = 1.16 秒。
 
 ################################################################################
 "Create IntensityTier..."
 © Paul Boersma 2002-12-04
 
-A command in the @@New menu@ to create an empty @IntensityTier object.
-The resulting object will have the specified name and time domain, but contain no intensity points.
-To add some points to it, use @@IntensityTier: Add point...@.
+@@New menu|新建菜单@ 中的一个命令，用于创建一个空的 @IntensityTier（音强层）对象。
+生成的对象将具有指定的名称和时间域，但不包含任何音强点。
+要向其中添加一些点，请使用 @@IntensityTier: Add point...@。
 
 ################################################################################
 "Create Matrix..."
 © Paul Boersma 2002-12-12
 
-A command in the #Matrix submenu of the #Generics submenu of the @@New menu@,
-to create a @Matrix with the specified sampling attributes,
-filled with values from a formula (see @@Matrix: Formula...@).
+@@New menu|新建菜单@ 的 #Generics（通用）子菜单下的 #Matrix（矩阵）子菜单中的一个命令，
+用于创建一个具有指定采样属性的 @Matrix（矩阵），
+并用公式中的值进行填充（参见 @@Matrix: Formula...@）。
 
 ################################################################################
 "Create simple Matrix..."
 © Paul Boersma 2002-12-04
 
-A command in the #Matrix submenu of the #Generics submenu of the @@New menu@,
-to create a @Matrix with the specified number of rows and columns,
-filled with values from a formula (see @@Matrix: Formula...@).
+@@New menu|新建菜单@ 的 #Generics（通用）子菜单下的 #Matrix（矩阵）子菜单中的一个命令，
+用于创建一个具有指定行数和列数的 @Matrix（矩阵），
+并用公式中的值进行填充（参见 @@Matrix: Formula...@）。
 
 ################################################################################
 "Create simple Matrix from values..."
 © Paul Boersma 2023
 
-A command in the #Matrix submenu of the #Generics submenu of the @@New menu@,
-to create a @Matrix with the specified cells.
+@@New menu|新建菜单@ 的 #Generics（通用）子菜单下的 #Matrix（矩阵）子菜单中的一个命令，
+用于根据指定单元格的值创建一个 @Matrix（矩阵）。
 
 ################################################################################
 "Create Photo..."
 © Paul Boersma 2023
 
-A command in the #Photo submenu of the #Generics submenu of the @@New menu@,
-to create a @Photo with the specified sampling attributes,
-filled with values from a formula for each of the three colour channels.
+@@New menu|新建菜单@ 的 #Generics（通用）子菜单下的 #Photo（图像）子菜单中的一个命令，
+用于创建一个具有指定采样属性的 @Photo（图像），
+且其三个颜色通道分别使用公式中的值进行填充。
 
 ################################################################################
 "Create simple Photo..."
 © Paul Boersma 2023
 
-A command in the #Photo submenu of the #Generics submenu of the @@New menu@,
-to create a @Photo with the specified number of rows and columns,
-filled with values from a formula for each of the three colour channels.
+@@New menu|新建菜单@ 的 #Generics（通用）子菜单下的 #Photo（图像）子菜单中的一个命令，
+用于创建一个具有指定行数和列数的 @Photo（图像），
+且其三个颜色通道分别使用公式中的值进行填充。
 
 ################################################################################
 "Create Strings as folder list..."
-© Paul Boersma 2006(with “directory list”),2020,2024
+© Paul Boersma 2006（使用“directory list”），2020，2024
 
-A command in the @@New menu@ to create a @Strings object containing a list of folders in a given parent folder.
-It works completely analogously to @@Create Strings as file list...@.
+@@New menu|新建菜单@ 中的一个命令，用于创建一个包含给定父文件夹中所有子文件夹列表的 @Strings（字符串列表）对象。
+它的工作方式与 @@Create Strings as file list...@ 完全类似。
 
-Script usage
-============
-See @@Create Strings as file list...@.
-If you don’t need the resulting @Strings object,
-it may be easier to use @`folderNames$#` instead.
+脚本用法
+========
+参见 @@Create Strings as file list...@。
+如果您不需要最终生成的 @Strings 对象，
+使用 @`folderNames$#` 可能更容易。
 
 ################################################################################
 "Create Strings as directory list..."
 
-A synonym for @@Create Strings as folder list...@.
+@@Create Strings as folder list...@ 的同义词。
 
-You can see this command in older scripts, but not in Praat’s menus.
-This command is kept for reasons of compatibility.
+您可能在旧的脚本中看到过这个命令，但它已不在 Praat 的菜单中出现。
+保留此命令是为了向后兼容。
 
 ################################################################################
 "Create Strings as file list..."
 © Paul Boersma 1998,2006,2013-2015,2020,2024,2025
 
-A command in the @@New menu@ to create a @Strings object containing a list of files in a given folder.
+@@New menu|新建菜单@ 中的一个命令，用于创建一个包含给定文件夹中所有文件列表的 @Strings（字符串列表）对象。
 
-Settings
-========
+设置
+====
 {- 5.4x2.44
 )~~~"
 	Manual_DRAW_SETTINGS_WINDOW ("Create Strings as file list", 2.6)
@@ -320,40 +313,40 @@ R"~~~(
 }
 
 ##Name
-: the name of the resulting Strings object.
+: 生成的 Strings（字符串列表）对象的名称。
 
 ##File path
-: the folder name, with optional %wildcards (see below) for selecting files.
+: 文件夹路径，可使用可选的%通配符（见下文）来筛选文件。
 
-Behaviour
-=========
-The resulting Strings object will contain an alphabetical list of file names (by naïve Unicode-sorting),
-without the preceding path through the folder structures. If there are no files that match the file path,
-the Strings object will contain no strings.
+行为
+====
+生成的 Strings 对象将包含文件名的按字母排序列表（通过简单的 Unicode 排序），
+不包含文件夹结构中的前导路径。如果没有与 file path 匹配的文件，
+生成的 Strings 对象将不包含任何字符串。
 
-Usage
-=====
-There are two ways to specify the file path.
+用法
+====
+指定文件路径有两种方式。
 
-One way is to specify a folder name only. On Unix, the file path could be
-`/usr/people/miep/sounds` or `/usr/people/miep/sounds/`, for instance. On Windows,
-`C:\Users\Miep\Sounds` or `C:\Users\Miep\Sounds\`.
-On Macintosh, `/Users/miep/Sounds` or `/Users/miep/Sounds/`. Any of these produce
-a list of all the files in the specified folder.
+第一种方式是仅指定一个文件夹名称。例如，在 Unix 上，文件路径可以是
+`/usr/people/miep/sounds` 或 `/usr/people/miep/sounds/`。在 Windows 上，
+为 `C:\Users\Miep\Sounds` 或 `C:\Users\Miep\Sounds\`。
+在 Macintosh 上，为 `/Users/miep/Sounds` 或 `/Users/miep/Sounds/`。这些路径中的任何一个
+都将生成指定文件夹中所有文件的列表。
 
-The other way is to specify a %wildcard (an asterisk) for the file names.
-To get a list of all the files whose names start with “`hal`” and end in “`.wav`”,
-type `/usr/people/miep/sounds/hal*.wav`, `C:\Users\Miep\Sounds\hal*.wav`,
-or `/Users/miep/Sounds/hal*.wav`.
+另一种方式是在文件名中指定一个%通配符（星号）。
+要获取所有以“`hal`”开头且以“`.wav`”结尾的文件列表，
+请输入 `/usr/people/miep/sounds/hal*.wav`、`C:\Users\Miep\Sounds\hal*.wav`
+或 `/Users/miep/Sounds/hal*.wav`。
 
-You can even use %two wildcards: `/usr/people/miep/sounds/*al*.wav` gives you a list
-of all files whose names contain `al` and end in `wav`.
+您甚至可以使用%两个通配符：`/usr/people/miep/sounds/*al*.wav` 会为您生成一个
+文件名中包含 `al` 且以 `wav` 结尾的所有文件列表。
 
-Script usage
-============
-In a script, you can use this command to cycle through the files in a folder.
-For instance, to read in all the sound files in a specified folder,
-you could use the following script:
+脚本用法
+========
+在脚本中，您可以使用此命令循环遍历文件夹中的文件。
+例如，要读取指定文件夹中的所有声音文件，
+您可以使用以下脚本：
 {;
 	folder$ = “/usr/people/miep/sounds”
 	strings = \#{Create Strings as file list:} “list”, folder$ + “/*.wav”
@@ -365,21 +358,20 @@ you could use the following script:
 	endfor
 	removeObject: strings
 }
-If the script has been saved to a script file, you can use file paths that are relative to the folder
-where you saved the script. Thus, with
+如果该脚本已保存到脚本文件中，您可以使用相对于保存脚本的文件夹的相对文件路径。因此，通过使用：
 {;
 	\#{Create Strings as file list:} “list”, “*.wav”
 }
-you get a list of all the `.wav` files that are in the same folder as the script that contains this line.
-And to get a list of all the `.wav` files in the folder `Sounds` that resides in the same folder as your script,
-you can do
+您会得到与包含此行的脚本所在的同一文件夹中的所有 `.wav` 文件的列表。
+而要得到与您的脚本所在的同一文件夹下的 `Sounds` 文件夹中所有 `.wav` 文件的列表，
+您可以这样做：
 {;
 	\#{Create Strings as file list:} “list”, “Sounds/*.wav”
 }
-As is usual in Praat scripting, the forward slash (“/”) in this example can be used on all platforms, including Windows.
-This makes your script portable across platforms.
+与 Praat 脚本中的通常做法一样，此示例中的正斜杠（“/”）可用于包括 Windows 在内的所有平台。
+这使您的脚本具有跨平台可移植性。
 
-Note that the above functionality can also be written four lines shorter, using built-in functions:
+注意，上述功能也可以使用内置函数编写，从而省去四行代码：
 {;
 	folder$ = “/usr/people/miep/sounds”
 	list$# = \#`{fileNames$#}: folder$ + “/*.wav”
@@ -387,18 +379,18 @@ Note that the above functionality can also be written four lines shorter, using 
 		\@{Read from file:} folder$ + “/” + list$# [ifile]
 	endfor
 }
-This doesn’t produce a Strings object.
+这不会生成 Strings 对象。
 
-See also
+另请参阅
 ========
-To get a list of folders instead of files, use @@Create Strings as folder list...@.
+要获取文件夹列表而非文件列表，请使用 @@Create Strings as folder list...@。
 
 ################################################################################
 "Photo"
 © Paul Boersma 2023
 
-One of the @@types of objects@ in Praat. It is comparable to a @Matrix
-but has a matrix of cells for each of three colour channels: red, green and blue.
+Praat 中的@@types of objects|对象类型@之一。它与 @Matrix（矩阵）对象类似，
+但它具有针对红、绿、蓝三个颜色通道的单元格矩阵。
 
 ################################################################################
 )~~~"
@@ -752,30 +744,30 @@ NORMAL (U"For all the times of the points in the PointProcess, an intensity is c
 MAN_END
 
 MAN_BEGIN (U"IntensityTier", U"ppgb", 20101230)
-INTRO (U"One of the @@types of objects@ in Praat. "
-	"An IntensityTier object represents a time-stamped intensity contour, i.e., it contains a series of (%time, %intensity) points. "
-	"The intensity values are in dB.")
-NORMAL (U"For examples, see @@Source-filter synthesis@.")
-ENTRY (U"IntensityTier commands")
-NORMAL (U"Creation:")
-LIST_ITEM (U"From scratch:")
+INTRO (U"Praat 中的@@types of objects|对象类型@之一。 "
+	"一个 IntensityTier（音强层）对象表示一条带有时间戳的音强曲线，也就是说，它包含一系列的（%time, %intensity，即时间，音强）点。 "
+	"音强值的单位为分贝（dB）。")
+NORMAL (U"示例请参阅 @@Source-filter synthesis|源-滤波器合成@。")
+ENTRY (U"IntensityTier 命令")
+NORMAL (U"创建：")
+LIST_ITEM (U"从头创建：")
 LIST_ITEM (U"• @@Create IntensityTier...")
 LIST_ITEM (U"• @@IntensityTier: Add point...")
-LIST_ITEM (U"Copy from another object:")
-LIST_ITEM (U"• @@Intensity: To IntensityTier@: trivial copying of linearly spaced points.")
-LIST_ITEM (U"• @@Intensity & PointProcess: To IntensityTier...@: copying interpolated values at specified points.")
-LIST_ITEM (U"• @@PointProcess: Up to IntensityTier...@: equal values at specified points.")
-NORMAL (U"Viewing and editing:")
+LIST_ITEM (U"从另一个对象复制：")
+LIST_ITEM (U"• @@Intensity: To IntensityTier@：复制等间距排列的音强点。")
+LIST_ITEM (U"• @@Intensity & PointProcess: To IntensityTier...@：在指定的点上复制插值后的音强值。")
+LIST_ITEM (U"• @@PointProcess: Up to IntensityTier...@：在指定的点上设为相等的值。")
+NORMAL (U"查看与编辑：")
 LIST_ITEM (U"• @IntensityTierEditor")
-NORMAL (U"Conversion:")
-LIST_ITEM (U"• @@IntensityTier: Down to PointProcess@: copy times.")
-NORMAL (U"Synthesis (see @@Source-filter synthesis@):")
+NORMAL (U"转换：")
+LIST_ITEM (U"• @@IntensityTier: Down to PointProcess@：复制时间点。")
+NORMAL (U"合成（参见 @@Source-filter synthesis|源-滤波器合成@）：")
 LIST_ITEM (U"• @@Sound & IntensityTier: Multiply@")
-NORMAL (U"Queries:")
+NORMAL (U"查询：")
 LIST_ITEM (U"• @@Get low index from time...")
 LIST_ITEM (U"• @@Get high index from time...")
 LIST_ITEM (U"• @@Get nearest index from time...")
-NORMAL (U"Modification:")
+NORMAL (U"修改：")
 LIST_ITEM (U"• @@Remove point...")
 LIST_ITEM (U"• @@Remove point near...")
 LIST_ITEM (U"• @@Remove points between...")
@@ -783,21 +775,21 @@ LIST_ITEM (U"• @@IntensityTier: Add point...@")
 MAN_END
 
 MAN_BEGIN (U"IntensityTier: Add point...", U"ppgb", 20010410)
-INTRO (U"A command to add a point to each selected @IntensityTier.")
-ENTRY (U"Settings")
+INTRO (U"向每个选中的 @IntensityTier（音强层）对象添加一个点的命令。")
+ENTRY (U"设置")
 TERM (U"##Time (s)")
-DEFINITION (U"the time at which a point is to be added.")
+DEFINITION (U"要添加的点的时间。")
 TERM (U"##Intensity (dB)")
-DEFINITION (U"the intensity value of the requested new point.")
-ENTRY (U"Behaviour")
-NORMAL (U"The tier is modified so that it contains the new point. "
-	"If a point at the specified time was already present in the tier, nothing happens.")
+DEFINITION (U"所请求新点的音强值。")
+ENTRY (U"行为")
+NORMAL (U"该音强层将被修改，以包含新添加的点。 "
+	"如果该音强层在指定时间已存在一个点，则不执行任何操作。")
 MAN_END
 
 MAN_BEGIN (U"IntensityTier: Down to PointProcess", U"ppgb", 20010410)
-INTRO (U"A command to degrade every selected @IntensityTier to a @PointProcess.")
-ENTRY (U"Behaviour")
-NORMAL (U"The times of all the points are trivially copied, and so is the time domain. The intensity information is lost.")
+INTRO (U"将每个选中的 @IntensityTier（音强层）降级为 @PointProcess（点过程）对象的命令。")
+ENTRY (U"行为")
+NORMAL (U"所有点的时间点将被简单地复制，时间域也同样被复制。音强信息将会丢失。")
 MAN_END
 
 MAN_BEGIN (U"IntensityTierEditor", U"ppgb", 20110128)
@@ -811,194 +803,192 @@ INTRO (U"%%Command-click%（按住 Command/Ctrl 键单击）是指在按下 %%Co
 MAN_END
 
 MAN_BEGIN (U"Keyboard shortcuts", U"ppgb", 20220701)  // 2026
-INTRO (U"To accelerate menu commands in Praat, you can sometimes choose them with the keyboard, "
-	"sometimes while also pressing the Command key, Option key, or Shift key. "
-	"All of these commands can also be chosen from a menu.")
-NORMAL (U"When mentioning the %%Command key%, this manual refers to the key that is marked with an apple "
-	"or the word \"command\" on Apple keyboards "
-	"or to the key that is marked \"Ctrl\" if you are on a Windows or Linux computer.")
-NORMAL (U"When mentioning the %%Option key%, this manual refers to the key that is marked with "
-	"the word \"option\" on Apple keyboards or with \"Alt\" if you are on Windows or Linux.")
-NORMAL (U"When mentioning the %%Extra-Command key%, this manual refers to "
-	"pressing the “Command” and “Shift” keys together (on Windows) "
-	"or pressing the “Command” and “Option” keys together (on the Mac). "
-	"In Praat, Extra-Command is sometimes used "
-	"for destructive actions that are the reverse of the actions invoked by using the Command key only. "
-	"For instance, if Command-T means \"add a target at the cursor position\", "
-	"Extra-Command-T may mean \"remove the selected targets\".")
-ENTRY (U"Shortcuts")
-LIST_ITEM (U"Command-A: Zoom all")
-LIST_ITEM (U"Command-C: Copy (the selected text, or the selected sound, or the selected part of the Picture window)")
-LIST_ITEM (U"Command-D (in TextGrid window): Align interval")
-LIST_ITEM (U"Command-D (in Manipulation window): Insert duration point at cursor")
-LIST_ITEM (U"Extra-Command-D (in Manipulation window): Remove selected duration points")
-LIST_ITEM (U"Command-E (in Picture window): Erase all")
-LIST_ITEM (U"Command-E (in OT windows): Edit ranking")
-LIST_ITEM (U"Command-F: Find")
-LIST_ITEM (U"Extra-Command-F: Replace (yes, this is destructive...)")
-LIST_ITEM (U"Command-G: Find again")
-LIST_ITEM (U"Extra-Command-G: Replace again (yes, this is destructive...)")
-LIST_ITEM (U"Command-H (in script window): Paste history")
-LIST_ITEM (U"Extra-Command-H: Move cursor to maximum pitch")
-LIST_ITEM (U"Command-I: Zoom in")
-LIST_ITEM (U"Command-L (in Objects window): @@Open long sound file...@")
-LIST_ITEM (U"Command-L (in sound windows): @@Intro 3.6. Viewing a spectral slice|View spectral slice@")
-LIST_ITEM (U"Extra-Command-L: Move cursor to minimum pitch")
-LIST_ITEM (U"Command-M: Search Praat manual...")
-LIST_ITEM (U"Command-N: Zoom to selection")
-LIST_ITEM (U"Command-O (in Objects window): @@Read from file...@")
-LIST_ITEM (U"Command-O (in sound windows): Zoom out")
-LIST_ITEM (U"Command-P (in Picture window): Print")
-LIST_ITEM (U"Command-P (in PointProcess window): Add point at cursor")
-LIST_ITEM (U"Command-P (in Manipulation window): Add pulse at cursor")
-LIST_ITEM (U"Extra-Command-P (in Manipulation window): Remove selected pulses")
-LIST_ITEM (U"Command-Q: Quit Praat")
-LIST_ITEM (U"Command-R (in Script window): Run")
-LIST_ITEM (U"Command-R: Reverse selection")
-LIST_ITEM (U"Command-S: Save")
-LIST_ITEM (U"Command-T (in script window): Run selection")
-LIST_ITEM (U"Command-T (in TextGrid window): Transcribe interval")
-LIST_ITEM (U"Command-T (in PitchTier/DurationTier/RealTier/FormantGrid window): Add point at cursor")
-LIST_ITEM (U"Command-T (in Manipulation window): Add pitch point at cursor")
-LIST_ITEM (U"Extra-Command-T (in Manipulation window): Remove selected pitch points")
-LIST_ITEM (U"Command-U: @@Calculator...@")
-LIST_ITEM (U"Command-V (in text window or TextGrid window): Paste (insert over the selected text")
-LIST_ITEM (U"Command-V (in Sound window): Paste after selection (insert the sound clipboard after the selected sound)")
-LIST_ITEM (U"Extra-Command-V (in Sound window): Paste over selection (insert the sound clipboard over the selected sound)")
-LIST_ITEM (U"Command-W: Close window")
-LIST_ITEM (U"Command-X: Cut (the selected text or the selected sound)")
-LIST_ITEM (U"Command-Y: Redo")
-LIST_ITEM (U"Command-Z: Undo")
-LIST_ITEM (U"Command-0 (in sound windows): Move cursor to nearest zero crossing")
-LIST_ITEM (U"Command-0 (in OT windows): Evaluate with zero noise")
-LIST_ITEM (U"Command-2 (in Manipulation window): Stylize pitch (2 semitones)")
-LIST_ITEM (U"Command-2 (in OT windows): Evaluate with noise 2.0")
-LIST_ITEM (U"Command-4 (in Manipulation window): Interpolate quadratically (4 points)")
-LIST_ITEM (U"Shift-Command-?: Local help")
-LIST_ITEM (U"Command-,: Move start of selection to nearest zero crossing")
-LIST_ITEM (U"Command-.: Move end of selection to nearest zero crossing")
-LIST_ITEM (U"Command-F1: Formant listing")
-LIST_ITEM (U"F1: Get first formant")
-LIST_ITEM (U"F2: Get second formant")
-LIST_ITEM (U"F3: Get third formant")
-LIST_ITEM (U"F4: Get fourth formant")
-LIST_ITEM (U"On Windows and Linux: F5: Get pitch")
-LIST_ITEM (U"On Windows and Linux: Command-F5: Pitch listing")
-LIST_ITEM (U"On Windows and Linux: Option-F5: Get minimum pitch")
-LIST_ITEM (U"On Windows and Linux: Shift-F5: Get maximum pitch")
-LIST_ITEM (U"F6: Get cursor")
-LIST_ITEM (U"F7: Get spectral power at cursor cross")
-LIST_ITEM (U"F8: Get intensity")
-LIST_ITEM (U"Command-F8: Intensity listing")
-LIST_ITEM (U"Option-F8: Get minimum intensity")
-LIST_ITEM (U"Shift-F8: Get maximum intensity")
-LIST_ITEM (U"Command-F9: Pulse listing")
-LIST_ITEM (U"On the Mac: F10: Get pitch")
-LIST_ITEM (U"On the Mac: Command-F10: Pitch listing")
-LIST_ITEM (U"On the Mac: Option-F10: Get minimum pitch")
-LIST_ITEM (U"On the Mac: Shift-F10: Get maximum pitch")
-LIST_ITEM (U"F11: Voice report")
-LIST_ITEM (U"F12: Log 1")
-LIST_ITEM (U"Shift-F12: Log 2")
-LIST_ITEM (U"Option-F12: Log script 3")
-LIST_ITEM (U"Command-F12: Log script 4   [note: Command-Fxx combinations are not available to apps on all computers]")
-LIST_ITEM (U"Tab (in sound windows): Play selection")
-LIST_ITEM (U"Shift-Tab (in sound windows): Play window")
-LIST_ITEM (U"Arrow-up (in sound windows): Select earlier")
-LIST_ITEM (U"Arrow-down (in sound windows): Select later")
-LIST_ITEM (U"Shift-Arrow-up (in sound windows): Move start of selection left")
-LIST_ITEM (U"Shift-Arrow-down (in sound windows): Move start of selection right")
-LIST_ITEM (U"Command-Arrow-up (in sound windows): Move end of selection left")
-LIST_ITEM (U"Command-Arrow-down (in sound windows): Move end of selection right")
-LIST_ITEM (U"Page-up (in sound windows): Scroll page back")
-LIST_ITEM (U"Page-down (in sound windows): Scroll page forward")
-LIST_ITEM (U"Escape: Interrupt playing")
+INTRO (U"为了在 Praat 中加快菜单命令的执行速度，您有时可以使用键盘来选择它们，"
+	"有时在按住 Command 键、Option 键或 Shift 键的同时按下相应按键。"
+	"所有这些命令也可以从菜单中进行选择。")
+NORMAL (U"当提到 %%Command 键% 时，本手册在苹果（Apple）键盘上是指标有苹果标志"
+	"或“command”字样的键；"
+	"如果您使用的是 Windows 或 Linux 电脑，则指的是键盘上的“Ctrl”键。")
+NORMAL (U"当提到 %%Option 键% 时，本手册在苹果键盘上是指标有"
+	"“option”字样的键，在 Windows 或 Linux 上是指标有“Alt”字样的键。")
+NORMAL (U"当提到 %%Extra-Command 键% 时，本手册指的是"
+	"同时按下“Command”和“Shift”键（在 Windows 上）"
+	"或同时按下“Command”和“Option”键（在 Mac 上）。"
+	"在 Praat 中，Extra-Command 有时用于执行"
+	"与仅使用 Command 键调用的操作相反的破坏性操作。"
+	"例如，如果 Command-T表示“在光标位置添加目标点”，"
+	"则 Extra-Command-T 可能表示“移除选中的目标点”。")
+ENTRY (U"快捷键")
+LIST_ITEM (U"Command-A: Zoom all（全部缩放）")
+LIST_ITEM (U"Command-C: Copy（复制选中的文本、选中的声音或 Picture 窗口的选中部分）")
+LIST_ITEM (U"Command-D（在 TextGrid 窗口中）：Align interval（对齐区间）")
+LIST_ITEM (U"Command-D（在操纵对象窗口中）：Insert duration point at cursor（在光标处插入时长点）")
+LIST_ITEM (U"Extra-Command-D（在操纵对象窗口中）：Remove selected duration points（移除选中的时长点）")
+LIST_ITEM (U"Command-E（在 Picture 窗口中）：Erase all（擦除全部）")
+LIST_ITEM (U"Command-E（在优选论窗口中）：Edit ranking（编辑排序）")
+LIST_ITEM (U"Command-F: Find（查找）")
+LIST_ITEM (U"Extra-Command-F: Replace（替换，是的，这是破坏性的……）")
+LIST_ITEM (U"Command-G: Find again（再次查找）")
+LIST_ITEM (U"Extra-Command-G: Replace again（再次替换，是的，这是破坏性的……）")
+LIST_ITEM (U"Command-H（在脚本窗口中）：Paste history（粘贴历史记录）")
+LIST_ITEM (U"Extra-Command-H: Move cursor to maximum pitch（将光标移至最大音高处）")
+LIST_ITEM (U"Command-I: Zoom in（放大）")
+LIST_ITEM (U"Command-L（在对象窗口中）：@@Open long sound file...@")
+LIST_ITEM (U"Command-L（在声音窗口中）：@@Intro 3.6. Viewing a spectral slice|View spectral slice（查看频谱切片）@")
+LIST_ITEM (U"Extra-Command-L: Move cursor to minimum pitch（将光标移至最小音高处）")
+LIST_ITEM (U"Command-M: Search Praat manual...（搜索 Praat 手册...）")
+LIST_ITEM (U"Command-N: Zoom to selection（缩放到选区）")
+LIST_ITEM (U"Command-O（在对象窗口中）：@@Read from file...@")
+LIST_ITEM (U"Command-O（在声音窗口中）：Zoom out（缩小）")
+LIST_ITEM (U"Command-P（在 Picture 窗口中）：Print（打印）")
+LIST_ITEM (U"Command-P（在 PointProcess 窗口中）：Add point at cursor（在光标处添加点）")
+LIST_ITEM (U"Command-P（在操纵对象窗口中）：Add pulse at cursor（在光标处添加脉冲）")
+LIST_ITEM (U"Extra-Command-P（在操纵对象窗口中）：Remove selected pulses（移除选中的脉冲）")
+LIST_ITEM (U"Command-Q: Quit Praat（退出 Praat）")
+LIST_ITEM (U"Command-R（在脚本窗口中）：Run（运行）")
+LIST_ITEM (U"Command-R: Reverse selection（反转选区）")
+LIST_ITEM (U"Command-S: Save（保存）")
+LIST_ITEM (U"Command-T（在脚本窗口中）：Run selection（运行选中部分）")
+LIST_ITEM (U"Command-T（在 TextGrid 窗口中）：Transcribe interval（转录区间）")
+LIST_ITEM (U"Command-T（在音高层/时长层/实数层/共振峰网格窗口中）：Add point at cursor（在光标处添加点）")
+LIST_ITEM (U"Command-T（在操纵对象窗口中）：Add pitch point at cursor（在光标处添加音高点）")
+LIST_ITEM (U"Extra-Command-T（在操纵对象窗口中）：Remove selected pitch points（移除选中的音高点）")
+LIST_ITEM (U"Command-U: @@Calculator...@（计算器）")
+LIST_ITEM (U"Command-V（在文本窗口或 TextGrid 窗口中）：Paste（在选中文本上覆盖插入粘贴）")
+LIST_ITEM (U"Command-V（在声音窗口中）：Paste after selection（在选区后粘贴，在选中声音后插入声音剪贴板内容）")
+LIST_ITEM (U"Extra-Command-V（在声音窗口中）：Paste over selection（在选区上覆盖粘贴，在选中声音上覆盖插入声音剪贴板内容）")
+LIST_ITEM (U"Command-W: Close window（关闭窗口）")
+LIST_ITEM (U"Command-X: Cut（剪切选中的文本或选中的声音）")
+LIST_ITEM (U"Command-Y: Redo（重做）")
+LIST_ITEM (U"Command-Z: Undo（撤销）")
+LIST_ITEM (U"Command-0（在声音窗口中）：Move cursor to nearest zero crossing（将光标移至最近的过零点）")
+LIST_ITEM (U"Command-0（在优选论窗口中）：Evaluate with zero noise（在无噪声下评估）")
+LIST_ITEM (U"Command-2（在操纵对象窗口中）：Stylize pitch (2 semitones)（音高简化为2半音）")
+LIST_ITEM (U"Command-2（在优选论窗口中）：Evaluate with noise 2.0（以噪声2.0评估）")
+LIST_ITEM (U"Command-4（在操纵对象窗口中）：Interpolate quadratically (4 points)（以4个点进行二次插值）")
+LIST_ITEM (U"Shift-Command-?: Local help（本地帮助）")
+LIST_ITEM (U"Command-,: Move start of selection to nearest zero crossing（将选区起点移至最近的过零点）")
+LIST_ITEM (U"Command-.: Move end of selection to nearest zero crossing（将选区终点移至最近的过零点）")
+LIST_ITEM (U"Command-F1: Formant listing（列出共振峰）")
+LIST_ITEM (U"F1: Get first formant（获取第一共振峰）")
+LIST_ITEM (U"F2: Get second formant（获取第二共振峰）")
+LIST_ITEM (U"F3: Get third formant（获取第三共振峰）")
+LIST_ITEM (U"F4: Get fourth formant（获取第四共振峰）")
+LIST_ITEM (U"在 Windows 和 Linux 上：F5: Get pitch（获取音高）")
+LIST_ITEM (U"在 Windows 和 Linux 上：Command-F5: Pitch listing（列出音高）")
+LIST_ITEM (U"在 Windows 和 Linux 上：Option-F5: Get minimum pitch（获取最小音高）")
+LIST_ITEM (U"在 Windows 和 Linux 上：Shift-F5: Get maximum pitch（获取最大音高）")
+LIST_ITEM (U"F6: Get cursor（获取光标位置）")
+LIST_ITEM (U"F7: Get spectral power at cursor cross（获取光标交叉处的频谱功率）")
+LIST_ITEM (U"F8: Get intensity（获取音强）")
+LIST_ITEM (U"Command-F8: Intensity listing（列出音强）")
+LIST_ITEM (U"Option-F8: Get minimum intensity（获取最小音强）")
+LIST_ITEM (U"Shift-F8: Get maximum intensity（获取最大音强）")
+LIST_ITEM (U"Command-F9: Pulse listing（列出脉冲）")
+LIST_ITEM (U"在 Mac 上：F10: Get pitch（获取音高）")
+LIST_ITEM (U"在 Mac 上：Command-F10: Pitch listing（列出音高）")
+LIST_ITEM (U"在 Mac 上：Option-F10: Get minimum pitch（获取最小音高）")
+LIST_ITEM (U"在 Mac 上：Shift-F10: Get maximum pitch（获取最大音高）")
+LIST_ITEM (U"F11: Voice report（嗓音报告）")
+LIST_ITEM (U"F12: Log 1（记录 1）")
+LIST_ITEM (U"Shift-F12: Log 2（记录 2）")
+LIST_ITEM (U"Option-F12: Log script 3（记录脚本 3）")
+LIST_ITEM (U"Command-F12: Log script 4（记录脚本 4）【注：Command-Fxx 组合键并非在所有计算机上都对应用程序可用】")
+LIST_ITEM (U"Tab（在声音窗口中）：Play selection（播放选区）")
+LIST_ITEM (U"Shift-Tab（在声音窗口中）：Play window（播放整个窗口）")
+LIST_ITEM (U"Arrow-up（在声音窗口中）：Select earlier（选择更早部分）")
+LIST_ITEM (U"Arrow-down（在声音窗口中）：Select later（选择更晚部分）")
+LIST_ITEM (U"Shift-Arrow-up（在声音窗口中）：Move start of selection left（将选区起点向左移动）")
+LIST_ITEM (U"Shift-Arrow-down（在声音窗口中）：Move start of selection right（将选区起点向右移动）")
+LIST_ITEM (U"Command-Arrow-up（在声音窗口中）：Move end of selection left（将选区终点向左移动）")
+LIST_ITEM (U"Command-Arrow-down（在声音窗口中）：Move end of selection right（将选区终点向右移动）")
+LIST_ITEM (U"Page-up（在声音窗口中）：Scroll page back（向前翻页）")
+LIST_ITEM (U"Page-down（在声音窗口中）：Scroll page forward（向后翻页）")
+LIST_ITEM (U"Escape: Interrupt playing（中断播放）")
 MAN_END
 
 MAN_BEGIN (U"Log files", U"ppgb", 20230122)
-INTRO (U"With some commands in the @@Analyses menu@ of the @SoundEditor and @TextGridEditor, "
-	"you can write combined information about times, pitch values, formants, and intensities "
-	"to the @@Info window@ and/or to a log file.")
-NORMAL (U"A log file is a text file on disk. It consists of a number of similar lines, "
-	"whose format you determine with the log settings in the Analyses menu.")
-NORMAL (U"Every time you press @@Keyboard shortcuts|F12@ (or choose ##Log 1# from the Analysis menu), "
-	"Praat will write a line to the Info window and/or to log file 1. "
-	"If you press @@Keyboard shortcuts|Shift-F12@ (or choose ##Log 2# from the Analysis menu), "
-	"Praat will write a line to the Info window and/or to log file 2.")
-NORMAL (U"With the ##log settings# command window, you determine the following:")
+INTRO (U"利用 @SoundEditor（声音编辑器）和 @TextGridEditor 中的 @@Analyses menu|分析菜单@ 中的一些命令，"
+	"您可以将关于时间、音高值、共振峰和音强的组合信息"
+	"输出到 @@Info window|信息窗口@ 和/或日志文件中。")
+NORMAL (U"日志文件是磁盘上的一个文本文件。它由若干行格式相似的内容组成，"
+	"其格式由分析菜单中的日志设置（log settings）决定。")
+NORMAL (U"每当您按下 @@Keyboard shortcuts|F12@（或在分析菜单中选择 ##Log 1# 选项）时，"
+	"Praat 将会向信息窗口和/或日志文件 1 写入一行内容。"
+	"如果您按下 @@Keyboard shortcuts|Shift-F12@（或在分析菜单中选择 ##Log 2#），"
+	"Praat 将会向信息窗口 and/or to log file 2 写入一行内容。")
+NORMAL (U"在 ##log settings#（日志设置）窗口中，您可以指定以下设置：")
 TERM (U"##Write log 1 to")
-DEFINITION (U"this determines whether your log line will be written to log file 1 only, to the Info window only, or to both.")
+DEFINITION (U"这决定了您的日志行是仅写入日志文件 1、仅写入信息窗口，还是同时写入两者。")
 TERM (U"##Log file 1")
-DEFINITION (U"the name of the log file. Click Browse to select a file to write to. "
-	"On most platforms you can also use a home-relative name such as `~/Desktop/pitchLog.txt`.")
+DEFINITION (U"日志文件的名称。单击 Browse（浏览）选择要写入的文件。"
+	"在大多数平台上，您也可以使用相对于主目录的名称，例如 `~/Desktop/pitchLog.txt`。")
 TERM (U"##Log 1 format")
-DEFINITION (U"the format of the line that Praat will write. See below.")
-NORMAL (U"The same goes for log file 2.")
-ENTRY (U"Usage")
-NORMAL (U"The logging facility has been implemented in Praat especially for former users of Kay CSL, "
-	"who have been used to doing it for years and like to continue doing it in Praat. "
-	"Otherwise, you may prefer to use the @TextGridEditor to mark time points and run "
-	"an automatic analysis afterwards.")
-NORMAL (U"If you do want to use the logging facility, you typically start by deleting any old "
-	"log file (by choosing ##Delete log file 1# or ##Delete log file 2#), if you want to re-use "
-	"the file name. Otherwise, you can change the log file name (with ##Log settings...#). "
-	"After this, you will move the cursor to various time locations and press @@Keyboard shortcuts|F12@ (or @@Keyboard shortcuts|Shift-F12@) "
-	"each time, so that information about the current time will be written to the log file.")
-ENTRY (U"Example 1: pitch logging")
-NORMAL (U"Suppose you want to log the time of the cursor and the pitch value at the cursor. "
-	"You could use the following log format:")
-CODE (U"Time \'time:6\' seconds, pitch \'f0:2\' hertz")
-NORMAL (U"If you now click at 3.456789876 seconds, and the pitch happens to be 355.266 hertz "
-	"at that time, the following line will be appended to the log file and/or to the Info window:")
+DEFINITION (U"Praat 将写入的行的格式。见下文。")
+NORMAL (U"对于日志文件 2 也是如此。")
+ENTRY (U"用法")
+NORMAL (U"Praat 中实现的日志记录功能主要是为了方便以前 Kay CSL 的用户，"
+	"他们多年来一直习惯于这样做，并希望在 Praat 中继续使用此功能。"
+	"否则，您可能更倾向于使用 @TextGridEditor 来标记时间点，然后运行"
+	"自动分析。")
+NORMAL (U"如果您确实想使用日志记录功能，如果您想重新使用该文件名，通常首先要删除旧的"
+	"日志文件（通过选择 ##Delete log file 1# 或 ##Delete log file 2#）。"
+	"否则，您可以更改日志文件名称（使用 ##Log settings...#）。"
+	"在此之后，您可以将光标移动到各个时间位置，并每次按下 @@Keyboard shortcuts|F12@（或 @@Keyboard shortcuts|Shift-F12@），"
+	"这样关于当前时间的信息就会被写入日志文件中。")
+ENTRY (U"示例 1：音高记录")
+NORMAL (U"假设您想记录光标的时间以及光标处的音高值。"
+	"您可以使用以下日志格式：")
+CODE (U"Time 'time:6' seconds, pitch 'f0:2' hertz")
+NORMAL (U"如果现在您单击 3.456789876 秒，且该时间点的音高恰好是 355.266 赫兹，"
+	"则以下行将会追加到日志文件和/或信息窗口中：")
 CODE (U"Time 3.456790 seconds, pitch 355.27 hertz.")
-NORMAL (U"The parts \":6\" and \":2\" denote the number of digits after the decimal point. "
-	"If you leave them out, the values will be written with a precision of 17 digits.")
-NORMAL (U"The words \'time\' and \'f0\' mean exactly the same as the result of the commands "
-	"##Get cursor# and ##Get pitch#. Therefore, if instead of setting a cursor line you selected a larger "
-	"piece of the sound, \'time\' will give the centre of the selection and \'f0\' will give the mean pitch "
-	"in the selection.")
-NORMAL (U"Beware of the following pitfall: if your pitch units are not hertz, but semitones, "
-	"then \'f0\' will give the result in semitones. A format as in this example will then be misleading.")
-ENTRY (U"Example 2: formant logging")
-NORMAL (U"Suppose you want to log the start and finish of the selection, its duration, and the mean values "
-	"of the first three formants, all separated by tab stops for easy importation into Microsoft® Excel™. "
-	"You could use the following log format:")
-CODE (U"\'t1:4\'\'tab$\'\'t2:4\'\'tab$\'\'f1:0\'\'tab$\'\'f2:0\'\'tab$\'\'f3:0\'")
-NORMAL (U"You see that \'t1\' and \'t2\' are the start and finish of the selection, respectively, "
-	"and that they are written with 4 digits after the decimal point. By using \":0\", the three formant values "
-	"are rounded to whole numbers in hertz. The word `tab$` is the tab stop.")
-ENTRY (U"Loggable values")
-NORMAL (U"The following values can be logged:")
-LIST_ITEM (U"`time`: the time of the cursor, or the centre of the selection.")
-LIST_ITEM (U"`t1`: the start of the selection (\"B\").")
-LIST_ITEM (U"`t2`: the end of the selection (\"E\").")
-LIST_ITEM (U"`dur`: the duration of the selection.")
-LIST_ITEM (U"`freq`: the frequency at the frequency cursor.")
-LIST_ITEM (U"`f0`: the pitch at the cursor time, or the mean pitch in the selection.")
-LIST_ITEM (U"`f1`, `f2`, `f3`, `f4`, `f5`: the first/second/third/fourth/fifth formant at the cursor time, "
-	"or the mean first/second/third/fourth/fifth formant in the selection.")
-LIST_ITEM (U"`b1`, `b2`, `b3`, `b4`, `b5`: the bandwidth of the first/second/third/fourth/fifth formant "
-	"at the cursor time or at the centre of the selection.")
-LIST_ITEM (U"`intensity`: the intensity at the cursor time, or the mean intensity in the selection, in dB.")
-LIST_ITEM (U"`power`: the spectral power at the cursor cross, in Pa^2/Hz.")
-LIST_ITEM (U"`tab$`: the tab stop.")
-LIST_ITEM (U"`editor$`: the title of the editor window (i.e. the name of the visible Sound or TextGrid).")
-ENTRY (U"More flexibility in logging")
-NORMAL (U"You may sometimes require information in your log file that cannot be generated directly "
-	"by the loggable values above. Suppose, for instance, that you want to log the values for F1 and F2-F1 "
-	"at the points where you click. You could write the following script:")
+NORMAL (U"“:6”和“:2”部分表示小数点后的位数。"
+	"如果省去它们，写入的值将具有 17 位的精度。")
+NORMAL (U"“time”和“f0”两个词的含义与命令"
+	"##Get cursor# 和 ##Get pitch# 的结果完全相同。因此，如果在设置光标线时，您选择了一个较大的"
+	"声音片段，则“time”将给出选区的中心，而“f0”将给出选区内的平均音高。")
+NORMAL (U"注意以下陷阱：如果您的音高单位不是赫兹而是半音，"
+	"那么“f0”将以半音给出结果。此示例中的格式将会产生误导。")
+ENTRY (U"示例 2：共振峰记录")
+NORMAL (U"假设您想记录选区的开始和结束、其时长，以及前三个共振峰的平均值，"
+	"所有这些都用制表符隔开，以便导入到 Microsoft® Excel™ 中。"
+	"您可以使用以下日志格式：")
+CODE (U"'t1:4''tab$''t2:4''tab$''f1:0''tab$''f2:0''tab$''f3:0'")
+NORMAL (U"您可以看到“t1”和“t2”分别是选区的开始和结束，"
+	"并且它们在小数点后保留了 4 位数字。通过使用“:0”，三个共振峰值"
+	"被四舍五入为赫兹的整数。单词 `tab$` 是制表符。")
+ENTRY (U"可记录的值")
+NORMAL (U"以下值可以被记录：")
+LIST_ITEM (U"`time`：光标的时间，或选区的中心。")
+LIST_ITEM (U"`t1`：选区的起点（“B”）。")
+LIST_ITEM (U"`t2`：选区的终点（“E”）。")
+LIST_ITEM (U"`dur`：选区的时长。")
+LIST_ITEM (U"`freq`：频率光标处的频率。")
+LIST_ITEM (U"`f0`：光标时间的音高，或选区内的平均音高。")
+LIST_ITEM (U"`f1`、`f2`、`f3`、`f4`、`f5`：光标时间的第一/第二/第三/第四/第五共振峰，"
+	"或选区内第一/第二/第三/第四/第五共振峰的平均值。")
+LIST_ITEM (U"`b1`、`b2`、`b3`、`b4`、`b5`：第一/第二/第三/第四/第五共振峰的带宽"
+	"在光标时间或选区中心的值。")
+LIST_ITEM (U"`intensity`：光标时间的音强，或选区内的平均音强，单位为分贝（dB）。")
+LIST_ITEM (U"`power`：光标交叉处的频谱功率，单位为 Pa^2/Hz。")
+LIST_ITEM (U"`tab$`：制表符。")
+LIST_ITEM (U"`editor$`：编辑器窗口的标题（即可见的 Sound 或 TextGrid 的名称）。")
+ENTRY (U"更具弹性的记录方式")
+NORMAL (U"您有时可能需要在日志文件中记录一些无法直接"
+	"由上述可记录值生成的信息。例如，假设您想要记录单击点处的 F1 和 F2-F1 的值。"
+	"您可以编写以下脚本：")
 CODE (U"f1 = Get first formant")
 CODE (U"f2 = Get second formant")
 CODE (U"f21 = f2 - f1")
 CODE (U"appendInfoLine: fixed$ (f1, 0), \" \", fixed$ (f21, 0)")
 CODE (U"appendFileLine: \"D:\\Praat logs\\Formant log.txt\", fixed$ (f1, 0), tab$, fixed$ (f21, 0)")
-NORMAL (U"With this script, the information would be appended both to the Info window and to the "
-	"file \"Formant log.txt\" on your desktop.")
-NORMAL (U"You can make this script accessible with @@Keyboard shortcuts|Option-F12@ (or @@Keyboard shortcuts|Command-F12@) "
-	"by saving the script and specifying the name of the script file in the ##Log script 3# (or #4) field "
-	"in the ##Log settings...# window.")
-NORMAL (U"These scripts may take arguments. Suppose, for instance, that you want to specify a vowel symbol "
-	"as you press @@Keyboard shortcuts|Option-F12@. The following script will take care of that:")
+NORMAL (U"通过此脚本，信息将同时追加到信息窗口和您桌面上的"
+	"“Formant log.txt”文件中。")
+NORMAL (U"您可以通过保存脚本并在 ##Log settings...# 窗口的 ##Log script 3#（或 #4）字段中指定该脚本文件的名称，"
+	"从而使用 @@Keyboard shortcuts|Option-F12@（或 @@Keyboard shortcuts|Command-F12@）来访问此脚本。")
+NORMAL (U"这些脚本可以接收参数。例如，假设您希望在按下 @@Keyboard shortcuts|Option-F12@ 时指定一个元音符号。"
+	"以下脚本将处理这一点：")
 CODE (U"form: \"Save vowel and formants\"")
 	CODE1 (U"word: \"Vowel\", \"a\"")
 CODE (U"endform")
@@ -1007,88 +997,86 @@ CODE (U"f2 = Get second formant")
 CODE (U"f21 = f2 - f1")
 CODE (U"appendInfoLine: vowel$, \" \", fixed$ (f1, 0), \" \", fixed$ (f21, 0)")
 CODE (U"appendFileLine: \"~/Praat logs/Vowels and formants log\", vowel$, tab$, fixed$ (f1, 0), tab$, fixed$ (f21, 0)")
-NORMAL (U"Beware of the following pitfall: because of the nature of scripts, you should not try to do this "
-	"when you have two editor windows with the same name. We cannot predict which of the two windows "
-	"will answer the #Get queries...")
+NORMAL (U"注意以下陷阱：由于脚本的特性，当您有两个同名的编辑器窗口时，不要尝试这样做。"
+	"我们无法预测这两个窗口中哪一个会响应 #Get 查询……")
 MAN_END
 
 MAN_BEGIN (U"Manipulation", U"ppgb", 20030316)   // 2023
-INTRO (U"One of the @@types of objects@ in Praat, for changing the pitch and duration contours of a sound.")
-ENTRY (U"Inside a manipulation object")
-NORMAL (U"With @Inspect, you will see the following attributes:")
+INTRO (U"Praat 中的@@types of objects|对象类型@之一，用于更改声音的音高和时长曲线。")
+ENTRY (U"Manipulation（操纵）对象内部")
+NORMAL (U"使用 @Inspect（检查）时，您将看到以下属性：")
 TERM (U"##timeStep")
-DEFINITION (U"the time step (or %%frame length%) used in the pitch analysis. A common value is 0.010 seconds.")
+DEFINITION (U"音高分析中使用的时间步长（或%%frame length%，帧长）。常用值为 0.010 秒。")
 TERM (U"##pitchFloor")
-DEFINITION (U"the minimum pitch frequency considered in the pitch analysis. A common value is 75 hertz.")
+DEFINITION (U"音高分析中考虑的最小音高频率。常用值为 75 赫兹。")
 TERM (U"##pitchCeiling")
-DEFINITION (U"the maximum pitch frequency considered in the pitch analysis. A common value is 600 hertz.")
-NORMAL (U"A Manipulation object also contains the following smaller objects:")
-LIST_ITEM (U"1. The original @Sound.")
-LIST_ITEM (U"2. A @PointProcess representing glottal pulses.")
-LIST_ITEM (U"3. A @PitchTier.")
-LIST_ITEM (U"4. A @DurationTier.")
-ENTRY (U"Analysis")
-NORMAL (U"When a Manipulation object is created from a sound, the following steps are performed:")
-LIST_ITEM (U"1. A pitch analysis is performed on the original sound, with the method of @@Sound: To Pitch...@. "
-	"This uses the time step, pitch floor, and pitch ceiling parameters.")
-LIST_ITEM (U"2. The information of the resulting pitch contour (frequency and voiced/unvoiced decisions) "
-	"is used to posit glottal pulses where the original sound contains much energy. "
-	"The method is the same as in @@Sound & Pitch: To PointProcess (cc)@.")
-LIST_ITEM (U"3. The pitch contour is converted to a pitch tier with many points (targets), "
-	"with the method of @@Pitch: To PitchTier@.")
-LIST_ITEM (U"4. An empty @DurationTier is created.")
-ENTRY (U"Resynthesis")
-TERM (U"A Manipulation object can produce Sound input. This Sound can be computed in several ways:")
-LIST_ITEM (U"• @@overlap-add@: from original sound + pulses + pitch tier + duration tier;")
-LIST_ITEM (U"• #LPC: from LPC (from original sound) + pulses + pitch tier;")
-LIST_ITEM (U"• from the pulses only, as a pulse train or hummed;")
-LIST_ITEM (U"• from the pitch tier only, as a pulse train or hummed.")
+DEFINITION (U"音高分析中考虑的最大音高频率。常用值为 600 赫兹。")
+NORMAL (U"一个 Manipulation 对象还包含以下较小的对象：")
+LIST_ITEM (U"1. 原始 @Sound（声音）对象。")
+LIST_ITEM (U"2. 表示声门脉冲的 @PointProcess（点过程）对象。")
+LIST_ITEM (U"3. 一个 @PitchTier（音高层）对象。")
+LIST_ITEM (U"4. 一个 @DurationTier（时长层）对象。")
+ENTRY (U"分析")
+NORMAL (U"当从声音创建 Manipulation 对象时，会执行以下步骤：")
+LIST_ITEM (U"1. 使用 @@Sound: To Pitch...@ 的方法对原始声音进行音高分析。"
+	"这会使用时间步长、音高下限和音高上限参数。")
+LIST_ITEM (U"2. 得到的音高曲线信息（频率和有声/无声决策）"
+	"被用于在原始声音包含较多能量的位置放置声门脉冲。"
+	"其方法与 @@Sound & Pitch: To PointProcess (cc)@ 相同。")
+LIST_ITEM (U"3. 使用 @@Pitch: To PitchTier@ 的方法将音高曲线转换为包含许多点（目标点）的音高层。")
+LIST_ITEM (U"4. 创建一个空的 @DurationTier（时长层）对象。")
+ENTRY (U"重合成（Resynthesis）")
+TERM (U"Manipulation 对象可以生成 Sound 输入。该 Sound 可以通过以下几种方式进行计算：")
+LIST_ITEM (U"• @@overlap-add|重叠相加法@：基于 原始声音 + 脉冲 + 音高层 + 时长层；")
+LIST_ITEM (U"• #LPC：基于 LPC（来自原始声音）+ 脉冲 + 音高层；")
+LIST_ITEM (U"• 仅基于脉冲，以脉冲列或嗡嗡声（蜂鸣）形式；")
+LIST_ITEM (U"• 仅基于音高层，以脉冲列或嗡嗡声（蜂鸣）形式。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Extract duration tier", U"ppgb", 20010330)
-INTRO (U"A command to extract a copy of the duration information in each selected @Manipulation object into a new @DurationTier object.")
+INTRO (U"从每个选中的 @Manipulation 对象中提取时长信息，复制到一个新的 @DurationTier 对象的命令。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Extract original sound", U"ppgb", 20010330)
-INTRO (U"A command to copy the original sound in each selected @Manipulation object to a new @Sound object.")
+INTRO (U"将每个选中的 @Manipulation 对象中的原始声音复制到一个新的 @Sound 对象中的命令。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Extract pitch tier", U"ppgb", 20010330)
-INTRO (U"A command to extract a copy of the pitch information in each selected @Manipulation object into a new @PitchTier object.")
+INTRO (U"从每个选中的 @Manipulation 对象中提取音高信息，复制到一个新的 @PitchTier 对象的命令。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Extract pulses", U"ppgb", 20010330)
-INTRO (U"A command to extract a copy of the vocal-pulse information in each selected @Manipulation object into a new @PointProcess object.")
+INTRO (U"从每个选中的 @Manipulation 对象中提取声带脉冲信息，复制到一个新的 @PointProcess 对象的命令。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Play (overlap-add)", U"ppgb", 20070722)
-INTRO (U"A command to play each selected @Manipulation object, resynthesized with the @@overlap-add@ method.")
+INTRO (U"播放每个选中的 @Manipulation 对象，通过 @@overlap-add|重叠相加法@ 重合成声音的命令。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Get resynthesis (overlap-add)", U"ppgb", 20070722)
-INTRO (U"A command to extract the sound from each selected @Manipulation object, resynthesized with the @@overlap-add@ method.")
+INTRO (U"从每个选中的 @Manipulation 对象中提取声音，通过 @@overlap-add|重叠相加法@ 重合成的命令。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Replace duration tier", U"ppgb", 20030216)
-INTRO (U"You can replace the duration tier that you see in your @Manipulation object "
-	"with a separate @DurationTier object, for instance one that you extracted from another Manipulation "
-	"or one that you created with @@Create DurationTier...@.")
-NORMAL (U"To do this, select your Manipulation object together with the @DurationTier object and click ##Replace duration tier#.")
+INTRO (U"您可以使用一个单独的 @DurationTier 对象来替换您在 @Manipulation 对象中看到的时长层，"
+	"例如，您从另一个 Manipulation 提取的时长层，"
+	"或者您使用 @@Create DurationTier...@ 创建的时长层。")
+NORMAL (U"要做到这一点，请同时选择您的 Manipulation 对象和 @DurationTier 对象，然后点击 ##Replace duration tier#。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Replace pitch tier", U"ppgb", 20030216)
-INTRO (U"You can replace the pitch tier that you see in your @Manipulation object "
-	"with a separate @PitchTier object, for instance one that you extracted from another Manipulation "
-	"or one that you created with @@Create PitchTier...@.")
-NORMAL (U"To do this, select your Manipulation object together with the @PitchTier object and click ##Replace pitch tier#.")
+INTRO (U"您可以使用一个单独的 @PitchTier 对象来替换您在 @Manipulation 对象中看到的音高层，"
+	"例如，您从另一个 Manipulation 提取的音高层，"
+	"或者您使用 @@Create PitchTier...@ 创建的音高层。")
+NORMAL (U"要做到这一点，请同时选择您的 Manipulation 对象和 @PitchTier 对象，然后点击 ##Replace pitch tier#。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Replace pulses", U"ppgb", 20010330)
-INTRO (U"A command to replace the vocal-pulse information in the selected @Manipulation object with the selected @PointProcess object.")
+INTRO (U"用选中的 @PointProcess 对象替换选中 @Manipulation 对象中的声带脉冲信息的命令。")
 MAN_END
 
 MAN_BEGIN (U"Manipulation: Replace original sound", U"ppgb", 20010330)
-INTRO (U"A command to replace the original sound in the selected @Manipulation object with the selected @Sound object.")
+INTRO (U"用选中的 @Sound 对象替换选中 @Manipulation 对象中的原始声音的命令。")
 MAN_END
 
 MAN_BEGIN (U"ManipulationEditor", U"ppgb", 20030316)  // 2023-06-08
@@ -1126,21 +1114,20 @@ ENTRY (U"简化（Stylization）")
 MAN_END
 
 MAN_BEGIN (U"Matrix", U"ppgb", 20240712)
-INTRO (U"One of the @@types of objects@ in Praat. "
-	"A Matrix object represents a function %z (%x, %y) "
-	"on the domain [%x__%min_, %x__%max_] × [%y__%min_, %y__%max_]. "
-	"The domain has been sampled in the %x and %y directions "
-	"with constant sampling intervals (%dx and %dy) along each direction. "
-	"The samples are thus %z [%i_%y] [%i_%x], %i_%x = 1 ... %n_%x, %i_%y = 1 ... %n_%y. "
-	"The samples represent the function values %z (%x__1_ + (%i_%x - 1) %dx, %y__1_ + (%i_%y - 1) %dy).")
-ENTRY (U"Matrix commands")
-NORMAL (U"Creation:")
+INTRO (U"Praat 中的@@types of objects|对象类型@之一。 "
+	"一个 Matrix（矩阵）对象表示定义域 [%x__%min_, %x__%max_] × [%y__%min_, %y__%max_] 上的一个函数 %z (%x, %y)。 "
+	"该定义域已在 %x 和 %y 方向上进行采样，"
+	"在每个方向上具有恒定的采样间隔（%dx and %dy）。 "
+	"因此，样本为 %z [%i_%y] [%i_%x], %i_%x = 1 ... %n_%x, %i_%y = 1 ... %n_%y。 "
+	"这些样本表示函数值 %z (%x__1_ + (%i_%x - 1) %dx, %y__1_ + (%i_%y - 1) %dy)。")
+ENTRY (U"Matrix 命令")
+NORMAL (U"创建：")
 LIST_ITEM (U"• @@Create Matrix...")
 LIST_ITEM (U"• @@Create simple Matrix...")
 LIST_ITEM (U"• @@Read from file...")
 LIST_ITEM (U"• @@Read Matrix from raw text file...")
 LIST_ITEM (U"• ##Read Matrix from LVS AP file...")
-NORMAL (U"Drawing:")
+NORMAL (U"绘制：")
 LIST_ITEM (U"• ##Matrix: Draw rows...")
 LIST_ITEM (U"• ##Matrix: Draw contours...")
 LIST_ITEM (U"• ##Matrix: Paint contours...")
@@ -1149,97 +1136,96 @@ LIST_ITEM (U"• ##Matrix: Scatter plot...")
 LIST_ITEM (U"• @@Matrix: Draw as squares...")
 LIST_ITEM (U"• ##Matrix: Draw value distribution...")
 LIST_ITEM (U"• ##Matrix: Paint surface...")
-NORMAL (U"Modification:")
+NORMAL (U"修改：")
 LIST_ITEM (U"• @@Matrix: Formula...")
 LIST_ITEM (U"• ##Matrix: Scale...")
-ENTRY (U"Inside a Matrix object")
-NORMAL (U"With @Inspect, you will see the following attributes.")
+ENTRY (U"Matrix 对象内部")
+NORMAL (U"使用 @Inspect（检查）时，您将看到以下属性。")
 TERM (U"%xmin, %xmax ≥ %xmin")
-DEFINITION (U"%x domain.")
+DEFINITION (U"%x 定义域。")
 TERM (U"%nx ≥ 1")
-DEFINITION (U"number of columns.")
+DEFINITION (U"列数。")
 TERM (U"%dx > 0.0")
-DEFINITION (U"distance between columns.")
+DEFINITION (U"列之间的距离。")
 TERM (U"%x1")
-DEFINITION (U"%x value associated with first column.")
+DEFINITION (U"与第一列关联的 %x 值。")
 TERM (U"%ymin, %ymax ≥ %ymin")
-DEFINITION (U"%y domain.")
+DEFINITION (U"%y 定义域。")
 TERM (U"%ny ≥ 1")
-DEFINITION (U"number of rows.")
+DEFINITION (U"行数。")
 TERM (U"%dy > 0.0")
-DEFINITION (U"distance between rows.")
+DEFINITION (U"行之间的距离。")
 TERM (U"%y1")
-DEFINITION (U"%y value associated with first row.")
+DEFINITION (U"与第一行关联的 %y 值。")
 TERM (U"%z [1..%ny] [1..%nx]")
-DEFINITION (U"The sample values.")
-NORMAL (U"After creation of the #Matrix, %xmin, %xmax, %ymin, %ymax, "
-	"%nx, %ny, %dx, %dy, %x1, and %y1 "
-	"do not usually change. The contents of %z do.")
-NORMAL (U"Normally, you will want %xmin ≤ %x1 and %xmax ≥ %x1 + (%nx - 1) %dx.")
-ENTRY (U"Example: simple matrix")
-NORMAL (U"If a simple matrix has %x equal to column number "
-	"and %y equal to row number, it has the following attributes:")
+DEFINITION (U"样本值。")
+NORMAL (U"在创建 #Matrix（矩阵）之后，%xmin, %xmax, %ymin, %ymax, "
+	"%nx, %ny, %dx, %dy, %x1 和 %y1 "
+	"通常不会改变，而 %z 的内容会改变。")
+NORMAL (U"通常情况下，您会希望 %xmin ≤ %x1 且 %xmax ≥ %x1 + (%nx - 1) %dx。")
+ENTRY (U"示例：简单矩阵")
+NORMAL (U"如果简单矩阵的 %x 等于列号，"
+	"且 %y 等于行号，它具有以下属性：")
 LIST_ITEM (U"%xmin = 1;   %xmax = %nx;   %dx = 1;  %x1 = 1;")
 LIST_ITEM (U"%ymin = 1;   %ymax = %ny;   %dy = 1;  %y1 = 1;")
-ENTRY (U"Example: sampled signal")
-NORMAL (U"If the matrix represents a sampled signal of 1 second duration "
-	"with a sampling frequency of 10 kHz, it has the following attributes:")
+ENTRY (U"示例：采样信号")
+NORMAL (U"如果矩阵表示持续时间为 1 秒且采样频率为 10 kHz 的采样信号，"
+	"它具有以下属性：")
 LIST_ITEM (U"%xmin = 0.0;   %xmax = 1.0;   %nx = 10000 ;   %dx = 1.0·10^^-4^;   %x1 = 0.5·10^^-4^;")
 LIST_ITEM (U"%ymin = 1;   %ymax = 1;   %ny = 1;   %dy = 1;   %y1 = 1;")
-ENTRY (U"Example: complex signal")
-NORMAL (U"If the matrix represents a complex spectrum "
-	"derived with an @FFT from the sound of example 2, it has the following attributes:")
+ENTRY (U"示例：复杂信号")
+NORMAL (U"如果矩阵代表一个复杂频谱，"
+	"该频谱是用 @FFT（快速傅里叶变换）从示例 2 中的声音导出的，它具有以下属性：")
 LIST_ITEM (U"%xmin = 0.0;   %xmax = 5000.0;   %nx = 8193 ;   %dx = 5000.0 / 8192;   %x1 = 0.0;")
-LIST_ITEM (U"%ny = 2 (real and imaginary part);")
-LIST_ITEM (U"%ymin = 1 (first row, real part);")
-LIST_ITEM (U"%ymax = 2 (second row, imaginary part);")
-LIST_ITEM (U"%dy = 1;   %y1 = 1;  (so that %y is equal to row number)")
+LIST_ITEM (U"%ny = 2（实部和虚部）；")
+LIST_ITEM (U"%ymin = 1（第一行，实部）；")
+LIST_ITEM (U"%ymax = 2（第二行，虚部）；")
+LIST_ITEM (U"%dy = 1;   %y1 = 1;（使得 %y 等于行号）")
 MAN_END
 
 MAN_BEGIN (U"Matrix: Draw as squares...", U"ppgb", 19980319)
-INTRO (U"A command to draw a @Matrix object into the @@Picture window@.")
-ENTRY (U"Settings")
+INTRO (U"将 @Matrix 对象绘制到 @@Picture window|Picture 窗口@ 中的命令。")
+ENTRY (U"设置")
 TERM (U"##Xmin")
 TERM (U"##Xmax")
-DEFINITION (U"the windowing domain in the %x direction. Elements outside will not be drawn. "
-	"%Autowindowing: if (%Xmin ≥ %Xmax), the entire %x domain [%x__%min_, %x__%max_] of the Matrix is used.")
+DEFINITION (U"%x 方向的窗口域。在此范围之外的元素将不会被绘制。 "
+	"%Autowindowing（自动窗口化）：如果（%Xmin ≥ %Xmax），将使用该矩阵的整个 %x 域 [%x__%min_, %x__%max_]。")
 TERM (U"##Ymin")
 TERM (U"##Ymax")
-DEFINITION (U"the windowing domain in the %y direction. Elements outside will not be drawn. "
-	"%Autowindowing: if (%Ymin ≥ %Ymax), the entire %y domain [%y__%min_, %y__%max_] of the Matrix is used.")
+DEFINITION (U"%y 方向的窗口域。在此范围之外的元素将不会被绘制。 "
+	"%Autowindowing（自动窗口化）：如果（%Ymin ≥ %Ymax），将使用该矩阵的整个 %y 域 [%y__%min_, %y__%max_]。")
 TERM (U"##Garnish")
-DEFINITION (U"determines whether axes are drawn around the picture. "
-	"Turn this button off if you prefer to garnish your picture by yourself with the @Margins menu.")
-ENTRY (U"Behaviour")
-NORMAL (U"For every element of the Matrix inside the specified windowing domain, "
-	"an opaque white or black rectangle is painted (white if the value of the element is positive, "
-	"black if it is negative), surrounded by a thin black box. "
-	"The %area of the rectangle is proportional to the value of the element.")
-ENTRY (U"Trick")
-NORMAL (U"If you prefer the %sides of the rectangle (instead of the area) to be proportional "
-	"to the value of the element, you can use the formula \"`self^2`\" before drawing (see @@Matrix: Formula...@).") 
+DEFINITION (U"决定是否在图画周围绘制轴。 "
+	"如果您更喜欢自己使用 @Margins（边距）菜单来点缀图画，请关闭此按钮。")
+ENTRY (U"行为")
+NORMAL (U"对于在指定窗口域内的 Matrix 的每个元素， "
+	"会绘制一个不透明的白色或黑色矩形（如果元素的值为正，则为白色，"
+	"如果为负，则为黑色），周围环绕着一个黑色细线框。 "
+	"矩形的%面积与元素的值成正比。")
+ENTRY (U"技巧")
+NORMAL (U"如果您希望矩形的%边长（而不是面积）与元素的值成正比， "
+	"您可以在绘制前使用公式“`self^2`”（参见 @@Matrix: Formula...@）。")
 MAN_END
 
 MAN_BEGIN (U"Matrix: Formula...", U"ppgb", 20021206)
-INTRO (U"A command for changing the data in all selected @Matrix objects.")
-NORMAL (U"See the @Formulas tutorial for examples and explanations.")
+INTRO (U"更改所有选定 @Matrix 对象中数据的命令。")
+NORMAL (U"有关示例和解释，请参阅 @Formulas 教程。")
 MAN_END
 
 MAN_BEGIN (U"Matrix: Paint cells...", U"ppgb", 20021204)
-INTRO (U"A command to draw the contents of a @Matrix to the @@Picture window@.")
-NORMAL (U"Every cell of the matrix is drawn as a rectangle filled with a grey value between white (if the content "
-	"of the cell is small) and black (if the content is large).")
+INTRO (U"将 @Matrix 的内容绘制到 @@Picture window|Picture 窗口@ 中的命令。")
+NORMAL (U"矩阵的每个单元格都绘制为一个矩形，矩形填充有介于白色（如果单元格的内容较小）和黑色（如果内容较大）之间的灰色值。")
 MAN_END
 
 MAN_BEGIN (U"Matrix: Set value...", U"ppgb", 19980319)
-INTRO (U"A command to change the value of one cell in each selected @Matrix object.")
-ENTRY (U"Settings")
+INTRO (U"更改每个选定 @Matrix 对象中一个单元格的值的命令。")
+ENTRY (U"设置")
 TERM (U"##Row number")
-DEFINITION (U"the number of the row of the cell whose value you want to change.")
+DEFINITION (U"您要更改其值的单元格所在的行号。")
 TERM (U"##Column number")
-DEFINITION (U"the number of the column of the cell whose value you want to change.")
+DEFINITION (U"您要更改其值的单元格所在的列号。")
 TERM (U"##New value")
-DEFINITION (U"the value that you want the specified cell to have.")
+DEFINITION (U"您希望指定的单元格具有的新值。")
 MAN_END
 
 /*
@@ -1382,16 +1368,16 @@ or incorrect choices.
 */
 
 MAN_BEGIN (U"Matrix: To TableOfReal", U"ppgb", 19991030)
-INTRO (U"A command to convert every selected @Matrix to a @TableOfReal.")
-NORMAL (U"This command is available from the #Cast menu. The resulting TableOfReal "
-	"has the same number of rows and columns as the original Matrix, "
-	"and the same data in the cells. However, it does not yet have any row or column "
-	"labels; you can add those with some commands from the TableOfReal #Modify menu.")
+INTRO (U"将每个选中的 @Matrix 转换为 @TableOfReal 的命令。")
+NORMAL (U"该命令可从 #Cast 菜单中获得。生成的 TableOfReal "
+	"具有与原始 Matrix 相同的行数和列数， "
+	"并且单元格中具有相同的数据。但是，它尚没有任何行或列 "
+	"标签；您可以使用 TableOfReal #Modify 菜单中的一些命令来添加这些标签。")
 MAN_END
 
 MAN_BEGIN (U"Modify", U"ppgb", 20021204)
-INTRO (U"The title of a submenu of the @@dynamic menu@ for many object types. "
-	"This submenu usually collects all the commands that can change the selected object.")
+INTRO (U"许多对象类型的 @@dynamic menu|动态菜单@ 子菜单的标题。 "
+	"此子菜单通常收集所有可以更改所选对象的命令。")
 MAN_END
 
 MAN_BEGIN (U"PairDistribution", U"ppgb", 20030316)

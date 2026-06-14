@@ -22,85 +22,80 @@ void manual_scripting_init (ManPages me);
 void manual_scripting_init (ManPages me) {
 
 MAN_BEGIN (U"Paste history", U"ppgb", 20050822)
-INTRO (U"A command in the #Edit menu of a @ScriptEditor, for inserting the history of commands. "
-	"See @@History mechanism@.")
+INTRO (U"@ScriptEditor（脚本编辑器）的 #Edit 菜单中的一个命令，用于插入命令的历史记录。 "
+	"参见 @@History mechanism|历史机制@。")
 MAN_END
 
 MAN_BEGIN (U"Clear history", U"ppgb", 20000927)
-INTRO (U"A command in the Edit menu of the @ScriptEditor for clearing the remembered history. "
-	"See @@History mechanism@.")
+INTRO (U"@ScriptEditor（脚本编辑器）的 #Edit 菜单中的一个命令，用于清除已记录的历史记录。 "
+	"参见 @@History mechanism|历史机制@。")
 MAN_END
 
 MAN_BEGIN (U"History mechanism", U"ppgb", 20040414)
-INTRO (U"The easiest way to do @@scripting@. "
-	"The %history is the sequence of all menu commands "
-	"(in the Objects or Picture window or in the editors), "
-	"action commands (in the dynamic menu), "
-	"or mouse clicks on objects (in the list of objects), that you performed during your Praat session, "
-	"together with the settings that you specified in the settings windows "
-	"that popped up as a result of those commands.")
+INTRO (U"这是进行 @@scripting|脚本编写@ 最简单的方法。 "
+	"所谓%历史记录（history）%是指您在 Praat 会话期间执行的所有菜单命令"
+	"（在对象窗口、画图窗口或各编辑器中）、"
+	"操作命令（在动态菜单中）"
+	"或在对象列表上点击鼠标的顺序，"
+	"以及您在由于执行这些命令而弹出的设置窗口中指定的设置。")
 ENTRY (U"Viewing the history")
-NORMAL (U"To view your history, you first open a @ScriptEditor with @@New Praat script@ or @@Open Praat script...@. "
-	"You then choose @@Paste history@ from the #Edit menu.")
+NORMAL (U"要查看历史记录，您首先需要通过 @@New Praat script|新建 Praat 脚本@ 或 @@Open Praat script...|打开 Praat 脚本...@ 打开一个 @ScriptEditor（脚本编辑器）。 "
+	"然后，从 #Edit 菜单中选择 @@Paste history|粘贴历史@。")
 ENTRY (U"Recording a macro")
-NORMAL (U"To record a sequence of mouse clicks for later re-use, "
-	"perform the following steps:")
-LIST_ITEM (U"1. Choose @@Clear history@ from the #Edit menu. "
-	"This makes the history mechanism forget all previous clicks.")
-LIST_ITEM (U"2. Perform the actions that you want to record.")
-LIST_ITEM (U"3. Choose @@Paste history@ from the #Edit menu. Because you cleared the history "
-	"before you started, the resulting script contains only the actions "
-	"that you performed in step 2. "
-	"You can now already re-run the actions that you performed in step 2.")
-LIST_ITEM (U"4. You can save the recorded actions to a script file by choosing #Save from the #File menu.")
-LIST_ITEM (U"5. You can put this script file under a button in the @@dynamic menu@ "
-	"by choosing @@Add to dynamic menu...@ from the File menu, "
-	"or under a button in a fixed menu by choosing @@Add to fixed menu...@. "
-	"This button will be preserved across Praat sessions.")
-NORMAL (U"This macro mechanism is much more flexible than the usual opaque macro mechanism "
-	"used by most programs, because you can edit the script and make some "
-	"of the arguments variable by putting them in the #form clause at the top of the script. "
-	"In this way, the script will prompt the user for these arguments, "
-	"just as with all the menu and action commands that end in the three dots (...). "
-	"See the @Scripting tutorial for all the things that you can do in scripts.")
+NORMAL (U"要记录一系列鼠标点击以供日后重复使用，"
+	"请执行以下步骤：")
+LIST_ITEM (U"1. 从 #Edit 菜单中选择 @@Clear history|清除历史@。 "
+	"这会使历史记录机制忘掉之前的所有点击。")
+LIST_ITEM (U"2. 执行您想要记录的操作。")
+LIST_ITEM (U"3. 从 #Edit 菜单中选择 @@Paste history|粘贴历史@。因为您在开始前清空了历史记录，"
+	"生成的脚本将只包含您在第 2 步中执行的操作。 "
+	"此时您就已经可以重新运行在第 2 步中执行的操作了。")
+LIST_ITEM (U"4. 您可以通过从 #File 菜单中选择 #Save，将记录的操作保存到脚本文件中。")
+LIST_ITEM (U"5. 您可以通过从 File 菜单中选择 @@Add to dynamic menu...|添加到动态菜单...@，将此脚本文件置于 @@dynamic menu|动态菜单@ 的按钮下，"
+	"或者通过选择 @@Add to fixed menu...|添加到固定菜单...@ 将其置于固定菜单的按钮下。"
+	"该按钮将在不同的 Praat 会话之间保留。")
+NORMAL (U"这种宏机制比大多数程序所使用的常见且不透明的宏机制要灵活得多，"
+	"因为您可以编辑脚本，并通过在脚本顶部放入 #form 子句使某些参数成为变量。"
+	"通过这种方式，脚本会向用户提示输入这些参数， "
+	"就像所有以省略号（...）结尾的菜单和操作命令一样。 "
+	"有关您在脚本中可以做的事情，请参阅 @Scripting 教程。")
 MAN_END
 
 MAN_BEGIN (U"New Praat script", U"ppgb", 20050822)
-INTRO (U"A command in the @@Praat menu@ for creating a new Praat script. "
-	"It creates a @ScriptEditor with an empty script that you can edit, run, and save.") 
+INTRO (U"@@Praat menu|Praat 菜单@ 中的一个命令，用于创建一个新的 Praat 脚本。"
+	"它会创建一个带有空白脚本的 @ScriptEditor（脚本编辑器），供您编辑、运行和保存。")
 MAN_END
 
 MAN_BEGIN (U"New Praat notebook", U"ppgb", 20230325)
-INTRO (U"A command in the @@Praat menu@ for creating a new Praat notebook. "
-	"It creates a @NotebookEditor with an empty notebook that you can edit, run, and save.")
+INTRO (U"@@Praat menu|Praat 菜单@ 中的一个命令，用于创建一个新的 Praat 笔记本（notebook）。"
+	"它会创建一个带有空白笔记本的 @NotebookEditor（笔记本编辑器），供您编辑、运行和保存。")
 MAN_END
 
 MAN_BEGIN (U"Open Praat script...", U"ppgb", 20050822)
-INTRO (U"A command in the @@Praat menu@ for editing an existing @@Praat script@. "
-	"It creates a @ScriptEditor and asks "
-	"you to select a file. If you click #%OK, the file is read into the ScriptEditor window, "
-	"and you can run and edit it; if you click #%Cancel, you get an empty script, as with @@New Praat script@.")
+INTRO (U"@@Praat menu|Praat 菜单@ 中的一个命令，用于编辑现有的 @@Praat script|Praat 脚本@。"
+	"它会创建一个 @ScriptEditor（脚本编辑器）并请求您选择一个文件。"
+	"如果您点击 #%OK，该文件将被读取到 ScriptEditor 窗口中，您可以运行和编辑它；"
+	"如果您点击 #%Cancel，您将得到一个空脚本，效果同 @@New Praat script|新建 Praat 脚本@。")
 MAN_END
 
 MAN_BEGIN (U"Open Praat notebook...", U"ppgb", 20230325)
-INTRO (U"A command in the @@Praat menu@ for editing an existing @@Praat notebook@. "
-	"It creates a @NotebookEditor and asks "
-	"you to select a file. If you click #%OK, the file is read into the NotebookEditor window, "
-	"and you can run and edit it; if you click #%Cancel, you get an empty notebook, as with @@New Praat notebook@.")
+INTRO (U"@@Praat menu|Praat 菜单@ 中的一个命令，用于编辑现有的 @@Praat notebook|Praat 笔记本@。"
+	"它会创建一个 @NotebookEditor（笔记本编辑器）并请求您选择一个文件。"
+	"如果您点击 #%OK，该文件将被读取到 NotebookEditor 窗口中，您可以运行 and 编辑它；"
+	"如果您点击 #%Cancel，您将得到一个空笔记本，效果同 @@New Praat notebook|新建 Praat 笔记本@。")
 MAN_END
 
 MAN_BEGIN (U"Praat script", U"ppgb", 20230325)
-INTRO (U"An executable program text in the Praat scripting language, which consists of menu commands, action commands, computations and control flow.")
-NORMAL (U"See the @Scripting tutorial.")
+INTRO (U"用 Praat 脚本语言编写的可执行程序文本，由菜单命令、操作命令、计算和控制流组成。")
+NORMAL (U"参见 @Scripting 教程。")
 MAN_END
 
 MAN_BEGIN (U"Praat notebook", U"ppgb", 20230325)
-INTRO (U" A text document with which you can create things that look like Praat’s manual pages, "
-	"with capabilities of graphics and @scripting.")
+INTRO (U"一个文本文档，您可以使用它创建看起来像 Praat 帮助页面内容的手册，并具有图形和 @scripting（脚本编写）能力。")
 MAN_END
 
 MAN_BEGIN (U"NotebookEditor", U"ppgb", 20230325)
-INTRO (U"An aid to documented @@scripting@ as well as to creating manual pages.")
+INTRO (U"用于文档化 @@scripting|脚本编写@ 以及创建手册页面的辅助工具。")
 MAN_END
 
 MAN_PAGES_BEGIN
@@ -788,12 +783,11 @@ CODE (U"endfor")
 MAN_END
 
 MAN_BEGIN (U"Scripting 3.7. Layout", U"ppgb", 20170904)
-INTRO (U"This chapter handles the way you use white space, comments, and continuation lines in a Praat script.")
+INTRO (U"本章介绍在 Praat 脚本中如何使用空白字符、注释和续行。")
 ENTRY (U"White space")
-NORMAL (U"Praat ignores all white space (spaces and tabs) that you put at the beginning of lines. The indentation "
-	"that you saw on the @@Scripting 3.6. “For” loops|previous page@ was therefore used solely for readability. "
-	"You are advised to use indenting, though, with three or four spaces for each level, "
-	"as in the following example, which loops over all tiers and intervals of a TextGrid:")
+NORMAL (U"Praat 会忽略您在行首放置的所有空白字符（空格和制表符）。因此，您在 @@Scripting 3.6. “For” loops|前一页@ 中看到的缩进纯粹是为了提高可读性。 "
+	"不过，建议您使用缩进，每层缩进使用三到四个空格， "
+	"如下面的示例所示，该示例循环遍历 TextGrid 的所有层和区间：")
 CODE (U"writeInfoLine: “The texts in all tiers and intervals:”")
 CODE (U"numberOfTiers = Get number of tiers")
 CODE (U"for tierNumber from 1 to numberOfTiers")
@@ -803,29 +797,28 @@ CODE (U"for tierNumber from 1 to numberOfTiers")
 		CODE2 (U"appendInfoLine: “Tier ”, tierNumber, “, interval ”, intervalNumber, “: ”, text$")
 	CODE1 (U"endfor")
 CODE (U"endfor")
-NORMAL (U"Praat also ignores lines that are empty or consist solely of white space, "
-	"so you use those to structure your script visually.")
+NORMAL (U"Praat 还会忽略空白行或仅包含空白字符的行， "
+	"因此您可以使用它们在视觉上结构化您的脚本。")
 ENTRY (U"Comments")
-NORMAL (U"Comments are lines that start with “`#`” or “`;`”. Praat ignores these lines when your script is running:")
+NORMAL (U"注释是以 “`#`” 或 “`;`” 开头的行。当您的脚本运行时，Praat 会忽略这些行：")
 CODE (U"# Create 1 second of a sine wave with a frequency of 100 Hertz,")
 CODE (U"# sampled at 44100 Hz:")
 CODE (U"Create Sound from formula: “sine”, 1, 0, 1, 44100, ~ sin (2*pi*100*x)")
-NORMAL (U"Because of its visibility, you are advised to use “`#`” for comments that structure your script, "
-	"and “;” perhaps only for “commenting out” a statement, i.e. to temporarily put it before a line "
-	"that you don’t want to execute.")
+NORMAL (U"由于其可见性，建议您在结构化脚本的注释时使用 “`#`”， "
+	"而 “;” 或许只在“注释掉（commenting out）”某条语句时使用，即暂时将其置于您不想执行的代码行之前。")
 ENTRY (U"Continuation lines")
-NORMAL (U"There is normally one line per statement, and one statement per line. But some statements are very long, "
-	"such as this one on a previous page:")
+NORMAL (U"通常每行有一条语句，每条语句占一行。但有些语句非常长， "
+	"比如前一页上的这一条：")
 CODE (U"appendInfoLine: “Interval ”, intervalNumber, “ is ”, duration, “ seconds long and contains the text: ”, text$")
-NORMAL (U"By making the current window wider, you can see that I really put this whole statement on a single line. "
-	"I could have distributed it over two lines in the following way, by using three dots (an %ellipsis):")
+NORMAL (U"通过将当前窗口拉宽，您可以看到我确实将这整个语句放在了单行上。 "
+	"我也可以通过使用三个点（即%省略号%）将其分布在两行中，如下所示：")
 CODE (U"appendInfoLine: “Interval ”, intervalNumber, “ is ”, duration, “ seconds long")
 CODE (U"... and contains the text: ”, text$")
-NORMAL (U"Here is another common type of example:")
+NORMAL (U"这是另一个常见的示例类型：")
 CODE (U"Create Sound from formula: “windowedSine”, 1, 0, 1, 44100,")
 CODE (U"... ~ 0.5 * sin(2*pi*1000*x) * exp(-0.5*((x-0.5)/0.1)^2)")
-NORMAL (U"You will normally want to follow such an ellipsis with a space, unless you want to concatenate "
-	"the parts of a long word:")
+NORMAL (U"通常您会在这种省略号后加一个空格，除非您想要拼接 "
+	"一个长单词的各个部分：")
 CODE (U"Select outer viewport: 0, 10, 0, 4")
 CODE (U"Text top: “yes”, “It’s a long way to Llanfairpwllgwyngyll")
 CODE (U"...gogerychwyrndrobwllllantysiliogogogoch,")
@@ -833,72 +826,72 @@ CODE (U"... unless you start from Tyddyn-y-felin.”")
 MAN_END
 
 MAN_BEGIN (U"Scripting 4. Object selection", U"ppgb", 20130501)
-INTRO (U"This chapter is about how to select objects from your script, "
-	"and how to find out what objects are currently selected.")
-LIST_ITEM (U"@@Scripting 4.1. Selecting objects")
-LIST_ITEM (U"@@Scripting 4.2. Removing objects")
-LIST_ITEM (U"@@Scripting 4.3. Querying objects")
+INTRO (U"本章介绍如何在您的脚本中选择对象， "
+	"以及如何查明当前选择了哪些对象。")
+LIST_ITEM (U"@@Scripting 4.1. Selecting objects|Scripting 4.1. 选择对象@")
+LIST_ITEM (U"@@Scripting 4.2. Removing objects|Scripting 4.2. 删除对象@")
+LIST_ITEM (U"@@Scripting 4.3. Querying objects|Scripting 4.3. 查询对象@")
 MAN_END
 
 MAN_BEGIN (U"Scripting 4.1. Selecting objects", U"ppgb", 20180428)
-NORMAL (U"To simulate the mouse-clicked and dragged selection in the list of objects, "
-	"you have the functions @`selectObject`, @`plusObject` and @`minusObject`.")
-NORMAL (U"Suppose you start Praat and use ##Create Sound as tone...# to create a Sound called %tone. "
-	"In the object list it looks like “1. Sound tone”. "
-	"Suppose you then do ##To Spectrum...# from the ##Analyse Spectrum# menu. "
-	"A second object, called “2. Spectrum tone” appears in the list and is selected. "
-	"To select and play the Sound, you can do either")
+NORMAL (U"为了在对象列表中模拟鼠标点击和拖拽选择， "
+	"您可以使用 @`selectObject`、@`plusObject` 和 @`minusObject` 函数。")
+NORMAL (U"假设您启动 Praat 并使用 ##Create Sound as tone...# 创建一个名为 %tone 的 Sound（声音）对象。 "
+	"在对象列表中，它显示为 “1. Sound tone”。 "
+	"假设您接着从 ##Analyse Spectrum# 菜单中执行 ##To Spectrum...#。 "
+	"列表中会出现第二个名为 “2. Spectrum tone” 的对象且被选中。 "
+	"要选择并播放该 Sound，您可以通过以下任一方式进行：")
 CODE (U"\\#`{selectObject}: 1")
 CODE (U"Play")
-NORMAL (U"or")
+NORMAL (U"或者")
 CODE (U"\\#`{selectObject}: “Sound tone”")
 CODE (U"Play")
-NORMAL (U"So you can select an object either by its unique ID (identifier: the unique number by which it appears in the list) "
-	"or by name.")
-NORMAL (U"The function @`selectObject` works by first deselecting all objects, and then selecting the one you mention. "
-	"If you don’t want to deselect the existing selection, you can use @`plusObject` or @`minusObject`. "
-	"When the Sound is selected, you can select the Spectrum as well by doing")
+NORMAL (U"因此，您可以通过对象的唯一 ID（标识符：它在列表中显示的唯一数字） "
+	"或者它的名称来选择对象。")
+NORMAL (U"@`selectObject` 函数的工作原理是首先取消选择所有对象，然后选择您指定的对象。 "
+	"如果您不想取消当前已选中的对象，可以使用 @`plusObject` 或 @`minusObject`。 "
+	"当 Sound 被选中时，您也可以通过执行以下操作来选择 Spectrum（频谱）：")
 CODE (U"\\#`{plusObject}: 2")
-NORMAL (U"or")
+NORMAL (U"或者")
 CODE (U"\\#`{plusObject}: “Spectrum tone”")
-NORMAL (U"If you then want to deselect the Sound, and keep the Spectrum selected, you can do")
+NORMAL (U"如果您接下来想取消选择 Sound 并保持 Spectrum 处于选中状态，您可以执行")
 CODE (U"\\#`{minusObject}: 1")
-NORMAL (U"or")
+NORMAL (U"或者")
 CODE (U"\\#`{minusObject}: “Sound tone”")
-NORMAL (U"All these functions can take more than one argument. To select the Sound and the Spectrum together, you can do")
+NORMAL (U"所有这些函数都可以接受多个参数。要同时选择 Sound 和 Spectrum，您可以执行")
 CODE (U"\\#`{selectObject}: 1, 2")
-NORMAL (U"or")
+NORMAL (U"或者")
 CODE (U"\\#`{selectObject}: “Sound tone”, “Spectrum tone”")
-NORMAL (U"or even")
+NORMAL (U"甚至")
 CODE (U"\\#`{selectObject}: 1, “Spectrum tone”")
-NORMAL (U"or, using a numeric vector:")
+NORMAL (U"或者，使用数值型向量：")
 CODE (U"myObjects# = { 1, 2 }")
 CODE (U"\\#`{selectObject}: myObjects#")
 ENTRY (U"How to refer to objects created in your script")
-NORMAL (U"In a script, you typically don't know whether the IDs of the objects are 1 and 2, or much higher numbers. "
-	"Fortunately, commands that create a new object give you the ID of the object that is created, "
-	"so that you can refer to the object later on. For instance, suppose you want to generate a sine wave, play it, "
-	"draw its spectrum, and then throw away both the Sound and the Spectrum. Here is how you do it:")
+NORMAL (U"在脚本中，您通常不知道对象的 ID 是 1 和 2，还是大得多的数字。 "
+	"幸运的是，创建新对象的命令会返回所创建对象的 ID， "
+	"以便您稍后引用该对象。例如，假设您要生成一个正弦波、播放它、"
+	"绘制其频谱，然后将该 Sound 和 Spectrum 都扔掉。以下是具体操作方法：")
 CODE (U"sound = Create Sound as pure tone: “sine377”,")
-CODE (U"... 1, 0, 1, 44100, 377, 0.2, 0.01, 0.01   ; remember the ID of the Sound")
-CODE (U"Play   ; the Sound is selected, so it plays")
+CODE (U"... 1, 0, 1, 44100, 377, 0.2, 0.01, 0.01   ; 记住 Sound 的 ID")
+CODE (U"Play   ; Sound 被选中，因此播放")
 CODE (U"To Spectrum: “yes”")
-CODE (U"Draw: 0, 5000, 20, 80, “yes”   ; the Spectrum is selected, so it is drawn")
-CODE (U"# Remove the created Spectrum and Sound:")
-CODE (U"\\#`{plusObject}: sound   ; the Spectrum was already selected")
+CODE (U"Draw: 0, 5000, 20, 80, “yes”   ; Spectrum 被选中，因此被绘制")
+CODE (U"# 移除创建的 Spectrum 和 Sound：")
+CODE (U"\\#`{plusObject}: sound   ; Spectrum 已经被选中了")
 CODE (U"Remove")
-NORMAL (U"You could also select the objects by name:")
+NORMAL (U"您还可以通过名称选择对象：")
 CODE (U"Create Sound as pure tone: “sine377”,")
-CODE (U"... 1, 0, 1, 44100, 377, 0.2, 0.01, 0.01   ; no need to remember the ID of the Sound")
-CODE (U"Play   ; the Sound is selected, so it plays")
+CODE (U"... 1, 0, 1, 44100, 377, 0.2, 0.01, 0.01   ; 不需要记住 Sound 的 ID")
+CODE (U"Play   ; Sound 被选中，因此播放")
 CODE (U"To Spectrum: “yes”")
-CODE (U"Draw: 0, 5000, 20, 80, “yes”   ; the Spectrum is selected, so it is drawn")
-CODE (U"# Remove the created Spectrum and Sound:")
-CODE (U"\\#`{plusObject}: “Sound sine377”   ; the Spectrum was already selected")
+CODE (U"Draw: 0, 5000, 20, 80, “yes”   ; Spectrum 被选中，因此被绘制")
+CODE (U"# 移除创建的 Spectrum 和 Sound：")
+CODE (U"\\#`{plusObject}: “Sound sine377”   ; Spectrum 已经被选中了")
 CODE (U"Remove")
-NORMAL (U"This works even if there are multiple objects called “Sound sine377”, "
-	"because if there are more objects with the same name, @`selectObject` and @`plusObject` select the most recently created one, "
-	"i.e., the one nearest to the bottom of the list of objects.")
+NORMAL (U"即使有多个名为 “Sound sine377” 的对象，这也同样有效， "
+	"因为如果存在多个同名对象，@`selectObject` 和 @`plusObject` 会选择最近创建的一个， "
+	"即最靠近对象列表底部的那个。")
 MAN_END
 
 
@@ -1204,40 +1197,39 @@ endif
 */
 
 MAN_BEGIN (U"Scripting 5.2. Expressions", U"ppgb", 20180721)
-INTRO (U"In a Praat script, you can use numeric expressions as well as string expressions.")
+INTRO (U"在 Praat 脚本中，您可以使用数值表达式以及字符串表达式。")
 ENTRY (U"Numeric expressions")
-NORMAL (U"You can use a large variety of @@Formulas@ in your script:")
+NORMAL (U"您可以在脚本中使用种类繁多的 @@Formulas|公式@：")
 CODE (U"length = 10")
 CODE (U"height = length/2")
 CODE (U"area = length * height")
 CODE (U"writeInfoLine: “The area is ”, area, “.”")
-NORMAL (U"You can use numeric variables and formulas in numeric arguments to commands:")
+NORMAL (U"您可以在命令的数值参数中使用数值变量和公式：")
 CODE (U"Draw line: 0, 0, length / 2, 2 * height")
-NORMAL (U"You can use numeric expressions in assignments (as above), or after "
-	"#`if`, #`elsif`, #`while`, #`until`, and twice after #`for`.")
+NORMAL (U"您可以在赋值（如上所示）、#`if`、#`elsif`、#`while`、#`until` 之后，以及在 #`for` 之后出现两次的位置使用数值表达式。")
 ENTRY (U"String expressions")
-NORMAL (U"You can use a large variety of @@Formulas@ in your script:")
+NORMAL (U"您可以在脚本中使用种类繁多的 @@Formulas|公式@：")
 CODE (U"addressee$ = “Silke”")
 CODE (U"greeting$ = “Hi ” + addressee$ + “!”")
 CODE (U"writeInfoLine: “The greeting is: ”, greeting$")
-NORMAL (U"You can use string variables and formulas in numeric arguments to commands:")
+NORMAL (U"您可以在命令的数值参数中使用字符串变量和公式：")
 CODE (U"Draw line: 0, length (greeting$), 0, 100")
 CODE (U"Draw line: 0, if answer$ = “yes” then 20 else 30 fi, 0, 100")
-NORMAL (U"You can use numeric and string variables and formulas in string arguments to commands:")
+NORMAL (U"您可以在命令的字符串参数中使用数值/字符串变量和公式：")
 CODE (U"Text top: “yes”, “Hi ” + addressee$ + “!”")
 CODE (U"Text top: “yes”, left$ (fileName$, index (fileName$, “.”) - 1)")
 ENTRY (U"Assignments from query commands")
-NORMAL (U"On how to get information from commands that normally write to the Info window, "
-	"see @@Scripting 6.3. Query commands@.")
+NORMAL (U"关于如何从通常写入信息窗口（Info window）的命令中获取信息，"
+	"请参见 @@Scripting 6.3. Query commands|Scripting 6.3. 查询命令@。")
 MAN_END
 
 MAN_BEGIN (U"Scripting 5.3. Jumps", U"ppgb", 19991112)
-NORMAL (U"You can use conditional jumps in your script:")
+NORMAL (U"您可以在脚本中使用条件跳转（分支）：")
 TERM (U"#if %expression")
 TERM (U"#elsif %expression")
-DEFINITION (U"if the expression evaluates to zero or %false, the execution of the script jumps to the next "
-	"#`elsif` or after the next #`else` or #`endif` at the same depth.")
-NORMAL (U"The following script computes the preferred length of a bed for a person `age` years of age:")
+DEFINITION (U"如果表达式的值为零或为 %false，脚本的执行将跳转到同深度下一个 "
+	"#`elsif`，或者跳转到下一个 #`else` 或 #`endif` 之后。")
+NORMAL (U"以下脚本计算适合年龄为 `age` 岁的人的首选床长：")
 CODE (U"if age <= 3")
 	CODE1 (U"length = 1.20")
 CODE (U"elsif age <= 8")
@@ -1245,52 +1237,51 @@ CODE (U"elsif age <= 8")
 CODE (U"else")
 	CODE1 (U"length = 2.00")
 CODE (U"endif")
-NORMAL (U"A variant spelling for #`elsif` is #`elif`.")
+NORMAL (U"#`elsif` 的另一种拼写形式是 #`elif`。")
 MAN_END
 
 MAN_BEGIN (U"Scripting 5.4. Loops", U"ppgb", 20140111)
 ENTRY (U"\"For\" loops")
 TERM (U"#for %variable #from %expression__1_ #to %expression__2_")
 TERM (U"#for %variable #to %expression")
-DEFINITION (U"the statements between the #for line and the matching #endfor will be executed "
-	"while a variable takes on values between two expressions, with an increment (raise) of 1 "
-	"on each turn of the loop. If there is no #from, the loop variable starts at 1.")
-NORMAL (U"The following script plays nine sine waves, with frequencies of 200, 300, ..., 1000 Hz:")
+DEFINITION (U"在 #for 行和相匹配的 #endfor 之间的语句将被循环执行， "
+	"期间变量将在两个表达式的值之间变化，每次循环递增（增加）1。 "
+	"如果没有指定 #from，则循环变量从 1 开始。")
+NORMAL (U"以下脚本播放九个正弦波，频率分别为 200, 300, ..., 1000 Hz：")
 CODE (U"\\#{for} i \\#{from} 2 \\#{to} 10")
 	CODE1 (U"Create Sound as pure tone: \"tone\", 1, 0, 0.3, 44100, i * 100, 0.2, 0.01, 0.01")
 	CODE1 (U"Play")
 	CODE1 (U"Remove")
 CODE (U"\\#{endfor}")
-NORMAL (U"The stop value of the #for loop is evaluated on each turn. If the second expression "
-	"is already less than the first expression to begin with, the statements between #for and #endfor "
-	"are not executed even once.")
+NORMAL (U"#for 循环的终止值在每次循环时进行评估。如果一开始第二个表达式的值 "
+	"就小于第一个表达式的值，则 #for 和 #endfor 之间的语句一次也不会被执行。")
 ENTRY (U"“Repeat” loops")
 TERM (U"#until %expression")
-DEFINITION (U"the statements between the matching preceding #repeat and the #until line "
-	"will be executed again if the expression evaluates to zero or %false.")
-NORMAL (U"The following script measures the number of trials it takes me to throw 12 with two dice:")
+DEFINITION (U"如果在评估该表达式时值为零或为 %false， "
+	"则相匹配的、位于前面的 #repeat 与 #until 行之间的语句将被再次执行。")
+NORMAL (U"以下脚本测量我用两颗骰子掷出 12 点所需要的尝试次数：")
 CODE (U"throws = 0")
 CODE (U"\\#{repeat}")
 	CODE1 (U"eyes = randomInteger (1, 6) + randomInteger (1, 6)")
 	CODE1 (U"throws = throws + 1")
 CODE (U"\\#{until} eyes = 12")
 CODE (U"writeInfoLine: \"It took me \", throws, \" trials to throw 12 with two dice.\"")
-NORMAL (U"The statements in the #repeat/#until loop are executed at least once.")
+NORMAL (U"#repeat/#until 循环中的语句至少会被执行一次。")
 ENTRY (U"\"While\" loops")
 TERM (U"#while %expression")
-DEFINITION (U"if the expression evaluates to zero or %false, the execution of the script jumps "
-	"after the matching #endwhile.")
+DEFINITION (U"如果评估该表达式的值为零或为 %false，脚本的执行将跳转到 "
+	"相匹配的 #endwhile 之后。")
 TERM (U"#endwhile")
-DEFINITION (U"execution jumps back to the matching preceding #while line, which is then evaluated again.")
-NORMAL (U"The following script forces the number %x into the range [0; 2\\pi):")
+DEFINITION (U"执行跳回到相匹配的、位于前面的 #while 行，然后再重新评估它。")
+NORMAL (U"以下脚本将数值 %x 强制转换到范围 [0; 2\\pi) 内：")
 CODE (U"\\#{while} x < 0")
 	CODE1 (U"x = x + 2 * pi")
 CODE (U"\\#{endwhile}")
 CODE (U"\\#{while} x >= 2 * pi")
 	CODE1 (U"x = x - 2 * pi")
 CODE (U"\\#{endwhile}")
-NORMAL (U"If the expression evaluates to zero or %false to begin with, the statements between #while and #endwhile "
-	"are not executed even once.")
+NORMAL (U"如果一开始该表达式的值就为零或为 %false，则 #while 和 #endwhile 之间的语句 "
+	"一次也不会被执行。")
 MAN_END
 
 MAN_PAGES_BEGIN
@@ -2604,16 +2595,16 @@ How many nanoseconds is that per assignment?
 MAN_PAGES_END
 
 MAN_BEGIN (U"Scripting 6.6. Controlling the user", U"ppgb", 20230130)
-INTRO (U"You can temporarily halt a Praat script:")
+INTRO (U"您可以暂时中止 Praat 脚本的运行：")
 TERM (U"#`pauseScript`: %message")
-DEFINITION (U"suspends execution of the script, and allows the user to interrupt it. "
-	"A message window will appear with the %message (you can use the same argument list as with @`writeInfoLine`) and the buttons #Stop and #Continue:")
+DEFINITION (U"挂起脚本的执行，并允许用户中断它。 "
+	"将弹出一个消息窗口，显示 %message（您可以使用与 @`writeInfoLine` 相同的参数列表），并带有 #Stop（停止）和 #Continue（继续）按钮：")
 CODE (U"\\#{pauseScript}: “The next file will be ”, fileName$")
-NORMAL (U"The #`pauseScript` function is useful if you want to send a simple message to the user, "
-	"and you only want to ask the user whether she wants to proceed or not. "
-	"More interesting interactions between your script and the user are possible with the ##%%pause window%#. "
-	"In a pause window you can include the same kinds of arguments as in a @@Scripting 6.1. Arguments to the script|form@. "
-	"Here is an extensive example:")
+NORMAL (U"如果您只想给用户发送一条简单的消息， "
+	"并且只想询问用户是否要继续，那么 #`pauseScript` 函数非常有用。 "
+	"如果您的脚本和用户之间需要更复杂的交互，可以使用##%%暂停窗口（pause window）%#。 "
+	"在暂停窗口中，您可以包含与 @@Scripting 6.1. Arguments to the script|form 窗口@ 中相同类型的参数。 "
+	"以下是一个详尽的示例：")
 CODE (U"writeInfoLine: “script”")
 CODE (U"compression = 1")
 CODE (U"number_of_channels = 2")
@@ -2651,28 +2642,26 @@ CODE (U"for i to 5")
 	CODE1 (U"appendInfoLine: “Input file: ”, input_file$")
 	CODE1 (U"appendInfoLine: “Array: ”, array_of_reals#")
 CODE (U"endfor")
-NORMAL (U"This example uses several tricks. A useful one is seen with `number_of_channels`: "
-	"this is at the same time the value that is passed to #`optionmenu` (and therefore determines the setting of "
-	"the ##Number of channels# menu when the window appears) and the name of the variable in which the user’s "
-	"chosen value of ##Number of channels# is stored (because the text “number\\_ of \\_ channels” is what you get "
-	"by replacing the spaces in “Number of channels” with underscores and turning its first letter to lower case).")
-NORMAL (U"Your own pause windows are not likely to be as rich as the above example. "
-	"For instance, the example has three continuation buttons (the second of these is the default button, "
-	"i.e. the button that you can “click” by pressing the Enter or Return key). "
-	"You will often use only one continuation button, for instance")
+NORMAL (U"该示例使用了几项技巧。其中很实用的一点展现在 `number_of_channels` 上： "
+	"这既是传递给 #`optionmenu` 的值（因此它在窗口出现时决定了 ##Number of channels# 菜单的初始设置），"
+	"又是存储用户选择的 ##Number of channels# 值的变量名称（因为将 “Number of channels” 中的空格替换为下划线并将首字母变为小写，就得到了文本 “number\\_ of \\_ channels”）。")
+NORMAL (U"您自己编写的暂停窗口不太可能像上面的示例那样丰富。 "
+	"例如，该示例有三个继续按钮（其中第二个是默认按钮，"
+	"即您可以通过按 Enter 或 Return 键来“点击”的按钮）。 "
+	"您通常只会使用一个继续按钮，例如")
 CODE (U"\\#{endPause}: “Continue”, 1")
-NORMAL (U"or")
+NORMAL (U"或者")
 CODE (U"\\#{endPause}: “Finish”, 1")
-NORMAL (U"or")
+NORMAL (U"或者")
 CODE (U"\\#{endPause}: “OK”, 1")
-NORMAL (U"If your script shows multiple different pause windows, then it is in fact a %wizard, "
-	"and it becomes useful to have")
+NORMAL (U"如果您的脚本显示多个不同的暂停窗口，那么它实际上就是一个%向导（wizard）%，"
+	"此时对大多数窗口使用")
 CODE (U"\\#{endPause}: “Next”, 1")
-NORMAL (U"for most of them, and")
+NORMAL (U"而对最后一个窗口使用")
 CODE (U"\\#{endPause}: “Finish”, 1")
-NORMAL (U"for the last one.")
-NORMAL (U"The possibility of multiple continuation buttons can save the user a mouse click. "
-	"The following script, for instance, requires two mouse clicks per sound:")
+NORMAL (U"会非常有用。")
+NORMAL (U"有多个继续按钮的设计可以减少用户的鼠标点击。 "
+	"例如，以下脚本处理每个声音都需要点击两次鼠标：")
 CODE (U"for %i to 20")
 	CODE1 (U"Read from file: “sound“ + string$ (i) + “.wav”")
 	CODE1 (U"Play")
@@ -2690,7 +2679,7 @@ CODE (U"for %i to 20")
 	CODE1 (U"\\#{endPause}: if i = 20 then “Finish” else “Next” fi, 1")
 	CODE1 (U"appendInfoLine: quality")
 CODE (U"endfor")
-NORMAL (U"The following script works faster:")
+NORMAL (U"以下脚本工作起来更快：")
 CODE (U"for i to 20")
 	CODE1 (U"Read from file: “sound” + string$ (i) + “.wav”")
 	CODE1 (U"Play")
@@ -2700,29 +2689,29 @@ CODE (U"for i to 20")
 	CODE1 (U"quality = \\#{endPause}: “1”, “2”, “3”, “4”, “5”, “6”, “7”, 0")
 	CODE1 (U"appendInfoLine: quality")
 CODE (U"endfor")
-NORMAL (U"In this example, the 0 at the end of #endPause means that there is no default button.")
+NORMAL (U"在此示例中，#endPause 末尾 of 的 0 意味着没有默认按钮。")
 ENTRY (U"File selection")
-NORMAL (U"If you want the user to choose a file name for reading (opening), do")
+NORMAL (U"如果您想让用户选择一个文件名来读取（打开），请执行：")
 CODE (U"fileName$ = \\#{chooseReadFile$}: “Open a table file\"")
 CODE (U"if fileName$ <> “”")
 	CODE1 (U"table = Read Table from tab-separated file: fileName$")
 CODE (U"endif")
-NORMAL (U"A file selector window will appear, with (in this example) ##Open a table file# as the title. "
-	"If the user clicks #OK, the variable %`fileName$` will contain the name of the file that the user selected; "
-	"if the user clicks #Cancel, the variable %`fileName$` will contain the empty string (“”).")
-NORMAL (U"If you want the user to choose a file name for writing (saving), do")
+NORMAL (U"屏幕上将出现一个文件选择器窗口，其标题为（在此示例中）##Open a table file#。 "
+	"如果用户点击 #OK，变量 %`fileName$` 将包含用户选择的文件的名称；"
+	"如果用户点击 #Cancel，变量 %`fileName$` 将包含空字符串（“”）。")
+NORMAL (U"如果您想让用户选择一个文件名来写入（保存），请执行：")
 CODE (U"selectObject: mySound")
 CODE (U"fileName$ = \\#{chooseWriteFile$}: “Save as a WAV file”, “mySound.wav”")
 CODE (U"if fileName$ <> “”")
 	CODE1 (U"Save as WAV file: fileName$")
 CODE (U"endif")
-NORMAL (U"A file selector window will appear, with (in this example) ##Save as a WAV file# as the title "
-	"and “mySound.wav” as the suggested file name (which the user can change). "
-	"If the user clicks #OK, the form will ask for confirmation if the file name that the user typed already exists. "
-	"If the user clicks #OK with a new file name, or clicks #OK in the confirmation window, "
-	"the variable %`fileName$` will contain the file name that the user typed; "
-	"if the user clicks #Cancel at any point, the variable %`fileName$` will contain the empty string (“”).")
-NORMAL (U"If you want the user to choose a folder (directory) name, do")
+NORMAL (U"屏幕上将出现一个文件选择器窗口，其标题为（在此示例中）##Save as a WAV file#，"
+	"建议的文件名为 “mySound.wav”（用户可以修改）。 "
+	"如果用户点击 #OK，若用户键入的文件名已存在，窗口将请求确认。 "
+	"如果用户使用新文件名点击 #OK，或在确认窗口中点击 #OK，"
+	"变量 %`fileName$` 将包含用户键入的文件名；"
+	"如果用户在任何时候点击 #Cancel，变量 %`fileName$` 将包含空字符串（“”）。")
+NORMAL (U"如果您想让用户选择一个文件夹（目录）名称，请执行：")
 CODE (U"folderName$ = \\#{chooseFolder$}: “Choose a folder to save all the new files in”")
 CODE (U"if folderName$ <> “”")
 	CODE1 (U"for i to numberOfSelectedSounds")
@@ -2730,14 +2719,14 @@ CODE (U"if folderName$ <> “”")
 		CODE2 (U"Save as WAV file: folderName$ + “/sound” + string$ (i) + “.wav”")
 	CODE1 (U"endfor")
 CODE (U"endif")
-NORMAL (U"A folder selector window will appear, with (in this example) ##Choose a folder to save all the new files in# as the title. "
-	"If the user clicks #OK, the variable %`folderName$` will contain the name of the folder that the user selected; "
-	"if the user clicks #Cancel, the variable %`folderName$` will contain the empty string (“”).")
+NORMAL (U"屏幕上将出现一个文件夹选择器窗口，其标题为（在此示例中）##Choose a folder to save all the new files in#。 "
+	"如果用户点击 #OK，变量 %`folderName$` 将包含用户选择的文件夹的名称；"
+	"如果用户点击 #Cancel，变量 %`folderName$` 将包含空字符串（“”）。")
 ENTRY (U"A non-pausing pause window without a #Stop button")
-NORMAL (U"Especially if you use the pause window within the @@Demo window@, you may not want to give the user the capability of "
-	"ending the script by hitting #Stop or closing the pause window. "
-	"In that case, you can add an extra numeric argument to #`endPause` (at the end) "
-	"that denotes the cancel button:")
+NORMAL (U"特别是在您在 @@Demo window|演示窗口@ 内使用暂停窗口时，您可能不想让用户能够"
+	"通过点击 #Stop 或关闭暂停窗口来终止脚本。 "
+	"在这种情况下，您可以在 #`endPause` 的末尾添加一个额外的数值参数，"
+	"它代表取消按钮：")
 CODE (U"\\#{beginPause}: “Learning settings”")
 	CODE1 (U"\\#{positive}: “Learning rate”, “0.01”")
 	CODE1 (U"\\#{choice}: “Directions”, 3")
@@ -2750,29 +2739,28 @@ CODE (U"if clicked = 2")
 	CODE1 (U"includeForward = ( directions = 1 or directions = 3 )")
 	CODE1 (U"includeBackward = ( directions = 2 or directions = 3 )")
 CODE (U"endif")
-NORMAL (U"In this example, the default button is 2 (i.e. #OK), and the cancel button is 1 (i.e. #Cancel). "
-	"The form will now contain no #Stop button, and if the user closes the window, "
-	"this will be the same as clicking #Cancel, namely that %`clicked` will be 1 (because the #Cancel button is the first button) "
-	"and the variables %`learning_rate`, %`directions` and %`directions$` will not be changed (i.e. they might remain undefined).")
+NORMAL (U"在此示例中，默认按钮是 2（即 #OK），取消按钮是 1（即 #Cancel）。 "
+	"此时窗口将不再包含 #Stop 按钮，如果用户关闭窗口，"
+	"效果将与点击 #Cancel 相同，即 %`clicked` 将为 1（因为 #Cancel 按钮是第一个按钮），"
+	"且变量 %`learning_rate`、%`directions` 和 %`directions$` 将不会改变（即它们可能仍为未定义状态）。")
 ENTRY (U"Pausing for a fixed time without a window")
-NORMAL (U"You can pause Praat for 1.3 seconds by saying")
+NORMAL (U"您可以通过指定以下命令来让 Praat 暂停 1.3 秒：")
 CODE (U"\\#{sleep} (1.3)")
-NORMAL (U"This is of course not about controlling the user, "
-	"but it is mentioned here because this section is about pausing.")
+NORMAL (U"这当然与控制用户无关， "
+	"但在此提及是因为本节讨论的是暂停。")
 MAN_END
 
 MAN_BEGIN (U"Scripting 6.7. Sending a message to another program", U"ppgb", 20241116)
-NORMAL (U"To send messages to running programs that use the Praat shell, "
-	"use $sendpraat (see @@Scripting 8. Controlling Praat from another program@).")
+NORMAL (U"要向使用 Praat shell 的正在运行的程序发送消息， "
+	"请使用 $sendpraat（参见 @@Scripting 8. Controlling Praat from another program|Scripting 8. 从其他程序控制 Praat@）。")
 ENTRY (U"Security measure")
-NORMAL (U"One some platforms it used to be possible to send a message to another running program that listens to a socket, "
-	"using the $sendsocket directive. This is no longer possible in Praat version 7.")
+NORMAL (U"在某些平台上，以前可以使用 $sendsocket 指令向另一个监听套接字（socket）的运行中程序发送消息。但在 Praat 第 7 版中，这已不再可行。")
 MAN_END
 
 MAN_BEGIN (U"Scripting 6.8. Messages to the user", U"ppgb", 20230122)
-NORMAL (U"If the user makes a mistake (e.g. types conflicting settings into your form window), "
-	"you can use the #exitScript function (@@Scripting 5.9. Quitting|\\SS5.9@) "
-	"to stop the execution of the script with an error message:")
+NORMAL (U"如果用户犯了错误（例如在表单窗口中键入了冲突的设置）， "
+	"您可以使用 #exitScript 函数（@@Scripting 5.9. Quitting|第 5.9 节@） "
+	"来停止脚本的执行并显示错误消息：")
 CODE (U"form: “My analysis”")
 	CODE1 (U"real: “Starting time (s)”, “0.0”")
 	CODE1 (U"real: “Finishing time (s)”, “1.0”")
@@ -2781,107 +2769,107 @@ CODE (U"if finishing_time <= starting_time")
 	CODE1 (U"\\#{exitScript}: “The finishing time should exceed ”, starting_time, “ seconds.”")
 CODE (U"endif")
 CODE (U"# Proceed with the analysis...")
-NORMAL (U"For things that should not normally go wrong, you can use the #`assert` directive:")
+NORMAL (U"对于在正常情况下不应该出错的事情，您可以使用 #`assert`（断言）指令：")
 CODE (U"power = Get power")
 CODE (U"assert power > 0")
-NORMAL (U"This is the same as:")
+NORMAL (U"这等同于：")
 CODE (U"if (power > 0) = undefined")
 	CODE1 (U"exitScript: “Assertion failed in line ”, lineNumber, “ (undefined): power > 0”")
 CODE (U"elsif not (power > 0)")
 	CODE1 (U"exitScript: “Assertion failed in line ”, lineNumber, “ (false): power > 0”")
 CODE (U"endif")
-NORMAL (U"You can prevent Praat from issuing warning messages:")
+NORMAL (U"您可以阻止 Praat 发出警告消息：")
 CODE (U"nowarn Save as WAV file: “hello.wav”")
-NORMAL (U"This prevents warning messages about clipped samples, for instance.")
-NORMAL (U"You can also prevent Praat from showing a progress window:")
+NORMAL (U"例如，这可以防止关于样本削波（clipped samples）的警告消息。")
+NORMAL (U"您还可以阻止 Praat 显示进度窗口：")
 CODE (U"pitch = noprogress To Pitch: 0, 75, 500")
-NORMAL (U"This prevents the progress window from popping up during lengthy operations. "
-	"Use this only if you want to prevent the user from stopping the execution of the script.")
-NORMAL (U"Finally, you can make Praat ignore error messages:")
+NORMAL (U"这可以防止在耗时较长的操作期间弹出进度窗口。 "
+	"仅当您想防止用户停止脚本的执行时才使用此功能。")
+NORMAL (U"最后，您可以让 Praat 忽略错误消息：")
 CODE (U"nocheck Remove")
-NORMAL (U"This would cause the script to continue even if there is nothing to remove.")
+NORMAL (U"这将导致即使没有要删除的对象，脚本也会继续执行。")
 MAN_END
 
 MAN_BEGIN (U"Scripting 6.9. Calling from the command line", U"ppgb", 20220122)   // 2023 2025
-INTRO (U"Previous sections of this tutorial have shown you how to run a Praat script from the Script window. "
-	"However, you can also call a Praat script from the command line (text console) instead. "
-	"Information that would normally show up in the Info window, then goes to %stdout, "
-	"and error messages go to %stderr. "
-	"You cannot use commands in your script that create windows, such as ##View & Edit#. "
-	"Before describing how to achieve this (from section 4 below on), we first describe "
-	"how the normal Praat, with its usual Objects and Picture (and perhaps Info) window, "
-	"can be started from the command line.")
+INTRO (U"本教程的前几节向您展示了如何从脚本窗口（Script window）运行 Praat 脚本。 "
+	"然而，您也可以改为从命令行（文本控制台）调用 Praat 脚本。 "
+	"通常会显示在信息窗口（Info window）中的信息，届时将输出到 %stdout， "
+	"而错误消息将输出到 %stderr。 "
+	"您不能在脚本中使用会创建窗口的命令，例如 ##View & Edit#。 "
+	"在描述如何实现这一目标（从下面的第 4 节开始）之前，我们首先描述 "
+	"普通 Praat 及其通常的对象窗口和画图窗口（或许还有信息窗口）"
+	"如何从命令行启动。")
 
 ENTRY (U"1. Starting Praat from the command line")
-NORMAL (U"Before seeing how a Praat script can be called from the command line, "
-	"you should first know that just calling Praat from the command line just starts up Praat "
-	"with its usual GUI (Graphical User Interface), i.e. with its two windows. "
-	"For instance, on Windows you can start the Command Prompt window (the “Console”), and type")
+NORMAL (U"在了解如何从命令行调用 Praat 脚本之前， "
+	"您首先应该知道，仅在命令行中调用 Praat 只会启动 Praat "
+	"并显示其通常的 GUI（图形用户界面），即包含其两个窗口。 "
+	"例如，在 Windows 上，您可以启动命令提示符窗口（“控制台”），然后输入")
 CODE (U"\"C:\\Program Files\\Praat.exe\"")
-NORMAL (U"(including the quotes) if Praat.exe is indeed in the folder `C:\\Program Files`.")
-NORMAL (U"On the Mac, the executable is hidden inside the `app` file, so you open a Terminal window "
-	"and type something like")
+NORMAL (U"（包含引号），前提是 Praat.exe 确实在 `C:\\Program Files` 文件夹中。")
+NORMAL (U"在 Mac 上，可执行文件隐藏在 `app` 文件内，因此您需要打开终端（Terminal）窗口 "
+	"并输入类似以下内容：")
 CODE (U"/Applications/Praat.app/Contents/MacOS/Praat")
-NORMAL (U"On Linux, you type into the Terminal something like")
+NORMAL (U"在 Linux 上，您在终端中输入类似以下内容：")
 CODE (U"/usr/bin/praat")
 
 ENTRY (U"2. Calling Praat to open data files")
-NORMAL (U"On Windows, you can open Praat with a sound file and a TextGrid file by typing")
+NORMAL (U"在 Windows 上，您可以通过输入以下内容，让 Praat 打开一个声音文件和一个 TextGrid 文件：")
 CODE (U"\"C:\\Program Files\\Praat.exe\" --open data\\hello.wav data\\hello.TextGrid")
-NORMAL (U"or")
+NORMAL (U"或者")
 CODE (U"\"C:\\Program Files\\Praat.exe\" --open data/hello.wav data/hello.TextGrid")
-NORMAL (U"at least if your current folder (see the Console’s `cd` and `dir` commands) "
-	"contains the folder `data` and that folder contains those two files. "
-	"Praat will start up, and shows the two files as a Sound and a TextGrid object in the list. "
-	"If Praat was already running when you typed the command, "
-	"the two files are added as objects to the existing list in Praat.")
-NORMAL (U"On the Mac, you do")
+NORMAL (U"这至少要求您的当前文件夹（见控制台的 `cd` 和 `dir`命令） "
+	"包含 `data` 文件夹且该文件夹包含这两个文件。 "
+	"Praat 将启动，并在列表中以 Sound 和 TextGrid 对象的形式显示这两个文件。 "
+	"如果当您键入命令时 Praat 已经在运行， "
+	"这两个文件将被作为对象添加到 Praat 的现有列表中。")
+NORMAL (U"在 Mac 上，执行：")
 CODE (U"/Applications/Praat.app/Contents/MacOS/Praat --open data/hello.wav data/hello.TextGrid")
-NORMAL (U"and on Linux")
+NORMAL (U"在 Linux 上，执行：")
 CODE (U"/usr/bin/praat --open data/hello.wav data/hello.TextGrid")
-NORMAL (U"Again, if Praat was already running when you typed the command, "
-	"the two files are added as objects to the existing list in Praat.")
-NORMAL (U"Note that if you want to send messages or files to a running Praat, "
-	"the best way (on all platforms) is to use `praat --send` (see below) "
-	"or %sendpraat (see @@Scripting 8. Controlling Praat from another program@).")
-NORMAL (U"To always start up a new instance of Praat, use #`--new-open` instead of `--open`.")
+NORMAL (U"同样，如果当您键入命令时 Praat 已经在运行， "
+	"这两个文件将被作为对象添加到 Praat 的现有列表中。")
+NORMAL (U"请注意，如果您想向运行中的 Praat 发送消息或文件， "
+	"在所有平台上的最佳方式都是使用 `praat --send`（见下文） "
+	"或 %sendpraat（参见 @@Scripting 8. Controlling Praat from another program|Scripting 8. 从其他程序控制 Praat@）。")
+NORMAL (U"要始终启动一个新的 Praat 实例，请使用 #`--new-open` 而非 `--open`。")
 
 ENTRY (U"3. Calling Praat to open a script")
-NORMAL (U"On Windows, when you type")
+NORMAL (U"在 Windows 上，当您输入：")
 CODE (U"\"C:\\Program Files\\Praat.exe\" --open \"my script.praat\"")
-NORMAL (U"Praat will start up, opening the script `my script.praat` in a script window. "
-	"If Praat was already running when you typed the command, "
-	"the script window will appear within the already running instantiation of Praat.")
-NORMAL (U"On the Mac, you do")
+NORMAL (U"Praat 将启动，并在脚本窗口中打开脚本 `my script.praat`。 "
+	"如果当您键入命令时 Praat 已经在运行， "
+	"脚本窗口将出现在已经运行的 Praat 实例中。")
+NORMAL (U"在 Mac 上，执行：")
 CODE (U"/Applications/Praat.app/Contents/MacOS/Praat --open \"my script.praat\"")
-NORMAL (U"and on Linux")
+NORMAL (U"在 Linux 上，执行：")
 CODE (U"/usr/bin/praat --open \"my script.praat\"")
-NORMAL (U"Note that on all three platforms, you have to supply quotes around the file name "
-	"if that file name contains one or more spaces, as here between `my` and `script` "
-	"or above between `Program` and `Files`. This is because the script languages of "
-	"the Console or Terminal use spaces for separating commands and arguments.")
+NORMAL (U"注意，在这三个平台上，如果文件名中包含一个或多个空格，您必须用引号将文件名括起来， "
+	"就像这里的 `my` 和 `script` 之间， "
+	"或者上面的 `Program` 和 `Files` 之间。这是因为控制台或终端的 "
+	"脚本语言使用空格来分隔命令和参数。")
 
 ENTRY (U"4. Calling Praat to run a script in the background")
-NORMAL (U"Now we are ready to discuss how to run Praat without a GUI.")
-NORMAL (U"On Windows, when you type")
+NORMAL (U"现在我们准备讨论如何在没有 GUI 的情况下运行 Praat。")
+NORMAL (U"在 Windows 上，当您输入：")
 CODE (U"\"C:\\Program Files\\Praat.exe\" --run \"my script.praat\"")
-NORMAL (U"Praat will execute the script `my script.praat` without showing Praat's GUI, "
-	"i.e. without showing its usual two windows. "
-	"In fact, any output that would normally go to the Info window, "
-	"will now go directly to the Console window in which you typed the command. "
-	"If Praat was already running when you typed the command, "
-	"its windows will not be affected. In fact, the GUI-instantiation of Praat and the Console-instantiation "
-	"can run simultaneously without them noticing each other’s existence; "
-	"moreover, multiple Console-instantiations of Praat can run simultaneously, each in their own Console.")
-NORMAL (U"On the Mac, you type")
+NORMAL (U"Praat 将 execute 执行脚本 `my script.praat`，而不显示 Praat 的 GUI， "
+	"即不显示其通常的两个窗口。 "
+	"实际上，任何通常会输出到信息窗口的输出， "
+	"现在都将直接输出到您输入命令的控制台窗口中。 "
+	"如果当您键入命令时 Praat 已经在运行， "
+	"其窗口将不会受到影响。事实上，GUI 实例的 Praat 和控制台实例的 Praat "
+	"可以同时运行而互不干扰； "
+	"此外，Praat 的多个控制台实例可以同时运行，每个实例都在其自己的控制台窗口中。")
+NORMAL (U"在 Mac 上，键入：")
 CODE (U"/Applications/Praat.app/Contents/MacOS/Praat --run \"my script.praat\"")
-NORMAL (U"and on Linux")
+NORMAL (U"在 Linux 上，键入：")
 CODE (U"/usr/bin/praat --run \"my script.praat\"")
-NORMAL (U"What happens on all platforms is that the Console or Terminal starts up Praat, "
-	"then Praat executes the script, and then Praat closes itself.")
+NORMAL (U"在所有平台上，发生的情况都是控制台或终端启动 Praat， "
+	"然后 Praat 执行脚本，接着 Praat 自行关闭。")
 
 ENTRY (U"5. Calling Praat to run a script with arguments")
-NORMAL (U"Consider the following script:")
+NORMAL (U"考虑以下脚本：")
 CODE (U"form: \"Test command line calls\"")
 CODE1 (U"sentence: \"First text\", \"I love you\"")
 CODE1 (U"real: \"Beep duration\", \"0.4\"")
@@ -2899,149 +2887,148 @@ CODE (U"Play")
 CODE (U"Remove")
 CODE (U"synth2 = Create SpeechSynthesizer: \"English (America)\", \"Male1\"")
 CODE (U"Play text: second_text$")
-NORMAL (U"When you run this script from within Praat, it writes two lines to the Info window "
-	"and plays first a female voice speaking the first sentence, then a beep, and then a male voice "
-	"speaking the second sentence. To make this happen from the Windows command line instead, you type")
+NORMAL (U"当您在 Praat 内部运行此脚本时，它会向信息窗口写入两行， "
+	"并先以女声播放第一句话，接着发出一声蜂鸣，然后以男声播放 "
+	"第二句话。若要在 Windows 命令行中实现相同的效果，请输入")
 CODE (U"\"C:\\Program Files\\Praat.exe\" --run testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"")
-NORMAL (U"In the Mac terminal, you type")
+NORMAL (U"在 Mac 终端中，键入：")
 CODE (U"/Applications/Praat.app/Contents/MacOS/Praat --run testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"")
-NORMAL (U"and in the Linux terminal, you do")
+NORMAL (U"在 Linux 终端中，执行：")
 CODE (U"/usr/bin/praat --run testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"")
-NORMAL (U"Note that each argument that contains one or more spaces has to be put within quotes, "
-	"on all three platforms. As with #runScript, Praat will not present a form window, "
-	"but simply run the script with the arguments given on the command line "
-	"(see @@Scripting 6.1. Arguments to the script@). What then happens on all three platforms is that a console instantiation of Praat writes "
-	"the two lines to the Console window and plays the three sounds.")
-NORMAL (U"The path to the script file as well as to `infile`, `outfile` and `folder` "
-	"arguments will be taken relative to the current working directory of the terminal window. For instance, "
-	"the following example from @@Scripting 6.1. Arguments to the script@ will run the script "
-	"`/Users/miep/research/usefulScripts/playFile.praat`, which will play the sound file "
-	"`/Users/miep/research/project19/sounds/sound3.wav`:")
+NORMAL (U"请注意，在所有这三个平台上，包含一个或多个空格的每个参数都必须用引号括起来。 "
+	"与 #runScript 类似，Praat 不会呈现表单窗口， "
+	"而只是简单地使用命令行中给出的参数运行脚本 "
+	"（参见 @@Scripting 6.1. Arguments to the script|Scripting 6.1. 脚本参数@）。在这三个平台上，控制台实例的 Praat "
+	"将把这两行输出到控制台窗口中，并播放这三个声音。")
+NORMAL (U"脚本文件的路径以及 `infile`、`outfile` 和 `folder` "
+	"参数将相对于终端窗口的当前工作目录。例如， "
+	"来自 @@Scripting 6.1. Arguments to the script|Scripting 6.1. 脚本参数@ 的以下示例将运行脚本 "
+	"`/Users/miep/research/usefulScripts/playFile.praat`，该脚本将播放声音文件 "
+	"`/Users/miep/research/project19/sounds/sound3.wav`：")
 CODE (U"cd /Users/miep/research/project19")
 CODE (U"/usr/bin/praat --run ../usefulScripts/playFile.praat sounds/sound3.wav")
 
 ENTRY (U"6. Calling Praat to run a script in the GUI")
-NORMAL (U"You can send a script to a running Praat. Praat will then execute it:")
+NORMAL (U"您可以将脚本发送给正在运行的 Praat，然后 Praat 将执行它：")
 CODE (U"\"C:\\Program Files\\Praat.exe\" --send testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"")
 CODE (U"/Applications/Praat.app/Contents/MacOS/Praat --send testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"")
 CODE (U"/usr/bin/praat --send testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"")
-NORMAL (U"This works the same way as `--run`, except that `--send` runs in Praat’s Graphical User Interface. "
-	"If Praat is already running, then that instance of Praat will execute your script. "
-	"If Praat is not running yet, then a new GUI instance of Praat will start up and execute your script. "
-	"To always start up a new instance of Praat, use `--new-send` instead of `--send`.")
-NORMAL (U"If you use")
+NORMAL (U"这与 `--run` 的工作方式相同，不同之处在于 `--send` 在 Praat 的图形用户界面中运行。 "
+	"如果 Praat 已经在运行，那么该 Praat 实例将执行您的脚本。 "
+	"如果 Praat 尚未运行，那么一个新的 GUI 实例 Praat 将启动并执行您的脚本。 "
+	"要始终启动一个新的 Praat 实例，请使用 `--new-send` 而非 `--send`。")
+NORMAL (U"如果您使用：")
 CODE (U"\"C:\\Program Files\\Praat.exe\" --send-or-form testCommandLineCalls.praat")
 CODE (U"/Applications/Praat.app/Contents/MacOS/Praat --send-or-form testCommandLineCalls.praat")
 CODE (U"/usr/bin/praat --send-or-form testCommandLineCalls.praat")
-NORMAL (U"then Praat will present the above form that asks for the three arguments "
-	"(if you use `--send-or-form` with a script that has no `form` in it, it will work the same as `--send`). "
-	"This switch is useful if you want to implement a Praat connection for interfacing with an IDE such as Microsoft\\re Visual Studio Code\\tm. "
-	"To always start up a new instance of Praat, use `--new-send-or-form` instead of `--send-or-form`.")
-NORMAL (U"See also %sendpraat (see @@Scripting 8. Controlling Praat from another program@).")
+NORMAL (U"then Praat 将呈现上述表单以请求这三个参数 "
+	"（如果对没有 `form` 的脚本使用 `--send-or-form`，其效果与 `--send` 相同）。 "
+	"如果您想实现与 Microsoft\\re Visual Studio Code\\tm 等 IDE 接口的 Praat 连接，此开关将非常有用。 "
+	"要始终启动一个新的 Praat 实例，请使用 `--new-send-or-form` 而非 `--send-or-form`。")
+NORMAL (U"另见 %sendpraat（参见 @@Scripting 8. Controlling Praat from another program|Scripting 8. 从其他程序控制 Praat@）。")
 
 ENTRY (U"7. Calling Praat from other programs such as Python")
-NORMAL (U"You can run the above script from several programming languages, not just from a Console or Terminal. "
-	"In Python, for instance, you can do it using the same syntax as you would use in the Console or Terminal:")
+NORMAL (U"您可以使用几种编程语言来运行上述脚本，而不仅仅是在控制台或终端中。 "
+	"例如在 Python 中，您可以使用与控制台或终端相同的语法来进行操作：")
 CODE (U"import os")
 CODE (U"os.system ('\"C:\\\\Program Files\\\\Praat.exe\" --run testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"')")
-NORMAL (U"Note that you have to double the backslashes!")
-NORMAL (U"A disadvantage of the `os.system` method is that you have to use quotes within quotes. "
-	"A somewhat cleaner approach is:")
+NORMAL (U"请注意，您必须使用双反斜杠！")
+NORMAL (U"`os.system` 方法的一个缺点是您必须在引号内再使用引号。 "
+	"一种稍微更整洁的方法是：")
 CODE (U"import subprocess")
 CODE (U"subprocess.call(['C:\\\\Program Files\\\\Praat.exe', '--run', 'testCommandLineCalls.praat', 'I love you', '0.4', 'Me too'])")
-NORMAL (U"This way you specify the arguments directly, with quotes only because they are all strings, "
-	"but without having to worry about spaces. And perhaps even more importantly, this syntax "
-	"makes it easy to use variables as arguments, as in:")
+NORMAL (U"通过这种方式，您可以直接指定参数，使用引号仅因为它们是字符串， "
+	"而无需担心空格。或许更重要的是，这种语法 "
+	"使得将变量用作参数变得容易，例如在：")
 CODE (U"first_line = 'I love you'")
 CODE (U"second_line = 'me too'")
 CODE (U"subprocess.call(['C:\\\\Program Files\\\\Praat.exe', '--run', 'testCommandLineCalls.praat', first_line, '0.4', second_line])")
-NORMAL (U"Many other programs beside Python have a `system`-like command, so that you can run a command like")
+NORMAL (U"除了 Python 之外，许多其他程序也有类似 `system` 的命令，因此您可以运行诸如以下命令：")
 CODE (U"system ('\"C:\\\\Program Files\\\\Praat.exe\" --run testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"')")
 
 ENTRY (U"8. What happens if I specify neither --open nor --run nor --send?")
-NORMAL (U"If you specify neither `--open` nor `--run` nor `--send`, Praat's behaviour is not guaranteed. "
-	"If you type something like")
+NORMAL (U"如果您既未指定 `--open`、`--run` 也未指定 `--send`，Praat 的行为是无法保证的。 "
+	"如果您手动在控制台或终端窗口中输入类似")
 CODE (U"praat testCommandLineCalls.praat \"I love you\" 0.4 \"Me too\"")
-NORMAL (U"into a Console or Terminal window by hand, Praat will typically run the script. "
-	"Also, the `--run` option can probably be left out from the Python call above. "
-	"However, if you redirect the output of Praat to a file or pipe, you cannot typically leave out the `--run` option; "
-	"if you do, Praat may start its GUI and %open the file rather than run it.")
-NORMAL (U"“Why this strange behaviour?”, you may ask. The reason is that several platforms (e.g. Windows) "
-	"use this same mechanismm when you double-click a file, or drop a file on an application icon. "
-	"For instance, when you double-click `hello.wav` or `doSomething.praat`, "
-	"or drop `hello.wav` or `doSomething.praat` on the Praat icon, "
-	"you expect Praat to %open that sound file or script, not to %run it. "
-	"However, when you double-click or drop `doSomething.praat`, "
-	"Windows will send Praat a message %%as if% you had typed `praat doSomething.praat` into a Console window. "
-	"This means that in this case Praat will have to interpret `praat doSomething.praat` "
-	"as an indication that you want to %open that file, not %run it. "
-	"Praat will try to be a bit smart, though: when receiving the message `praat doSomething.praat` from the operating system, "
-	"Praat will try to figure out whether you meant to %run or %open the file. "
-	"If Praat detects that you typed `praat doSomething.praat` into the Console "
-	"by hand, Praat will %run this script; if not, then Praat will %open this script; "
-	"this includes double-clicking and dropping (appropriately), but may also include some indirect invocations "
-	"such as through a shell script or redirection or pipe. "
-	"After all, if Praat is in doubt, wrongly assuming that you want to %open the script is safer than wrongly "
-	"assuming that you want to %run the script.")
+NORMAL (U"的内容，Praat 通常会运行该脚本。 "
+	"此外，上面的 Python 调用中可能也可以省略 `--run` 选项。 "
+	"然而，如果您将 Praat 的输出重定向到文件或管道，您通常不能省略 `--run` 选项； "
+	"如果省略，Praat 可能会启动其 GUI 并打开文件，而不是运行它。")
+NORMAL (U"您可能会问：“为什么会有这种奇怪的行为？”原因是，当您双击文件或将文件拖放到应用程序图标上时， "
+	"多个平台（例如 Windows）都使用相同的机制。 "
+	"例如，当您双击 `hello.wav` 或 `doSomething.praat`， "
+	"或将 `hello.wav` 或 `doSomething.praat` 拖放到 Praat 图标上时， "
+	"您期望 Praat 打开该声音文件或脚本，而不是运行它。 "
+	"然而，当您双击或拖放 `doSomething.praat` 时， "
+	"Windows 将向 Praat 发送一条消息，%%就好像%您在控制台窗口中输入了 `praat doSomething.praat` 一样。 "
+	"这意味着在这种情况下，Praat 必须将 `praat doSomething.praat` "
+	"解释为您想要打开该文件，而不是运行它。 "
+	"不过，Praat 会试图表现得更聪明一些：当从操作系统接收到消息 `praat doSomething.praat` 时， "
+	"Praat 将尝试弄清楚您的意思到底是运行还是打开该文件。 "
+	"如果 Praat 检测到您是手动在控制台中输入了 `praat doSomething.praat`， "
+	"Praat 将运行此脚本；如果不是，Praat 将打开此脚本； "
+	"这包括双击和拖放操作，但也可能包括某些间接调用， "
+	"例如通过 shell 脚本、重定向或管道。 "
+	"总之，如果 Praat 存在疑问，错误地假定您想打开脚本比错误地 "
+	"假定您想运行脚本要安全得多。")
 
 ENTRY (U"9. Running Praat interactively from the command line")
-NORMAL (U"On the Mac and Linux, you have the possibility of running the program interactively from the command line:")
+NORMAL (U"在 Mac 和 Linux 上，您可以选择从命令行以交互方式运行程序：")
 CODE (U"> /usr/bin/praat -")
-NORMAL (U"You can then type in any of the fixed and dynamic commands, and commands that handle object selection, "
-	"such as #selectObject. This method also works in pipes:")
+NORMAL (U"然后，您可以键入任何固定和动态命令，以及处理对象选择的命令， "
+	"例如 #selectObject。此方法在管道中也有效：")
 CODE (U"> echo \"Report memory use\" | /usr/bin/praat -")
 
 ENTRY (U"10. Calling Praat from a web server")
-NORMAL (U"If you call Praat from a web server, you typically do not want to read and write its preferences and buttons files. "
-	"To achieve this, you use the #`--no-pref-files` command line option before the script name:")
+NORMAL (U"如果您从 Web 服务器调用 Praat，通常不想读取和写入其首选项（preferences）和按钮（buttons）文件。 "
+	"为了实现这一点，您可以在脚本名称之前使用 #`--no-pref-files` 命令行选项：")
 CODE (U"system ('/users/apache/praat --run --no-pref-files /user/apache/scripts/computeAnalysis.praat 1234 blibla')")
-NORMAL (U"On Windows, you will often want to specify #`--utf8` as well, because otherwise "
-	"Praat will write its output to BOM-less UTF-16 files, which many programs do not understand.")
+NORMAL (U"在 Windows 上，您通常也会想要指定 #`--utf8`，因为否则 "
+	"Praat 会将其输出写入不带 BOM 的 UTF-16 文件，许多程序无法理解这种格式。")
 
 ENTRY (U"11. All command line switches and options")
-NORMAL (U"Switches:")
+NORMAL (U"开关（Switches）：")
 TERM (U"##--open")
-DEFINITION (U"Interpret the command line arguments as files to be opened in an existing or new GUI.")
+DEFINITION (U"将命令行参数解释为要在现有或新的 GUI 中打开的文件。")
 TERM (U"##--new-open")
-DEFINITION (U"Start a new GUI and interpret the command line arguments as files to be opened.")
+DEFINITION (U"启动一个新的 GUI，并将命令行参数解释为要打开的文件。")
 TERM (U"##--run")
-DEFINITION (U"Interpret the command line arguments as a script file name and its arguments, to run without a GUI.")
+DEFINITION (U"将命令行参数解释为脚本文件名及其参数，在没有 GUI 的情况下运行。")
 TERM (U"##--send")
-DEFINITION (U"Interpret the command line arguments as a script file name and its arguments, to run in an existing or new GUI.")
+DEFINITION (U"将命令行参数解释为脚本文件名及其参数，在现有或新的 GUI 中运行。")
 TERM (U"##--new-send")
-DEFINITION (U"Start a new GUI and interpret the command line arguments as a script file name and its arguments.")
+DEFINITION (U"启动一个新的 GUI，并将命令行参数解释为脚本文件名及其参数。")
 TERM (U"##--version")
-DEFINITION (U"Print the Praat version.")
+DEFINITION (U"打印 Praat 版本。")
 TERM (U"##--help")
-DEFINITION (U"Print this list of command line options.")
-NORMAL (U"Options:")
+DEFINITION (U"打印此命令行选项列表。")
+NORMAL (U"选项（Options）：")
 TERM (U"##--no-pref-files#")
-DEFINITION (U"Ignore the preferences file and the buttons file at start-up, and don't write them when quitting (see above).")
+DEFINITION (U"启动时忽略首选项文件和按钮文件，并且退出时不写入它们（见上文）。")
 TERM (U"##--no-plugins#")
-DEFINITION (U"Don't activate the plugins at start-up.")
+DEFINITION (U"启动时不激活插件。")
 TERM (U"##--pref-dir=#`/var/www/praat_plugins`")
-DEFINITION (U"Set the preferences folder to `/var/www/praat_plugins` (for instance). "
-	"This can come in handy if you require access to preference files and/or plugins that are not in your home folder.")
+DEFINITION (U"将首选项文件夹设置为（例如）`/var/www/praat_plugins`。 "
+	"如果您需要访问不在您的家目录（home folder）中的首选项文件和/或插件，这将非常有用。")
 TERM (U"##-8#, ##--utf8#")
-DEFINITION (U"Write the output (e.g. of $writeInfo$) in UTF-8 encoding. This is the default encoding on MacOS and Linux, "
-	"but on Windows the default is the Console’s native UTF-16 Little Endian (i.e. the Console understands UTF-16 always, "
-	"whereas it understands UTF-8 only if you type `chcp 65001` first). "
-	"If you pipe to Windows programs that understand UTF-8 rather than UTF-16, "
-	"or if you want to redirect the output to a UTF-8 file, use this option.")
+DEFINITION (U"以 UTF-8 编码写入输出（例如 $writeInfo$ 的输出）。这是 MacOS 和 Linux 上的默认编码， "
+	"但在 Windows 上默认是控制台的原生 UTF-16 Little Endian（即控制台始终能理解 UTF-16， "
+	"而只有在您先键入 `chcp 65001` 后它才能理解 UTF-8）。 "
+	"如果您要通过管道输送到理解 UTF-8 而非 UTF-16 的 Windows 程序， "
+	"或者如果您想将输出重定向到 UTF-8 文件，请使用此选项。")
 TERM (U"##-a#, ##--ansi#")
-DEFINITION (U"Write the output (e.g. of `writeInfo`) in ISO-Latin 1 (\"ANSI\") encoding. "
-	"This is not recommended, because it potentially loses information (characters above U+00FF will show up as \"?\"), "
-	"but it might be necessary if you want to use Praat in a pipe with programs "
-	"that do understand ANSI but do not understand UTF-8 or UTF-16, "
-	"or if you want to redirect the output to an ANSI-encoded file.")
+DEFINITION (U"以 ISO-Latin 1（“ANSI”）编码写入输出（例如 `writeInfo` 的输出）。 "
+	"不建议使用此选项，因为它可能会丢失信息（U+00FF 以上的字符将显示为 “?”）， "
+	"但如果您想在管道中将 Praat 与理解 ANSI 但不理解 UTF-8 或 UTF-16 的程序配合使用， "
+	"或者如果您想将输出重定向到 ANSI 编码的文件中，则这可能是必要的。")
 TERM (U"##-u#, ##--utf16#")
-DEFINITION (U"Write the output (e.g. of `writeInfo`) in UTF-16 Little Endian encoding, without Byte Order Mark. "
-	"This format is the default on Windows, "
-	"but you can use it to write the output to a UTF-16LE-encoded file on any platform.")
+DEFINITION (U"以无字节顺序标记（BOM）的 UTF-16 Little Endian 编码写入输出（例如 `writeInfo` 的输出）。 "
+	"此格式在 Windows 上是默认设置， "
+	"但您可以使用它在任何平台上将输出写入 UTF-16LE 编码的文件中。")
 TERM (U"##--trace#")
-DEFINITION (U"Switch tracing on at start-up.")
+DEFINITION (U"在启动时开启追踪（tracing）。")
 TERM (U"##--hide-picture#")
-DEFINITION (U"Hide the Picture window at start-up.")
+DEFINITION (U"在启动时隐藏画图窗口（Picture window）。")
 MAN_END
 
 MAN_PAGES_BEGIN
@@ -3374,10 +3361,10 @@ NORMAL (U"(You can also run scripts from the command line. See @@Scripting 6.9. 
 */
 
 MAN_BEGIN (U"Scripting 9. Turning a script into a stand-alone program", U"ppgb", 20201229)  // 2025
-INTRO (U"You can turn your script into a double-clickable stand-alone program by including it into Praat's #main procedure. "
-	"If you want to try this, you should already know how to compile and link the Praat program on your computer.")
-NORMAL (U"These stand-alone programs do not show the Objects window and the Picture window; "
-	"therefore, you will usually want to use @@Demo window@ commands in your script. Here is an example:")
+INTRO (U"您可以通过将您的脚本包含到 Praat 的 #main 过程中，将其转换为一个可双击的独立运行程序。 "
+	"如果您想尝试这样做，您应该已经知道如何在您的计算机上编译和链接 Praat 程序。")
+NORMAL (U"这些独立程序不会显示对象窗口（Objects window）和画图窗口（Picture window）； "
+	"因此，您通常会在脚本中想要使用 @@Demo window|演示窗口@ 命令。以下是一个示例：")
 CODE (U"#include \"praat.h\"")
 CODE (U"")
 CODE (U"const char32 myScript [ ] = U\"\"")
@@ -3392,72 +3379,71 @@ CODE (U"int main (int argc, char *argv [ ]) {")
 	CODE1 (U"praat_run ();")
 	CODE1 (U"return 0;   // obligatory")
 CODE (U"}")
-NORMAL (U"The script in this example raises the Demo window, writes “Hello world” in the middle of the window, "
-	"waits until the user clicks the mouse or presses a key, and then closes.")
-NORMAL (U"Note that Praat is distributed under the General Public License (GPL). This means that if you distribute "
-	"a Praat-based stand-alone program, you have to make it open source under the GPL as well (version 3.0 or later).")
-NORMAL (U"See also @@Programming with Praat@.")
+NORMAL (U"此示例中的脚本会升起 Demo 窗口，在窗口中央写入“Hello world”， "
+	"等待用户点击鼠标或按键，然后关闭。")
+NORMAL (U"请注意，Praat 是在 GNU 通用公共许可证（GPL）下发布的。这意味着如果您发布 "
+	"一个基于 Praat 的独立运行程序，您也必须将其在 GPL（3.0 或更高版本）下开源。")
+NORMAL (U"另见 @@Programming with Praat|使用 Praat 进行编程@。")
 ENTRY (U"Details")
-NORMAL (U"Your program can save its preferences in a folder of its choice, "
-	"e.g. in #`preferencesDirectory$ + “/../GuineaPigAnalyzer”` if your program is called GuineaPigAnalyzer. "
-	"If you want to be less conspicuous and like to use the Praat preferences folder instead, "
-	"please use the #`apps` subfolder, in this way:")
+NORMAL (U"您的程序可以将其首选项保存在其选择的文件夹中， "
+	"例如，如果您的程序名为 GuineaPigAnalyzer，可以保存在 #`preferencesDirectory$ + “/../GuineaPigAnalyzer”` 中。 "
+	"如果您想低调一些，并想改用 Praat 首选项文件夹， "
+	"请按照以下方式使用 #`apps` 子文件夹：")
 CODE (U"\\`{createFolder}: preferencesDirectory$ + “/apps”")
 CODE (U"\\`{createFolder}: preferencesDirectory$ + “/apps/GuineaPigAnalyzer”")
 MAN_END
 
 MAN_BEGIN (U"Scripting 10. Old functions", U"ppgb", 20140112)
-INTRO (U"The Praat scripting language improves and changes, but old scripts should continue to work correctly. "
-	"Here are some examples of what you can see in old scripts, and what they mean:")
-NORMAL (U"The meaning of")
+INTRO (U"Praat 脚本语言在不断改进和变化，但旧脚本应该可以继续正常工作。 "
+	"以下是您在旧脚本中可能会看到的一些示例及其含义：")
+NORMAL (U"其含义")
 CODE (U"echo Hello, my name is 'name$' and I am 'age' years old.")
-NORMAL (U"is")
+NORMAL (U"为")
 CODE (U"writeInfoLine: \"Hello, my name is \", name$, \" and I am \", age, \" years old.\"")
-NORMAL (U"The meaning of")
+NORMAL (U"其含义")
 CODE (U"Draw... 0 0 0 0 yes Curve")
-NORMAL (U"is")
+NORMAL (U"为")
 CODE (U"Draw: 0, 0, 0, 0, \"yes\", \"Curve\"")
-NORMAL (U"The meaning of")
+NORMAL (U"其含义")
 CODE (U"Read from file... 'fileName$'")
-NORMAL (U"is")
+NORMAL (U"为")
 CODE (U"Read from file: fileName$")
 MAN_END
 
 MAN_BEGIN (U"ScriptEditor", U"ppgb", 20140107)
-INTRO (U"An aid to @@scripting@.")
-NORMAL (U"The ScriptEditor is a text editor that allows you to edit, save, and run "
-	"any @@Praat script@. You can type such a script from scratch, "
-	"but it is sometimes easier to use the @@History mechanism@, which automatically records "
-	"all your commands and mouse clicks, and which can paste these directly "
-	"into a ScriptEditor.")
-NORMAL (U"To add a script as a button to a fixed or dynamic menu, "
-	"use @@Add to fixed menu...@ or @@Add to dynamic menu...@ from the @@File menu@.")
+INTRO (U"@@scripting|脚本编写@ 的辅助工具。")
+NORMAL (U"ScriptEditor（脚本编辑器）是一个文本编辑器，允许您编辑、保存和运行 "
+	"任何 @@Praat script|Praat 脚本@。您可以从头开始键入此类脚本， "
+	"但有时使用 @@History mechanism|历史机制@ 会更容易，该机制会自动记录 "
+	"您的所有命令和鼠标点击，并且可以直接将这些内容粘贴到 ScriptEditor 中。")
+NORMAL (U"要将脚本作为按钮添加到固定或动态菜单中， "
+	"请使用 @@File menu|File 菜单@ 中的 @@Add to fixed menu...|添加到固定菜单...@ 或 @@Add to dynamic menu...|添加到动态菜单...@。")
 ENTRY (U"Example 1")
-NORMAL (U"In this example, we create a fixed button that will play a 0.4-second sine wave with a specified frequency.")
-NORMAL (U"First, we create a ScriptEditor by choosing @@New Praat script@ from the @@Praat menu@. "
-	"Then, we choose @@Clear history@ from the #Edit menu in the ScriptEditor. "
-	"We then perform some actions that will create a sine wave, play it, and remove it:")
-LIST_ITEM (U"1. Choose ##Create Sound as pure tone...# from the @@New menu@ and click OK.")
-LIST_ITEM (U"2. Click #Play in the dynamic menu.")
-LIST_ITEM (U"3. Click the fixed #Remove button.")
-NORMAL (U"We then choose @@Paste history@ from the #Edit menu in the ScriptEditor (or type @@Keyboard shortcuts|Command-H@). "
-	"The text will now contain at least the following lines (delete any other lines):")
+NORMAL (U"在此示例中，我们创建了一个固定按钮，该按钮将播放指定频率的 0.4 秒正弦波。")
+NORMAL (U"首先，我们通过从 @@Praat menu|Praat 菜单@ 中选择 @@New Praat script|新建 Praat 脚本@ 来创建一个 ScriptEditor。 "
+	"然后，我们从 ScriptEditor 的 #Edit 菜单中选择 @@Clear history|清除历史@。 "
+	"接着，我们执行一些操作，这些操作将创建正弦波、播放它并将其移除：")
+LIST_ITEM (U"1. 从 @@New menu|New 菜单@ 中选择 ##Create Sound as pure tone...# 并点击 OK。")
+LIST_ITEM (U"2. 点击动态菜单中的 #Play（播放）按钮。")
+LIST_ITEM (U"3. 点击固定的 #Remove（删除）按钮。")
+NORMAL (U"然后我们选择 ScriptEditor 中 #Edit 菜单下的 @@Paste history|粘贴历史@（或者输入 @@Keyboard shortcuts|Command-H@ 快捷键）。 "
+	"此时文本将至少包含以下几行（delete any other lines）：")
 CODE (U"Create Sound as pure tone: \"tone\", 1, 0, 0.4, 44100, 440, 0.2, 0.01, 0.01")
 CODE (U"Play")
 CODE (U"Remove")
-NORMAL (U"We can run this script again by choosing #Run from the #Run menu (or typing @@Keyboard shortcuts|Command-R@). "
-	"However, this always plays a sine with a frequency of 440 Hz, so we will add the variable \"Frequency\" "
-	"to the script, which then looks like:")
+NORMAL (U"我们可以通过从 #Run 菜单中选择 #Run（或键入 @@Keyboard shortcuts|Command-R@ 快捷键）再次运行此脚本。 "
+	"但是，这总是播放频率为 440 Hz 的正弦波，因此我们将在脚本中添加变量 \"Frequency\"（频率）， "
+	"脚本随后看起来像这样：")
 CODE (U"#form Play a sine wave")
 	CODE1 (U"#positive Frequency")
 CODE (U"#endform")
 CODE (U"Create Sound as pure tone: \"tone\", 1, 0, 0.4, 44100, frequency, 0.2, 0.01, 0.01")
 CODE (U"Play")
 CODE (U"Remove")
-NORMAL (U"When we choose #Run, the ScriptEditor will ask us to supply a value for the \"Frequency\" variable. "
-	"We can now play 1-second sine waves with any frequency.")
-NORMAL (U"It is advisable to supply a standard value for each argument in your script. "
-	"If the duration should be variable, too, the final script could look like:")
+NORMAL (U"当我们选择 #Run 时，ScriptEditor 会请求我们提供 \"Frequency\" 变量的值。 "
+	"现在我们可以播放任何频率的 1 秒正弦波了。")
+NORMAL (U"建议在您的脚本中为每个参数提供一个默认值。 "
+	"如果时长（Duration）也需要是可变的，最终的脚本可能看起来像这样：")
 CODE (U"#form Play a sine wave")
 	CODE1 (U"#positive Frequency 440")
 	CODE1 (U"#positive Duration 1.0")
@@ -3465,56 +3451,55 @@ CODE (U"#endform")
 CODE (U"Create Sound as pure tone: \"tone\", 1, 0, duration, 44100, frequency, 0.2, 0.01, 0.01")
 CODE (U"Play")
 CODE (U"Remove")
-NORMAL (U"When you run this script, the ScriptEditor will ask you to supply values for the two variables, "
-	"but the values \"440\" and \"1.0\" are already visible in the form window, "
-	"so that you will get a sensible result if you just click #OK.")
-NORMAL (U"If this script is useful to you, you may want to put a button for it in the @@New menu@, "
-	"in the ##Sound# submenu:")
-LIST_ITEM (U"1. Save the script to a file, with #Save from the #File menu. The file name that you supply, will "
-	"be shown in the title bar of the ScriptEditor window.")
-LIST_ITEM (U"2. Choose @@Add to fixed menu...@ from the #File menu. Supply #Objects for the %window, "
-	"#New for the %menu, \"Play sine wave...\" for the %command, "
-	"##Create Sound from formula...# for %%after command%, and \"1\" for the depth (because it is supposed to be in a submenu); "
-	"the %script argument has already been set to the file name that you supplied in step 1.")
-LIST_ITEM (U"3. Click #OK and ensure that the button has been added in the @@New menu@. This button will still be there "
-	"after you leave the program and enter it again; to remove it from the menu, use the @ButtonEditor.")
+NORMAL (U"当您运行此脚本时，ScriptEditor 会请求您提供这两个变量的值， "
+	"但是值 \"440\" 和 \"1.0\" 已经显示在表单窗口中， "
+	"因此如果您直接点击 #OK 就可以得到合理的结果。")
+NORMAL (U"如果此脚本对您有用，您可能想在 @@New menu|New 菜单@的 ##Sound# 子菜单中为其添加一个按钮：")
+LIST_ITEM (U"1. 通过 #File 菜单中的 #Save 保存脚本为文件。您提供的文件名将 "
+	"显示在 ScriptEditor 窗口的标题栏中。")
+LIST_ITEM (U"2. 从 #File 菜单中选择 @@Add to fixed menu...|添加到固定菜单...@。为 %window（窗口）提供 #Objects， "
+	"为 %menu（菜单）提供 #New，为 %command（命令）提供 \"Play sine wave...\"， "
+	"为 %%after command%（在此命令后插入）提供 ##Create Sound from formula...#，并为 %depth（深度）提供 \"1\"（因为它是要放在子菜单中）； "
+	"而 %script 参数已被自动设置为您在第 1 步中提供的文件名。")
+LIST_ITEM (U"3. 点击 #OK并确保该按钮已被添加到 @@New menu|New 菜单@ 中。这个按钮在您 "
+	"退出程序并再次进入后仍将存在；要将其从菜单中移除，请使用 @ButtonEditor（按钮编辑器）。")
 ENTRY (U"Example 2")
-NORMAL (U"In this example, we will create a shortcut for the usual complex pitch-analysis command.")
+NORMAL (U"在此示例中，我们将为常用的复杂基频分析（pitch analysis）命令创建一个快捷键。")
 NORMAL (U"First, we perform the required actions:")
-LIST_ITEM (U"1. Select a Sound object.")
-LIST_ITEM (U"2. Click ##To Pitch...# and set the arguments to your personal standard values.")
-LIST_ITEM (U"3. Click #OK. A new #Pitch object will appear.")
-NORMAL (U"We then paste the history into the ScriptEditor, after which this will contain at least a line like (delete all the other lines):")
+LIST_ITEM (U"1. 选择一个 Sound（声音）对象。")
+LIST_ITEM (U"2. 点击 ##To Pitch...# 并将参数设置为您的个人标准值。")
+LIST_ITEM (U"3. 点击 #OK。列表中将出现一个新的 #Pitch（音高）对象。")
+NORMAL (U"然后我们将历史记录粘贴到 ScriptEditor 中，之后它将至少包含类似如下的一行（删除所有其他行）：")
 CODE (U"To Pitch: 0.01, 150, 900")
-NORMAL (U"You can run this script only after selecting one or more Sound objects.")
-NORMAL (U"If this script is useful to you, you may want to put a button for it in the dynamic menu:")
-LIST_ITEM (U"1. Save the script to a file, with #Save from the #File menu.")
-LIST_ITEM (U"2. Choose @@Add to dynamic menu...@ from the #File menu. Supply \"Sound\" for %class1 "
-	"(because the button is supposed to be available only if a Sound is selected), \"0\" for %number1 "
-	"(because the command is supposed to work for any number of selected Sound objects), "
-	"\"To Pitch (child)\" for the %command, "
-	"\"To Spectrum\" for %%after command%, and \"0\" for the depth (because it is not supposed to be in a submenu); "
-	"the %script argument has already been set to the file name that you supplied in step 1.")
-LIST_ITEM (U"3. Click #OK and ensure that the button is clickable if you select one or more Sound objects. "
-	"This button will still be available after you leave the program and enter it again; "
-	"to remove it from the dynamic menus, use the @ButtonEditor.")
+NORMAL (U"您只有在选择了一个或多个 Sound 对象后才能运行此脚本。")
+NORMAL (U"如果此脚本对您有用，您可能想在动态菜单中为其添加一个按钮：")
+LIST_ITEM (U"1. 通过 #File 菜单中的 #Save 保存脚本为文件。")
+LIST_ITEM (U"2. 从 #File 菜单中选择 @@Add to dynamic menu...|添加到动态菜单...@。为 %class1（类1）提供 \"Sound\" "
+	"（因为该按钮应该仅在选中 Sound 时可用），为 %number1（数量1）提供 \"0\" "
+	"（因为该命令应该适用于任意数量的选定 Sound 对象）， "
+	"为 %command（命令）提供 \"To Pitch (child)\"， "
+	"为 %%after command%（在此命令后插入）提供 \"To Spectrum\"，并为 %depth（深度）提供 \"0\"（因为它不应该放在子菜单中）； "
+	"而 %script 参数已被自动设置为您在第 1 步中提供的文件名。")
+LIST_ITEM (U"3. 点击 #OK 并确保当您选择一个或多个 Sound 对象时，该按钮是可点击的。 "
+	"此按钮在您退出程序并再次进入后仍将可用； "
+	"要将其从动态菜单中移除，请使用 @ButtonEditor（按钮编辑器）。")
 MAN_END
 
 MAN_BEGIN (U"Scripting examples", U"ppgb", 20040222)
-INTRO (U"Here is a number of examples of how to use scripting in the Praat program. "
-	"Refer to the @scripting tutorial when necessary.")
-LIST_ITEM (U"@@Script for listing time–F0 pairs")
-LIST_ITEM (U"@@Script for listing time–F0–intensity")
-LIST_ITEM (U"@@Script for listing F0 statistics")
-LIST_ITEM (U"@@Script for creating a frequency sweep")
-LIST_ITEM (U"@@Script for onset detection")
-LIST_ITEM (U"@@Script for TextGrid boundary drawing")
-LIST_ITEM (U"@@Script for analysing pitch with a TextGrid")
+INTRO (U"以下是若干如何在 Praat 程序中使用脚本的示例。 "
+	"在需要时，请参考 @Scripting 教程。")
+LIST_ITEM (U"@@Script for listing time–F0 pairs|列出 时间-F0 对的脚本@")
+LIST_ITEM (U"@@Script for listing time–F0–intensity|列出 时间-F0-音强 的脚本@")
+LIST_ITEM (U"@@Script for listing F0 statistics|列出 F0 统计数据的脚本@")
+LIST_ITEM (U"@@Script for creating a frequency sweep|创建扫频信号的脚本@")
+LIST_ITEM (U"@@Script for onset detection|检出起始点的脚本@")
+LIST_ITEM (U"@@Script for TextGrid boundary drawing|绘制 TextGrid 边界的脚本@")
+LIST_ITEM (U"@@Script for analysing pitch with a TextGrid|使用 TextGrid 分析音高的脚本@")
 MAN_END
 
 MAN_BEGIN (U"Script for listing time–F0 pairs", U"ppgb", 20140223)
-INTRO (U"“I wish to have a list of time markers in one column and F0 in the other. "
-	"Those times that have no voiced data should be represented as “.” in the F0 column.”")
+INTRO (U"“我希望在一列中列出时间标记，在另一列中列出 F0 值。 "
+	"那些没有浊音数据的时刻在 F0 列中应表示为“.”。”")
 CODE (U"writeInfoLine: \"Time:    Pitch:\"")
 CODE (U"numberOfFrames = Get number of frames")
 CODE (U"for iframe to numberOfFrames")
@@ -3526,17 +3511,17 @@ CODE (U"for iframe to numberOfFrames")
 		CODE2 (U"appendInfoLine: fixed$ (time, 6), \" \", fixed$ (pitch, 3)")
 	CODE1 (U"endif")
 CODE (U"endfor")
-NORMAL (U"If you want to see this in a text file, you can copy and paste from the Info window, or save the Info window, "
-	"or add a line to the script like")
+NORMAL (U"如果您想在文本文件中查看这些内容，您可以从信息窗口中复制并粘贴，或者保存信息窗口， "
+	"或者在脚本中添加一行，如：")
 CODE (U"appendFile: \"out.txt\", info$ ( )")
 MAN_END
 
 MAN_BEGIN (U"Script for listing time–F0–intensity", U"ppgb", 20200912)
-INTRO (U"\"I want a list of pitch and intensity values at the same times.\"")
-NORMAL (U"Since @@Sound: To Pitch...@ and @@Sound: To Intensity...@ do not give values at the same times, "
-	"you create separate pitch and intensity contours with high time resolution, then interpolate. "
-	"In the following example, you get pitch and intensity values at steps of 0.01 seconds "
-	"by interpolating curves that have a time resolution of 0.001 seconds.")
+INTRO (U"“我想要一份在同一时刻下的基频（Pitch）和音强（Intensity）值列表。”")
+NORMAL (U"由于 @@Sound: To Pitch...|To Pitch...@ 和 @@Sound: To Intensity...|To Intensity...@ 不会在相同的时刻给出值， "
+	"您可以分别创建高时间分辨率的 Pitch 和 Intensity 曲线，然后进行插值。 "
+	"在下面的示例中，您通过对具有 0.001 秒时间分辨率的曲线进行插值， "
+	"来获取以 0.01 秒为步长的 Pitch 和 Intensity 值。")
 CODE (U"sound = selected (\"Sound\")")
 CODE (U"tmin = Get start time")
 CODE (U"tmax = Get end time")
@@ -3557,11 +3542,11 @@ CODE (U"endfor")
 MAN_END
 
 MAN_BEGIN (U"Script for listing F0 statistics", U"ppgb", 20221202)
-INTRO (U"\"I need to split the wave into 50 msec sections, and then for each of those sections "
-	"get the F0 statistics. That is, for each 50 msec section of speech I want to get the average F0, "
-	"min, max, and standard deviation.\"")
-NORMAL (U"First you create the complete pitch contour, i.e., you select the Sound and choose "
-	"@@Sound: To Pitch...|To Pitch...@. You can then use the commands from the @@Query submenu@ in a loop:")
+INTRO (U"“我需要将音频分成 50 毫秒的片段，然后获取每个片段的 F0 统计信息。 "
+	"也就是说，对于每段 50 毫秒的语音，我想得到其平均 F0、 "
+	"最小值、最大值和标准差。”")
+NORMAL (U"首先，您创建完整的 Pitch 曲线，即选择 Sound 对象并选择 "
+	"@@Sound: To Pitch...|To Pitch...@。接着，您可以在循环中使用 @@Query submenu|查询子菜单@ 中的命令：")
 CODE (U"startTime = Get start time")
 CODE (U"endTime = Get end time")
 CODE (U"numberOfTimeSteps = (endTime - startTime) / 0.05")
@@ -3577,35 +3562,35 @@ CODE (U"for step to numberOfTimeSteps")
 	CODE1 (U"... \" \", fixed$ (minimum, 2), \" \", fixed$ (maximum, 2), \" \", fixed$ (stdev, 2)")
 CODE (U"endfor")
 ENTRY (U"Notes")
-NORMAL (U"One should not cut the sound up into pieces of 50 ms and then do ##To Pitch...# on each of them, "
-	"because Praat will not compute F0 values in the first or last 20 ms (or so) of each piece. "
-	"This is because the analysis requires a window of 40 ms (or so) for every pitch frame. "
-	"Instead, one typically does the analysis on the whole sound, then queries the resulting large Pitch object. "
-	"In that way, the information loss of windowing only affects the two 20 ms edges of the whole sound.")
-NORMAL (U"The example writes lines to the #Info window. If you want to write to a file instead, "
-	"you start with something like")
+NORMAL (U"您不应该把声音切成 50 毫秒的小碎片然后对每个碎片执行 ##To Pitch...#， "
+	"因为 Praat 在每个碎片的最初或最后 20 毫秒（左右）里是无法计算 F0 值的。 "
+	"这是因为声学分析对每个 pitch 帧都需要大约 40 毫秒（或左右）的窗口。 "
+	"相反，通常的做法是对整个声音进行分析，然后查询生成的 Pitch 对象。 "
+	"这样，加窗造成的信息损失只影响整个声音的开头和结尾的 20 毫秒边缘。")
+NORMAL (U"该示例将代码行写入到 #Info 窗口。如果您想写入文件， "
+	"可以从类似以下内容开始：")
 	CODE1 (U"deleteFile: \"~/results/out.txt\"")
-NORMAL (U"and add lines in the following way:")
+NORMAL (U"并按以下方式添加内容行：")
 	CODE1 (U"appendFileLine: \"~/results/out.txt \", fixed$ (tmin, 6), \" \", fixed$ (tmax, 6), \" \",")
 	CODE1 (U"... fixed$ (mean, 2), \" \", fixed$ (minimum, 2), \" \", fixed$ (maximum, 2), \" \",")
 	CODE1 (U"... fixed$ (stdev, 2)")
 MAN_END
 
 MAN_BEGIN (U"Script for creating a frequency sweep", U"ppgb", 20170904)
-INTRO (U"\"I have to find a formula for a sinewave that sweeps from 1 kHz to 12 kHz in "
-	"60 seconds while ramping the amplitude from 1 to 12 volts in the same amount of time.\"")
-NORMAL (U"The absolute amplitude in volts cannot be handled, of course, but linear crescendo is easy:")
+INTRO (U"“我必须找到一个正弦波的公式，使其在 60 秒内频率从 1 kHz 扫频到 12 kHz， "
+	"同时在相同的时间内将振幅从 1 伏特增加到 12 伏特。”")
+NORMAL (U"当然，我们无法直接处理以伏特为单位的绝对振幅，但线性渐强（crescendo）很容易实现：")
 CODE (U"Create Sound from formula: \"sweep\", 1, 0, 60, 44100,")
 CODE (U"... ~ 0.05 * (1 + 11 * x/60) * sin (2*pi * (1000 + 11000/2 * x/60) * x)")
-NORMAL (U"Note the \"/2\" in this formula. Here is the derivation of the formula:")
+NORMAL (U"请注意该公式中的 \"/2\"。以下是公式的推导过程：")
 EQUATION (U"%frequency (%t) = 1000 + 11000 %t / 60")
 EQUATION (U"%phase (%t) = \\in %frequency (%t) %dt = 1000 %t + 11000 (%t^2/2) / 60")
 EQUATION (U"%signal (%t) = sin (%phase (%t))")
 MAN_END
 
 MAN_BEGIN (U"Script for onset detection", U"ppgb", 20140112)
-INTRO (U"\"Can anybody provide me with a script that detects the onset of sound (i.e. the end of silence).\"")
-NORMAL (U"You can create an Intensity contour and look for the first frame that is above some predefined threshold:")
+INTRO (U"“有没有人能给我提供一个能检出声音起始点（即静音结束处）的脚本？”")
+NORMAL (U"您可以创建一个 Intensity（音强）曲线并寻找第一个超过预定义阈值的帧：")
 CODE (U"To Intensity: 100, 0")
 CODE (U"n = Get number of frames")
 CODE (U"for i to n")
@@ -3616,13 +3601,12 @@ CODE (U"for i to n")
 		CODE2 (U"exit")
 	CODE1 (U"endif")
 CODE (U"endfor")
-NORMAL (U"Since the intensity is computed with rather long windows, the result may be 0.01 or 0.02 seconds "
-	"before the actual start of sound.")
+NORMAL (U"由于音强是用相当长的窗口计算的，结果可能会比声音的实际开始时间早 0.01 或 0.02 秒。")
 MAN_END
 
 MAN_BEGIN (U"Script for TextGrid boundary drawing", U"ppgb", 20140107)
-INTRO (U"\"I want only the dotted lines of the textgrid marked on top of another analysis (e.g. pitch, intensity or so) "
-	"without the labels being shown below it.\"")
+INTRO (U"“我只想在另一个分析图（如音高、音强等）之上标出 TextGrid 的虚线， "
+	"而不显示下方的标签。”")
 CODE (U"n = Get number of intervals: 1")
 CODE (U"for i to n-1")
     CODE1 (U"t = Get end point: 1, i")
@@ -3631,7 +3615,7 @@ CODE (U"endfor")
 MAN_END
 
 MAN_BEGIN (U"Script for analysing pitch with a TextGrid", U"ppgb", 20201229)
-INTRO (U"\"I want the mean pitch of every interval that has a non-empty label on tier 5.\"")
+INTRO (U"“我想要获取第 5 层上每个具有非空标签的区间的平均音高。”")
 CODE (U"if numberOfSelected (\"Sound\") <> 1 or numberOfSelected (\"TextGrid\") <> 1")
 	CODE1 (U"exitScript: \"Please select a Sound and a TextGrid first.\"")
 CODE (U"endif")
