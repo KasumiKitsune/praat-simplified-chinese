@@ -1458,27 +1458,26 @@ static void menu_cb_TranscribeInterval (TextGridArea me, EDITOR_ARGS) {
 }
 
 static void menu_cb_TranscriptionSettings (TextGridArea me, EDITOR_ARGS) {
-	EDITOR_FORM (U"Transcription settings", nullptr)
-		HEADING (U"Textgrid...")
-		BOOLEAN (includeWords, U"Include words", my default_transcribe_includeWords())
-		BOOLEAN (includeDiarization, U"Include diarization", my default_transcribe_diarize())
-		HEADING (U"Speech activity detection...")
-		BOOLEAN (useVad, U"Allow silences", my default_transcribe_useVad())
-		REAL (speechProbabilityThreshold, U"Speech probability threshold (0-1)", my default_vad_speechThreshold())
-		POSITIVE (minNonSpeechDuration, U"Min. non-speech interval (s)", my default_vad_minNonSpeech())
-		POSITIVE (minSpeechDuration, U"Min. speech interval (s)", my default_vad_minSpeech())
-		POSITIVE (speechPad, U"Padding around speech segments (s)", my default_vad_speechPadding())
+	EDITOR_FORM (U"Transcription settings", U"transcription with whisper.cpp")
 		HEADING (U"Transcription...")
 		LISTNUMSTR (modelIndex, modelName, U"Whisper model", constSTRVEC(), 1)
 		OPTIONMENU (language, U"Language", (int) NUMfindFirst (theSpeechRecognizerLanguageNames(), TranscriptionDefaults::languageName))
 		for (integer i = 1; i <= theSpeechRecognizerLanguageNames().size; i ++) {
 			OPTION (theSpeechRecognizerLanguageNames() [i]);
 		}
+		BOOLEAN (includeWords, U"Include words", my default_transcribe_includeWords())
+		BOOLEAN (includeDiarization, U"Include diarization", my default_transcribe_diarize())
+		BOOLEAN (useVad, U"Allow silences", my default_transcribe_useVad())
+		HEADING (U"Speech activity detection...")
+		REAL (speechProbabilityThreshold, U"Speech probability threshold (0-1)", my default_vad_speechThreshold())
+		POSITIVE (minNonSpeechDuration, U"Min. gap between speech segments (s)", my default_vad_minNonSpeech())
+		POSITIVE (minSpeechDuration, U"Min. speech segment (s)", my default_vad_minSpeech())
+		POSITIVE (speechPad, U"Padding around speech segments (s)", my default_vad_speechPadding())
 		HEADING (U"Diarization...")
 		INTEGER (numSpeakers, U"Fixed number of speakers...", DiarizationDefaults::numSpeakers)
 		INTEGER (minSpeakers, U"left ... or range of numbers of speakers", DiarizationDefaults::minSpeakers)
 		INTEGER (maxSpeakers, U"right ... or range of numbers of speakers", DiarizationDefaults::maxSpeakers)
-		BOOLEAN (allowSpeakersOverlap, U"Allow speakers overlap", DiarizationDefaults::allowOverlap)
+		BOOLEAN (allowSpeakersOverlap, U"Allow speakers to overlap", DiarizationDefaults::allowOverlap)
 		POSITIVE (clusterThreshold, U"Clustering threshold (0-2)", DiarizationDefaults::clusterThreshold)
 		POSITIVE (segmentationStep, U"Segmentation step (0-1)", DiarizationDefaults::segmentationStep)
 	EDITOR_OK
@@ -1559,7 +1558,7 @@ static void menu_cb_DiarizationSettings (TextGridArea me, EDITOR_ARGS) {
 		INTEGER (numSpeakers, U"Fixed number of speakers...", DiarizationDefaults::numSpeakers)
 		INTEGER (minSpeakers, U"left ... or range of numbers of speakers", DiarizationDefaults::minSpeakers)
 		INTEGER (maxSpeakers, U"right ... or range of numbers of speakers", DiarizationDefaults::maxSpeakers)
-		BOOLEAN (allowSpeakersOverlap, U"Allow speakers overlap", DiarizationDefaults::allowOverlap)
+		BOOLEAN (allowSpeakersOverlap, U"Allow speakers to overlap", DiarizationDefaults::allowOverlap)
 		WORD (nonSpeechLabel, U"Non-speech interval label", DiarizationDefaults::nonSpeechLabel)
 		WORD (speechLabel, U"Speech interval label", DiarizationDefaults::speechLabel)
 		POSITIVE (clusterThreshold, U"Clustering threshold (0-2)", DiarizationDefaults::clusterThreshold)

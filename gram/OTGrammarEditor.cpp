@@ -1,10 +1,10 @@
 /* OTGrammarEditor.cpp
  *
- * Copyright (C) 1997-2005,2007-2020,2022,2024 Paul Boersma
+ * Copyright (C) 1997-2005,2007-2020,2022,2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -210,7 +210,7 @@ void structOTGrammarEditor :: v_draw () {
 				U"@\t      ", Melder_fixed (constraint -> ranking, 3),
 				U"\t      ", Melder_fixed (constraint -> disharmony, 3),
 				U"\t      ", Melder_fixed (constraint -> plasticity, 6),
-				U"\t ", Melder_float (Melder_half (exp (constraint -> disharmony))));
+				U"\t ", Melder_graphicalHalf (exp (constraint -> disharmony)));
 		} else {
 			Melder_sprint (text,1000,
 				U"\t", icons == selected ? U"♠︎ " : U"   ",

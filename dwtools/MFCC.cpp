@@ -2,7 +2,7 @@
  *
  * Mel Frequency Cepstral Coefficients class.
  *
- * Copyright (C) 1993-2017 David Weenink
+ * Copyright (C) 1993-2017, 2026 David Weenink
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,9 +85,16 @@ autoTableOfReal MFCC_to_TableOfReal (MFCC me, bool includeC0) {
 // as_Sound not to_Sound
 autoSound MFCC_to_Sound (MFCC me) {
 	try {
-		autoSound thee = Sound_create (my maximumNumberOfCoefficients, my xmin, my xmax, my nx, my dx, my x1);
+		/*
+			All frames of an MFCC have the same size, which can differ from maximumNumberOfCoefficients.
+		*/
+		const CC_Frame cf1 = & my frame [1];
+		const integer numberOfCoefficients = cf1 -> c.size;
+		autoSound thee = Sound_create (numberOfCoefficients, my xmin, my xmax, my nx, my dx, my x1);
 		for (integer iframe = 1; iframe <= my nx; iframe ++) {
 			const CC_Frame cf = & my frame [iframe];
+			if (cf -> c.size != numberOfCoefficients)
+				Melder_crash (U"MFCC_to_Sound: ", cf -> c.size, U" ", numberOfCoefficients);
 			thy z.column (iframe)  <<=  cf -> c.all();
 		}
 		return thee;
@@ -96,12 +103,22 @@ autoSound MFCC_to_Sound (MFCC me) {
 	}
 }
 
+static void checkMFCCpair (MFCC me, MFCC thee) {
+	Melder_require (my dx == thy dx,
+			U"The samplings of the two MFCC's should be equal.");
+	Melder_require (my maximumNumberOfCoefficients == thy maximumNumberOfCoefficients,
+		U"The maximum number of coefficients in the two MFCC's should be equal.");
+	const CC_Frame my_cf1 = & my frame [1];
+	const integer my_numberOfCoefficients = my_cf1 -> c.size;
+	const CC_Frame thy_cf1 = & thy frame [1];
+	const integer thy_numberOfCoefficients = thy_cf1 -> c.size;
+	Melder_require (my_numberOfCoefficients == thy_numberOfCoefficients,
+			U"The number of coefficients in the two MFCC's should be equal.");
+}
+
 autoSound MFCCs_crossCorrelate (MFCC me, MFCC thee, enum kSounds_convolve_scaling scaling, enum kSounds_convolve_signalOutsideTimeDomain signalOutsideTimeDomain) {
 	try {
-		Melder_require (my dx == thy dx,
-			U"The samplings of the two MFCC's should be equal.");
-		Melder_require (my maximumNumberOfCoefficients == thy maximumNumberOfCoefficients,
-			U"The number of coefficients in the two MFCC's should be equal.");
+		checkMFCCpair (me, thee);
 		autoSound target = MFCC_to_Sound (me);
 		autoSound source = MFCC_to_Sound (thee);
 		autoSound cc = Sounds_crossCorrelate (target.get(), source.get(), scaling, signalOutsideTimeDomain);
@@ -113,10 +130,7 @@ autoSound MFCCs_crossCorrelate (MFCC me, MFCC thee, enum kSounds_convolve_scalin
 
 autoSound MFCCs_convolve (MFCC me, MFCC thee, enum kSounds_convolve_scaling scaling, enum kSounds_convolve_signalOutsideTimeDomain signalOutsideTimeDomain) {
 	try {
-		Melder_require (my dx == thy dx,
-			U"The samplings of the two MFCC's should be equal.");
-		Melder_require (my maximumNumberOfCoefficients == thy maximumNumberOfCoefficients,
-			U"The number of coefficients in the two MFCC's should be equal.");
+		checkMFCCpair (me, thee);
 		autoSound target = MFCC_to_Sound (me);
 		autoSound source = MFCC_to_Sound (thee);
 		autoSound cc = Sounds_convolve (target.get(), source.get(), scaling, signalOutsideTimeDomain);

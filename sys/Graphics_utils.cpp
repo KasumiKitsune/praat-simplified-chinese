@@ -1,10 +1,10 @@
 /* Graphics_utils.cpp
  *
- * Copyright (C) 1992-2007,2009-2012,2015-2021 Paul Boersma
+ * Copyright (C) 1992-2007,2009-2012,2015-2021,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -147,7 +147,7 @@ void Graphics_marksLeft (Graphics me, integer numberOfMarks, bool haveNumbers, b
 		const double f = (i - 1.0) / (numberOfMarks - 1);
 		const double yWC = original_y1WC + (original_y2WC - original_y1WC) * f;
 		if (haveNumbers)
-			Graphics_text (me, - my horTick, yWC, Melder_float (Melder_half (yWC)));
+			Graphics_text (me, - my horTick, yWC, Melder_graphicalHalf (yWC));
 		if (haveTicks)
 			Graphics_line (me, - my horTick, yWC, 0, yWC);
 	}
@@ -190,7 +190,7 @@ void Graphics_marksRight (Graphics me, integer numberOfMarks, bool haveNumbers, 
 		const double f = (i - 1.0) / (numberOfMarks - 1);
 		const double yWC = original_y1WC + (original_y2WC - original_y1WC) * f;
 		if (haveNumbers)
-			Graphics_text (me, 1.0 + my horTick, yWC, Melder_float (Melder_half (yWC)));
+			Graphics_text (me, 1.0 + my horTick, yWC, Melder_graphicalHalf (yWC));
 		if (haveTicks)
 			Graphics_line (me, 1.0, yWC, 1.0 + my horTick, yWC);
 	}
@@ -233,7 +233,7 @@ void Graphics_marksBottom (Graphics me, integer numberOfMarks, bool haveNumbers,
 		const double f = (i - 1.0) / (numberOfMarks - 1);
 		const double xWC = original_x1WC + (original_x2WC - original_x1WC) * f;
 		if (haveNumbers)
-			Graphics_text (me, xWC, - my vertTick, Melder_float (Melder_half (xWC)));
+			Graphics_text (me, xWC, - my vertTick, Melder_graphicalHalf (xWC));
 		if (haveTicks)
 			Graphics_line (me, xWC, - my vertTick, xWC, 0);
 	}
@@ -276,7 +276,7 @@ void Graphics_marksTop (Graphics me, integer numberOfMarks, bool haveNumbers, bo
 		const double f = (i - 1.0) / (numberOfMarks - 1);
 		const double xWC = original_x1WC + (original_x2WC - original_x1WC) * f;
 		if (haveNumbers)
-			Graphics_text (me, xWC, 1.0 + my vertTick, Melder_float (Melder_half (xWC)));
+			Graphics_text (me, xWC, 1.0 + my vertTick, Melder_graphicalHalf (xWC));
 		if (haveTicks)
 			Graphics_line (me, xWC, 1.0, xWC, 1.0 + my vertTick);
 	}
@@ -334,7 +334,7 @@ void Graphics_marksLeftLogarithmic (Graphics me, integer numberOfMarksPerDecade,
 			y /= 10.0;
 		for (y *= 10.0; y <= (y1<y2?py2:py1); y *= 10.0) {
 			if (haveNumbers)
-				Graphics_text (me, - my horTick, log10 (y), Melder_float (Melder_half (y)));
+				Graphics_text (me, - my horTick, log10 (y), Melder_graphicalHalf (y));
 			if (haveTicks) {
 				Graphics_setLineWidth (me, 2.0 * lineWidth);
 				Graphics_setLineType (me, Graphics_DRAWN);
@@ -379,7 +379,7 @@ void Graphics_marksRightLogarithmic (Graphics me, integer numberOfMarksPerDecade
 			y /= 10.0;
 		for (y *= 10.0; y <= (y1<y2?py2:py1); y *= 10.0) {
 			if (haveNumbers)
-				Graphics_text (me, 1.0 + my horTick, log10 (y), Melder_float (Melder_half (y)));
+				Graphics_text (me, 1.0 + my horTick, log10 (y), Melder_graphicalHalf (y));
 			if (haveTicks) {
 				Graphics_setLineWidth (me, 2.0 * lineWidth);
 				Graphics_setLineType (me, Graphics_DRAWN);
@@ -424,7 +424,7 @@ void Graphics_marksTopLogarithmic (Graphics me, integer numberOfMarksPerDecade, 
 			x /= 10.0;
 		for (x *= 10.0; x <= (x1<x2?px2:px1); x *= 10.0) {
 			if (haveNumbers)
-				Graphics_text (me, log10 (x), 1.0 + my vertTick, Melder_float (Melder_half (x)));
+				Graphics_text (me, log10 (x), 1.0 + my vertTick, Melder_graphicalHalf (x));
 			if (haveTicks) {
 				Graphics_setLineWidth (me, 2.0 * lineWidth);
 				Graphics_setLineType (me, Graphics_DRAWN);
@@ -469,7 +469,7 @@ void Graphics_marksBottomLogarithmic (Graphics me, integer numberOfMarksPerDecad
 			x /= 10.0;
 		for (x *= 10.0; x <= (x1<x2?px2:px1); x *= 10.0) {
 			if (haveNumbers)
-				Graphics_text (me, log10 (x), - my vertTick, Melder_float (Melder_half (x)));
+				Graphics_text (me, log10 (x), - my vertTick, Melder_graphicalHalf (x));
 			if (haveTicks) {
 				Graphics_setLineWidth (me, 2.0 * lineWidth);
 				Graphics_setLineType (me, Graphics_DRAWN);
@@ -502,7 +502,7 @@ void Graphics_markLeft (Graphics me, double position, bool hasNumber, bool hasTi
 	Graphics_setTextAlignment (me, Graphics_RIGHT, Graphics_HALF);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, - my horTick, position, Melder_float (Melder_half (position)));
+		Graphics_text (me, - my horTick, position, Melder_graphicalHalf (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -535,7 +535,7 @@ void Graphics_markRight (Graphics me, double position, bool hasNumber, bool hasT
 	Graphics_setTextAlignment (me, Graphics_LEFT, Graphics_HALF);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, 1.0 + my horTick, position, Melder_float (Melder_half (position)));
+		Graphics_text (me, 1.0 + my horTick, position, Melder_graphicalHalf (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -568,7 +568,7 @@ void Graphics_markTop (Graphics me, double position, bool hasNumber, bool hasTic
 	Graphics_setTextAlignment (me, Graphics_CENTRE, Graphics_BOTTOM);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, position, 1.0 + my vertTick, Melder_float (Melder_single (position)));
+		Graphics_text (me, position, 1.0 + my vertTick, Melder_graphicalSingle (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -601,7 +601,7 @@ void Graphics_markBottom (Graphics me, double position, bool hasNumber, bool has
 	Graphics_setTextAlignment (me, Graphics_CENTRE, Graphics_TOP);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, position, - my vertTick, Melder_float (Melder_single (position)));
+		Graphics_text (me, position, - my vertTick, Melder_graphicalSingle (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -636,7 +636,7 @@ void Graphics_markLeftLogarithmic (Graphics me, double position, bool hasNumber,
 	Graphics_setTextAlignment (me, Graphics_RIGHT, Graphics_HALF);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, - my horTick, log10 (position), Melder_float (Melder_half (position)));
+		Graphics_text (me, - my horTick, log10 (position), Melder_graphicalHalf (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -671,7 +671,7 @@ void Graphics_markRightLogarithmic (Graphics me, double position, bool hasNumber
 	Graphics_setTextAlignment (me, Graphics_LEFT, Graphics_HALF);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, 1.0 + my horTick, log10 (position), Melder_float (Melder_half (position)));
+		Graphics_text (me, 1.0 + my horTick, log10 (position), Melder_graphicalHalf (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -706,7 +706,7 @@ void Graphics_markTopLogarithmic (Graphics me, double position, bool hasNumber, 
 	Graphics_setTextAlignment (me, Graphics_CENTRE, Graphics_BOTTOM);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, log10 (position), 1.0 + my vertTick, Melder_float (Melder_half (position)));
+		Graphics_text (me, log10 (position), 1.0 + my vertTick, Melder_graphicalHalf (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -741,7 +741,7 @@ void Graphics_markBottomLogarithmic (Graphics me, double position, bool hasNumbe
 	Graphics_setTextAlignment (me, Graphics_CENTRE, Graphics_TOP);
 	Graphics_setInner (me);
 	if (hasNumber)
-		Graphics_text (me, log10 (position), - my vertTick, Melder_float (Melder_half (position)));
+		Graphics_text (me, log10 (position), - my vertTick, Melder_graphicalHalf (position));
 	if (hasTick) {
 		Graphics_setLineType (me, Graphics_DRAWN);
 		Graphics_setLineWidth (me, 2.0 * lineWidth);
@@ -783,7 +783,7 @@ void Graphics_marksLeftEvery (Graphics me, double units, double distance, bool h
 	for (integer i = first; i <= last; i ++) {
 		const double yWC = i * distance;
 		if (haveNumbers)
-			Graphics_text (me, - my horTick, yWC, Melder_float (Melder_half (yWC / units)));
+			Graphics_text (me, - my horTick, yWC, Melder_graphicalHalf (yWC / units));
 		if (haveTicks)
 			Graphics_line (me, - my horTick, yWC, 0.0, yWC);
 	}
@@ -827,7 +827,7 @@ void Graphics_marksRightEvery (Graphics me, double units, double distance, bool 
 	for (integer i = first; i <= last; i ++) {
 		const double yWC = i * distance;
 		if (haveNumbers)
-			Graphics_text (me, 1.0 + my horTick, yWC, Melder_float (Melder_half (yWC / units)));
+			Graphics_text (me, 1.0 + my horTick, yWC, Melder_graphicalHalf (yWC / units));
 		if (haveTicks)
 			Graphics_line (me, 1.0, yWC, 1.0 + my horTick, yWC);
 	}
@@ -869,7 +869,7 @@ void Graphics_marksBottomEvery (Graphics me, double units, double distance, bool
 	for (integer i = first; i <= last; i ++) {
 		const double xWC = i * distance;
 		if (haveNumbers)
-			Graphics_text (me, xWC, - my vertTick, Melder_float (Melder_half (xWC / units)));
+			Graphics_text (me, xWC, - my vertTick, Melder_graphicalHalf (xWC / units));
 		if (haveTicks)
 			Graphics_line (me, xWC, - my vertTick, xWC, 0.0);
 	}
@@ -911,7 +911,7 @@ void Graphics_marksTopEvery (Graphics me, double units, double distance, bool ha
 	for (integer i = first; i <= last; i ++) {
 		const double xWC = i * distance;
 		if (haveNumbers)
-			Graphics_text (me, xWC, 1.0 + my vertTick, Melder_float (Melder_half (xWC / units)));
+			Graphics_text (me, xWC, 1.0 + my vertTick, Melder_graphicalHalf (xWC / units));
 		if (haveTicks)
 			Graphics_line (me, xWC, 1.0, xWC, 1.0 + my vertTick);
 	}

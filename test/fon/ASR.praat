@@ -1,5 +1,5 @@
 # src/test/fon/ASR.praat
-# Paul Boersma, 22 May 2026
+# Paul Boersma, 7 June 2026
 
 modelsFolder$ = preferencesDirectory$ + "/models"
 if not folderExists (modelsFolder$)
@@ -18,8 +18,8 @@ selectObject: "Sound example", "TextGrid example"
 # TODO: warnings.
 # TODO: exit without error  ; document at exitScript!
 #
-Transcribe interval: 1, 1, "yes", "no", "yes", 0.5, 0.1, 0.25, 0.03, "ggml-base.bin", "Autodetect language",
-... 3, 0, 0, 0, 0.7045655, 0.1
+Transcribe interval: 1, 1, "ggml-base.bin", "Autodetect language", "yes", "no", "yes", 0.5, 0.1, 0.25, 0.03,
+... 0, 0, 0, "yes", 0.7045655, 0.1
 selectObject: "TextGrid example"
 text$ = Get label of interval: 1, 1
 writeInfoLine: text$

@@ -94,7 +94,8 @@ static void gui_drawingarea_cb_mouse (DemoEditor me, GuiDrawingArea_MouseEvent e
 	my optionKeyPressed = event -> optionKeyPressed;
 	if (my waitingForInput) {
 		my waitingForInput = false;
-		Melder_assert (my interpreterReference);
+		Melder_require (my interpreterReference,
+			U"The script that was waiting for input (e.g. your mouse click) no longer exists.");
 		try {
 			autoPraatBackground background;
 			Melder_assert (my interpreterReference -> owningInterpreterStack);
@@ -119,7 +120,8 @@ static void gui_drawingarea_cb_key (DemoEditor me, GuiDrawingArea_KeyEvent event
 	my optionKeyPressed = event -> optionKeyPressed;
 	if (my waitingForInput) {
 		my waitingForInput = false;
-		Melder_assert (my interpreterReference);
+		Melder_require (my interpreterReference,
+			U"The script that was waiting for input (e.g. your key press) no longer exists.");
 		try {
 			autoPraatBackground background;
 			Melder_assert (my interpreterReference -> owningInterpreterStack);
@@ -275,7 +277,7 @@ void Demo_waitForInput (Interpreter interpreter) {
 		*/
 		if (! theReferenceToTheOnlyDemoEditor)
 			Melder_throw (U"Cannot do demoWaitForInput() if the Demo window isn’t visible.");
-		trace (U"is the Demo window already waiting for input? ", theReferenceToTheOnlyDemoEditor -> waitingForInput );
+		trace (U"is the Demo window already waiting for input? ", theReferenceToTheOnlyDemoEditor -> waitingForInput);
 		if (theReferenceToTheOnlyDemoEditor -> waitingForInput &&0) {
 			Melder_throw (U"You cannot work with the Demo window while it is waiting for input. "
 				U"Please click or type into the Demo window or close it.");

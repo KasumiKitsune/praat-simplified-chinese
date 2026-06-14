@@ -2763,6 +2763,25 @@ NORMAL (U"Singular value decomposition with backsubstitution. "
 NORMAL (U"See for more details: @@Golub & van Loan (1996)@ chapters 2 and 3.")
 MAN_END
 
+MAN_BEGIN (U"Matrix: To Eigen (special)...", U"djmw", 20260328)
+INTRO (U"A command to get the @Eigen structure of a square matrix.")
+ENTRY (U"Settings")
+TERM (U"##Matrix type#")
+DEFINITION (U"determines the matrix type. Symmetric matrices always have real eigenvalues and eigenvectors,"
+	" while a general matrix can have complex eigenvalues and eigenvectors. For a general matrix"
+	" the complex eigenvalues always occur in pairs with equal real parts and complex parts"
+	" with opposite signs. ")
+TERM (U"##Number of eigenvalues#")
+DEFINITION (U"The number of eigenvalues you need. If you choose the default, 0, the number of eigenvalues"
+	" will be equal to the dimension of the square matrix. If the number you choose is less than"
+	" the dimension of the matrix then if the sort is %ascending the smallest eigenvalues are selected."
+	" If the sort is %descending the largest eigenvalues are selected.")
+TERM (U"##Sort ascending")
+DEFINITION (U"if true, the eigenvalues and corresponding eigenvectors are sorted from smallest to largest,"
+	" if false the values are sorted from largest to smallest. For a general matrix the eigenvalues/vectors"
+	" are not sorted.")
+MAN_END
+
 MAN_BEGIN (U"Matrix: To NMF (m.u.)...", U"djmw", 20190409)
 INTRO (U"A command to get the @@non-negative matrix factorization@ of a matrix by means of a multiplicative update algorithm.")
 MAN_END

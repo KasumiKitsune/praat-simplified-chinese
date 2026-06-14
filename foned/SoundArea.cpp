@@ -1,6 +1,6 @@
 /* SoundArea.cpp
  *
- * Copyright (C) 2022-2025 Paul Boersma, 2007 Erez Volk (FLAC support)
+ * Copyright (C) 2022-2026 Paul Boersma, 2007 Erez Volk (FLAC support)
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ void SoundArea_draw (SoundArea me) {
 		Graphics_setColour (my graphics(), Melder_BLACK);
 		Graphics_setTextAlignment (my graphics(), Graphics_CENTRE, Graphics_BOTTOM);
 		Graphics_text (my graphics(), 0.5, 0.5,   U"(window longer than ",
-				Melder_float (Melder_single (my longSound() -> bufferLength)), U" seconds)");
+				Melder_graphicalSingle (my longSound() -> bufferLength), U" seconds)");
 		Graphics_setTextAlignment (my graphics(), Graphics_CENTRE, Graphics_TOP);
 		Graphics_text (my graphics(), 0.5, 0.5, U"(zoom in to see the samples)");
 		return;
@@ -105,9 +105,7 @@ void SoundArea_draw (SoundArea me) {
 		return;
 	}
 	integer first, last;
-	if (Sampled_getWindowSamples (my soundOrLongSound(),
-		my startWindow(), my endWindow(), & first, & last) <= 1)
-	{
+	if (Sampled_getWindowSamples (my soundOrLongSound(), my startWindow(), my endWindow(), & first, & last) <= 1) {
 		Graphics_setWindow (my graphics(), 0.0, 1.0, 0.0, 1.0);
 		Graphics_setTextAlignment (my graphics(), Graphics_CENTRE, Graphics_HALF);
 		Graphics_text (my graphics(), 0.5, 0.5, U"(zoom out to see the data)");
@@ -191,15 +189,15 @@ void SoundArea_draw (SoundArea me) {
 		if (horizontal) {
 			Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
 			const double mid = 0.5 * (minimum + maximum);
-			Graphics_text (my graphics(), my startWindow(), mid, Melder_float (Melder_half (mid)));
+			Graphics_text (my graphics(), my startWindow(), mid, Melder_graphicalHalf (mid));
 		} else {
 			if (! cursorVisible || isundef (cursorFunctionValue) || Graphics_dyWCtoMM (my graphics(), cursorFunctionValue - minimum) > 4.0) {
 				Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, ichan == lastVisibleChannel? Graphics_HALF : Graphics_BOTTOM);
-				Graphics_text (my graphics(), my startWindow(), minimum, Melder_float (Melder_half (minimum)));
+				Graphics_text (my graphics(), my startWindow(), minimum, Melder_graphicalHalf (minimum));
 			}
 			if (! cursorVisible || isundef (cursorFunctionValue) || Graphics_dyWCtoMM (my graphics(), maximum - cursorFunctionValue) > 4.0) {
 				Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, ichan == firstVisibleChannel ? Graphics_HALF : Graphics_TOP);
-				Graphics_text (my graphics(), my startWindow(), maximum, Melder_float (Melder_half (maximum)));
+				Graphics_text (my graphics(), my startWindow(), maximum, Melder_graphicalHalf (maximum));
 			}
 		}
 		if (minimum < 0.0 && maximum > 0.0 && ! horizontal) {
@@ -246,7 +244,7 @@ void SoundArea_draw (SoundArea me) {
 		if (my sound()) {
 			Graphics_setWindow (my graphics(), my startWindow(), my endWindow(), minimum, maximum);
 			if (cursorVisible && isdefined (cursorFunctionValue))
-				SoundArea_drawCursorFunctionValue (me, cursorFunctionValue, Melder_float (Melder_half (cursorFunctionValue)), U"");
+				SoundArea_drawCursorFunctionValue (me, cursorFunctionValue, Melder_graphicalHalf (cursorFunctionValue), U"");
 			Graphics_setColour (my graphics(), DataGui_defaultForegroundColour (me, false));
 			Graphics_function (my graphics(), & my sound() -> z [ichan] [0], first, last,
 					Sampled_indexToX (my sound(), first), Sampled_indexToX (my sound(), last));

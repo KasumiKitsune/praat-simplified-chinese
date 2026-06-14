@@ -2656,7 +2656,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 				Graphics_setColour (my graphics(), MelderColour (0.6, 0.0, 0.4));
 				Graphics_setTextAlignment (my graphics(), Graphics_LEFT, Graphics_HALF);
 				Graphics_text (my graphics(), my endWindow(), pitchCursor_hidden,
-					Melder_float (Melder_half (pitchCursor_overt)), U" ",
+					Melder_graphicalHalf (pitchCursor_overt), U" ",
 					Function_getUnitText (my d_pitch.get(), Pitch_LEVEL_FREQUENCY, (int) pitchUnit, Function_UNIT_TEXT_SHORT | Function_UNIT_TEXT_GRAPHICAL)
 				);
 				Graphics_setColour (my graphics(), 1.2 * Melder_BLUE);
@@ -2664,14 +2664,14 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 			if (isundef (pitchCursor_hidden) || Graphics_dyWCtoMM (my graphics(), pitchCursor_hidden - pitchViewFrom_hidden) > 4.0) {
 				Graphics_setTextAlignment (my graphics(), Graphics_LEFT, Graphics_HALF);
 				Graphics_text (my graphics(), my endWindow(), pitchViewFrom_hidden - Graphics_dyMMtoWC (my graphics(), 0.5),
-					Melder_float (Melder_half (pitchViewFrom_overt)), U" ",
+					Melder_graphicalHalf (pitchViewFrom_overt), U" ",
 					Function_getUnitText (my d_pitch.get(), Pitch_LEVEL_FREQUENCY, (int) pitchUnit, Function_UNIT_TEXT_SHORT | Function_UNIT_TEXT_GRAPHICAL)
 				);
 			}
 			if (isundef (pitchCursor_hidden) || Graphics_dyWCtoMM (my graphics(), pitchViewTo_hidden - pitchCursor_hidden) > 4.0) {
 				Graphics_setTextAlignment (my graphics(), Graphics_LEFT, Graphics_HALF);
 				Graphics_text (my graphics(), my endWindow(), pitchViewTo_hidden,
-					Melder_float (Melder_half (pitchViewTo_overt)), U" ",
+					Melder_graphicalHalf (pitchViewTo_overt), U" ",
 					Function_getUnitText (my d_pitch.get(), Pitch_LEVEL_FREQUENCY, (int) pitchUnit, Function_UNIT_TEXT_SHORT | Function_UNIT_TEXT_GRAPHICAL)
 				);
 			}
@@ -2722,19 +2722,19 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 				static const conststring32 methodString [] = { U" (.5)", U" (μE)", U" (μS)", U" (μ)" };
 				Graphics_setTextAlignment (my graphics(), hor, Graphics_HALF);
 				Graphics_text (my graphics(), y, intensityCursor,
-					Melder_float (Melder_half (intensityCursor)), U" dB",
+					Melder_graphicalHalf (intensityCursor), U" dB",
 					my startSelection() == my endSelection() ? U"" : methodString [(int) my instancePref_intensity_averagingMethod()]
 				);
 			}
 			if (! intensityCursorVisible || Graphics_dyWCtoMM (my graphics(), intensityCursor - my instancePref_intensity_viewFrom()) > 5.0) {
 				Graphics_setTextAlignment (my graphics(), hor, vert == -1 ? Graphics_BOTTOM : Graphics_HALF);
 				Graphics_text (my graphics(), y, my instancePref_intensity_viewFrom() - Graphics_dyMMtoWC (my graphics(), 0.5),
-						Melder_float (Melder_half (my instancePref_intensity_viewFrom())), U" dB");
+						Melder_graphicalHalf (my instancePref_intensity_viewFrom()), U" dB");
 			}
 			if (! intensityCursorVisible || Graphics_dyWCtoMM (my graphics(), my instancePref_intensity_viewTo() - intensityCursor) > 5.0) {
 				Graphics_setTextAlignment (my graphics(), hor, vert == -1 ? Graphics_TOP : Graphics_HALF);
 				Graphics_text (my graphics(), y, my instancePref_intensity_viewTo(),
-						Melder_float (Melder_half (my instancePref_intensity_viewTo())), U" dB");
+						Melder_graphicalHalf (my instancePref_intensity_viewTo()), U" dB");
 			}
 			Graphics_setColour (my graphics(), Melder_BLACK);
 		}
@@ -2750,12 +2750,12 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 		if (! frequencyCursorVisible || Graphics_dyWCtoMM (my graphics(), my d_spectrogram_cursor - my instancePref_spectrogram_viewFrom()) > 5.0) {
 			Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
 			Graphics_text (my graphics(), my startWindow(), my instancePref_spectrogram_viewFrom() - Graphics_dyMMtoWC (my graphics(), 0.5),
-					Melder_float (Melder_half (my instancePref_spectrogram_viewFrom())), U" Hz");
+					Melder_graphicalHalf (my instancePref_spectrogram_viewFrom()), U" Hz");
 		}
 		if (! frequencyCursorVisible || Graphics_dyWCtoMM (my graphics(), my instancePref_spectrogram_viewTo() - my d_spectrogram_cursor) > 5.0) {
 			Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
 			Graphics_text (my graphics(), my startWindow(), my instancePref_spectrogram_viewTo(),
-					Melder_float (Melder_half (my instancePref_spectrogram_viewTo())), U" Hz");
+					Melder_graphicalHalf (my instancePref_spectrogram_viewTo()), U" Hz");
 		}
 		/*
 			Cursor lines.
@@ -2765,7 +2765,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 		if (frequencyCursorVisible) {
 			const double x = my startWindow(), y = my d_spectrogram_cursor;
 			Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
-			Graphics_text (my graphics(), x, y,   Melder_float (Melder_half (y)), U" Hz");
+			Graphics_text (my graphics(), x, y,   Melder_graphicalHalf (y), U" Hz");
 			Graphics_line (my graphics(), x, y, my endWindow(), y);
 		}
 		/*

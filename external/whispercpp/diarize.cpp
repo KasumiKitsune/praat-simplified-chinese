@@ -2010,25 +2010,55 @@ static reconstruct_result reconstruct(
 
 // ============================================================================
 // Aggregate overlapping windows
+//
+// Because chunks overlap, a single global-timeline frame is covered by several
+// chunks. For each global (frame, speaker) we average the activation over only
+// the chunks that actually have data for that speaker (missing entries are
+// skipped). Result: one activation score per (frame, speaker) over the whole
+// timeline.
 // ============================================================================
 static std::vector<float> aggregate_overlapping(
-    const float * clustered, const int8_t * nan_mask,
-    int num_chunks, int nf, int ns, int step_frames, int total_frames
+    const float *  frame_activations,   // [chunk][frame][speaker], flattened
+    const int8_t * is_missing_in_frame, // [chunk][frame][speaker]; 1 = no data
+    int n_chunks,
+    int n_frames_per_chunk,             // frames produced per chunk (e.g. 589)
+    int n_global_speakers,              // number of global speakers (clusters)
+    int segmentation_step_in_frames,    // frame offset between consecutive chunks
+    int n_total_frames                  // length of the global timeline, in frames
 ) {
-    std::vector<double> sum(total_frames * ns, 0.0);
-    std::vector<double> cnt(total_frames * ns, 0.0);
-    for (int c = 0; c < num_chunks; c++) {
-        int start = c * step_frames, end = std::min(start + nf, total_frames);
-        for (int f = 0; f < end - start; f++)
-            for (int s = 0; s < ns; s++) {
-                size_t si = (c*nf+f)*ns+s, di = (start+f)*ns+s;
-                if (nan_mask[si] == 0) { sum[di] += (double)clustered[si]; cnt[di] += 1.0; }
+    std::vector<double> activation_sum(n_total_frames * n_global_speakers, 0.0);
+    std::vector<int> contributor_count(n_total_frames * n_global_speakers, 0);
+
+    for (int chunk = 0; chunk < n_chunks; chunk++) {
+        // Where this chunk sits on the global timeline (in frames), and where it ends
+        // (clipped, because the last chunk may run past the timeline).
+        const int chunk_start = chunk * segmentation_step_in_frames;
+        const int chunk_end   = std::min(chunk_start + n_frames_per_chunk, n_total_frames);
+
+        for (int local_frame = 0; local_frame < chunk_end - chunk_start; local_frame++) {
+            const int global_frame = chunk_start + local_frame;
+
+            for (int speaker = 0; speaker < n_global_speakers; speaker++) {
+                const size_t src = ((size_t) chunk * n_frames_per_chunk + local_frame) * n_global_speakers + speaker;
+                const size_t dst = ((size_t) global_frame) * n_global_speakers + speaker;
+
+                if (is_missing_in_frame[src] == 0) {                 // this chunk has an opinion here
+                    activation_sum   [dst] += (double) frame_activations[src];
+                    contributor_count[dst] += 1;
+                }
             }
+        }
     }
-    std::vector<float> r(total_frames * ns);
-    for (int i = 0; i < total_frames * ns; i++)
-        r[i] = (cnt[i] > 0) ? (float)(sum[i] / cnt[i]) : 0.0f;
-    return r;
+
+    // Average each summed activation by how many chunks contributed to it.
+    // A (frame, speaker) that no chunk had data for stays at 0.
+    std::vector<float> averaged_activations(n_total_frames * n_global_speakers);
+    for (int i = 0; i < n_total_frames * n_global_speakers; i++) {
+        averaged_activations[i] = (contributor_count[i] > 0)
+            ? (float) (activation_sum[i] / contributor_count[i])
+            : 0.0f;
+    }
+    return averaged_activations;
 }
 
 // ============================================================================

@@ -428,8 +428,8 @@ xxd -i -n ggml_silero_bin -n whisper.cpp/models/ggml-silero-v6.2.0.bin > praat/e
 
 5.2. Segmentation
 -----------------
-todo
+see generate/pyannote/README.txt
 
 5.3. Embedding
 --------------
-todo
+see generate/pyannote/README.txt

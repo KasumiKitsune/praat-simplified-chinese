@@ -385,9 +385,8 @@ static void gui_trust (void *void_interpreter, conststring32 action) {
 		Notebook notebook = interpreter -> notebookReference;
 		if (script && script -> trusted || notebook && notebook -> trusted)
 			return;   // the request should be granted
-/**********/
-//return;   // remove this line from Praat version 7.0
-/**********/
+		if (Melder_appVersion() < 7000)
+			return;   // no trust checking before Praat 7.0
 		conststring32 paragraphs [1+5] = { };
 		if (script) {
 			paragraphs [1] = U"The script";

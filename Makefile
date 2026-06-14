@@ -1,7 +1,7 @@
 # File: Makefile
 
 # Makefile for Praat
-# Paul Boersma, 23 May 2026
+# Paul Boersma, 28 May 2026
 
 ##########################
 #
@@ -88,9 +88,6 @@
 ##########################
 
 # First try: explicit setting of the OS via argument or environment variable PRAAT_OS.
-PREFIX ?= /usr/local
-BINDIR ?= $(PREFIX)/bin
-DATADIR ?= $(PREFIX)/share
 ifeq ($(PRAAT_OS),windows)
   OS_IS_WINDOWS := 1
   $(info OS given as Windows)
@@ -151,9 +148,10 @@ $(info ARCHITECTURE: given as "$(PRAAT_ARCH)", resolved as "$(ARCH_COMPILER_FLAG
 ifeq ($(OS_IS_FREEBSD),1)
   # by Paul Boersma, Jason Bacon, Adriaan de Groot
 
-  # Where external / third-party software is installed; needs to be
-  # added to include and linker paths. (In the FreeBSD ports system,
-  # this is already set so nothing is overridden)
+  # Default setting for where the executable will be installed,
+  # overridable by an environment variable (or on the `make` command line).
+  # Also needs to be added to the include and linker paths.
+  # (In the FreeBSD ports system, this is already set so nothing is overridden.)
   LOCALBASE ?= /usr/local
 
   PKG_CONFIG ?= pkg-config
@@ -196,6 +194,8 @@ ifeq ($(OS_IS_FREEBSD),1)
   MAIN_ICON =
 
 else ifeq ($(OS_IS_WINDOWS),1)
+  # by Paul Boersma
+
   #
   # Determine the compiler: either GCC or Clang.
   #
@@ -260,6 +260,13 @@ else ifeq ($(OS_IS_WINDOWS),1)
   MAIN_ICON = main/praat_win.o
 
 else ifeq ($(OS_IS_LINUX),1)
+  # by Paul Boersma, David Weenink, Anna Simmons
+
+  # Default settings for where the executable will be installed,
+  # overridable by environment variables (or on the `make` command line).
+  PREFIX ?= /usr/local
+  BINDIR ?= $(PREFIX)/bin
+  DATADIR ?= $(PREFIX)/share
 
   PKG_CONFIG ?= pkg-config
 

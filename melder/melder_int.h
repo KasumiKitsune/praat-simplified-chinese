@@ -2,7 +2,7 @@
 #define _melder_int_h_
 /* melder_int.h
  *
- * Copyright (C) 1992-2021,2023-2025 Paul Boersma
+ * Copyright (C) 1992-2021,2023-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,6 +117,11 @@ inline integer Melder_iroundUpToPowerOfTwo (integer n) {
 		n |= (n >> 16) >> 16;   // copy the 32 highest 1-bits to their right ("n >> 32" would give a compiler warning on 32-bit platforms)
 	n += 1;
 	return n;
+}
+
+inline double integer_to_double_a (integer n) {
+	Melder_assert (n >= INT54_MIN && n <= INT54_MAX);
+	return (double) n;
 }
 
 inline integer integer_abs (integer n) {

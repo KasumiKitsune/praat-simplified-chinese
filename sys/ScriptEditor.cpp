@@ -77,14 +77,6 @@ void structScriptEditor :: v_nameChanged () {
 	}
 }
 
-void structScriptEditor :: v_goAway () {
-	if (our interpreterStack -> interpreters [1] && our interpreterStack -> interpreters [1] -> running)
-		Melder_flushError (U"Cannot close the script window while the script is running or paused.\n"
-				"Please close or continue the pause, trust or demo window.");
-	else
-		ScriptEditor_Parent :: v_goAway ();
-}
-
 static void args_ok (UiForm sendingForm, integer /* narg */, Stackel /* args */, conststring32 /* sendingString */,
 	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* modified */, void *void_me, Editor optionalEditor)
 {

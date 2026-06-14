@@ -1,10 +1,10 @@
 /* VocalTract.cpp
  *
- * Copyright (C) 1992-2008,2011,2012,2015-2020,2022 Paul Boersma
+ * Copyright (C) 1992-2008,2011,2012,2015-2020,2022,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -153,7 +153,7 @@ autoMatrix VocalTract_to_Matrix (VocalTract me) {
 autoVocalTract Matrix_to_VocalTract (Matrix me) {
 	try {
 		autoVocalTract thee = VocalTract_create (my nx, my dx);
-		thy z.all()  <<=  my z.all();
+		thy z.all()  <<=  my z.row (1);
 		return thee;
 	} catch (MelderError) {
 		Melder_throw (me, U": not converted to VocalTract.");

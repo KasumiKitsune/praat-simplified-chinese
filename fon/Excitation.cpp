@@ -41,7 +41,7 @@ autoExcitation Excitation_create (double frequencyStep, integer numberOfFrequenc
 	try {
 		autoExcitation me = Thing_new (Excitation);
 		Matrix_init (me.get(),
-			0.0, numberOfFrequencies * frequencyStep, numberOfFrequencies, frequencyStep, 0.5 * frequencyStep,
+			0.0, double (numberOfFrequencies) * frequencyStep, numberOfFrequencies, frequencyStep, 0.5 * frequencyStep,
 			1.0, 1.0, 1, 1.0, 1.0);
 		return me;
 	} catch (MelderError) {
@@ -57,8 +57,8 @@ double Excitation_getDistance (Excitation me, Excitation thee) {
 		mean += dper;
 		distance += dper * dper;
 	}
-	mean /= my nx;
-	distance /= my nx;
+	mean /= double (my nx);
+	distance /= double (my nx);
 	/* distance -= mean * mean; */
 	return sqrt ((double) distance);
 }
@@ -74,7 +74,10 @@ double Excitation_getLoudness (Excitation me) {
 void Excitation_draw (Excitation me, Graphics g,
 	double fmin, double fmax, double minimum, double maximum, bool garnish)
 {
-	if (fmax <= fmin) { fmin = my xmin; fmax = my xmax; }
+	if (fmax <= fmin) {
+		fmin = my xmin;
+		fmax = my xmax;
+	}
 	integer ifmin, ifmax;
 	Matrix_getWindowSamplesX (me, fmin, fmax, & ifmin, & ifmax);
 	if (maximum <= minimum)
@@ -83,7 +86,7 @@ void Excitation_draw (Excitation me, Graphics g,
 	Graphics_setInner (g);
 	Graphics_setWindow (g, fmin, fmax, minimum, maximum);
 	Graphics_function (g, & my z [1] [0], ifmin, ifmax,
-		Matrix_columnToX (me, ifmin), Matrix_columnToX (me, ifmax));
+			Matrix_columnToX (me, double (ifmin)), Matrix_columnToX (me, double (ifmax)));
 	Graphics_unsetInner (g);
 	if (garnish) {
 		Graphics_drawInnerBox (g);

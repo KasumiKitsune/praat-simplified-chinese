@@ -37,7 +37,7 @@ void structFormantGridArea :: v_drawInside () {
 	//Graphics_line (our graphics(), our startWindow, our formantGridArea -> ycursor, our endWindow, our formantGridArea -> ycursor);
 	Graphics_setTextAlignment (our graphics(), Graphics_RIGHT, Graphics_HALF);
 	//Graphics_text (our graphics(), our startWindow(), our ycursor,
-	//		Melder_float (Melder_half (our ycursor)));
+	//		Melder_graphicalHalf (our ycursor));
 	Graphics_setLineWidth (our graphics(), 1.0);
 	Graphics_setColour (our graphics(), Melder_GREY);
 	OrderedOf<structRealTier>* tiers = (

@@ -88,14 +88,14 @@ void structRealTierArea :: v_drawInside () {
 	Graphics_line (our graphics(), our startWindow(), our ycursor, our endWindow(), our ycursor);
 	Graphics_setTextAlignment (our graphics(), Graphics_RIGHT, Graphics_HALF);
 	Graphics_text (our graphics(), our startWindow(), our ycursor,
-			Melder_float (Melder_half (our ycursor)), our v_rightTickUnits());
+			Melder_graphicalHalf (our ycursor), our v_rightTickUnits());
 	Graphics_setColour (our graphics(), DataGuiColour_EDITABLE);
 	Graphics_setTextAlignment (our graphics(), Graphics_LEFT, Graphics_HALF);
 	Graphics_text (our graphics(), our endWindow(), our ymax,
-			Melder_float (Melder_half (our ymax)), our v_rightTickUnits());
+			Melder_graphicalHalf (our ymax), our v_rightTickUnits());
 	Graphics_setTextAlignment (our graphics(), Graphics_LEFT, Graphics_HALF);
 	Graphics_text (our graphics(), our endWindow(), our ymin,
-			Melder_float (Melder_half (our ymin)), our v_rightTickUnits());
+			Melder_graphicalHalf (our ymin), our v_rightTickUnits());
 
 	const integer ifirstSelected = AnyTier_timeToHighIndex (our realTier()->asAnyTier(), our startSelection());
 	const integer ilastSelected = AnyTier_timeToLowIndex (our realTier()->asAnyTier(), our endSelection());

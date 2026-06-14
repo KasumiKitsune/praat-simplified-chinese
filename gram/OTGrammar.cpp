@@ -1,6 +1,6 @@
 /* OTGrammar.cpp
  *
- * Copyright (C) 1997-2025 Paul Boersma
+ * Copyright (C) 1997-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -978,7 +978,7 @@ void OTGrammar_drawTableau (OTGrammar me, Graphics g, bool vertical, conststring
 				if (my decisionStrategy == kOTGrammar_decisionStrategy::EXPONENTIAL_HG ||
 					my decisionStrategy == kOTGrammar_decisionStrategy::EXPONENTIAL_MAXIMUM_ENTROPY)
 				{
-					Graphics_text (g, x, y + descent, Melder_float (Melder_half (value)));
+					Graphics_text (g, x, y + descent, Melder_graphicalHalf (value));
 				} else {
 					Graphics_text (g, x, y + descent, Melder_fixed (value, 3));
 				}

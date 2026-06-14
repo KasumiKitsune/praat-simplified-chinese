@@ -555,29 +555,29 @@ DIRECT (MODIFY_TextGrid_Sound_scaleTimes) {
 	MODIFY_FIRST_OF_ONE_AND_ONE_END
 }
 
-FORM (MODIFY_TextGrid_Sound_transcribeInterval, U"TextGrid & Sound: Transcribe interval", U"TextGrid & Sound: Transcribe interval") {
+FORM (MODIFY_TextGrid_Sound_transcribeInterval, U"TextGrid & Sound: Transcribe interval", U"TextGrid & Sound: Transcribe interval...") {
 	HEADING (U"Textgrid...")
 	NATURAL (tierNumber, STRING_TIER_NUMBER, U"1")
 	NATURAL (intervalNumber, STRING_INTERVAL_NUMBER, U"1")
-	BOOLEAN (includeWords, U"Include words", TranscriptionDefaults::includeWords)
-	BOOLEAN (includeDiarization, U"Include diarization", TranscriptionDefaults::includeDiarization)
-	HEADING (U"Speech activity detection...")
-	BOOLEAN (useVad, U"Allow silences", TranscriptionDefaults::useVad)
-	REAL (speechProbabilityThreshold, U"Speech probability threshold (0-1)", VadDefaults::speechThreshold)
-	POSITIVE (minNonSpeechDuration, U"Min. non-speech interval (s)", VadDefaults::minNonSpeechDuration)
-	POSITIVE (minSpeechDuration, U"Min. speech interval (s)", VadDefaults::minSpeechDuration)
-	POSITIVE (speechPad, U"Padding around speech segments (s)", VadDefaults::speechPad)
 	HEADING (U"Transcription...")
 	LISTNUMSTR (modelIndex, modelName, U"Whisper model", constSTRVEC(), 1)
 	OPTIONMENUSTR (languageName, U"Language",
 		(int) NUMfindFirst (theSpeechRecognizerLanguageNames(), TranscriptionDefaults::languageName))
 	for (integer i = 1; i <= theSpeechRecognizerLanguageNames().size; i ++)
 		OPTION (theSpeechRecognizerLanguageNames() [i])
+	BOOLEAN (includeWords, U"Include words", TranscriptionDefaults::includeWords)
+	BOOLEAN (includeDiarization, U"Include diarization", TranscriptionDefaults::includeDiarization)
+	BOOLEAN (useVad, U"Allow silences", TranscriptionDefaults::useVad)
+	HEADING (U"Speech activity detection...")
+	REAL (speechProbabilityThreshold, U"Speech probability threshold (0-1)", VadDefaults::speechThreshold)
+	POSITIVE (minNonSpeechDuration, U"Min. gap between speech segments (s)", VadDefaults::minNonSpeechDuration)
+	POSITIVE (minSpeechDuration, U"Min. speech segment (s)", VadDefaults::minSpeechDuration)
+	POSITIVE (speechPad, U"Padding around speech segments (s)", VadDefaults::speechPad)
 	HEADING (U"Diarization...")
 	INTEGER (numSpeakers, U"Fixed number of speakers...", DiarizationDefaults::numSpeakers)
 	INTEGER (minSpeakers, U"left ... or range of numbers of speakers", DiarizationDefaults::minSpeakers)
 	INTEGER (maxSpeakers, U"right ... or range of numbers of speakers", DiarizationDefaults::maxSpeakers)
-	BOOLEAN (allowSpeakersOverlap, U"Allow speakers overlap", DiarizationDefaults::allowOverlap)
+	BOOLEAN (allowSpeakersOverlap, U"Allow speakers to overlap", DiarizationDefaults::allowOverlap)
 	POSITIVE (clusterThreshold, U"Clustering threshold (0-2)", DiarizationDefaults::clusterThreshold)
 	POSITIVE (segmentationStep, U"Segmentation step (0-1)", DiarizationDefaults::segmentationStep)
 OK
@@ -598,7 +598,7 @@ DO
 	MODIFY_FIRST_OF_ONE_AND_ONE_END
 }
 
-FORM (MODIFY_TextGrid_Sound_diarizeInterval, U"TextGrid & Sound: Diarize interval", U"TextGrid & Sound: Diarize interval") {
+FORM (MODIFY_TextGrid_Sound_diarizeInterval, U"TextGrid & Sound: Diarize interval", U"TextGrid & Sound: Diarize interval...") {
 	HEADING (U"Textgrid...")
 	NATURAL (tierNumber, STRING_TIER_NUMBER, U"1")
 	NATURAL (intervalNumber, STRING_INTERVAL_NUMBER, U"1")
@@ -606,7 +606,7 @@ FORM (MODIFY_TextGrid_Sound_diarizeInterval, U"TextGrid & Sound: Diarize interva
 	INTEGER (numSpeakers, U"Fixed number of speakers...", DiarizationDefaults::numSpeakers)
 	INTEGER (minSpeakers, U"left ... or range of numbers of speakers", DiarizationDefaults::minSpeakers)
 	INTEGER (maxSpeakers, U"right ... or range of numbers of speakers", DiarizationDefaults::maxSpeakers)
-	BOOLEAN (allowSpeakersOverlap, U"Allow speakers overlap", DiarizationDefaults::allowOverlap)
+	BOOLEAN (allowSpeakersOverlap, U"Allow speakers to overlap", DiarizationDefaults::allowOverlap)
 	WORD (nonSpeechLabel, U"Non-speech interval label", DiarizationDefaults::nonSpeechLabel)
 	WORD (speechLabel, U"Speech interval label", DiarizationDefaults::speechLabel)
 	POSITIVE (clusterThreshold, U"Clustering threshold (0-2)", DiarizationDefaults::clusterThreshold)

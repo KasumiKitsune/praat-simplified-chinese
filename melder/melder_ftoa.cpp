@@ -1,6 +1,6 @@
 /* melder_ftoa.cpp
  *
- * Copyright (C) 1992-2008,2010-2012,2014-2025 Paul Boersma
+ * Copyright (C) 1992-2008,2010-2012,2014-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,9 @@
 
 /********** NUMBER TO STRING CONVERSION **********/
 
-#define NUMBER_OF_BUFFERS  32
-	/* = maximum number of arguments to a function call */
-#define MAXIMUM_NUMERIC_STRING_LENGTH  800
-	/* = sign + 324 + point + 60 + e + sign + 3 + null byte + ("·10^^" - "e"), times 2, + i, + 7 extra */
+inline constexpr int NUMBER_OF_BUFFERS = 32;   // = maximum number of arguments to a function call
+inline constexpr int extraRoom = 2;
+inline constexpr int MAXIMUM_NUMERIC_STRING_LENGTH = 1200;   // = sign + 326 + point + 60 + e + sign + 3 + null byte + ("·10^^^" - "e"), times 3, + i, + 2 extra
 
 static char   buffers8  [NUMBER_OF_BUFFERS] [MAXIMUM_NUMERIC_STRING_LENGTH + 1];
 static char32 buffers32 [NUMBER_OF_BUFFERS] [MAXIMUM_NUMERIC_STRING_LENGTH + 1];
@@ -76,54 +75,46 @@ conststring32 Melder_integer (int64 value) {
 }
 
 const char * Melder8_bigInteger (int64 value) {
+	if (value == INT64_MIN)
+		return "-9,223,372,036,854,775,808";
 	if (++ ibuffer == NUMBER_OF_BUFFERS)
 		ibuffer = 0;
-	char *text = buffers8 [ibuffer];
-	text [0] = '\0';
+	static_assert (MAXIMUM_NUMERIC_STRING_LENGTH > 200);   // so that we can be sure that even the longest int64 will fit
+	char *pout = buffers8 [ibuffer];
+	pout [0] = '\0';
 	if (value < 0) {
-		snprintf (text,MAXIMUM_NUMERIC_STRING_LENGTH+1, "-");
+		pout += snprintf (pout,100, "-");   // "100" for performance and simplicity; the onus is upon us to have this algorithm right
 		value = - value;
 	}
-	const int quintillions =  value / 1000000000000000000LL;
-	value -=           quintillions * 1000000000000000000LL;
-	const int quadrillions =  value / 1000000000000000LL;
-	value -=           quadrillions * 1000000000000000LL;
-	const int trillions =     value / 1000000000000LL;
-	value -=              trillions * 1000000000000LL;
-	const int billions =      value / 1000000000LL;
-	value -=               billions * 1000000000LL;
-	const int millions =      value / 1000000LL;
-	value -=               millions * 1000000LL;
-	const int thousands =     value / 1000LL;
-	value -=              thousands * 1000LL;
-	const int units =         value;
-	bool firstDigitPrinted = false;
-	if (quintillions) {
-		sprintf (text + strlen (text), firstDigitPrinted ? "%03d," : "%d,", quintillions);
-		firstDigitPrinted = true;
-	}
-	if (quadrillions || firstDigitPrinted) {
-		sprintf (text + strlen (text), firstDigitPrinted ? "%03d," : "%d,", quadrillions);
-		firstDigitPrinted = true;
-	}
-	if (trillions || firstDigitPrinted) {
-		sprintf (text + strlen (text), firstDigitPrinted ? "%03d," : "%d,", trillions);
-		firstDigitPrinted = true;
-	}
-	if (billions || firstDigitPrinted) {
-		sprintf (text + strlen (text), firstDigitPrinted ? "%03d," : "%d,", billions);
-		firstDigitPrinted = true;
-	}
-	if (millions || firstDigitPrinted) {
-		sprintf (text + strlen (text), firstDigitPrinted ? "%03d," : "%d,", millions);
-		firstDigitPrinted = true;
-	}
-	if (thousands || firstDigitPrinted) {
-		sprintf (text + strlen (text), firstDigitPrinted ? "%03d," : "%d,", thousands);
-		firstDigitPrinted = true;
-	}
-	sprintf (text + strlen (text), firstDigitPrinted ? "%03d" : "%d", units);
-	return text;
+	char * const startOfDigits = pout;
+	const int quintillions =  int (value / 1'000'000'000'000'000'000LL);
+	value -=                quintillions * 1'000'000'000'000'000'000LL;
+	const int quadrillions =  int (value / 1'000'000'000'000'000LL);
+	value -=                quadrillions * 1'000'000'000'000'000LL;
+	const int trillions =     int (value / 1'000'000'000'000LL);
+	value -=                   trillions * 1'000'000'000'000LL;
+	const int billions =      int (value / 1'000'000'000LL);   // cast to silence warning; the onus is upon us to have this algorithm right
+	value -=                    billions * 1'000'000'000LL;
+	const int millions =      int (value / 1'000'000LL);
+	value -=                    millions * 1'000'000LL;
+	const int thousands =     int (value / 1'000LL);
+	value -=                   thousands * 1'000LL;
+	const int units =         int (value);
+	if (quintillions)
+		pout += snprintf (pout,100, "%d,", quintillions);   // "100" for performance and simplicity; the onus is upon us to have this algorithm right
+	if (quadrillions || pout > startOfDigits)
+		pout += snprintf (pout,100, pout > startOfDigits ? "%03d," : "%d,", quadrillions);
+	if (trillions || pout > startOfDigits)
+		pout += snprintf (pout,100, pout > startOfDigits ? "%03d," : "%d,", trillions);
+	if (billions || pout > startOfDigits)
+		pout += snprintf (pout,100, pout > startOfDigits ? "%03d," : "%d,", billions);
+	if (millions || pout > startOfDigits)
+		pout += snprintf (pout,100, pout > startOfDigits ? "%03d," : "%d,", millions);
+	if (thousands || pout > startOfDigits)
+		pout += snprintf (pout,100, pout > startOfDigits ? "%03d," : "%d,", thousands);
+	pout += snprintf (pout,100, pout > startOfDigits ? "%03d" : "%d", units);
+	Melder_post (pout - buffers8 [ibuffer] <= 27);   // negative quintillions can go up to 27 characters
+	return buffers8 [ibuffer];
 }
 conststring32 Melder_bigInteger (int64 value) {
 	const char *p = Melder8_bigInteger (value);
@@ -151,6 +142,33 @@ conststring32 Melder_kleenean (kleenean valueK) {
 	return valueK ? U"yes" : ! valueK ? U"no": U"unknown";
 }
 
+inline static int common_snprintf_double (const mutablestring8 buffer, const int bufferSize, const double value) {
+	Melder_pre (bufferSize > 0);   // make sure that it can be cast to size_t
+	int numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.15g", value);   // guarded cast
+	if (strtod (buffer, nullptr) != value) {
+		numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.16g", value);   // guarded cast
+		if (strtod (buffer, nullptr) != value)
+			numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.17g", value);   // guarded cast
+	}
+	Melder_post (numberOfPrintedCharacters > 0);
+	Melder_post (numberOfPrintedCharacters < bufferSize);   // truncation is a fatal error
+	return numberOfPrintedCharacters;
+}
+inline static int common_snprintf_single (const mutablestring8 buffer, const int bufferSize, const double value) {
+	Melder_pre (bufferSize > 0);   // make sure that it can be cast to size_t
+	const int numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.9g", value);   // guarded cast
+	Melder_post (numberOfPrintedCharacters > 0);
+	Melder_post (numberOfPrintedCharacters < bufferSize);   // truncation is a fatal error
+	return numberOfPrintedCharacters;
+}
+inline static int common_snprintf_half (const mutablestring8 buffer, const int bufferSize, const double value) {
+	Melder_pre (bufferSize > 0);   // make sure that it can be cast to size_t
+	const int numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.4g", value);   // guarded cast
+	Melder_post (numberOfPrintedCharacters > 0);
+	Melder_post (numberOfPrintedCharacters < bufferSize);   // truncation is a fatal error
+	return numberOfPrintedCharacters;
+}
+
 /*@praat
 	assert string$ (1000000000000) = "1000000000000"
 	assert string$ (undefined) = "--undefined--"
@@ -160,12 +178,7 @@ const char * Melder8_double (double value) {
 		ibuffer = 0;
 	if (isundef (value))
 		return "--undefined--";
-	snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.15g", value);
-	if (strtod (buffers8 [ibuffer], nullptr) != value) {
-		snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.16g", value);
-		if (strtod (buffers8 [ibuffer], nullptr) != value)
-			snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.17g", value);
-	}
+	common_snprintf_double (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, value);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_double (double value) {
@@ -178,14 +191,10 @@ const char * Melder8_double_overtlyReal (double value) {
 		ibuffer = 0;
 	if (isundef (value))
 		return "--undefined--";
-	snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.15g", value);
-	if (strtod (buffers8 [ibuffer], nullptr) != value) {
-		snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.16g", value);
-		if (strtod (buffers8 [ibuffer], nullptr) != value)
-			snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.17g", value);
-	}
+	constexpr int roomForDotZero = 2;
+	common_snprintf_double (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1 - roomForDotZero, value);
 	if (! strchr (buffers8 [ibuffer], '.') && ! strchr (buffers8 [ibuffer], 'e') && ! strchr (buffers8 [ibuffer], 'E'))
-		strcat (buffers8 [ibuffer], ".0");
+		strcat (buffers8 [ibuffer], ".0");   // dot zero
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_double_overtlyReal (double value) {
@@ -198,7 +207,7 @@ const char * Melder8_single (double value) {
 		ibuffer = 0;
 	if (isundef (value))
 		return "--undefined--";
-	snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.9g", value);
+	common_snprintf_single (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, value);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_single (double value) {
@@ -211,7 +220,7 @@ const char * Melder8_half (double value) {
 		ibuffer = 0;
 	if (isundef (value))
 		return "--undefined--";
-	snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.4g", value);
+	common_snprintf_half (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, value);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_half (double value) {
@@ -229,10 +238,10 @@ const char * Melder8_fixed (double value, integer precision) {
 	if (precision > 60)
 		precision = 60;
 	const int minimumPrecision = - (int) floor (log10 (fabs (value)));
-	const int n = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH + 1, "%.*f",
+	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.*f",
 			(int) (minimumPrecision > precision ? minimumPrecision : precision), value);
-	Melder_assert (n > 0);
-	Melder_assert (n <= MAXIMUM_NUMERIC_STRING_LENGTH);
+	Melder_post (numberOfPrintedCharacters > 0);
+	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_fixed (double value, integer precision) {
@@ -252,10 +261,10 @@ const char * Melder8_fixedExponent (double value, integer exponent, integer prec
 		precision = 60;
 	value /= factor;
 	const int minimumPrecision = - (int) floor (log10 (fabs (value)));
-	const int n = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH + 1, "%.*fE%d",
+	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.*fE%d",
 			(int) (minimumPrecision > precision ? minimumPrecision : precision), value, (int) exponent);
-	Melder_assert (n > 0);
-	Melder_assert (n <= MAXIMUM_NUMERIC_STRING_LENGTH);
+	Melder_post (numberOfPrintedCharacters > 0);
+	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_fixedExponent (double value, integer exponent, integer precision) {
@@ -263,7 +272,7 @@ conststring32 Melder_fixedExponent (double value, integer exponent, integer prec
 	CONVERT_BUFFER_TO_CHAR32
 }
 
-const char * Melder8_percent (double value, integer precision) {
+static const char * common_Melder8_percent (bool graphical, double value, integer precision) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
 	if (isundef (value))
@@ -274,14 +283,24 @@ const char * Melder8_percent (double value, integer precision) {
 		precision = 60;
 	value *= 100.0;
 	const int minimumPrecision = - (int) floor (log10 (fabs (value)));
-	const int n = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH + 1, "%.*f%%",
+	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, graphical ? "%.*f\\%% " : "%.*f%%",
 			(int) (minimumPrecision > precision ? minimumPrecision : precision), value);
-	Melder_assert (n > 0);
-	Melder_assert (n <= MAXIMUM_NUMERIC_STRING_LENGTH);
+	Melder_post (numberOfPrintedCharacters > 0);
+	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
+}
+const char * Melder8_percent (double value, integer precision) {
+	return common_Melder8_percent (false, value, precision);
 }
 conststring32 Melder_percent (double value, integer precision) {
 	const char *p = Melder8_percent (value, precision);
+	CONVERT_BUFFER_TO_CHAR32
+}
+const char * Melder8_graphicalPercent (double value, integer precision) {
+	return common_Melder8_percent (true, value, precision);
+}
+conststring32 Melder_graphicalPercent (double value, integer precision) {
+	const char *p = Melder8_graphicalPercent (value, precision);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -293,10 +312,10 @@ const char * Melder8_hexadecimal (integer value, integer precision) {
 	if (precision > 60)
 		precision = 60;
 	const integer integerValue = Melder_iround (value);
-	const int n = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH + 1, "%.*llX",
+	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.*llX",
 			(int) precision, (unsigned long long) integerValue);
-	Melder_assert (n > 0);
-	Melder_assert (n <= MAXIMUM_NUMERIC_STRING_LENGTH);
+	Melder_post (numberOfPrintedCharacters > 0);
+	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_hexadecimal (integer value, integer precision) {
@@ -309,22 +328,14 @@ const char * Melder8_dcomplex (dcomplex value) {
 		ibuffer = 0;
 	if (isundef (value.real()) || isundef (value.imag()))
 		return "--undefined--";
-	snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.15g", value.real());
-	if (strtod (buffers8 [ibuffer], nullptr) != value.real()) {
-		snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.16g", value.real());
-		if (strtod (buffers8 [ibuffer], nullptr) != value.real())
-			snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.17g", value.real());
-	}
-	char *p = buffers8 [ibuffer] + strlen (buffers8 [ibuffer]);
-	*p = ( value.imag() < 0.0 ? '-' : '+' );
-	value. imag (fabs (value.imag()));
-	++ p;
-	sprintf (p, "%.15g", value.imag());
-	if (strtod (p, nullptr) != value.imag()) {
-		sprintf (p, "%.16g", value.imag());
-		if (strtod (p, nullptr) != value.imag())
-			sprintf (p, "%.17g", value.imag());
-	}
+	constexpr int roomForAdditionOrSubtractionSymbol = 1;
+	constexpr int roomForISymbol = 1;
+	constexpr int totalRoom = roomForAdditionOrSubtractionSymbol + roomForISymbol;
+	static_assert (totalRoom <= extraRoom);
+	const int numberOfPrintedCharacters = common_snprintf_double (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH/2+1 - roomForAdditionOrSubtractionSymbol, value.real());
+	char *p = buffers8 [ibuffer] + numberOfPrintedCharacters;
+	* (p ++) = ( value.imag() < 0.0 ? '-' : '+' );
+	common_snprintf_double (p, MAXIMUM_NUMERIC_STRING_LENGTH/2+1 - roomForISymbol, fabs (value.imag()));
 	strcat (buffers8 [ibuffer], "i");
 	return buffers8 [ibuffer];
 }
@@ -338,10 +349,14 @@ const char * Melder8_scomplex (dcomplex value) {
 		ibuffer = 0;
 	if (isundef (value.real()) || isundef (value.imag()))
 		return "--undefined--";
-	snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.9g", value.real());
-	char *p = buffers8 [ibuffer] + strlen (buffers8 [ibuffer]);
-	*p = ( value.imag() < 0.0 ? '-' : '+' );
-	sprintf (++ p, "%.9g", fabs (value.imag()));
+	constexpr int roomForAdditionOrSubtractionSymbol = 1;
+	constexpr int roomForISymbol = 1;
+	constexpr int totalRoom = roomForAdditionOrSubtractionSymbol + roomForISymbol;
+	static_assert (totalRoom <= extraRoom);
+	const int numberOfPrintedCharacters = common_snprintf_single (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH/2+1 - roomForAdditionOrSubtractionSymbol, value.real());
+	char *p = buffers8 [ibuffer] + numberOfPrintedCharacters;
+	* (p ++) = ( value.imag() < 0.0 ? '-' : '+' );
+	common_snprintf_single (p, MAXIMUM_NUMERIC_STRING_LENGTH/2+1 - roomForISymbol, fabs (value.imag()));
 	strcat (buffers8 [ibuffer], "i");
 	return buffers8 [ibuffer];
 }
@@ -350,7 +365,7 @@ conststring32 Melder_scomplex (dcomplex value) {
 	CONVERT_BUFFER_TO_CHAR32
 }
 
-conststring32 Melder_float (conststring32 number) {
+static conststring32 commmon_Melder_graphicalFloat (conststring32 number) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
 	if (! str32chr (number, 'e')) {
@@ -384,6 +399,15 @@ conststring32 Melder_float (conststring32 number) {
 	}
 	return buffers32 [ibuffer];
 }
+conststring32 Melder_graphicalHalf (double number) {
+	return commmon_Melder_graphicalFloat (Melder_half (number));
+}
+conststring32 Melder_graphicalSingle (double number) {
+	return commmon_Melder_graphicalFloat (Melder_single (number));
+}
+conststring32 Melder_graphicalDouble (double number) {
+	return commmon_Melder_graphicalFloat (Melder_double (number));
+}
 
 const char * Melder8_naturalLogarithm (double lnNumber) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
@@ -393,20 +417,16 @@ const char * Melder8_naturalLogarithm (double lnNumber) {
 		return "--undefined--";
 	const double log10Number = lnNumber * NUMlog10e;
 	if (log10Number < -41.0) {
-		integer ceiling = (integer) ceil (log10Number);
+		/* mutable adjust */ integer ceiling = (integer) ceil (log10Number);
 		const double remainder = log10Number - ceiling;
 		double remainder10 = pow (10.0, remainder);
 		while (remainder10 < 1.0) {
 			remainder10 *= 10.0;
 			ceiling --;
 		}
-		snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.15g", remainder10);
-		if (strtod (buffers8 [ibuffer], nullptr) != remainder10) {
-			snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.16g", remainder10);
-			if (strtod (buffers8 [ibuffer], nullptr) != remainder10)
-				snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.17g", remainder10);
-		}
-		sprintf (buffers8 [ibuffer] + strlen (buffers8 [ibuffer]), "e-%td", ceiling);
+		constexpr int roomForExponent = 20;
+		const int numberOfPrintedCharacters = common_snprintf_double (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1 - roomForExponent, remainder10);
+		snprintf (buffers8 [ibuffer] + numberOfPrintedCharacters, roomForExponent+1, "e-%td", ceiling);   // BUG: this just doesn't work on Windows
 	} else {
 		return Melder8_double (exp (lnNumber));
 	}
@@ -442,33 +462,17 @@ const char * Melder8_colour (MelderColour colour) {
 	if (isundef (colour.red) || isundef (colour.green) || isundef (colour.blue))
 		return "{--undefined--,--undefined--,--undefined--}";
 	char *p = & buffers8 [ibuffer] [0];
-	strcpy (p, "{");
-	p ++;
-	sprintf (p, "%.15g", colour.red);
-	if (strtod (p, nullptr) != colour.red) {
-		sprintf (p, "%.16g", colour.red);
-		if (strtod (p, nullptr) != colour.red)
-			sprintf (p, "%.17g", colour.red);
-	}
-	p += strlen (p);
-	strcpy (p, ",");
-	p ++;
-	sprintf (p, "%.15g", colour.green);
-	if (strtod (p, nullptr) != colour.green) {
-		sprintf (p, "%.16g", colour.green);
-		if (strtod (p, nullptr) != colour.green)
-			sprintf (p, "%.17g", colour.green);
-	}
-	p += strlen (p);
-	strcpy (p, ",");
-	p ++;
-	sprintf (p, "%.15g", colour.blue);
-	if (strtod (p, nullptr) != colour.blue) {
-		sprintf (p, "%.16g", colour.blue);
-		if (strtod (p, nullptr) != colour.blue)
-			sprintf (p, "%.17g", colour.blue);
-	}
-	p += strlen (p);
+	constexpr int roomForBracesAndCommas = 4;
+	constexpr int roomPerBraceOrComma = 2;   // rounded up; although this reserves 6 characters instead of the maximum of 2, this is possible because there won't be a "·10^^^" (saving 3*5) or "i"
+	strcpy (p ++, "{");
+	/* mutable reuse */ int numberOfPrintedCharacters = common_snprintf_double (p, MAXIMUM_NUMERIC_STRING_LENGTH/3+1 - roomPerBraceOrComma, colour.red);
+	p += numberOfPrintedCharacters;
+	strcpy (p ++, ",");
+	numberOfPrintedCharacters = common_snprintf_double (p, MAXIMUM_NUMERIC_STRING_LENGTH/3+1 - roomPerBraceOrComma, colour.green);
+	p += numberOfPrintedCharacters;
+	strcpy (p ++, ",");
+	numberOfPrintedCharacters = common_snprintf_double (p, MAXIMUM_NUMERIC_STRING_LENGTH/3+1 - roomPerBraceOrComma, colour.blue);
+	p += numberOfPrintedCharacters;
 	strcpy (p, "}");
 	return buffers8 [ibuffer];
 }

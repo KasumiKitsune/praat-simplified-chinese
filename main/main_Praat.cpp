@@ -48,7 +48,7 @@ static void logo (Graphics graphics) {
 		#if defined (__AVX2__) && defined (__FMA__) && defined (__F16C__)
 			3;
 		#else
-			0;
+			1;
 		#endif
 	const conststring32 builtFor =
 		#if defined (macintosh)

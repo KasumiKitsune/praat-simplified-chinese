@@ -40,9 +40,9 @@ The following people contributed source code to Praat:
 	@@feedforward neural networks@, @@principal component analysis@, @@multidimensional scaling@, @@discriminant analysis@, @LPC,
 	@@KlattGrid|Acoustic synthesis (Klatt)@, automatic alignment, @VowelEditor, @FormantPath,
 	and adaptation of GSL, @LAPACK, fftpack, regular expressions, @eSpeak, Ogg Vorbis, Opus and LAME.
-, Anastasia Shchupak: @@TextGrid & Sound: Transcribe interval...|automatic speech recognition with word-level timestamps@,
-	automatic speaker diarization,
-	and adaptation of @@whisper.cpp@, @@Silero VAD@ and pyannote.audio.
+, Anastasia Shchupak: @@transcription with whisper.cpp|automatic speech recognition with word-level timestamps@,
+	@@speaker diarization with adapted pyannote.audio|automatic speaker diarization@,
+	and adaptation of @@whisper.cpp@, @@Silero VAD@ and @@pyannote.audio@.
 , Erez Volk: adaptation of FLAC and MAD.
 , Stefan de Konink and Franz Brauße: major help in port to GTK.
 , Tom Naughton: major help in port to Cocoa.
@@ -82,8 +82,8 @@ We included the following freely available software libraries in Praat (sometime
 , @@whisper.cpp@: automatic speech recognition, by Georgi Gerganov and many others, version 1.8.3 (@@ggml and whisper.cpp MIT License|whisper.cpp MIT License@),
 	using separately installed Whisper models by OpenAI (@@Whisper OpenAI MIT License@).
 , @@Silero VAD@: speech activity detection model by Silero Team, version 6.2.0 of November 2025 (@@Silero VAD MIT License@).
-, pyannote.audio: automatic speaker diarization toolkit by Hervé Bredin, version 4.0.4 of February 2026 (@@pyannote.audio MIT License@).
-, WeSpeaker: speaker embedding learning toolkit by WeNet Community, version 1.2.0 of July 2023 (@@WeSpeaker Apache License 2.0@),
+, @@pyannote.audio@: automatic speaker diarization toolkit by Hervé Bredin, version 4.0.4 of February 2026 (@@pyannote.audio MIT License@).
+, @WeSpeaker: speaker embedding learning toolkit by WeNet Community, version 1.2.0 of July 2023 (@@WeSpeaker Apache License 2.0@),
     using speaker embedding model trained on VoxCeleb2 speaker recognition dataset by Joon Son Chung, Arsha Nagrani
 	and Andrew Zisserman (@@VoxCeleb CC-BY-4.0 license@).
 

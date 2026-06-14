@@ -1,10 +1,10 @@
 /* melder_trust.cpp
  *
- * Copyright (C) 2024 Paul Boersma
+ * Copyright (C) 2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -25,12 +25,15 @@ void MelderTrust::_defaultProc (void *void_interpreter, conststring32 message) {
 	if (interpreter) {
 		Script script = interpreter -> scriptReference;
 		Notebook notebook = interpreter -> notebookReference;
-		if (! script && ! notebook)
-			Melder_throw (U"We expected a script or a notebook.");
+		if (Melder_appVersion() < 7000)
+			return;   // no trust checking before Praat 7.0
 		if (script && ! script -> trusted)
-			Melder_throw (U"The following action was requested but is not allowed:\n", message);
+			Melder_throw (U"The following potentially dangerous action was requested but is not allowed:\n", message);
 		if (notebook && ! notebook -> trusted)
-			Melder_throw (U"The following action was requested but is not allowed:\n", message);
+			Melder_throw (U"The following potentially dangerous action was requested but is not allowed:\n", message);
+		if (! script && ! notebook)
+			Melder_throw (U"The following potentially dangerous action was requested but is not allowed:\n", message,
+					U"\nUse --fullyTrustThisScript to prevent this message.");
 	}
 }
 

@@ -259,49 +259,49 @@ DO
 
 DIRECT (REAL_Matrix_getLowestX) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = my xmin;
+		const double result = my xmin;
 	QUERY_ONE_FOR_REAL_END (U" (xmin)")
 }
 
 DIRECT (REAL_Matrix_getHighestX) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = my xmax;
+		const double result = my xmax;
 	QUERY_ONE_FOR_REAL_END (U" (xmax)")
 }
 
 DIRECT (REAL_Matrix_getLowestY) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = my ymin;
+		const double result = my ymin;
 	QUERY_ONE_FOR_REAL_END (U" (ymin)")
 }
 
 DIRECT (REAL_Matrix_getHighestY) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = my ymax;
-	QUERY_ONE_FOR_REAL_END (U" (xmax)")
+		const double result = my ymax;
+	QUERY_ONE_FOR_REAL_END (U" (ymax)")
 }
 
 DIRECT (INTEGER_Matrix_getNumberOfRows) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		integer result = my ny;
+		const integer result = my ny;
 	QUERY_ONE_FOR_REAL_END (U" rows")
 }
 
 DIRECT (INTEGER_Matrix_getNumberOfColumns) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		integer result = my nx;
+		const integer result = my nx;
 	QUERY_ONE_FOR_REAL_END (U" columns")
 }
 
 DIRECT (REAL_Matrix_getRowDistance) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = my dy;
+		const double result = my dy;
 	QUERY_ONE_FOR_REAL_END (U" (row distance)")
 }
 
 DIRECT (REAL_Matrix_getColumnDistance) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = my dx;
+		const double result = my dx;
 	QUERY_ONE_FOR_REAL_END (U" (column distance)")
 }
 
@@ -310,7 +310,7 @@ FORM (REAL_Matrix_getYofRow, U"Matrix: Get y of row", nullptr) {
 	OK
 DO
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = Matrix_rowToY (me, rowNumber);
+		const double result = Matrix_rowToY (me, rowNumber);
 	QUERY_ONE_FOR_REAL_END (U" (y of row ", rowNumber, U")")
 }
 
@@ -319,7 +319,7 @@ FORM (REAL_Matrix_getXofColumn, U"Matrix: Get x of column", nullptr) {
 	OK
 DO
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = Matrix_columnToX (me, columnNumber);
+		const double result = Matrix_columnToX (me, columnNumber);
 	QUERY_ONE_FOR_REAL_END (U" (x of column ", columnNumber, U")")
 }
 
@@ -329,9 +329,11 @@ FORM (REAL_Matrix_getValueInCell, U"Matrix: Get value in cell", nullptr) {
 	OK
 DO
 	QUERY_ONE_FOR_REAL (Matrix)
-		if (rowNumber > my ny) Melder_throw (U"Row number should not exceed number of rows.");
-		if (columnNumber > my nx) Melder_throw (U"Column number should not exceed number of columns.");
-		double result = my z [rowNumber] [columnNumber];
+		if (rowNumber > my ny)
+			Melder_throw (U"Row number should not exceed number of rows.");
+		if (columnNumber > my nx)
+			Melder_throw (U"Column number should not exceed number of columns.");
+		const double result = my z [rowNumber] [columnNumber];
 	QUERY_ONE_FOR_REAL_END (U" (value in column ", columnNumber, U" of row ", rowNumber, U")")
 }
 
@@ -341,7 +343,7 @@ FORM (REAL_Matrix_getValueAtXY, U"Matrix: Get value at xy", nullptr) {
 	OK
 DO
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = Matrix_getValueAtXY (me, x, y);
+		const double result = Matrix_getValueAtXY (me, x, y);
 	QUERY_ONE_FOR_REAL_END (U" (at x = ", x, U" and y = ", y, U")");
 }
 
@@ -349,7 +351,7 @@ DIRECT (REAL_Matrix_getMinimum) {
 	QUERY_ONE_FOR_REAL (Matrix)
 		double minimum = undefined, maximum = undefined;
 		Matrix_getWindowExtrema (me, 0, 0, 0, 0, & minimum, & maximum);
-		double result = minimum;
+		const double result = minimum;
 	QUERY_ONE_FOR_REAL_END (U" (minimum)");
 }
 
@@ -357,13 +359,13 @@ DIRECT (REAL_Matrix_getMaximum) {
 	QUERY_ONE_FOR_REAL (Matrix)
 		double minimum = undefined, maximum = undefined;
 		Matrix_getWindowExtrema (me, 0, 0, 0, 0, & minimum, & maximum);
-		double result = maximum;
+		const double result = maximum;
 	QUERY_ONE_FOR_REAL_END (U" (maximum)");
 }
 
 DIRECT (REAL_Matrix_getSum) {
 	QUERY_ONE_FOR_REAL (Matrix)
-		double result = Matrix_getSum (me);
+		const double result = Matrix_getSum (me);
 	QUERY_ONE_FOR_REAL_END (U" (sum)");
 }
 

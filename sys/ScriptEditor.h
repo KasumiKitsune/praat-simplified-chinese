@@ -39,8 +39,6 @@ Thing_define (ScriptEditor, TextEditor) {
 		override;
 	void v_nameChanged ()
 		override;
-	void v_goAway ()
-		override;
 	bool v_scriptable ()
 		override { return false; }
 	void v_createMenus ()
