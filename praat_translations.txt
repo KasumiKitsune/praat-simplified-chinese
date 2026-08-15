@@ -1,13 +1,71 @@
-=== Praat Chinese Translation Database (Total: 2956 entries) ===
+=== Praat Chinese Translation Database (Total: 3375 entries) ===
 Format: [English] block followed by [Chinese] block, separated by '===================='.
 This structure prevents ambiguity with newlines or special characters in the text.
 
 [English]
-
-Please change its name or remove it.
+   # self = the value of the colth point
 [Chinese]
-
-请更改其名称或将其删除。
+   # self = 第 col 个点的值
+====================
+[English]
+   # self = the value of the colth point, in Pascal
+[Chinese]
+   # self = 第 col 个点的值（单位：帕斯卡 Pa）
+====================
+[English]
+   # self = the value of the colth point, in dB
+[Chinese]
+   # self = 第 col 个点的值（单位：分贝 dB）
+====================
+[English]
+   # self = the value of the colth point, in hertz
+[Chinese]
+   # self = 第 col 个点的值（单位：赫兹 Hz）
+====================
+[English]
+   # self = the value of the colth point, in relative units
+[Chinese]
+   # self = 第 col 个点的值（相对单位）
+====================
+[English]
+   # x = the time of the colth point, in seconds
+[Chinese]
+   # x = 第 col 个点的时间（单位：秒）
+====================
+[English]
+   `self` is the current value in Pa\u00B2/Hz
+[Chinese]
+   `self` 为当前值，单位 Pa\u00B2/Hz
+====================
+[English]
+   `x` is the time in seconds
+[Chinese]
+   `x` 为以秒为单位的时间
+====================
+[English]
+   `y` is the frequency in hertz
+[Chinese]
+   `y` 为以赫兹为单位的频率
+====================
+[English]
+   and may not work at all on your computer.
+[Chinese]
+并且可能在您的计算机上根本不起作用。
+====================
+[English]
+   because its behaviour is platform-dependent.
+[Chinese]
+因为其行为因操作系统平台而异。
+====================
+[English]
+   to work on all computers.
+[Chinese]
+适用于所有计算机。
+====================
+[English]
+   without meters)
+[Chinese]
+   ，无电平表)
 ====================
 [English]
  -- Pitch
@@ -18,6 +76,11 @@ Please change its name or remove it.
  -- Pitch (hum)
 [Chinese]
  -- 音高 (蜂鸣声)
+====================
+[English]
+ ...the text
+[Chinese]
+ ……文本：
 ====================
 [English]
  seconds,
@@ -33,6 +96,16 @@ Please change its name or remove it.
 " of row
 [Chinese]
 ” 行
+====================
+[English]
+# `x` is the time in seconds, `col` is the sample number.
+[Chinese]
+# `x` 为以秒为单位的时间，`col` 为采样点编号。
+====================
+[English]
+# ncol = the number of points
+[Chinese]
+# ncol = 点的总数
 ====================
 [English]
 & Manipulation: Replace?
@@ -85,6 +158,11 @@ Please change its name or remove it.
 （无法读取声音文件）
 ====================
 [English]
+(comma-separated)
+[Chinese]
+(以逗号分隔)
+====================
+[English]
 (fixed height)
 [Chinese]
 (固定高度)
@@ -93,6 +171,51 @@ Please change its name or remove it.
 (fixed range)
 [Chinese]
 (固定范围)
+====================
+[English]
+(formula)
+[Chinese]
+(公式)
+====================
+[English]
+(negative values count from last row)
+[Chinese]
+(负值表示从最后一行倒数)
+====================
+[English]
+(one per line)
+[Chinese]
+(每行一个)
+====================
+[English]
+(one row per line)
+[Chinese]
+(每行一行)
+====================
+[English]
+(pipe-separated)
+[Chinese]
+(以竖线分隔)
+====================
+[English]
+(ranges)
+[Chinese]
+(范围)
+====================
+[English]
+(semicolon-separated)
+[Chinese]
+(以分号分隔)
+====================
+[English]
+(use Windows mixer
+[Chinese]
+(使用 Windows 混音器
+====================
+[English]
+(uses Sound-to-Spectrum and Spectrum-to-Sound): x is frequency in hertz
+[Chinese]
+(使用声音转频谱与频谱转声音)：x 为以赫兹为单位的频率
 ====================
 [English]
 (whitespace-separated)
@@ -211,9 +334,34 @@ Missing samples were set to zero.
 ，但最多应为此对象的列数（
 ====================
 [English]
+- Draw TextGrid to picture window:
+[Chinese]
+- 绘制 TextGrid 到图像窗口：
+====================
+[English]
+- Draw formants to picture window:
+[Chinese]
+- 绘制共振峰到图像窗口：
+====================
+[English]
 - Draw intensity to picture window:
 [Chinese]
 - 绘制音强到图像窗口：
+====================
+[English]
+- Draw pitch to picture window:
+[Chinese]
+- 绘制音高到图像窗口：
+====================
+[English]
+- Draw pulses to picture window:
+[Chinese]
+- 绘制脉冲到图像窗口：
+====================
+[English]
+- Draw sound to picture window:
+[Chinese]
+- 绘制声音到图像窗口：
 ====================
 [English]
 - Draw spectogram to picture window:
@@ -231,9 +379,34 @@ Missing samples were set to zero.
 - 编辑音高：
 ====================
 [English]
+- Extract TextGrid to objects window:
+[Chinese]
+- 提取 TextGrid 到对象窗口：
+====================
+[English]
+- Extract formants to objects window:
+[Chinese]
+- 提取共振峰到对象窗口：
+====================
+[English]
 - Extract intensity to objects window:
 [Chinese]
 - 提取音强到对象窗口：
+====================
+[English]
+- Extract pitch to objects window:
+[Chinese]
+- 提取音高到对象窗口：
+====================
+[English]
+- Extract pulses to objects window:
+[Chinese]
+- 提取脉冲到对象窗口：
+====================
+[English]
+- Extract sound to objects window:
+[Chinese]
+- 提取声音到对象窗口：
 ====================
 [English]
 - Extract spectrum:
@@ -241,9 +414,64 @@ Missing samples were set to zero.
 - 提取频谱：
 ====================
 [English]
+- Extract to list of objects:
+[Chinese]
+- 提取至对象列表：
+====================
+[English]
+- Extract to objects window:
+[Chinese]
+- 提取到对象窗口：
+====================
+[English]
+- Modify boundary or point:
+[Chinese]
+- 修改边界或点：
+====================
+[English]
+- Modify pulses:
+[Chinese]
+- 修改脉冲：
+====================
+[English]
+- Modify selected pitch:
+[Chinese]
+- 修改所选音高：
+====================
+[English]
+- Modify sound:
+[Chinese]
+- 修改声音：
+====================
+[English]
+- Modify spectrum:
+[Chinese]
+- 修改频谱：
+====================
+[English]
+- Modify tier:
+[Chinese]
+- 修改层：
+====================
+[English]
+- Modify whole pitch:
+[Chinese]
+- 修改全部音高：
+====================
+[English]
+- Pitch methods and settings:
+[Chinese]
+- 音高方法与设置：
+====================
+[English]
 - Pulses settings:
 [Chinese]
 - 脉冲设置：
+====================
+[English]
+- Query formants:
+[Chinese]
+- 查询共振峰：
 ====================
 [English]
 - Query intensity:
@@ -261,6 +489,21 @@ Missing samples were set to zero.
 - 查询音高：
 ====================
 [English]
+- Query pulses:
+[Chinese]
+- 查询脉冲：
+====================
+[English]
+- Query selected pulses and sound:
+[Chinese]
+- 查询所选脉冲与声音：
+====================
+[English]
+- Query selected pulses:
+[Chinese]
+- 查询所选脉冲：
+====================
+[English]
 - Query selection:
 [Chinese]
 - 查询选择：
@@ -274,6 +517,41 @@ Missing samples were set to zero.
 - Query spectrogram:
 [Chinese]
 - 查询声谱图：
+====================
+[English]
+- Save TextGrid to disk:
+[Chinese]
+- 保存 TextGrid 至磁盘：
+====================
+[English]
+- Save sound to disk:
+[Chinese]
+- 保存声音到磁盘：
+====================
+[English]
+- Select by TextGrid:
+[Chinese]
+- 按 TextGrid 选择：
+====================
+[English]
+- Select by pitch:
+[Chinese]
+- 按音高选择：
+====================
+[English]
+- Select by sound:
+[Chinese]
+- 按声音选择：
+====================
+[English]
+- Select by spectrum:
+[Chinese]
+- 按频谱选择：
+====================
+[English]
+- Select frequency:
+[Chinese]
+- 选择频率：
 ====================
 [English]
 - Set selection:
@@ -291,6 +569,16 @@ Missing samples were set to zero.
 -- AI 设置 --
 ====================
 [English]
+-- Capitalization --
+[Chinese]
+-- 首字母大写 --
+====================
+[English]
+-- Capitals --
+[Chinese]
+-- 大写 --
+====================
+[English]
 -- Extract columns ----
 [Chinese]
 -- 提取列----
@@ -301,14 +589,54 @@ Missing samples were set to zero.
 -- 音高
 ====================
 [English]
+-- Syntax --
+[Chinese]
+-- 语法 --
+====================
+[English]
+-- Word parts --
+[Chinese]
+-- 单词组成部分 --
+====================
+[English]
+-- add & mul --
+[Chinese]
+-- 加 & 乘 --
+====================
+[English]
 -- add --
 [Chinese]
 -- 添加 --
 ====================
 [English]
+-- after align --
+[Chinese]
+-- 对齐后 --
+====================
+[English]
+-- after diarize --
+[Chinese]
+-- 说话人日志后 --
+====================
+[English]
+-- after transcribe --
+[Chinese]
+-- 转写后 --
+====================
+[English]
+-- autocorrelation --
+[Chinese]
+-- 自相关 --
+====================
+[English]
 -- axes --
 [Chinese]
 -- 坐标轴 --
+====================
+[English]
+-- cast --
+[Chinese]
+-- 转换 --
 ====================
 [English]
 -- confusion statistics --
@@ -319,6 +647,11 @@ Missing samples were set to zero.
 -- convert --
 [Chinese]
 -- 转换 --
+====================
+[English]
+-- cut copy paste --
+[Chinese]
+-- 剪切 复制 粘贴 --
 ====================
 [English]
 -- edit frication tiers --
@@ -336,9 +669,49 @@ Missing samples were set to zero.
 -- 编辑 ot --
 ====================
 [English]
+-- encoding --
+[Chinese]
+-- 编码 --
+====================
+[English]
+-- enhance --
+[Chinese]
+-- 增强 --
+====================
+[English]
+-- formants --
+[Chinese]
+-- 共振峰 --
+====================
+[English]
 -- frequency-domain filter --
 [Chinese]
 -- 频率-域滤波 --
+====================
+[English]
+-- get content --
+[Chinese]
+-- 获取内容 --
+====================
+[English]
+-- get distribution --
+[Chinese]
+-- 获取分布 --
+====================
+[English]
+-- get energy --
+[Chinese]
+-- 获取能量 --
+====================
+[English]
+-- get energy in air --
+[Chinese]
+-- 获取空气中能量 --
+====================
+[English]
+-- get extreme --
+[Chinese]
+-- 获取极值 --
 ====================
 [English]
 -- get gain --
@@ -349,6 +722,11 @@ Missing samples were set to zero.
 -- get moments --
 [Chinese]
 -- 获取矩 --
+====================
+[English]
+-- get shape --
+[Chinese]
+-- 获取形状 --
 ====================
 [English]
 -- get slope --
@@ -366,9 +744,24 @@ Missing samples were set to zero.
 -- 获取统计 --
 ====================
 [English]
+-- get structure --
+[Chinese]
+-- 获取结构 --
+====================
+[English]
 -- get time discretization --
 [Chinese]
 -- 获取时间离散化 --
+====================
+[English]
+-- get value --
+[Chinese]
+-- 获取值 --
+====================
+[English]
+-- hack --
+[Chinese]
+-- 特殊技巧 --
 ====================
 [English]
 -- help add --
@@ -386,6 +779,46 @@ Missing samples were set to zero.
 -- 历史 --
 ====================
 [English]
+-- hnr --
+[Chinese]
+-- 谐噪比 --
+====================
+[English]
+-- in-place filters --
+[Chinese]
+-- 原位滤波器 --
+====================
+[English]
+-- modify frequencies --
+[Chinese]
+-- 修改频率 --
+====================
+[English]
+-- modify generic --
+[Chinese]
+-- 修改通用参数 --
+====================
+[English]
+-- modify hack --
+[Chinese]
+-- 修改特殊技巧 --
+====================
+[English]
+-- modify order --
+[Chinese]
+-- 修改顺序 --
+====================
+[English]
+-- modify tier --
+[Chinese]
+-- 修改层 --
+====================
+[English]
+-- modify tiers --
+[Chinese]
+-- 修改多个层 --
+====================
+[English]
 -- monic --
 [Chinese]
 -- 首一 --
@@ -396,9 +829,24 @@ Missing samples were set to zero.
 -- 打开表格 --
 ====================
 [English]
+-- periods --
+[Chinese]
+-- 周期 --
+====================
+[English]
 -- pitch --
 [Chinese]
 -- 音高 --
+====================
+[English]
+-- points --
+[Chinese]
+-- 点 --
+====================
+[English]
+-- query interval from time --
+[Chinese]
+-- 根据时间查询区间 --
 ====================
 [English]
 -- query interval labels --
@@ -411,6 +859,21 @@ Missing samples were set to zero.
 -- 查询标签 --
 ====================
 [English]
+-- query log --
+[Chinese]
+-- 查询日志 --
+====================
+[English]
+-- query point from time --
+[Chinese]
+-- 根据时间查询点 --
+====================
+[English]
+-- query point labels --
+[Chinese]
+-- 查询点标签 --
+====================
+[English]
 -- query textgrid --
 [Chinese]
 -- 查询 TextGrid --
@@ -419,6 +882,11 @@ Missing samples were set to zero.
 -- query tier --
 [Chinese]
 -- 查询层 --
+====================
+[English]
+-- query two --
+[Chinese]
+-- 查询两者 --
 ====================
 [English]
 -- read sound --
@@ -441,6 +909,16 @@ Missing samples were set to zero.
 -- 移除 ot --
 ====================
 [English]
+-- remove point --
+[Chinese]
+-- 删除点 --
+====================
+[English]
+-- remove pulses --
+[Chinese]
+-- 删除脉冲 --
+====================
+[English]
 -- roots --
 [Chinese]
 -- 根 --
@@ -454,6 +932,21 @@ Missing samples were set to zero.
 -- scatter plots --
 [Chinese]
 -- 散点图 --
+====================
+[English]
+-- script get --
+[Chinese]
+-- 脚本获取 --
+====================
+[English]
+-- search --
+[Chinese]
+-- 搜索 --
+====================
+[English]
+-- select formant --
+[Chinese]
+-- 选择共振峰 --
 ====================
 [English]
 -- set --
@@ -481,6 +974,11 @@ Missing samples were set to zero.
 -- 声音设置 --
 ====================
 [English]
+-- spectrotemporal --
+[Chinese]
+-- 时频 --
+====================
+[English]
 -- statistics --
 [Chinese]
 -- 统计 --
@@ -499,6 +997,31 @@ Missing samples were set to zero.
 -- time-domain filter --
 [Chinese]
 -- 时间-域滤波 --
+====================
+[English]
+-- to other types --
+[Chinese]
+-- 转为其他类型 --
+====================
+[English]
+-- to single tier --
+[Chinese]
+-- 转为单个层 --
+====================
+[English]
+-- to sound --
+[Chinese]
+-- 转为声音 --
+====================
+[English]
+-- to text grid --
+[Chinese]
+-- 转为 TextGrid --
+====================
+[English]
+-- voice --
+[Chinese]
+-- 嗓音 --
 ====================
 [English]
 -- weight --
@@ -545,6 +1068,11 @@ Cannot play sound.
 . Please reverse.
 [Chinese]
 。请反转。
+====================
+[English]
+...the text
+[Chinese]
+……文本：
 ====================
 [English]
 0 (= at end)
@@ -1112,6 +1640,11 @@ A part of the path is not a folder (hint: look at the slahes).
 路径的一部分不是文件夹 (提示： 请检查斜杠)。
 ====================
 [English]
+A setting that influences shimmer only:
+[Chinese]
+仅影响微扰度 (shimmer) 的设置：
+====================
+[English]
 AI settings
 [Chinese]
 AI 设置
@@ -1187,6 +1720,11 @@ Add connection...
 添加连接...
 ====================
 [English]
+Add duration point
+[Chinese]
+添加时长点
+====================
+[English]
 Add duration point at cursor
 [Chinese]
 在光标处添加时长点
@@ -1194,7 +1732,7 @@ Add duration point at cursor
 [English]
 Add duration point at...
 [Chinese]
-添加时长点于...
+在...处添加时长点
 ====================
 [English]
 Add formant point...
@@ -1332,6 +1870,11 @@ Add open phase point...
 添加开放相位点...
 ====================
 [English]
+Add pitch point
+[Chinese]
+添加音高点
+====================
+[English]
 Add pitch point at cursor
 [Chinese]
 在光标处添加音高点
@@ -1339,17 +1882,22 @@ Add pitch point at cursor
 [English]
 Add pitch point at time slice
 [Chinese]
-在时间片上添加音高点
+在时间切片处添加音高点
 ====================
 [English]
 Add pitch point at...
 [Chinese]
-添加音高点于...
+在...处添加音高点
 ====================
 [English]
 Add pitch point...
 [Chinese]
 添加音高点...
+====================
+[English]
+Add point
+[Chinese]
+添加点
 ====================
 [English]
 Add point at cursor
@@ -1359,7 +1907,7 @@ Add point at cursor
 [English]
 Add point at...
 [Chinese]
-添加点于...
+在...处添加点
 ====================
 [English]
 Add point tier
@@ -1382,6 +1930,11 @@ Add points...
 添加points...
 ====================
 [English]
+Add pulse
+[Chinese]
+添加脉冲
+====================
+[English]
 Add pulse at cursor
 [Chinese]
 在光标处添加脉冲
@@ -1389,7 +1942,7 @@ Add pulse at cursor
 [English]
 Add pulse at...
 [Chinese]
-添加脉冲于...
+在...处添加脉冲
 ====================
 [English]
 Add search tier...
@@ -1397,9 +1950,24 @@ Add search tier...
 添加搜索层...
 ====================
 [English]
+Add selected word to user dictionary
+[Chinese]
+将所选单词添加到用户词典
+====================
+[English]
+Add target
+[Chinese]
+添加目标
+====================
+[English]
 Add tier...
 [Chinese]
 添加层...
+====================
+[English]
+Add to dynamic menu
+[Chinese]
+添加至动态菜单
 ====================
 [English]
 Add to dynamic menu...
@@ -1407,9 +1975,19 @@ Add to dynamic menu...
 添加到动态菜单...
 ====================
 [English]
+Add to fixed menu
+[Chinese]
+添加至固定菜单
+====================
+[English]
 Add to fixed menu...
 [Chinese]
 添加到固定菜单...
+====================
+[English]
+Add to menu
+[Chinese]
+添加至菜单
 ====================
 [English]
 Add to menu...
@@ -1442,9 +2020,24 @@ Advanced formant settings...
 高级共振峰设置...
 ====================
 [English]
+Advanced pitch settings
+[Chinese]
+高级音高设置
+====================
+[English]
+Advanced pitch settings (filtered AC and CC)
+[Chinese]
+高级音高设置 (滤波自相关与互相关)
+====================
+[English]
 Advanced pitch settings (filtered AC and CC)...
 [Chinese]
 高级音高设置 (滤波自相关与互相关)...
+====================
+[English]
+Advanced pitch settings (raw AC and CC)
+[Chinese]
+高级音高设置 (原始自相关与互相关)
 ====================
 [English]
 Advanced pitch settings (raw AC and CC)...
@@ -1485,6 +2078,11 @@ Align interval
 Align interval...
 [Chinese]
 对齐区间...
+====================
+[English]
+Alignment settings
+[Chinese]
+对齐设置
 ====================
 [English]
 Alignment settings...
@@ -1797,6 +2395,11 @@ Best matches
 最佳匹配
 ====================
 [English]
+Between parentheses, you find what you can do simultaneously.
+[Chinese]
+括号中是您可以同时进行的操作。
+====================
+[English]
 Bilingual
 [Chinese]
 对照表
@@ -1820,6 +2423,16 @@ Boundary
 Breathiness
 [Chinese]
 气声
+====================
+[English]
+Browse...
+[Chinese]
+浏览...
+====================
+[English]
+Buffer size (MB)
+[Chinese]
+缓冲区大小 (MB)
 ====================
 [English]
 Buttons...
@@ -1934,6 +2547,11 @@ Cannot open picture file
 无法打开图像文件
 ====================
 [English]
+Cannot write first bytes of file.
+[Chinese]
+无法写入文件的前几个字节。
+====================
+[English]
 Cast
 [Chinese]
 类型强转
@@ -2022,6 +2640,16 @@ ChebyshevSeries help
 ChebyshevSeries(x) = c[1] T[0](x) + c[2] T[1](x) + ... c[n+1] T[n](x)
 [Chinese]
 切比雪夫级数(x) = c[1] T[0](x) + c[2] T[1](x) + ... c[n+1] T[n](x)
+====================
+[English]
+Check spelling in interval
+[Chinese]
+检查区间拼写
+====================
+[English]
+Check spelling in tier
+[Chinese]
+检查层拼写
 ====================
 [English]
 Checking for updates
@@ -3139,6 +3767,11 @@ Debug...
 调试...
 ====================
 [English]
+Decrease asynchronicity if sound plays with discontinuities.
+[Chinese]
+如果播放的声音出现断续，请降低异步程度。
+====================
+[English]
 Deepen band modulation
 [Chinese]
 加深频带调制
@@ -3162,6 +3795,16 @@ Delete log file 2
 Demo window
 [Chinese]
 演示窗口
+====================
+[English]
+Demo window not created.
+[Chinese]
+未创建演示窗口。
+====================
+[English]
+Diarization settings
+[Chinese]
+说话人日志设置
 ====================
 [English]
 Diarization settings...
@@ -3197,6 +3840,26 @@ Difference of two proportions
 Difference...
 [Chinese]
 差异...
+====================
+[English]
+Discard & Close
+[Chinese]
+放弃并关闭
+====================
+[English]
+Discard & New
+[Chinese]
+放弃并新建
+====================
+[English]
+Discard & Open
+[Chinese]
+放弃并打开
+====================
+[English]
+Do for all times and frequencies:
+[Chinese]
+针对所有时间和频率执行：
 ====================
 [English]
 Do you still want to quit Praat?
@@ -3347,6 +4010,11 @@ Draw MDS class relations
 Draw Network
 [Chinese]
 绘制网络
+====================
+[English]
+Draw TextGrid and Pitch separately
+[Chinese]
+分别绘制 TextGrid 和音高
 ====================
 [English]
 Draw TextGrid to picture window:
@@ -3549,6 +4217,11 @@ Draw scatter plot...
 绘制散点图...
 ====================
 [English]
+Draw selected sound
+[Chinese]
+绘制所选声音
+====================
+[English]
 Draw selected sound...
 [Chinese]
 绘制选定声音...
@@ -3629,9 +4302,19 @@ Draw two-way arrow...
 绘制双向箭头...
 ====================
 [English]
+Draw visible TextGrid
+[Chinese]
+绘制可见 TextGrid
+====================
+[English]
 Draw visible TextGrid...
 [Chinese]
 绘制可见 TextGrid...
+====================
+[English]
+Draw visible formant contour
+[Chinese]
+绘制可见共振峰曲线
 ====================
 [English]
 Draw visible formant contour...
@@ -3639,9 +4322,19 @@ Draw visible formant contour...
 绘制可见共振峰曲线...
 ====================
 [English]
+Draw visible intensity contour
+[Chinese]
+绘制可见音强曲线
+====================
+[English]
 Draw visible intensity contour...
 [Chinese]
 绘制可见音强曲线...
+====================
+[English]
+Draw visible pitch contour
+[Chinese]
+绘制可见音高曲线
 ====================
 [English]
 Draw visible pitch contour and TextGrid...
@@ -3654,6 +4347,11 @@ Draw visible pitch contour...
 绘制可见音高曲线...
 ====================
 [English]
+Draw visible pulses
+[Chinese]
+绘制可见脉冲
+====================
+[English]
 Draw visible pulses...
 [Chinese]
 绘制可见脉冲...
@@ -3662,6 +4360,11 @@ Draw visible pulses...
 Draw visible sound
 [Chinese]
 绘制可见声音
+====================
+[English]
+Draw visible sound and TextGrid
+[Chinese]
+绘制可见声音和 TextGrid
 ====================
 [English]
 Draw visible sound and TextGrid...
@@ -3722,6 +4425,11 @@ Duplicate tier
 Duplicate tier...
 [Chinese]
 复制层...
+====================
+[English]
+Dur
+[Chinese]
+时长 (Dur)
 ====================
 [English]
 Duration (s):
@@ -3879,6 +4587,11 @@ Eigen
 特征值与特征向量
 ====================
 [English]
+Empty formula.
+[Chinese]
+公式为空。
+====================
+[English]
 Encoding of 8-bit text files
 [Chinese]
 8 位文本文件的编码
@@ -3909,9 +4622,19 @@ End time (s)
 结束时间 (s)
 ====================
 [English]
+English
+[Chinese]
+英文 (English)
+====================
+[English]
 Equal?
 [Chinese]
 是否相等？
+====================
+[English]
+Equalize domains
+[Chinese]
+对齐时间域
 ====================
 [English]
 Erase
@@ -3927,6 +4650,11 @@ Erase all
 Erase first
 [Chinese]
 先擦除
+====================
+[English]
+Erase text
+[Chinese]
+清除文本
 ====================
 [English]
 Excitation Formula
@@ -4084,6 +4812,16 @@ Extract duration tier
 提取时长层
 ====================
 [English]
+Extract entire selected tier
+[Chinese]
+提取整个所选层
+====================
+[English]
+Extract every interval whose label...
+[Chinese]
+提取所有符合此标签的区间...
+====================
+[English]
 Extract flutter tier
 [Chinese]
 提取抖动层
@@ -4221,17 +4959,57 @@ Extract selected TextGrid (time from 0)
 [English]
 Extract selected sound (preserve times)
 [Chinese]
-提取选定声音 (保留时间)
+提取所选声音 (保留时间)
+====================
+[English]
+Extract selected sound (preserve times) ||
+[Chinese]
+提取所选声音 (保留时间) ||
+====================
+[English]
+Extract selected sound (preserve times) || Extract sound selection (preserve times)
+[Chinese]
+提取所选声音 (保留时间) || 提取所选声音 (保留时间)
 ====================
 [English]
 Extract selected sound (time from 0)
 [Chinese]
-提取选定声音 (时间从 0 开始)
+提取所选声音 (时间从 0 开始)
+====================
+[English]
+Extract selected sound (time from 0) ||
+[Chinese]
+提取所选声音 (时间从 0 开始) ||
+====================
+[English]
+Extract selected sound (time from 0) || Extract sound selection (time from 0)
+[Chinese]
+提取所选声音 (时间从 0 开始) || 提取所选声音 (时间从 0 开始)
+====================
+[English]
+Extract selected sound (windowed)
+[Chinese]
+提取所选声音 (加窗)
 ====================
 [English]
 Extract selected sound (windowed)...
 [Chinese]
 提取选定声音 (加窗)...
+====================
+[English]
+Extract selected sound (windowed)... ||
+[Chinese]
+提取所选声音 (加窗)... ||
+====================
+[English]
+Extract selected sound (windowed)... || Extract sound selection (windowed)...
+[Chinese]
+提取所选声音 (加窗)... || 提取所选声音 (加窗)...
+====================
+[English]
+Extract selected sound for overlap)
+[Chinese]
+提取所选声音 (用于重叠)
 ====================
 [English]
 Extract selected sound for overlap...
@@ -4369,6 +5147,11 @@ Filter (one formant)...
 滤波 (单共振峰)...
 ====================
 [English]
+Filter (pass Hann band)
+[Chinese]
+滤波 (通过 Hann 带)
+====================
+[English]
 Filter (pass Hann band)...
 [Chinese]
 滤波 (带通 Hanning 窗)...
@@ -4377,6 +5160,11 @@ Filter (pass Hann band)...
 Filter (pre-emphasis)...
 [Chinese]
 滤波 (预加重)...
+====================
+[English]
+Filter (stop Hann band)
+[Chinese]
+滤波 (截止 Hann 带)
 ====================
 [English]
 Filter (stop Hann band)...
@@ -4429,9 +5217,24 @@ Find first
 寻找第一
 ====================
 [English]
+Find text
+[Chinese]
+查找文本
+====================
+[English]
 Find...
 [Chinese]
 寻找...
+====================
+[English]
+Finding a path...
+[Chinese]
+正在寻找路径...
+====================
+[English]
+Finding the candidates...
+[Chinese]
+正在寻找候选...
 ====================
 [English]
 First
@@ -4494,6 +5297,16 @@ Font
 字体
 ====================
 [English]
+Font menu
+[Chinese]
+字体菜单
+====================
+[English]
+Font size (points)
+[Chinese]
+字体大小 (点)
+====================
+[English]
 Font size...
 [Chinese]
 字号...
@@ -4506,12 +5319,12 @@ Font...
 [English]
 For "fixed height":
 [Chinese]
-对于 "固定高度"：
+针对“固定高度 (fixed height)”：
 ====================
 [English]
 For "fixed range":
 [Chinese]
-对于 "固定范围"：
+针对“固定范围 (fixed range)”：
 ====================
 [English]
 For details, click Help.
@@ -4809,6 +5622,11 @@ Frequency shift
 频率移动
 ====================
 [English]
+Frequency-domain filtering with a formula
+[Chinese]
+使用公式进行频域滤波
+====================
+[English]
 Frequently asked questions
 [Chinese]
 常见问题 (FAQ)
@@ -4972,6 +5790,11 @@ Get band energy difference...
 Get band energy...
 [Chinese]
 获取band energy...
+====================
+[English]
+Get bandwidth
+[Chinese]
+获取带宽
 ====================
 [English]
 Get bandwidth at time...
@@ -5159,6 +5982,11 @@ Get flutter at time...
 获取指定时间的 flutter
 ====================
 [English]
+Get formant
+[Chinese]
+获取共振峰
+====================
+[English]
 Get formant at time...
 [Chinese]
 获取指定时间的 formant
@@ -5324,9 +6152,19 @@ Get interval...
 获取区间...
 ====================
 [English]
+Get jitter (ddp)
+[Chinese]
+获取抖动度 (ddp)
+====================
+[English]
 Get jitter (ddp)...
 [Chinese]
 获取基频微扰 (jitter) (ddp)...
+====================
+[English]
+Get jitter (local)
+[Chinese]
+获取抖动度 (local)
 ====================
 [English]
 Get jitter (local)...
@@ -5334,14 +6172,29 @@ Get jitter (local)...
 获取基频微扰 (jitter) (local)...
 ====================
 [English]
+Get jitter (local, absolute)
+[Chinese]
+获取抖动度 (local, absolute)
+====================
+[English]
 Get jitter (local, absolute)...
 [Chinese]
 获取基频微扰 (jitter) (local, absolute)...
 ====================
 [English]
+Get jitter (ppq5)
+[Chinese]
+获取抖动度 (ppq5)
+====================
+[English]
 Get jitter (ppq5)...
 [Chinese]
 获取基频微扰 (jitter) (ppq5)...
+====================
+[English]
+Get jitter (rap)
+[Chinese]
+获取抖动度 (rap)
 ====================
 [English]
 Get jitter (rap)...
@@ -5804,9 +6657,19 @@ Get selection length
 获取选择长度
 ====================
 [English]
+Get shimmer (apq11)
+[Chinese]
+获取微扰度 (apq11)
+====================
+[English]
 Get shimmer (apq11)...
 [Chinese]
 获取振幅微扰 (shimmer) (apq11)...
+====================
+[English]
+Get shimmer (apq3)
+[Chinese]
+获取微扰度 (apq3)
 ====================
 [English]
 Get shimmer (apq3)...
@@ -5814,9 +6677,19 @@ Get shimmer (apq3)...
 获取振幅微扰 (shimmer) (apq3)...
 ====================
 [English]
+Get shimmer (apq5)
+[Chinese]
+获取微扰度 (apq5)
+====================
+[English]
 Get shimmer (apq5)...
 [Chinese]
 获取振幅微扰 (shimmer) (apq5)...
+====================
+[English]
+Get shimmer (dda)
+[Chinese]
+获取微扰度 (dda)
 ====================
 [English]
 Get shimmer (dda)...
@@ -5824,9 +6697,24 @@ Get shimmer (dda)...
 获取振幅微扰 (shimmer) (dda)...
 ====================
 [English]
+Get shimmer (local)
+[Chinese]
+获取微扰度 (local)
+====================
+[English]
 Get shimmer (local)...
 [Chinese]
 获取振幅微扰 (shimmer) (local)...
+====================
+[English]
+Get shimmer (local, dB)
+[Chinese]
+获取微扰度 (local, dB)
+====================
+[English]
+Get shimmer (local_dB)
+[Chinese]
+获取微扰度 (local_dB)
 ====================
 [English]
 Get shimmer (local_dB)...
@@ -6184,6 +7072,11 @@ Go to
 转到
 ====================
 [English]
+Go to line
+[Chinese]
+跳转到行
+====================
+[English]
 Go to line...
 [Chinese]
 转到行...
@@ -6319,6 +7212,11 @@ Helvetica
 Helvetica 无衬线体
 ====================
 [English]
+Here you determine the diameter (in millimetres)
+[Chinese]
+在此指定直径 (以毫米为单位)
+====================
+[English]
 Hertz
 [Chinese]
 赫兹
@@ -6409,14 +7307,24 @@ ISpline(x) = c[1] I[1](x) + c[2] I[1](x) + ... c[n] I[n](x)
 I 样条(x) = c[1] I[1](x) + c[2] I[1](x) + ... c[n] I[n](x)
 ====================
 [English]
+IT IS HERE ONLY FOR COMPATIBILITY WITH OLD SCRIPTS.
+[Chinese]
+此处保留仅为兼容旧脚本。
+====================
+[English]
 If the time step strategy is "fixed":
 [Chinese]
-如果时间步长策略为 "固定 (fixed)"：
+若时间步长策略为“固定 (fixed)”：
 ====================
 [English]
 If the time step strategy is "view-dependent":
 [Chinese]
-如果时间步长策略为 "每个视口 (view-dependent)"：
+若时间步长策略为“随视图变化 (view-dependent)”：
+====================
+[English]
+If you switch Tracing on, Praat will write lots of detailed 
+[Chinese]
+若开启追踪 (Tracing)，Praat 将输出详细的
 ====================
 [English]
 In-place filter
@@ -6464,6 +7372,11 @@ Info
 信息
 ====================
 [English]
+Info on whole LongSound || LongSound info
+[Chinese]
+完整 LongSound 信息 || LongSound 信息
+====================
+[English]
 Info on whole Sound
 [Chinese]
 完整声音信息
@@ -6472,6 +7385,26 @@ Info on whole Sound
 Info on whole Sound || Sound info
 [Chinese]
 完整声音信息 || 声音信息
+====================
+[English]
+Info window only
+[Chinese]
+仅 Info 窗口
+====================
+[English]
+Input sound system
+[Chinese]
+输入音频系统
+====================
+[English]
+Input source:
+[Chinese]
+输入源：
+====================
+[English]
+Insert
+[Chinese]
+插入
 ====================
 [English]
 Insert boundary...
@@ -6624,9 +7557,19 @@ Interpolate
 插值
 ====================
 [English]
+Interpolate quadratically
+[Chinese]
+二次插值
+====================
+[English]
 Interpolate quadratically...
 [Chinese]
 二次插值...
+====================
+[English]
+Interrupt
+[Chinese]
+中断
 ====================
 [English]
 Interrupt playing
@@ -6724,6 +7667,16 @@ Is word allowed?
 单词是否被允许？
 ====================
 [English]
+It is where your next drawing will appear.
+[Chinese]
+您的下一次绘制将显示在此处。
+====================
+[English]
+Keep visible version
+[Chinese]
+保留当前可见版本
+====================
+[English]
 Kill octave jumps
 [Chinese]
 消除倍频程跳变
@@ -6802,6 +7755,11 @@ Left or inside footer
 Left or inside header
 [Chinese]
 左页眉或内侧页眉
+====================
+[English]
+Left transition duration (s)
+[Chinese]
+左过渡时长 (s)
 ====================
 [English]
 LegendreSeries help
@@ -6929,6 +7887,11 @@ Log script 4 (...)
 日志脚本 4 (...)
 ====================
 [English]
+Log settings
+[Chinese]
+日志设置
+====================
+[English]
 Log settings...
 [Chinese]
 记录设置...
@@ -6946,22 +7909,22 @@ Logarithmic marks
 [English]
 Logarithmic marks bottom...
 [Chinese]
-底部对数标记...
+底部对数刻度...
 ====================
 [English]
 Logarithmic marks left...
 [Chinese]
-左侧对数标记...
+左侧对数刻度...
 ====================
 [English]
 Logarithmic marks right...
 [Chinese]
-右侧对数标记...
+右侧对数刻度...
 ====================
 [English]
 Logarithmic marks top...
 [Chinese]
-顶部对数标记...
+顶部对数刻度...
 ====================
 [English]
 LongSound help
@@ -7109,6 +8072,11 @@ Ltas: Subtract trend line
 Ltas：Subtract trend line
 ====================
 [English]
+MME via PortAudio
+[Chinese]
+MME (通过 PortAudio)
+====================
+[English]
 MSpline help
 [Chinese]
 M 样条帮助
@@ -7156,42 +8124,47 @@ Marks
 [English]
 Marks bottom every...
 [Chinese]
-底部每隔...标出刻度...
+底部刻度每...
 ====================
 [English]
 Marks bottom...
 [Chinese]
-底部标记...
+底部刻度...
 ====================
 [English]
 Marks left every...
 [Chinese]
-左侧每隔...标出刻度...
+左侧刻度每...
 ====================
 [English]
 Marks left...
 [Chinese]
-左侧标记...
+左侧刻度...
+====================
+[English]
+Marks left/right/top/bottom every...
+[Chinese]
+左/右/下/上刻度每...
 ====================
 [English]
 Marks right every...
 [Chinese]
-右侧每隔...标出刻度...
+右侧刻度每...
 ====================
 [English]
 Marks right...
 [Chinese]
-右侧标记...
+右侧刻度...
 ====================
 [English]
 Marks top every...
 [Chinese]
-顶部每隔...标出刻度...
+顶部刻度每...
 ====================
 [English]
 Marks top...
 [Chinese]
-顶部标记...
+顶部刻度...
 ====================
 [English]
 Maroon
@@ -7289,6 +8262,16 @@ Max. number of candidates
 最大候选音高数量
 ====================
 [English]
+Max. number of threads for diarization
+[Chinese]
+说话人日志最大线程数
+====================
+[English]
+Max. number of threads for transcription
+[Chinese]
+转写最大线程数
+====================
+[English]
 Maximum (dB/Hz)
 [Chinese]
 最大值 (dB/Hz)
@@ -7302,6 +8285,11 @@ Maximum (dB/Hz):
 Maximum amplitude factor
 [Chinese]
 最大振幅因子
+====================
+[English]
+Maximum asynchronicity
+[Chinese]
+最大异步级别
 ====================
 [English]
 Maximum formant (Hz)
@@ -7329,6 +8317,11 @@ Measure
 测量
 ====================
 [English]
+Meddis synapse properties
+[Chinese]
+Meddis 突触属性
+====================
+[English]
 Mel
 [Chinese]
 美尔
@@ -7347,6 +8340,11 @@ Merge (append rows)
 Merge...
 [Chinese]
 合并...
+====================
+[English]
+Meter
+[Chinese]
+电平表
 ====================
 [English]
 Method
@@ -7489,6 +8487,11 @@ Move cursor to minimum pitch
 移动光标到最小音高
 ====================
 [English]
+Move cursor to nearest peak
+[Chinese]
+移动光标至最近峰值
+====================
+[English]
 Move cursor to nearest zero crossing
 [Chinese]
 移动光标到最近的零交叉点
@@ -7529,9 +8532,19 @@ Move end of selection to nearest zero crossing
 移动选区终点到最近的零交叉点
 ====================
 [English]
+Move frequency cursor to
+[Chinese]
+移动频率光标至
+====================
+[English]
 Move frequency cursor to...
 [Chinese]
-移动频率光标到...
+移动频率光标至...
+====================
+[English]
+Move selection up
+[Chinese]
+上移选中项
 ====================
 [English]
 Move start of selection by
@@ -7559,6 +8572,26 @@ Move start of selection to nearest zero crossing
 移动选区起点到最近的零交叉点
 ====================
 [English]
+Move start of selection to nearest zero crossing || Move begin of selection to nearest zero crossing
+[Chinese]
+将选区起点移至最近零交叉点 || 将选区起点移至最近零交叉点
+====================
+[English]
+Move to B
+[Chinese]
+移至 B (起点)
+====================
+[English]
+Move to E
+[Chinese]
+移至 E (终点)
+====================
+[English]
+Move to nearest zero crossing
+[Chinese]
+移至最近零交叉点
+====================
+[English]
 Movie: Paint one image
 [Chinese]
 电影：绘制单帧图像
@@ -7582,6 +8615,16 @@ Multiply by window...
 Multiply frequencies...
 [Chinese]
 乘频率...
+====================
+[English]
+Multiply pitch frequencies
+[Chinese]
+倍乘音高频率
+====================
+[English]
+Multiply pitch frequencies...
+[Chinese]
+倍乘音高频率...
 ====================
 [English]
 Multiply...
@@ -7644,14 +8687,29 @@ New Praat script
 新建 Praat 脚本
 ====================
 [English]
+New boundary or point:
+[Chinese]
+新建边界或点：
+====================
+[English]
 New editor script
 [Chinese]
 新建编辑器脚本
 ====================
 [English]
+New interval:
+[Chinese]
+新建区间：
+====================
+[English]
 New name
 [Chinese]
 新名称
+====================
+[English]
+New tier:
+[Chinese]
+新建层：
 ====================
 [English]
 Next not allowed word...
@@ -7694,6 +8752,11 @@ No history.
 无历史。
 ====================
 [English]
+No object with number 
+[Chinese]
+没有编号为 
+====================
+[English]
 No periodicity at time
 [Chinese]
 指定时间无周期性
@@ -7732,6 +8795,11 @@ Note that you can include many special functions in your formula,
 Note: the pitch floor is taken from the pitch settings.
 [Chinese]
 注：音高下限取自音高设置。
+====================
+[English]
+Note: this setting works for the next long sound file that you open,
+[Chinese]
+注意：此设置仅对下一次打开的长音频文件生效，
 ====================
 [English]
 Number of formants
@@ -7826,42 +8894,42 @@ One logarithmic mark
 [English]
 One logarithmic mark bottom...
 [Chinese]
-底部单个对数标记...
+底部单对数刻度...
 ====================
 [English]
 One logarithmic mark left...
 [Chinese]
-左侧单个对数标记...
+左侧单对数刻度...
 ====================
 [English]
 One logarithmic mark right...
 [Chinese]
-右侧单个对数标记...
+右侧单对数刻度...
 ====================
 [English]
 One logarithmic mark top...
 [Chinese]
-顶部单个对数标记...
+顶部单对数刻度...
 ====================
 [English]
 One mark bottom...
 [Chinese]
-在底部标出单个刻度...
+底部单刻度...
 ====================
 [English]
 One mark left...
 [Chinese]
-在左侧标出单个刻度...
+左侧单刻度...
 ====================
 [English]
 One mark right...
 [Chinese]
-在右侧标出单个刻度...
+右侧单刻度...
 ====================
 [English]
 One mark top...
 [Chinese]
-在顶部标出单个刻度...
+顶部单刻度...
 ====================
 [English]
 Open
@@ -7912,6 +8980,11 @@ Open...
 Output encoding
 [Chinese]
 输出编码
+====================
+[English]
+Output sound system
+[Chinese]
+输出音频系统
 ====================
 [English]
 Override sampling frequency...
@@ -7994,6 +9067,11 @@ Paint image...
 绘制图像...
 ====================
 [English]
+Paint intervals green whose label...
+[Chinese]
+将区间标绿，若其标签...
+====================
+[English]
 Paint one image...
 [Chinese]
 绘制单帧图像...
@@ -8012,6 +9090,11 @@ Paint rounded rectangle...
 Paint surface...
 [Chinese]
 绘制表面...
+====================
+[English]
+Paint visible spectrogram
+[Chinese]
+绘制可见声谱图
 ====================
 [English]
 Paint visible spectrogram...
@@ -8037,6 +9120,11 @@ Palatino 优雅体
 ParamCurve help
 [Chinese]
 参数曲线帮助
+====================
+[English]
+Pass band...
+[Chinese]
+通带滤波...
 ====================
 [English]
 Paste
@@ -8107,6 +9195,11 @@ Phase
 Phase (0-1)
 [Chinese]
 相位(0-1)
+====================
+[English]
+Phonation settings...
+[Chinese]
+发声设置...
 ====================
 [English]
 Phonetic symbols
@@ -8239,6 +9332,11 @@ Pitch methods and settings:
 音高分析方法与设置：
 ====================
 [English]
+Pitch settings
+[Chinese]
+音高设置
+====================
+[English]
 Pitch settings (filtered autocorrelation)...
 [Chinese]
 音高设置 (滤波自相关)...
@@ -8257,6 +9355,26 @@ Pitch settings (raw autocorrelation)...
 Pitch settings (raw cross-correlation)...
 [Chinese]
 音高设置 (原始互相关)...
+====================
+[English]
+Pitch settings for the filtered autocorrelation method
+[Chinese]
+滤波自相关法音高设置
+====================
+[English]
+Pitch settings for the filtered cross-correlation method
+[Chinese]
+滤波互相关法音高设置
+====================
+[English]
+Pitch settings for the raw autocorrelation method
+[Chinese]
+原始自相关法音高设置
+====================
+[English]
+Pitch settings for the raw cross-correlation method
+[Chinese]
+原始互相关法音高设置
 ====================
 [English]
 Pitch settings...
@@ -8924,6 +10042,11 @@ PostScript text width in world coordinates
 PostScript 文本宽度 (世界坐标)
 ====================
 [English]
+Power density range:
+[Chinese]
+功率密度范围：
+====================
+[English]
 Power...
 [Chinese]
 乘方 (能量)...
@@ -9314,9 +10437,24 @@ Publish
 发布
 ====================
 [English]
+Publish band
+[Chinese]
+发布频带
+====================
+[English]
+Publish band-filtered sound
+[Chinese]
+发布带通滤波后的声音
+====================
+[English]
 Publish resynthesis
 [Chinese]
 发布合成声音
+====================
+[English]
+Pulse
+[Chinese]
+脉冲 (Pulse)
 ====================
 [English]
 Pulse listing
@@ -9352,6 +10490,11 @@ Pulses -- Pitch
 Pulses -- Pitch (hum)
 [Chinese]
 脉冲 -- 音高 (蜂鸣声)
+====================
+[English]
+Pulses settings
+[Chinese]
+脉冲设置
 ====================
 [English]
 Pulses settings...
@@ -9472,6 +10615,36 @@ Quit Praat
 Randomize
 [Chinese]
 随机化
+====================
+[English]
+Range in semitones re 100 Hz:
+[Chinese]
+相对于 100 Hz 的半音范围：
+====================
+[English]
+Range in semitones re 100 hertz:
+[Chinese]
+相对于 100 Hz 的半音范围：
+====================
+[English]
+Range in semitones re 200 Hz:
+[Chinese]
+相对于 200 Hz 的半音范围：
+====================
+[English]
+Range in semitones re 200 hertz:
+[Chinese]
+相对于 200 Hz 的半音范围：
+====================
+[English]
+Range in semitones re 440 Hz:
+[Chinese]
+相对于 440 Hz 的半音范围：
+====================
+[English]
+Range in semitones re 440 hertz:
+[Chinese]
+相对于 440 Hz 的半音范围：
 ====================
 [English]
 Read Matrix from LVS AP file...
@@ -9764,6 +10937,11 @@ Remove
 移除
 ====================
 [English]
+Remove all text from tier
+[Chinese]
+清除层中的所有文本
+====================
+[English]
 Remove bandwidth points between
 [Chinese]
 删除bandwidth 控制点 between
@@ -9809,6 +10987,16 @@ Remove constraint...
 移除约束...
 ====================
 [English]
+Remove duration point(s)
+[Chinese]
+删除时长点
+====================
+[English]
+Remove entire tier
+[Chinese]
+删除整层
+====================
+[English]
 Remove formant points between
 [Chinese]
 删除共振峰 控制点 between
@@ -9829,9 +11017,19 @@ Remove one point
 删除一个控制点
 ====================
 [English]
+Remove pitch point(s)
+[Chinese]
+删除音高点
+====================
+[English]
 Remove point near...
 [Chinese]
 删除point near...
+====================
+[English]
+Remove point(s)
+[Chinese]
+删除点
 ====================
 [English]
 Remove point...
@@ -9857,6 +11055,11 @@ Remove points between...
 Remove points...
 [Chinese]
 移除多个点...
+====================
+[English]
+Remove pulse(s)
+[Chinese]
+删除脉冲
 ====================
 [English]
 Remove right boundary...
@@ -9919,6 +11122,11 @@ Reopen from disk
 从磁盘重新打开
 ====================
 [English]
+Replace
+[Chinese]
+替换
+====================
+[English]
 Replace again
 [Chinese]
 再次替换
@@ -9947,6 +11155,11 @@ Replace 音高 tier?
 Replace point texts...
 [Chinese]
 替换点文本...
+====================
+[English]
+Replace with version from disk
+[Chinese]
+替换为磁盘上的版本
 ====================
 [English]
 Replace...
@@ -10084,6 +11297,11 @@ Right or outside header
 右页眉或外侧页眉
 ====================
 [English]
+Right transition duration (s)
+[Chinese]
+右过渡时长 (s)
+====================
+[English]
 Roots help
 [Chinese]
 根帮助
@@ -10149,6 +11367,16 @@ Save
 保存
 ====================
 [English]
+Save & Close
+[Chinese]
+保存并关闭
+====================
+[English]
+Save & New
+[Chinese]
+保存并新建
+====================
+[English]
 Save & Open
 [Chinese]
 保存&打开
@@ -10202,6 +11430,11 @@ Save as 32-bit WAV file...
 Save as 600-dpi PNG file...
 [Chinese]
 保存为 600-dpi PNG 图像...
+====================
+[English]
+Save as AIFC file
+[Chinese]
+保存为 AIFC 文件
 ====================
 [English]
 Save as AIFC file...
@@ -10279,6 +11512,11 @@ Save as Kay sound file... || Write to Kay sound file...
 保存为 Kay 声音文件... || 写入为 Kay 声音文件...
 ====================
 [English]
+Save as NIST file
+[Chinese]
+保存为 NIST 文件
+====================
+[English]
 Save as NIST file...
 [Chinese]
 保存为 NIST 文件...
@@ -10287,6 +11525,11 @@ Save as NIST file...
 Save as NIST file... || Write to NIST file...
 [Chinese]
 保存为 NIST 文件... || 写入 NIST 文件...
+====================
+[English]
+Save as NeXT/Sun file
+[Chinese]
+保存为 NeXT/Sun 文件
 ====================
 [English]
 Save as NeXT/Sun file...
@@ -10327,6 +11570,11 @@ Save as Sun audio file... || Write to Sun audio file...
 Save as TIFF file...
 [Chinese]
 保存为TIFF file...
+====================
+[English]
+Save as WAV file
+[Chinese]
+保存为 WAV 文件
 ====================
 [English]
 Save as WAV file...
@@ -10669,14 +11917,29 @@ Save right channel as WAV file... || Write right channel to WAV file...
 将右声道保存为 WAV 文件... || 将右声道写入 WAV 文件...
 ====================
 [English]
+Save selected sound as 24-bit WAV file
+[Chinese]
+保存所选声音为 24 位 WAV 文件
+====================
+[English]
 Save selected sound as 24-bit WAV file...
 [Chinese]
 保存选定声音为 24 位 WAV 文件...
 ====================
 [English]
+Save selected sound as 32-bit WAV file
+[Chinese]
+保存所选声音为 32 位 WAV 文件
+====================
+[English]
 Save selected sound as 32-bit WAV file...
 [Chinese]
 保存选定声音为 32 位 WAV 文件...
+====================
+[English]
+Save selected sound as AIFC file
+[Chinese]
+保存所选声音为 AIFC 文件
 ====================
 [English]
 Save selected sound as AIFC file...
@@ -10689,6 +11952,11 @@ Save selected sound as AIFC file... ||
 保存选定声音为 AIFC 文件... ||
 ====================
 [English]
+Save selected sound as AIFF file
+[Chinese]
+保存所选声音为 AIFF 文件
+====================
+[English]
 Save selected sound as AIFF file...
 [Chinese]
 保存选定声音为 AIFF 文件...
@@ -10697,6 +11965,11 @@ Save selected sound as AIFF file...
 Save selected sound as AIFF file... ||
 [Chinese]
 保存选定声音为 AIFF 文件... ||
+====================
+[English]
+Save selected sound as FLAC file
+[Chinese]
+保存所选声音为 FLAC 文件
 ====================
 [English]
 Save selected sound as FLAC file...
@@ -10709,6 +11982,11 @@ Save selected sound as FLAC file... ||
 保存选定声音为 FLAC 文件... ||
 ====================
 [English]
+Save selected sound as NIST file
+[Chinese]
+保存所选声音为 NIST 文件
+====================
+[English]
 Save selected sound as NIST file...
 [Chinese]
 保存选定声音为 NIST 文件...
@@ -10719,6 +11997,11 @@ Save selected sound as NIST file... ||
 保存选定声音为 NIST 文件... ||
 ====================
 [English]
+Save selected sound as NeXT/Sun file
+[Chinese]
+保存所选声音为 NeXT/Sun 文件
+====================
+[English]
 Save selected sound as NeXT/Sun file...
 [Chinese]
 保存选定声音为 NeXT/Sun 文件...
@@ -10727,6 +12010,11 @@ Save selected sound as NeXT/Sun file...
 Save selected sound as NeXT/Sun file... ||
 [Chinese]
 保存选定声音为 NeXT/Sun 文件... ||
+====================
+[English]
+Save selected sound as WAV file
+[Chinese]
+保存所选声音为 WAV 文件
 ====================
 [English]
 Save selected sound as WAV file...
@@ -10769,9 +12057,29 @@ Save to list & Close
 保存到列表并关闭
 ====================
 [English]
+Save whole TextGrid as text file
+[Chinese]
+保存整个 TextGrid 为文本文件
+====================
+[English]
+Save whole TextGrid as text file... || Save TextGrid as text file... || Write TextGrid to text file...
+[Chinese]
+保存整个 TextGrid 为文本文件... || 保存 TextGrid 为文本文件... || 写入 TextGrid 为文本文件...
+====================
+[English]
 Scale intensity...
 [Chinese]
 缩放音强...
+====================
+[English]
+Scale intervals whose label...
+[Chinese]
+缩放符合此标签的区间...
+====================
+[English]
+Scale intervals whose label... 
+[Chinese]
+缩放符合此标签的区间...
 ====================
 [English]
 Scale peak...
@@ -10924,6 +12232,36 @@ Select earlier
 选择较早部分
 ====================
 [English]
+Select eighth
+[Chinese]
+选择第八共振峰
+====================
+[English]
+Select fifth
+[Chinese]
+选择第五共振峰
+====================
+[English]
+Select first
+[Chinese]
+选择第一共振峰
+====================
+[English]
+Select formant or bandwidth
+[Chinese]
+选择共振峰或带宽
+====================
+[English]
+Select formant or bandwidth...
+[Chinese]
+选择共振峰或带宽...
+====================
+[English]
+Select fourth
+[Chinese]
+选择第四共振峰
+====================
+[English]
 Select frequency:
 [Chinese]
 选择频率：
@@ -10949,6 +12287,11 @@ Select next tier
 选择下一层
 ====================
 [English]
+Select ninth
+[Chinese]
+选择第九共振峰
+====================
+[English]
 Select outer viewport...
 [Chinese]
 选择外部视口...
@@ -10967,6 +12310,26 @@ Select previous interval
 Select previous tier
 [Chinese]
 选择上一层
+====================
+[English]
+Select second
+[Chinese]
+选择第二共振峰
+====================
+[English]
+Select seventh
+[Chinese]
+选择第七共振峰
+====================
+[English]
+Select sixth
+[Chinese]
+选择第六共振峰
+====================
+[English]
+Select third
+[Chinese]
+选择第三共振峰
 ====================
 [English]
 Select...
@@ -11046,6 +12409,16 @@ Set F3 & F4...
 设置 F3 & F4...
 ====================
 [English]
+Set bandwidth range
+[Chinese]
+设置带宽范围
+====================
+[English]
+Set bandwidth range...
+[Chinese]
+设置带宽范围...
+====================
+[English]
 Set column label
 [Chinese]
 设置列标签
@@ -11066,9 +12439,39 @@ Set domain...
 设置域...
 ====================
 [English]
+Set duration range
+[Chinese]
+设置时长范围
+====================
+[English]
+Set duration range...
+[Chinese]
+设置时长范围...
+====================
+[English]
+Set dynamic range
+[Chinese]
+设置动态范围
+====================
+[English]
+Set dynamic range...
+[Chinese]
+设置动态范围...
+====================
+[English]
 Set f0...
 [Chinese]
 设置 f0...
+====================
+[English]
+Set formant range
+[Chinese]
+设置共振峰范围
+====================
+[English]
+Set formant range...
+[Chinese]
+设置共振峰范围...
 ====================
 [English]
 Set interval text...
@@ -11084,6 +12487,16 @@ Set length
 Set part to zero...
 [Chinese]
 设置部分为零...
+====================
+[English]
+Set pitch range
+[Chinese]
+设置音高范围
+====================
+[English]
+Set pitch range...
+[Chinese]
+设置音高范围...
 ====================
 [English]
 Set point text...
@@ -11151,9 +12564,19 @@ Set weight...
 设置权重...
 ====================
 [English]
+Setting the following to anything other than zero
+[Chinese]
+将以下项设置为非零值
+====================
+[English]
 Settings
 [Chinese]
 设置
+====================
+[English]
+Settings that influence both jitter and shimmer:
+[Chinese]
+同时影响抖动度 (jitter) 与微扰度 (shimmer) 的设置：
 ====================
 [English]
 Settings...
@@ -11184,6 +12607,16 @@ Shift frequencies...
 Shift left
 [Chinese]
 移动左
+====================
+[English]
+Shift pitch frequencies
+[Chinese]
+平移音高频率
+====================
+[English]
+Shift pitch frequencies...
+[Chinese]
+平移音高频率...
 ====================
 [English]
 Shift right
@@ -11256,6 +12689,11 @@ Show analyses...
 显示分析...
 ====================
 [English]
+Show bandwidths
+[Chinese]
+显示带宽
+====================
+[English]
 Show boundaries
 [Chinese]
 显示边界
@@ -11281,6 +12719,11 @@ Show menu command...
 显示菜单命令...
 ====================
 [English]
+Show number of
+[Chinese]
+显示编号
+====================
+[English]
 Show pitch
 [Chinese]
 显示音高
@@ -11294,6 +12737,16 @@ Show pulses
 Show spectrogram
 [Chinese]
 显示声谱图
+====================
+[English]
+Silence after (s)
+[Chinese]
+后置静音 (秒)
+====================
+[English]
+Silence before (s)
+[Chinese]
+前置静音 (秒)
 ====================
 [English]
 Silence threshold
@@ -11324,6 +12777,11 @@ Smoothing parameter
 Smoothing:
 [Chinese]
 平滑：
+====================
+[English]
+So you typically need two clicks on Apply to get a text replaced.
+[Chinese]
+因此您通常需要点击两次“应用”才能完成文本替换。
 ====================
 [English]
 Solid line
@@ -11393,7 +12851,7 @@ Sound playing preferences...
 [English]
 Sound playing settings
 [Chinese]
-声音 playing settings
+播放设置
 ====================
 [English]
 Sound playing settings...
@@ -11413,7 +12871,7 @@ Sound recording preferences...
 [English]
 Sound recording settings
 [Chinese]
-声音 recording settings
+录音设置
 ====================
 [English]
 Sound recording settings...
@@ -11841,6 +13299,16 @@ Sounds: Cross-correlate
 声音：计算互相关
 ====================
 [English]
+Source
+[Chinese]
+声源 (Source)
+====================
+[English]
+Source pitch settings
+[Chinese]
+声源音高设置
+====================
+[English]
 Speaker
 [Chinese]
 说话人
@@ -12176,6 +13644,11 @@ SpeechSynthesizer help
 语音合成器帮助
 ====================
 [English]
+Spell
+[Chinese]
+拼写 (Spell)
+====================
+[English]
 Standards
 [Chinese]
 标准值
@@ -12226,6 +13699,11 @@ Stop
 停止
 ====================
 [English]
+Stop band...
+[Chinese]
+阻带滤波...
+====================
+[English]
 Stop playing sound
 [Chinese]
 停止播放声音
@@ -12261,9 +13739,14 @@ Strings: Set string
 字符串列表: Set string
 ====================
 [English]
+Stylize pitch
+[Chinese]
+样式化音高
+====================
+[English]
 Stylize pitch (2 st)
 [Chinese]
-样式化音高(2 st)
+样式化音高 (2 半音)
 ====================
 [English]
 Stylize pitch...
@@ -12314,6 +13797,11 @@ Symmetric neural networks
 Synchronize zoom and scroll
 [Chinese]
 同步缩放与滚动
+====================
+[English]
+Synth
+[Chinese]
+合成 (Synth)
 ====================
 [English]
 Synthesize
@@ -12461,6 +13949,11 @@ Tabulate...
 制表...
 ====================
 [English]
+Targets:
+[Chinese]
+目标：
+====================
+[English]
 Teal
 [Chinese]
 蓝绿 (鸭绿)
@@ -12471,14 +13964,29 @@ Technical
 技术调试 (Technical)
 ====================
 [English]
+Text alignment in intervals
+[Chinese]
+区间内文本对齐方式
+====================
+[English]
 Text bottom...
 [Chinese]
-在底部添加文本...
+底部文字...
+====================
+[English]
+Text changed
+[Chinese]
+文本已修改
 ====================
 [English]
 Text left...
 [Chinese]
-在左侧添加文本...
+左侧文字...
+====================
+[English]
+Text left/right/top/bottom...
+[Chinese]
+左/右/上/下文字...
 ====================
 [English]
 Text reading preferences...
@@ -12503,7 +14011,7 @@ Text reading settings... || Text reading preferences...
 [English]
 Text right...
 [Chinese]
-在右侧添加文本...
+右侧文字...
 ====================
 [English]
 Text special...
@@ -12513,7 +14021,7 @@ Text special...
 [English]
 Text top...
 [Chinese]
-在顶部添加文本...
+顶部文字...
 ====================
 [English]
 Text width (mm)...
@@ -12534,6 +14042,11 @@ Text width in millimetres
 Text width in world coordinates
 [Chinese]
 文本 width in world coordinates
+====================
+[English]
+Text window: Font size
+[Chinese]
+文本窗口：字体大小
 ====================
 [English]
 Text writing preferences...
@@ -12716,9 +14229,19 @@ TextGrid help
 TextGrid 帮助
 ====================
 [English]
+TextGrid info
+[Chinese]
+TextGrid 信息
+====================
+[English]
 TextGrid preferences...
 [Chinese]
 TextGrid 偏好设置...
+====================
+[English]
+TextGrid settings
+[Chinese]
+TextGrid 设置
 ====================
 [English]
 TextGrid settings...
@@ -12921,6 +14444,11 @@ TextGrid: Tabulate occurrences
 TextGrid：统计出现次数
 ====================
 [English]
+TextGrid: To DurationTier
+[Chinese]
+TextGrid：转为时长层 (DurationTier)
+====================
+[English]
 TextGrid: View & Edit with callback
 [Chinese]
 TextGrid：View & 编辑with callback
@@ -12956,6 +14484,11 @@ Textgrid...
 TextGrid...
 ====================
 [English]
+The LongSound window can become very slow if you set it too high.
+[Chinese]
+如果设置过高，长音频窗口的运行可能会变得非常缓慢。
+====================
+[English]
 The best matches to your query seem to be:
 [Chinese]
 以下似乎是与您的查询最匹配的项：
@@ -12966,14 +14499,84 @@ The column totals should be positive.
 列总数必须为正数。
 ====================
 [English]
+The combination of “microphone” and “48000 Hz” is likely
+[Chinese]
+“麦克风”与“48000 Hz”的组合可能
+====================
+[English]
+The following determines how sounds are played.
+[Chinese]
+以下设置决定声音如何播放：
+====================
+[English]
+The following number will be added to the amplitudes of 
+[Chinese]
+以下数值将被加到声音的
+====================
+[English]
+The multiplication is always done in hertz.
+[Chinese]
+乘法运算始终以赫兹 (Hz) 为单位执行。
+====================
+[English]
 The numbers should not be negative.
 [Chinese]
 数值不能为负数。
 ====================
 [English]
+The rectangle you select here will include the margins.
+[Chinese]
+在此选择的矩形区域将包含边距。
+====================
+[English]
+The rectangle you select here will not include the margins.
+[Chinese]
+在此选择的矩形区域将不包含边距。
+====================
+[English]
 The row totals should be positive.
 [Chinese]
 行总数必须为正数。
+====================
+[English]
+The symbols %#_^ in labels
+[Chinese]
+标签中的符号 %#_^
+====================
+[English]
+The text has changed! Save changes?
+[Chinese]
+文本已修改！是否保存更改？
+====================
+[English]
+The text in the editor contains changes! Reopen nevertheless?
+[Chinese]
+编辑器中的文本已修改！是否仍要重新打开？
+====================
+[English]
+The viewport is the selected rectangle in the Picture window.
+[Chinese]
+视口是图像窗口中选中的矩形区域。
+====================
+[English]
+The “Gain” and “Balance” settings tend to be obsolete
+[Chinese]
+“增益”与“平衡”设置往往已废弃，
+====================
+[English]
+These settings apply to the pitch curve
+[Chinese]
+这些设置适用于播放 FormantGrid 时
+====================
+[English]
+These settings determine how fast parallelized
+[Chinese]
+这些设置用于控制并行化算法的
+====================
+[English]
+These settings determine how fast transcription and diarization
+[Chinese]
+这些设置决定您电脑上的语音转写和说话人日志
 ====================
 [English]
 These settings determine how fast transcription and diarization procedures are performed on your computer.
@@ -12986,9 +14589,29 @@ This Praat version cannot open movie files.
 此 Praat 版本无法打开视频文件。
 ====================
 [English]
+This command assumes that the x and y axes
+[Chinese]
+此命令假定 x 轴和 y 轴
+====================
+[English]
+This is a "slow" find-and-replace method;
+[Chinese]
+这是一种“慢速”查找与替换方法；
+====================
+[English]
 This is not a Praat picture file.
 [Chinese]
 这不是一个有效的 Praat 图像文件。
+====================
+[English]
+This menu command is usually hidden,
+[Chinese]
+此菜单命令通常处于隐藏状态，
+====================
+[English]
+This setting determines the maximum number of seconds
+[Chinese]
+此设置决定在长音频 (LongSound) 窗口中
 ====================
 [English]
 Tier
@@ -13059,6 +14682,11 @@ Time range (s)
 Time range (s):
 [Chinese]
 时间范围 (秒)：
+====================
+[English]
+Time scale factor
+[Chinese]
+时间缩放比例
 ====================
 [English]
 Time step (s)
@@ -13731,6 +15359,11 @@ Transcribe interval...
 转写区间...
 ====================
 [English]
+Transcription settings
+[Chinese]
+转写设置
+====================
+[English]
 Transcription settings...
 [Chinese]
 转写设置...
@@ -13981,6 +15614,11 @@ Vowel marks...
 元音标记...
 ====================
 [English]
+Warning: this simply picks peaks from 0 Hz up!
+[Chinese]
+警告：这仅仅是从 0 Hz 开始往上提取峰值！
+====================
+[English]
 Weight
 [Chinese]
 权重
@@ -14066,9 +15704,19 @@ Window shape:
 窗形状：
 ====================
 [English]
+With the shift key, you drag
+[Chinese]
+配合 Shift 键，可以拖拽
+====================
+[English]
 Word
 [Chinese]
 单词
+====================
+[English]
+Work in progress
+[Chinese]
+正在处理中
 ====================
 [English]
 World
@@ -14271,6 +15919,11 @@ Y2 column
 Y2 列
 ====================
 [English]
+YOU SHOULD NEVER SEE THIS OBSOLETE SETTINGS WINDOW;
+[Chinese]
+您不应该看到此已废弃的设置窗口；
+====================
+[English]
 Yellow
 [Chinese]
 黄色
@@ -14336,9 +15989,44 @@ Zoom   
 缩放   
 ====================
 [English]
+`x` is the frequency in hertz, `col` is the bin number
+[Chinese]
+`x` 为以赫兹为单位的频率，`col` 为频段编号
+====================
+[English]
+`x` is the frequency in hertz, `col` is the bin number;   
+[Chinese]
+`x` 为以赫兹为单位的频率，`col` 为频段编号；   
+====================
+[English]
+`x` is the place in Bark, `col` is the bin number
+[Chinese]
+`x` 为以 Bark 为单位的位置，`col` 为频段编号
+====================
+[English]
+`x` is the time in seconds, `col` is the frame number, `self` is in dB
+[Chinese]
+`x` 为以秒为单位的时间，`col` 为帧编号，`self` 单位为 dB
+====================
+[English]
 `x` is time
 [Chinese]
 `x` is 时间
+====================
+[English]
+`x` is time in seconds, `y` is place in Bark
+[Chinese]
+`x` 为以秒为单位的时间，`y` 为以 Bark 为单位的位置
+====================
+[English]
+`x` is time; `col` is frame number; `row` = candidate (1 = current path); frequency (time, candidate) :=
+[Chinese]
+`x` 为时间；`col` 为帧编号；`row` = 候选序号 (1 = 当前路径)；频率 (时间, 候选) :=
+====================
+[English]
+a single boundary
+[Chinese]
+单个边界
 ====================
 [English]
 all
@@ -14346,9 +16034,39 @@ all
 全部
 ====================
 [English]
+all samples of the sound.
+[Chinese]
+所有采样的振幅上。
+====================
+[English]
+are shown as typed
+[Chinese]
+按键入内容显示
+====================
+[English]
 aspiration
 [Chinese]
 送气
+====================
+[English]
+asynchronous (anything)
+[Chinese]
+异步 (任意操作)
+====================
+[English]
+at exactly these times
+[Chinese]
+恰好在这些时刻
+====================
+[English]
+at nearest zero crossing
+[Chinese]
+在最近零交叉点处
+====================
+[English]
+at nearest zero crossings
+[Chinese]
+在最近零交叉点处
 ====================
 [English]
 automatic
@@ -14381,6 +16099,11 @@ bars
 条形
 ====================
 [English]
+blank
+[Chinese]
+空白 (blank)
+====================
+[English]
 bottom
 [Chinese]
 下
@@ -14399,6 +16122,11 @@ by window
 by window and channel
 [Chinese]
 视口与通道独立缩放
+====================
+[English]
+calling back (view running cursor)
+[Chinese]
+回调 (显示运行游标)
 ====================
 [English]
 centre
@@ -14431,9 +16159,49 @@ columns.
 列.
 ====================
 [English]
+contains
+[Chinese]
+包含
+====================
+[English]
+contains a word ending with
+[Chinese]
+包含单词结尾是
+====================
+[English]
+contains a word equal to
+[Chinese]
+包含单词等于
+====================
+[English]
+contains a word starting with
+[Chinese]
+包含单词开头是
+====================
+[English]
+contains ink ending with
+[Chinese]
+包含可见字符结尾是
+====================
+[English]
+contains ink equal to
+[Chinese]
+包含可见字符等于
+====================
+[English]
+contains ink starting with
+[Chinese]
+包含可见字符开头是
+====================
+[English]
 correlation
 [Chinese]
 相关
+====================
+[English]
+cosine
+[Chinese]
+余弦 (cosine)
 ====================
 [English]
 covariance
@@ -14446,6 +16214,61 @@ curve
 曲线
 ====================
 [English]
+decimal
+[Chinese]
+十进制 (decimal)
+====================
+[English]
+does not contain
+[Chinese]
+不包含
+====================
+[English]
+does not contain a word ending with
+[Chinese]
+不包含单词结尾是
+====================
+[English]
+does not contain a word equal to
+[Chinese]
+不包含单词等于
+====================
+[English]
+does not contain a word starting with
+[Chinese]
+不包含单词开头是
+====================
+[English]
+does not contain ink ending with
+[Chinese]
+不包含可见字符结尾不是
+====================
+[English]
+does not contain ink equal to
+[Chinese]
+不包含可见字符等于
+====================
+[English]
+does not contain ink starting with
+[Chinese]
+不包含可见字符开头不是
+====================
+[English]
+does not end with
+[Chinese]
+结尾不是
+====================
+[English]
+does not start with
+[Chinese]
+开头不是
+====================
+[English]
+dotted
+[Chinese]
+点线
+====================
+[English]
 end
 [Chinese]
 终点
@@ -14454,6 +16277,31 @@ end
 end time
 [Chinese]
 结束时间
+====================
+[English]
+ends with
+[Chinese]
+结尾是
+====================
+[English]
+energy
+[Chinese]
+能量 (energy)
+====================
+[English]
+error
+[Chinese]
+报错 (error)
+====================
+[English]
+exactly
+[Chinese]
+精确 (exactly)
+====================
+[English]
+exponential
+[Chinese]
+指数 (exponential)
 ====================
 [English]
 fixed height
@@ -14466,9 +16314,19 @@ fixed range
 固定数值范围 (fixed range)
 ====================
 [English]
+for viewing the waveform and playing a sound in the LongSound window.
+[Chinese]
+能够查看波形和播放声音的最大秒数。
+====================
+[English]
 frames.
 [Chinese]
 帧.
+====================
+[English]
+free
+[Chinese]
+自由 (free)
 ====================
 [English]
 frication
@@ -14481,6 +16339,21 @@ gender
 性别
 ====================
 [English]
+half
+[Chinese]
+一半
+====================
+[English]
+have been set by a Draw command or by "Axes...".
+[Chinese]
+已通过绘制命令或“坐标轴 (Axes)...”完成设置。
+====================
+[English]
+if the selected text is identical to the Find string,
+[Chinese]
+若所选文本与查找字符串相同，
+====================
+[English]
 in
 [Chinese]
 放大
@@ -14491,14 +16364,49 @@ in row
 in 行
 ====================
 [English]
+in unpredictable ways.
+[Chinese]
+并可能带来不可预期的结果。
+====================
+[English]
 including statistical functions and acoustics-auditory conversions.
 [Chinese]
 包括统计函数以及声学-听觉转换。
 ====================
 [English]
+information about what goes on in Praat
+[Chinese]
+内部运行信息
+====================
+[English]
+interpolate
+[Chinese]
+插值 (interpolate)
+====================
+[English]
+interruptable (Escape key stops playing)
+[Chinese]
+可中断 (按 Esc 键停止播放)
+====================
+[English]
 interval
 [Chinese]
 区间
+====================
+[English]
+intervals or points
+[Chinese]
+区间或点
+====================
+[English]
+is equal to
+[Chinese]
+等于
+====================
+[English]
+is not equal to
+[Chinese]
+不等于
 ====================
 [English]
 is singular.
@@ -14551,14 +16459,54 @@ left Start time (s)
 左开始时间 (s)
 ====================
 [English]
+line
+[Chinese]
+线 (line)
+====================
+[English]
+linear
+[Chinese]
+线性 (linear)
+====================
+[English]
+lines
+[Chinese]
+线条 (lines)
+====================
+[English]
+lines and speckles
+[Chinese]
+连线与散点
+====================
+[English]
 list
 [Chinese]
 列表
 ====================
 [English]
+literals
+[Chinese]
+字面量 (literals)
+====================
+[English]
+log file and Info window
+[Chinese]
+日志文件与 Info 窗口
+====================
+[English]
+log file only
+[Chinese]
+仅日志文件
+====================
+[English]
 logHertz
 [Chinese]
 对数赫兹 (logHertz)
+====================
+[English]
+matches (regex)
+[Chinese]
+匹配 (正则表达式)
 ====================
 [English]
 matrix.
@@ -14576,6 +16524,11 @@ mean energy
 平均能量
 ====================
 [English]
+mean italic/bold/sub/super
+[Chinese]
+表示斜体/粗体/下角标/上角标
+====================
+[English]
 mean sones
 [Chinese]
 平均宋 (sones)
@@ -14586,9 +16539,54 @@ median
 中位数
 ====================
 [English]
+mel
+[Chinese]
+梅尔 (mel)
+====================
+[English]
+microphone
+[Chinese]
+麦克风
+====================
+[English]
+multiple boundaries
+[Chinese]
+多个边界
+====================
+[English]
+nearest
+[Chinese]
+最近 (nearest)
+====================
+[English]
 no
 [Chinese]
 否
+====================
+[English]
+non-empty intervals or points
+[Chinese]
+非空区间或点
+====================
+[English]
+none
+[Chinese]
+无 (none)
+====================
+[English]
+normal
+[Chinese]
+正常 (normal)
+====================
+[English]
+not for currently existing LongSound objects.
+[Chinese]
+不对当前已存在的 LongSound 对象生效。
+====================
+[English]
+nothing
+[Chinese]
+不显示
 ====================
 [English]
 of column “
@@ -14599,6 +16597,11 @@ of 列“
 of tableau
 [Chinese]
 of 表格
+====================
+[English]
+of the dots that are drawn by "speckle" commands.
+[Chinese]
+由“散点 (speckle)”命令所绘制点的尺寸。
 ====================
 [English]
 of tier
@@ -14621,14 +16624,39 @@ or raise the “longest analysis” setting with “Show analyses” in the Anal
 或者在“分析”菜单中使用“显示分析”来调大“最长分析”设置。）
 ====================
 [English]
+otherwise, the next occurrence of the Find string will be selected.
+[Chinese]
+否则将选中查找到的下一个匹配项。
+====================
+[English]
 out
 [Chinese]
 缩小
 ====================
 [English]
+parabolic
+[Chinese]
+抛物线 (parabolic)
+====================
+[English]
 poles
 [Chinese]
 杆状
+====================
+[English]
+procedures are performed on your computer.
+[Chinese]
+的处理速度。
+====================
+[English]
+rational
+[Chinese]
+有理数 (rational)
+====================
+[English]
+regular expressions
+[Chinese]
+正则表达式 (regular expressions)
 ====================
 [English]
 right
@@ -14671,6 +16699,11 @@ row
 行
 ====================
 [English]
+row is formant number, col is point number:
+[Chinese]
+row 为共振峰序号，col 为点序号：
+====================
+[English]
 rows
 [Chinese]
 行
@@ -14698,7 +16731,17 @@ sel
 [English]
 select that Sound and choose "To TextGrid...".
 [Chinese]
-请选择该声音对象并选择“To TextGrid...”命令。
+选中该 Sound 并选择“转为 TextGrid (To TextGrid)...”。
+====================
+[English]
+self [] is the FormantGrid itself, so it returns frequencies, not bandwidths!
+[Chinese]
+self [] 代表 FormantGrid 本身，因此返回的是频率而非带宽！
+====================
+[English]
+semitones
+[Chinese]
+半音 (semitones)
 ====================
 [English]
 semitones re 1 Hz
@@ -14721,6 +16764,16 @@ semitones re 440 Hz
 半音 (基准 440 Hz)
 ====================
 [English]
+sine
+[Chinese]
+正弦 (sine)
+====================
+[English]
+sones
+[Chinese]
+宋 (sones)
+====================
+[English]
 sound
 [Chinese]
 声音
@@ -14729,6 +16782,11 @@ sound
 speckles
 [Chinese]
 斑点
+====================
+[English]
+speckles and curve
+[Chinese]
+散点与曲线
 ====================
 [English]
 square (rectangular)
@@ -14744,6 +16802,26 @@ start
 start time
 [Chinese]
 开始时间
+====================
+[English]
+starts with
+[Chinese]
+开头是
+====================
+[English]
+synchronous (nothing)
+[Chinese]
+同步 (无操作)
+====================
+[English]
+that you hear when playing the FormantGrid.
+[Chinese]
+所听到的音高曲线。
+====================
+[English]
+the selected text will be replaced by the Replace string;
+[Chinese]
+所选文本将被替换字符串替换；
 ====================
 [English]
 tiers.
@@ -14771,6 +16849,16 @@ voicing
 浊音化
 ====================
 [English]
+will alter the behaviour of Praat
+[Chinese]
+将会改变 Praat 的运行行为
+====================
+[English]
+x = x1   ! time associated with first sample
+[Chinese]
+x = x1   ! 第一个采样点对应的时间
+====================
+[English]
 y := 1;   row := 1;
 [Chinese]
 y := 1;   row := 1;
@@ -14784,6 +16872,11 @@ y := 2;   row := 2;
 yes
 [Chinese]
 是
+====================
+[English]
+zero
+[Chinese]
+置零 (zero)
 ====================
 [English]
 » in formula

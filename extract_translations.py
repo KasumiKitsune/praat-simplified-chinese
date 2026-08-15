@@ -8,13 +8,13 @@ def main():
 
     # 1. Output as JSON (very easy for AIs to parse directly)
     json_path = "praat_translations.json"
-    with open(json_path, "w", encoding="utf-8") as f:
+    with open(json_path, "w", encoding="utf-8", newline='\n') as f:
         json.dump(translations, f, ensure_ascii=False, indent=2)
     print(f"Successfully saved JSON format to {json_path} ({total} entries)")
 
     # 2. Output as TXT (structured and clear for human reading or prompt pasting)
     txt_path = "praat_translations.txt"
-    with open(txt_path, "w", encoding="utf-8") as f:
+    with open(txt_path, "w", encoding="utf-8", newline='\n') as f:
         f.write(f"=== Praat Chinese Translation Database (Total: {total} entries) ===\n")
         f.write("Format: [English] block followed by [Chinese] block, separated by '===================='.\n")
         f.write("This structure prevents ambiguity with newlines or special characters in the text.\n\n")
