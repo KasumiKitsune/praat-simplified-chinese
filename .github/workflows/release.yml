@@ -196,6 +196,56 @@ jobs:
               print("Added sys/praat_translate.cpp and sys/praat_translate.h to praat_mac Xcode target.")
           else:
               print("sys/praat_translate.cpp is already present in the Xcode project.")
+
+          if "CPP.cpp" not in project:
+              file_ref_cpp = "CDFE00000000000000000011"
+              build_file_cpp = "CDFE00000000000000000012"
+              header_ref_cpp = "CDFE00000000000000000013"
+              header_build_cpp = "CDFE00000000000000000014"
+
+              project = project.replace(
+                  "/* Begin PBXBuildFile section */\n",
+                  "/* Begin PBXBuildFile section */\n"
+                  f"\t\t{build_file_cpp} /* CPP.cpp in Sources */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {file_ref_cpp} /* CPP.cpp */; }};\n"
+                  f"\t\t{header_build_cpp} /* CPP.h in Headers */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {header_ref_cpp} /* CPP.h */; }};\n",
+                  1,
+              )
+              project = project.replace(
+                  "/* Begin PBXFileReference section */\n",
+                  "/* Begin PBXFileReference section */\n"
+                  f"\t\t{file_ref_cpp} /* CPP.cpp */ = "
+                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; "
+                  "name = CPP.cpp; path = LPC/CPP.cpp; sourceTree = \"<group>\"; };\n"
+                  f"\t\t{header_ref_cpp} /* CPP.h */ = "
+                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
+                  "name = CPP.h; path = LPC/CPP.h; sourceTree = \"<group>\"; };\n",
+                  1,
+              )
+              project = project.replace(
+                  "\t\t\t\t23D1643C243D165800A2A049 /* PowerCepstrogram.cpp */,\n",
+                  "\t\t\t\t23D1643C243D165800A2A049 /* PowerCepstrogram.cpp */,\n"
+                  f"\t\t{file_ref_cpp} /* CPP.cpp */,\n"
+                  f"\t\t{header_ref_cpp} /* CPP.h */,\n",
+                  1,
+              )
+              project = project.replace(
+                  "\t\t\t\t23D1643D243D165800A2A049 /* PowerCepstrogram.cpp in Sources */,\n",
+                  "\t\t\t\t23D1643D243D165800A2A049 /* PowerCepstrogram.cpp in Sources */,\n"
+                  f"\t\t{build_file_cpp} /* CPP.cpp in Sources */,\n",
+                  1,
+              )
+              project = project.replace(
+                  "\t\t\t\t23D16441243D165F00A2A049 /* PowerCepstrogram.h in Headers */,\n",
+                  "\t\t\t\t23D16441243D165F00A2A049 /* PowerCepstrogram.h in Headers */,\n"
+                  f"\t\t{header_build_cpp} /* CPP.h in Headers */,\n",
+                  1,
+              )
+              project_path.write_text(project, encoding="utf-8")
+              print("Added LPC/CPP.cpp and LPC/CPP.h to praat_mac Xcode target.")
+          else:
+              print("LPC/CPP.cpp is already present in the Xcode project.")
           PY
 
       - name: Build Praat.app

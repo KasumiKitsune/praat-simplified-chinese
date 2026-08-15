@@ -38,7 +38,7 @@ void Gui_runQuitApplicationCallback () {
 	theQuitApplicationCallback ();
 }
 
-#if defined (_WIN32)
+#if ! cocoa
 	static void (*theOpenDocumentCallback) (MelderFile file);
 	static void (*theFinishedOpeningDocumentsCallback) ();
 	void Gui_setOpenDocumentCallback (
