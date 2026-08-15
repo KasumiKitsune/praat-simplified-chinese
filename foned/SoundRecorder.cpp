@@ -312,7 +312,9 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 			sound = my recordedSounds.at [sel];
 
 		if (sound) {
-			Graphics_setViewport (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
+			double x1w, x2w, y1w, y2w;
+			Graphics_inqWsWindow (my graphics.get(), & x1w, & x2w, & y1w, & y2w);
+			Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
 			Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
 			Graphics_setColour (my graphics.get(), Melder_WHITE);
 			Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
@@ -332,22 +334,22 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 				if (tmax > sound -> xmax)
 					tmax = sound -> xmax;
 				if (tmin < sound -> xmax) {
-					double yBottom = 1.0 - (double)(row + 1) / numRows;
-					double yTop = 1.0 - (double)row / numRows;
-					Graphics_setViewport (my graphics.get(), 0.0, 1.0, yBottom, yTop);
+					double yBottom = y1w + (y2w - y1w) * (double)(numRows - 1 - row) / numRows;
+					double yTop = y1w + (y2w - y1w) * (double)(numRows - row) / numRows;
+					Graphics_setViewport (my graphics.get(), x1w, x2w, yBottom, yTop);
 					Sound_draw (sound, my graphics.get(), tmin, tmax, 0.0, 0.0, true, U"curve");
 				}
 			}
 
 			if (totalDuration > 30.0) {
-				Graphics_setViewport (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
+				Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
 				Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
 				Graphics_setTextAlignment (my graphics.get(), Graphics_RIGHT, Graphics_TOP);
 				Graphics_setColour (my graphics.get(), Melder_RED);
 				Graphics_text (my graphics.get(), 0.98, 0.98, Melder_cat (U"(前30秒预览 / 总长 ", Melder_fixed (totalDuration, 1), U"s)"));
 			}
 
-			Graphics_setViewport (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
+			Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
 			return;
 		}
 
