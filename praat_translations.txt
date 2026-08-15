@@ -1,4 +1,4 @@
-=== Praat Chinese Translation Database (Total: 3376 entries) ===
+=== Praat Chinese Translation Database (Total: 3802 entries) ===
 Format: [English] block followed by [Chinese] block, separated by '===================='.
 This structure prevents ambiguity with newlines or special characters in the text.
 
@@ -108,6 +108,16 @@ This structure prevents ambiguity with newlines or special characters in the tex
 # ncol = 点的总数
 ====================
 [English]
+& Configuration (reconstruct)?
+[Chinese]
+& 配置 (重建)?
+====================
+[English]
+& Covariance: Project?
+[Chinese]
+& 协方差：投影?
+====================
+[English]
 & Manipulation: Replace?
 [Chinese]
 & 操控：是否替换？
@@ -116,6 +126,16 @@ This structure prevents ambiguity with newlines or special characters in the tex
 & Sound: To TextGrid?
 [Chinese]
 & 声音： 转为 TextGrid？
+====================
+[English]
+& TableOfReal: To ClassificationTable?
+[Chinese]
+& 实数表格：转为分类表?
+====================
+[English]
+& TableOfReal: To Configuration?
+[Chinese]
+& 实数表格：转为配置?
 ====================
 [English]
 (= all)
@@ -246,6 +266,16 @@ This structure prevents ambiguity with newlines or special characters in the tex
 (zoom out to see the data)
 [Chinese]
 （缩小以查看数据）
+====================
+[English]
+(“auto” means ‘same as pitch floor and ceiling’)
+[Chinese]
+(“auto” 表示“与音高下限和上限相同”)
+====================
+[English]
+(“auto” means ‘same as pitch floor and top’)
+[Chinese]
+(“auto” 表示“与音高下限和顶部相同”)
 ====================
 [English]
 ) already exists, but it is not an interval tier.
@@ -624,6 +654,11 @@ Missing samples were set to zero.
 -- 转写后 --
 ====================
 [English]
+-- area --
+[Chinese]
+-- 面积 --
+====================
+[English]
 -- autocorrelation --
 [Chinese]
 -- 自相关 --
@@ -634,9 +669,19 @@ Missing samples were set to zero.
 -- 坐标轴 --
 ====================
 [English]
+-- between tables --
+[Chinese]
+-- 表格之间 --
+====================
+[English]
 -- cast --
 [Chinese]
 -- 转换 --
+====================
+[English]
+-- configurations --
+[Chinese]
+-- 配置 --
 ====================
 [English]
 -- confusion statistics --
@@ -654,6 +699,21 @@ Missing samples were set to zero.
 -- 剪切 复制 粘贴 --
 ====================
 [English]
+-- discriminant --
+[Chinese]
+-- 判别分析 --
+====================
+[English]
+-- distance queries --
+[Chinese]
+-- 距离查询 --
+====================
+[English]
+-- draw lines --
+[Chinese]
+-- 绘制线条 --
+====================
+[English]
 -- edit frication tiers --
 [Chinese]
 -- 编辑摩擦层 --
@@ -667,6 +727,21 @@ Missing samples were set to zero.
 -- edit ot --
 [Chinese]
 -- 编辑 ot --
+====================
+[English]
+-- eigen structure --
+[Chinese]
+-- 特征结构 --
+====================
+[English]
+-- eigenvectors --
+[Chinese]
+-- 特征向量 --
+====================
+[English]
+-- ellipses --
+[Chinese]
+-- 椭圆 --
 ====================
 [English]
 -- encoding --
@@ -684,9 +759,19 @@ Missing samples were set to zero.
 -- 共振峰 --
 ====================
 [English]
+-- frequency scales --
+[Chinese]
+-- 频率尺度 --
+====================
+[English]
 -- frequency-domain filter --
 [Chinese]
 -- 频率-域滤波 --
+====================
+[English]
+-- function specifics --
+[Chinese]
+-- 函数特征 --
 ====================
 [English]
 -- get content --
@@ -712,6 +797,16 @@ Missing samples were set to zero.
 -- get extreme --
 [Chinese]
 -- 获取极值 --
+====================
+[English]
+-- get fraction correct --
+[Chinese]
+-- 获取正确率 --
+====================
+[English]
+-- get from two --
+[Chinese]
+-- 从两者获取 --
 ====================
 [English]
 -- get gain --
@@ -784,6 +879,11 @@ Missing samples were set to zero.
 -- 谐噪比 --
 ====================
 [English]
+-- imaginary part --
+[Chinese]
+-- 虚部 --
+====================
+[English]
 -- in-place filters --
 [Chinese]
 -- 原位滤波器 --
@@ -824,9 +924,39 @@ Missing samples were set to zero.
 -- 首一 --
 ====================
 [English]
+-- new SpeechSynthesizer --
+[Chinese]
+-- 新建语音合成器 (SpeechSynthesizer) --
+====================
+[English]
+-- new TableOfReal --
+[Chinese]
+-- 新建实数表格 (TableOfReal) --
+====================
+[English]
+-- new TableOfReal children --
+[Chinese]
+-- 新建实数表格子类型 --
+====================
+[English]
+-- number of matches --
+[Chinese]
+-- 匹配数量 --
+====================
+[English]
 -- open table --
 [Chinese]
 -- 打开表格 --
+====================
+[English]
+-- other queries --
+[Chinese]
+-- 其他查询 --
+====================
+[English]
+-- pca --
+[Chinese]
+-- 主成分分析 (PCA) --
 ====================
 [English]
 -- periods --
@@ -919,6 +1049,11 @@ Missing samples were set to zero.
 -- 删除脉冲 --
 ====================
 [English]
+-- report stats --
+[Chinese]
+-- 统计报告 --
+====================
+[English]
 -- roots --
 [Chinese]
 -- 根 --
@@ -944,9 +1079,19 @@ Missing samples were set to zero.
 -- 搜索 --
 ====================
 [English]
+-- search range extensions --
+[Chinese]
+-- 扩展搜索范围 --
+====================
+[English]
 -- select formant --
 [Chinese]
 -- 选择共振峰 --
+====================
+[English]
+-- sequential permutations --
+[Chinese]
+-- 顺序排列 --
 ====================
 [English]
 -- set --
@@ -979,9 +1124,19 @@ Missing samples were set to zero.
 -- 时频 --
 ====================
 [English]
+-- sscps --
+[Chinese]
+-- 离差平方和与交叉积 (SSCP) --
+====================
+[English]
 -- statistics --
 [Chinese]
 -- 统计 --
+====================
+[English]
+-- structure --
+[Chinese]
+-- 结构 --
 ====================
 [English]
 -- stylize --
@@ -992,6 +1147,21 @@ Missing samples were set to zero.
 -- tableau grammars --
 [Chinese]
 -- 表格语法 --
+====================
+[English]
+-- tests --
+[Chinese]
+-- 检验 --
+====================
+[English]
+-- time domain x from y separator --
+[Chinese]
+-- 时域 x-y 分隔条 --
+====================
+[English]
+-- time sampling x from y separator --
+[Chinese]
+-- 时间采样 x-y 分隔条 --
 ====================
 [English]
 -- time-domain filter --
@@ -1605,6 +1775,11 @@ Cannot play sound.
 ：单词"
 ====================
 [English]
+: your column number should not be greater than the number of columns.
+[Chinese]
+：您的列号不应大于总列数。
+====================
+[English]
 A Sound cannot have a duration less than zero.
 [Chinese]
 声音时长不能小于零。
@@ -1683,6 +1858,11 @@ Acoustic synthesis (Klatt)
 Acoustic synthesis (Klatt) >
 [Chinese]
 声学合成 (Klatt) >
+====================
+[English]
+ActivationList: Formula
+[Chinese]
+激活列表 (ActivationList)：公式
 ====================
 [English]
 Add
@@ -2005,6 +2185,11 @@ Add...
 添加...
 ====================
 [English]
+Addition factor
+[Chinese]
+加法因子
+====================
+[English]
 Advanced
 [Chinese]
 高级
@@ -2070,6 +2255,21 @@ Advanced spectrogram settings...
 高级声谱图设置...
 ====================
 [English]
+After match criterion
+[Chinese]
+匹配后准则
+====================
+[English]
+Algorithm parameters
+[Chinese]
+算法参数
+====================
+[English]
+Align eigenvectors
+[Chinese]
+对齐特征向量
+====================
+[English]
 Align interval
 [Chinese]
 对齐区间
@@ -2108,6 +2308,16 @@ Allow silences
 Allow speakers overlap
 [Chinese]
 允许说话人声音重叠
+====================
+[English]
+Allow unmeasured predictors
+[Chinese]
+允许未测量的预测变量
+====================
+[English]
+Alternative hypothesis:
+[Chinese]
+备择假设：
 ====================
 [English]
 Amplitude range
@@ -2230,6 +2440,11 @@ Analyze
 分析
 ====================
 [English]
+Angle (degrees)
+[Chinese]
+角度 (度)
+====================
+[English]
 Annotate -
 [Chinese]
 标注 -
@@ -2260,6 +2475,11 @@ Append column...
 追加列...
 ====================
 [English]
+Append column:
+[Chinese]
+追加列：
+====================
+[English]
 Append columns
 [Chinese]
 追加列
@@ -2270,9 +2490,24 @@ Append difference column...
 追加差异列...
 ====================
 [English]
+Append product column...
+[Chinese]
+追加乘积列...
+====================
+[English]
+Append quotient column...
+[Chinese]
+追加商列...
+====================
+[English]
 Append row
 [Chinese]
 追加行
+====================
+[English]
+Append sum column...
+[Chinese]
+追加求和列...
 ====================
 [English]
 Append to existing sound file...
@@ -2280,9 +2515,24 @@ Append to existing sound file...
 追加到现有声音文件...
 ====================
 [English]
+Append to existing table
+[Chinese]
+追加到现有表格
+====================
+[English]
 Apply
 [Chinese]
 应用
+====================
+[English]
+Apply Varimax rotation
+[Chinese]
+应用方差最大化旋转 (Varimax)
+====================
+[English]
+Are distances squared?
+[Chinese]
+距离是否平方？
 ====================
 [English]
 Arrow size...
@@ -2315,6 +2565,11 @@ Aspiration
 送气
 ====================
 [English]
+Attenuation at top
+[Chinese]
+顶部衰减
+====================
+[English]
 Attenuation at tops
 [Chinese]
 高频衰减量
@@ -2333,6 +2588,11 @@ Autocorrelate...
 Autodetect language
 [Chinese]
 自动检测语言
+====================
+[English]
+Autoscaling
+[Chinese]
+自动缩放
 ====================
 [English]
 Average
@@ -2360,9 +2620,19 @@ Bandwidth (Hz)
 带宽 (Hz)
 ====================
 [English]
+Bandwidth column
+[Chinese]
+带宽对应列
+====================
+[English]
 Bar plot...
 [Chinese]
 条形图...
+====================
+[English]
+Bar width
+[Chinese]
+柱宽度
 ====================
 [English]
 Bar width (wc)
@@ -2380,6 +2650,11 @@ Bartlett (triangular)
 巴特利特窗 (Bartlett/triangular)
 ====================
 [English]
+Bartlett's test
+[Chinese]
+Bartlett 检验
+====================
+[English]
 Begin column
 [Chinese]
 起始列
@@ -2395,14 +2670,39 @@ Best matches
 最佳匹配
 ====================
 [English]
+Between / Total
+[Chinese]
+组间 / 总计
+====================
+[English]
+Between / Within
+[Chinese]
+组间 / 组内
+====================
+[English]
 Between parentheses, you find what you can do simultaneously.
 [Chinese]
 括号中是您可以同时进行的操作。
 ====================
 [English]
+Between-groups SSCP
+[Chinese]
+组间离差平方和与交叉积 (Between-groups SSCP)
+====================
+[English]
 Bilingual
 [Chinese]
 对照表
+====================
+[English]
+Bin width
+[Chinese]
+分箱宽度
+====================
+[English]
+Binned data:
+[Chinese]
+分箱数据：
 ====================
 [English]
 Black
@@ -2415,9 +2715,19 @@ Blue
 蓝色
 ====================
 [English]
+Bootstrap confidence intervals...
+[Chinese]
+Bootstrap 置信区间...
+====================
+[English]
 Boundary
 [Chinese]
 边界
+====================
+[English]
+Boxes
+[Chinese]
+箱体 (Boxes)
 ====================
 [English]
 Breathiness
@@ -2473,6 +2783,11 @@ CJK 字体样式设置...
 CJK font style settings... || CJK font style preferences...
 [Chinese]
 CJK 字体样式设置... || CJK 字体样式偏好...
+====================
+[English]
+Calculate cross-validation
+[Chinese]
+计算交叉验证
 ====================
 [English]
 Calculator
@@ -2552,6 +2867,16 @@ Cannot write first bytes of file.
 无法写入文件的前几个字节。
 ====================
 [English]
+Canonical correlation analysis
+[Chinese]
+典型相关分析 (CCA)
+====================
+[English]
+Canonical discriminant analysis
+[Chinese]
+典型判别分析 (CDA)
+====================
+[English]
 Cast
 [Chinese]
 类型强转
@@ -2560,6 +2885,21 @@ Cast
 Cast -
 [Chinese]
 类型强转 -
+====================
+[English]
+Categories: To Table
+[Chinese]
+类别：转为表格 (Table)
+====================
+[English]
+CategoriesEditor settings
+[Chinese]
+类别编辑器设置
+====================
+[English]
+Category column
+[Chinese]
+类别列
 ====================
 [English]
 Ceiling (Hz)
@@ -2590,6 +2930,11 @@ Centre x
 Centre y
 [Chinese]
 中心化 y
+====================
+[English]
+Centred
+[Chinese]
+中心化
 ====================
 [English]
 Cepstral smoothing...
@@ -2662,9 +3007,29 @@ Checking for updates?
 检查更新?
 ====================
 [English]
+Chi-squared test
+[Chinese]
+卡方检验
+====================
+[English]
 Circular permutation...
 [Chinese]
 循环置换...
+====================
+[English]
+Classification table
+[Chinese]
+分类表 (ClassificationTable)
+====================
+[English]
+ClassificationTable: Get fraction correct
+[Chinese]
+分类表：获取正确率
+====================
+[English]
+ClassificationTable: To Table
+[Chinese]
+分类表：转为表格
 ====================
 [English]
 Clear
@@ -2697,6 +3062,11 @@ Close   
 关闭   
 ====================
 [English]
+Cluster analysis...
+[Chinese]
+聚类分析...
+====================
+[English]
 Clustering threshold (0-2)
 [Chinese]
 聚类阈值 (0-2)
@@ -2722,6 +3092,11 @@ Cochleagram: Formula...
 耳蜗图：公式...
 ====================
 [English]
+Coefficient of variation
+[Chinese]
+变异系数 (CV)
+====================
+[English]
 Collapse rows...
 [Chinese]
 折叠行...
@@ -2742,6 +3117,16 @@ Collision phase
 碰撞相位
 ====================
 [English]
+Colour map
+[Chinese]
+颜色映射 (Colour map)
+====================
+[English]
+Colour map:
+[Chinese]
+颜色映射 (Colour map)：
+====================
+[English]
 Colour...
 [Chinese]
 画笔颜色...
@@ -2757,14 +3142,109 @@ Column "
 列"
 ====================
 [English]
+Column (name)
+[Chinese]
+列 (名称)
+====================
+[English]
+Column for row labels
+[Chinese]
+用于行标签的列
+====================
+[English]
 Column label
 [Chinese]
 列标签
 ====================
 [English]
+Column labels
+[Chinese]
+列标签
+====================
+[English]
+Column name
+[Chinese]
+列名
+====================
+[English]
+Column number
+[Chinese]
+列号
+====================
+[English]
+Column numbers
+[Chinese]
+列编号
+====================
+[English]
+Column scaling
+[Chinese]
+列缩放
+====================
+[English]
+Column to average over
+[Chinese]
+用于计算均值的列
+====================
+[English]
+Column to transpose
+[Chinese]
+用于转置的列
+====================
+[English]
+Column weights
+[Chinese]
+列权重
+====================
+[English]
+Column with distribution
+[Chinese]
+包含分布的列
+====================
+[English]
+Column with marks
+[Chinese]
+包含标记的列
+====================
+[English]
+Column with times
+[Chinese]
+包含时间的列
+====================
+[English]
+Column with values
+[Chinese]
+包含数值的列
+====================
+[English]
+Column1
+[Chinese]
+列 1
+====================
+[English]
+Column2
+[Chinese]
+列 2
+====================
+[English]
+Columns not mentioned above will be ignored.
+[Chinese]
+未在上述提及的列将被忽略。
+====================
+[English]
 Combine
 [Chinese]
 合并
+====================
+[English]
+Combine (mean)
+[Chinese]
+合并 (均值)
+====================
+[English]
+Combine (sum)
+[Chinese]
+合并 (求和)
 ====================
 [English]
 Combine -
@@ -2790,6 +3270,21 @@ Combine to stereo
 Combine two Matrices -
 [Chinese]
 Combine two 矩阵 -
+====================
+[English]
+Compare configurations
+[Chinese]
+比较配置
+====================
+[English]
+Compare two Means...
+[Chinese]
+比较两个均值...
+====================
+[English]
+Compare two Variances...
+[Chinese]
+比较两个方差...
 ====================
 [English]
 Compress frequency domain...
@@ -2842,6 +3337,16 @@ Concatenate?
 是否连接？
 ====================
 [English]
+Confidence interval
+[Chinese]
+置信区间
+====================
+[English]
+Confidence level
+[Chinese]
+置信水平
+====================
+[English]
 Confirm Quit
 [Chinese]
 确认退出
@@ -2875,6 +3380,11 @@ Constraint
 Constraint grammars
 [Chinese]
 约束语法
+====================
+[English]
+Contingency table
+[Chinese]
+列联表 (Contingency Table)
 ====================
 [English]
 Continue
@@ -3007,6 +3517,21 @@ Correlation help
 相关帮助
 ====================
 [English]
+Correlation matrix
+[Chinese]
+相关矩阵 (Correlation Matrix)
+====================
+[English]
+Correlation: Draw ellipse
+[Chinese]
+相关：绘制椭圆
+====================
+[English]
+Correlation: Draw scatter plot
+[Chinese]
+相关：绘制散点图
+====================
+[English]
 Count differences
 [Chinese]
 计数差异
@@ -3064,7 +3589,22 @@ Covariance help
 [English]
 Covariance matrix
 [Chinese]
-协方差矩阵
+协方差矩阵 (Covariance Matrix)
+====================
+[English]
+Covariance: Draw ellipse
+[Chinese]
+协方差：绘制椭圆
+====================
+[English]
+Covariance: To PCA
+[Chinese]
+协方差：转为主成分分析 (PCA)
+====================
+[English]
+Covariance: To SSCP
+[Chinese]
+协方差：转为 SSCP
 ====================
 [English]
 Create AmplitudeTier...
@@ -3447,6 +3987,11 @@ Create Table (Ganong 1980)
 创建表格 (Ganong 1980)
 ====================
 [English]
+Create Table with column names
+[Chinese]
+创建带列名的表格
+====================
+[English]
 Create Table with column names...
 [Chinese]
 创建带列名的表格...
@@ -3520,6 +4065,16 @@ Create Vocal Tract from phone...
 Create a Speaker
 [Chinese]
 创建 a 说话人
+====================
+[English]
+Create a new TableOfReal from the following existing columns.
+[Chinese]
+从以下现有列创建新的 TableOfReal。
+====================
+[English]
+Create a new TableOfReal from the following existing rows.
+[Chinese]
+从以下现有行创建新的 TableOfReal。
 ====================
 [English]
 Create an empty PointProcess
@@ -3707,6 +4262,11 @@ CrossCorrelationTable help
 互相关表帮助
 ====================
 [English]
+Crosstabulate
+[Chinese]
+交叉制表 (Crosstabulate)
+====================
+[English]
 Cut
 [Chinese]
 剪切
@@ -3735,6 +4295,11 @@ Dashed line
 Dashed-dotted line
 [Chinese]
 双点划线
+====================
+[English]
+Data scaling
+[Chinese]
+数据缩放
 ====================
 [English]
 Data sets from the literature
@@ -3782,6 +4347,11 @@ Deepen band modulation...
 加深频带调制...
 ====================
 [English]
+Degrees of freedom
+[Chinese]
+自由度 (df)
+====================
+[English]
 Delete log file 1
 [Chinese]
 删除记录文件 1
@@ -3800,6 +4370,26 @@ Demo window
 Demo window not created.
 [Chinese]
 未创建演示窗口。
+====================
+[English]
+Dendrogram
+[Chinese]
+树状图 (Dendrogram)
+====================
+[English]
+Dependent 1 (column name)
+[Chinese]
+因变量 1 (列名)
+====================
+[English]
+Dependent 2 (column name)
+[Chinese]
+因变量 2 (列名)
+====================
+[English]
+Determinant
+[Chinese]
+行列式 (Determinant)
 ====================
 [English]
 Diarization settings
@@ -3855,6 +4445,41 @@ Discard & New
 Discard & Open
 [Chinese]
 放弃并打开
+====================
+[English]
+Discriminant analysis
+[Chinese]
+判别分析 (Discriminant Analysis)
+====================
+[English]
+Discriminant: Draw boundaries
+[Chinese]
+判别分析：绘制决策边界
+====================
+[English]
+Discriminant: To Configuration
+[Chinese]
+判别分析：转为配置 (Configuration)
+====================
+[English]
+Discriminant: To TableOfReal
+[Chinese]
+判别分析：转为实数表格
+====================
+[English]
+Distance matrix
+[Chinese]
+距离矩阵 (Distance Matrix)
+====================
+[English]
+Distributions help
+[Chinese]
+分布 (Distributions) 帮助
+====================
+[English]
+Distributions: To Table
+[Chinese]
+分布：转为表格
 ====================
 [English]
 Do for all times and frequencies:
@@ -4002,6 +4627,11 @@ Draw Intensity
 绘制音强
 ====================
 [English]
+Draw Kruskal stress
+[Chinese]
+绘制 Kruskal 压力值 (Stress)
+====================
+[English]
 Draw MDS class relations
 [Chinese]
 绘制 MDS 类别关系
@@ -4010,6 +4640,11 @@ Draw MDS class relations
 Draw Network
 [Chinese]
 绘制网络
+====================
+[English]
+Draw Shepard diagram
+[Chinese]
+绘制谢泼德图 (Shepard Diagram)
 ====================
 [English]
 Draw TextGrid and Pitch separately
@@ -4047,9 +4682,29 @@ Draw as numbers
 绘制as numbers
 ====================
 [English]
+Draw as numbers if...
+[Chinese]
+绘制为数字 (如果...)...
+====================
+[English]
 Draw as numbers...
 [Chinese]
 绘制as numbers...
+====================
+[English]
+Draw as squares...
+[Chinese]
+绘制为方块...
+====================
+[English]
+Draw biplot
+[Chinese]
+绘制双标图 (Biplot)
+====================
+[English]
+Draw boundary...
+[Chinese]
+绘制边界...
 ====================
 [English]
 Draw circle (mm)...
@@ -4072,6 +4727,11 @@ Draw closed...
 绘制closed...
 ====================
 [English]
+Draw confidence ellipse
+[Chinese]
+绘制置信椭圆
+====================
+[English]
 Draw confusion...
 [Chinese]
 绘制混淆矩阵...
@@ -4087,6 +4747,31 @@ Draw contours...
 绘制等高线/曲线...
 ====================
 [English]
+Draw correlation circles
+[Chinese]
+绘制相关圆
+====================
+[English]
+Draw dendrogram
+[Chinese]
+绘制树状图
+====================
+[English]
+Draw eigenvalues
+[Chinese]
+绘制特征值碎石图 (Scree Plot)
+====================
+[English]
+Draw ellipse (standard deviation)
+[Chinese]
+绘制椭圆 (标准差)
+====================
+[English]
+Draw ellipse (standard deviation)...
+[Chinese]
+绘制椭圆 (标准差)...
+====================
+[English]
 Draw ellipse...
 [Chinese]
 绘制椭圆...
@@ -4095,6 +4780,11 @@ Draw ellipse...
 Draw erb...
 [Chinese]
 绘制erb...
+====================
+[English]
+Draw factor scores
+[Chinese]
+绘制因子得分
 ====================
 [English]
 Draw formant tracks
@@ -4127,6 +4817,16 @@ Draw harmonicity
 绘制谐噪比
 ====================
 [English]
+Draw horizontal lines
+[Chinese]
+绘制水平线
+====================
+[English]
+Draw horizontal lines...
+[Chinese]
+绘制水平线...
+====================
+[English]
 Draw inner box
 [Chinese]
 绘制内侧边框
@@ -4142,9 +4842,24 @@ Draw intensity to picture window:
 绘制音强到图像窗口：
 ====================
 [English]
+Draw left and right lines
+[Chinese]
+绘制左右线
+====================
+[English]
+Draw left and right lines...
+[Chinese]
+绘制左右线...
+====================
+[English]
 Draw line...
 [Chinese]
 绘制直线...
+====================
+[English]
+Draw loadings
+[Chinese]
+绘制载荷图 (Loadings)
 ====================
 [English]
 Draw logarithmic...
@@ -4197,6 +4912,11 @@ Draw rounded rectangle...
 绘制圆角矩形...
 ====================
 [English]
+Draw row from distribution...
+[Chinese]
+从分布中绘制行...
+====================
+[English]
 Draw rows
 [Chinese]
 绘制行
@@ -4215,6 +4935,11 @@ Draw scatter plot matrix...
 Draw scatter plot...
 [Chinese]
 绘制散点图...
+====================
+[English]
+Draw scree plot
+[Chinese]
+绘制碎石图 (Scree Plot)
 ====================
 [English]
 Draw selected sound
@@ -4277,6 +5002,11 @@ Draw splines...
 绘制样条曲线...
 ====================
 [English]
+Draw table as squares
+[Chinese]
+绘制表格为方块
+====================
+[English]
 Draw tableau
 [Chinese]
 绘制表格
@@ -4285,6 +5015,16 @@ Draw tableau
 Draw tableau...
 [Chinese]
 绘制表格...
+====================
+[English]
+Draw top and bottom lines
+[Chinese]
+绘制上下线
+====================
+[English]
+Draw top and bottom lines...
+[Chinese]
+绘制上下线...
 ====================
 [English]
 Draw tracks...
@@ -4300,6 +5040,16 @@ Draw trajectory...
 Draw two-way arrow...
 [Chinese]
 绘制双向箭头...
+====================
+[English]
+Draw vertical lines
+[Chinese]
+绘制垂直线
+====================
+[English]
+Draw vertical lines...
+[Chinese]
+绘制垂直线...
 ====================
 [English]
 Draw visible TextGrid
@@ -4462,6 +5212,11 @@ Dynamic compression (0 - 1):
 动态压缩 (0 - 1)：
 ====================
 [English]
+Dynamic compression (0 – 1)
+[Chinese]
+动态压缩 (0 – 1)
+====================
+[English]
 Dynamic range (dB)
 [Chinese]
 动态范围 (dB)
@@ -4587,6 +5342,21 @@ Eigen
 特征值与特征向量
 ====================
 [English]
+Eigenvalues
+[Chinese]
+特征值 (Eigenvalues)
+====================
+[English]
+Eigenvalues and eigenvectors
+[Chinese]
+特征值与特征向量
+====================
+[English]
+Eigenvectors
+[Chinese]
+特征向量 (Eigenvectors)
+====================
+[English]
 Empty formula.
 [Chinese]
 公式为空。
@@ -4627,6 +5397,11 @@ English
 英文 (English)
 ====================
 [English]
+Equal variances
+[Chinese]
+等方差假设
+====================
+[English]
 Equal?
 [Chinese]
 是否相等？
@@ -4655,6 +5430,16 @@ Erase first
 Erase text
 [Chinese]
 清除文本
+====================
+[English]
+Euclidean distance
+[Chinese]
+欧氏距离 (Euclidean Distance)
+====================
+[English]
+Exact test (Fisher)
+[Chinese]
+精确检验 (Fisher)
 ====================
 [English]
 Excitation Formula
@@ -4762,9 +5547,39 @@ Extract all channels
 提取所有通道
 ====================
 [English]
+Extract all columns where row...
+[Chinese]
+提取所有符合该行条件的列...
+====================
+[English]
+Extract all columns whose label...
+[Chinese]
+提取所有符合该标签条件的列...
+====================
+[English]
+Extract all columns with at least one cell where the following condition holds.
+[Chinese]
+提取至少有一个单元格满足以下条件的所有列。
+====================
+[English]
 Extract all intervals...
 [Chinese]
 提取所有区间...
+====================
+[English]
+Extract all rows where column...
+[Chinese]
+提取所有符合该列条件的行...
+====================
+[English]
+Extract all rows whose label...
+[Chinese]
+提取所有符合该标签条件的行...
+====================
+[English]
+Extract all rows with at least one cell where the following condition holds.
+[Chinese]
+提取至少有一个单元格满足以下条件的所有行。
 ====================
 [English]
 Extract amplitude tier...
@@ -4800,6 +5615,51 @@ Extract channels...
 Extract collision phase tier
 [Chinese]
 提取碰撞相位层
+====================
+[English]
+Extract column labels as Strings
+[Chinese]
+提取列标签为 Strings
+====================
+[English]
+Extract columns by number
+[Chinese]
+按列号提取列
+====================
+[English]
+Extract columns by number... || Extract column ranges...
+[Chinese]
+按列号提取列... || 提取列范围...
+====================
+[English]
+Extract columns where
+[Chinese]
+提取符合条件的列
+====================
+[English]
+Extract columns where row
+[Chinese]
+根据行值提取列
+====================
+[English]
+Extract columns where row...
+[Chinese]
+根据行值提取列...
+====================
+[English]
+Extract columns where...
+[Chinese]
+提取符合条件的列...
+====================
+[English]
+Extract columns whose label...
+[Chinese]
+提取符合该标签的列...
+====================
+[English]
+Extract columns whose label... || Extract columns where label...
+[Chinese]
+提取符合该标签的列... || 根据标签提取列...
 ====================
 [English]
 Extract double pulsing tier
@@ -4945,6 +5805,61 @@ Extract results
 Extract right channel
 [Chinese]
 提取右通道
+====================
+[English]
+Extract row labels as Strings
+[Chinese]
+提取行标签为 Strings
+====================
+[English]
+Extract rows by number
+[Chinese]
+按行号提取行
+====================
+[English]
+Extract rows by number... || Extract row ranges...
+[Chinese]
+按行号提取行... || 提取行范围...
+====================
+[English]
+Extract rows where
+[Chinese]
+提取符合条件的行
+====================
+[English]
+Extract rows where column
+[Chinese]
+根据列值提取行
+====================
+[English]
+Extract rows where column (number)... || Extract rows where column... || Select rows where column...
+[Chinese]
+根据列值提取行 (数值)... || 根据列值提取行... || 选择满足列条件的行...
+====================
+[English]
+Extract rows where column (text)...
+[Chinese]
+根据列值提取行 (文本)...
+====================
+[English]
+Extract rows where column...
+[Chinese]
+根据列值提取行...
+====================
+[English]
+Extract rows where...
+[Chinese]
+提取满足条件的行...
+====================
+[English]
+Extract rows whose label
+[Chinese]
+提取满足该标签的行
+====================
+[English]
+Extract rows whose label... || Extract rows where label...
+[Chinese]
+提取满足该标签的行... || 根据标签提取行...
 ====================
 [English]
 Extract selected TextGrid (preserve times)
@@ -5095,6 +6010,16 @@ F/B 权重(0-1)
 FAQ (Frequently Asked Questions)
 [Chinese]
 常见问题 (FAQ)
+====================
+[English]
+Factor analysis
+[Chinese]
+因子分析 (Factor Analysis)
+====================
+[English]
+Factor rotation
+[Chinese]
+因子旋转
 ====================
 [English]
 Feedforward neural networks
@@ -5357,6 +6282,11 @@ Formant listing
 共振峰列表
 ====================
 [English]
+Formant number
+[Chinese]
+共振峰序号
+====================
+[English]
 Formant settings
 [Chinese]
 共振峰设置
@@ -5547,6 +6477,11 @@ Formula (blue)...
 Formula (蓝色)...
 ====================
 [English]
+Formula (column range)...
+[Chinese]
+公式 (列范围)...
+====================
+[English]
 Formula (frequencies)...
 [Chinese]
 公式 (频率)...
@@ -5590,6 +6525,11 @@ Forward
 Fourier
 [Chinese]
 傅里叶 (Fourier)
+====================
+[English]
+Fraction of variance accounted for
+[Chinese]
+解释方差比例
 ====================
 [English]
 Frequency
@@ -5652,9 +6592,24 @@ From Formant to Matrix
 From Formant to 矩阵
 ====================
 [English]
+From column
+[Chinese]
+起始列
+====================
+[English]
+From column (name)
+[Chinese]
+起始列 (名称)
+====================
+[English]
 From end to centre
 [Chinese]
 从末尾到中心
+====================
+[English]
+From row
+[Chinese]
+起始行
 ====================
 [English]
 From start to centre
@@ -5682,6 +6637,21 @@ Gaussian
 高斯窗 (Gaussian)
 ====================
 [English]
+Gaussian mixture
+[Chinese]
+高斯混合模型 (GMM)
+====================
+[English]
+GaussianMixture: To Table
+[Chinese]
+高斯混合模型：转为表格
+====================
+[English]
+Generate two Strings objects
+[Chinese]
+生成两个 Strings 对象
+====================
+[English]
 Generics
 [Chinese]
 通用
@@ -5697,6 +6667,11 @@ Get AmplitudeTier value
 获取振幅层 value
 ====================
 [English]
+Get Bartlett's sphericity
+[Chinese]
+获取 Bartlett 球形度
+====================
+[English]
 Get DurationTier value
 [Chinese]
 获取时长层 value
@@ -5707,14 +6682,49 @@ Get IntensityTier value
 获取音强层 value
 ====================
 [English]
+Get Kaiser-Meyer-Olkin
+[Chinese]
+获取 KMO 检验值
+====================
+[English]
+Get Kendall's W
+[Chinese]
+获取 Kendall 协调系数 (W)
+====================
+[English]
+Get Kruskal-Wallis
+[Chinese]
+获取 Kruskal-Wallis 检验
+====================
+[English]
+Get Mahalanobis distance
+[Chinese]
+获取马氏距离 (Mahalanobis Distance)
+====================
+[English]
+Get Mann-Whitney U
+[Chinese]
+获取 Mann-Whitney U 检验
+====================
+[English]
 Get RealTier value
 [Chinese]
 获取实数层 value
 ====================
 [English]
+Get Spearman rank correlation
+[Chinese]
+获取 Spearman 秩相关
+====================
+[English]
 Get Whisper model name
 [Chinese]
 获取Whisper model name
+====================
+[English]
+Get Wilks' lambda
+[Chinese]
+获取 Wilks' lambda
 ====================
 [English]
 Get absolute extremum...
@@ -5725,6 +6735,16 @@ Get absolute extremum...
 Get all candidates in frame...
 [Chinese]
 获取all candidates in frame...
+====================
+[English]
+Get all numbers in column...
+[Chinese]
+获取列中所有数字...
+====================
+[English]
+Get all texts in column...
+[Chinese]
+获取列中所有文本...
 ====================
 [English]
 Get all values
@@ -5862,14 +6882,74 @@ Get column distance
 获取column distance
 ====================
 [English]
+Get column index
+[Chinese]
+获取列序号
+====================
+[English]
+Get column index (label)
+[Chinese]
+获取列序号 (按标签)
+====================
+[English]
+Get column index (label)...
+[Chinese]
+获取列序号 (按标签)...
+====================
+[English]
+Get column index...
+[Chinese]
+获取列序号...
+====================
+[English]
 Get column label
 [Chinese]
 获取列标签
 ====================
 [English]
+Get column label (index)...
+[Chinese]
+获取列标签 (按序号)...
+====================
+[English]
 Get column label...
 [Chinese]
 获取列标签...
+====================
+[English]
+Get column mean
+[Chinese]
+获取列均值
+====================
+[English]
+Get column mean (index)...
+[Chinese]
+获取列均值 (按序号)...
+====================
+[English]
+Get column mean (label)...
+[Chinese]
+获取列均值 (按标签)...
+====================
+[English]
+Get column standard deviation
+[Chinese]
+获取列标准差
+====================
+[English]
+Get column stdev
+[Chinese]
+获取列标准差
+====================
+[English]
+Get column stdev (index)...
+[Chinese]
+获取列标准差 (按序号)...
+====================
+[English]
+Get column stdev (label)...
+[Chinese]
+获取列标准差 (按标签)...
 ====================
 [English]
 Get constraint...
@@ -6007,6 +7087,16 @@ Get fourth formant
 获取第四共振峰
 ====================
 [English]
+Get fraction correct (maximum likelihood)
+[Chinese]
+获取正确率 (极大似然估计)
+====================
+[English]
+Get fraction correct (probability matching)
+[Chinese]
+获取正确率 (概率匹配)
+====================
+[English]
 Get frame number from time
 [Chinese]
 获取frame number from time
@@ -6075,6 +7165,11 @@ Get frication bypass at time...
 Get gain in frame...
 [Chinese]
 获取增益 in 帧...
+====================
+[English]
+Get group mean...
+[Chinese]
+获取分组均值...
 ====================
 [English]
 Get high index
@@ -6337,9 +7432,19 @@ Get mean (points)...
 获取mean (points)...
 ====================
 [English]
+Get mean absolute difference...
+[Chinese]
+获取平均绝对差...
+====================
+[English]
 Get mean absolute slope...
 [Chinese]
 获取mean absolute slope...
+====================
+[English]
+Get mean difference
+[Chinese]
+获取平均差异
 ====================
 [English]
 Get mean period...
@@ -6442,6 +7547,11 @@ Get number of intervals...
 获取区间数量...
 ====================
 [English]
+Get number of pairs
+[Chinese]
+获取数据对数量
+====================
+[English]
 Get number of periods...
 [Chinese]
 获取number of periods...
@@ -6542,6 +7652,16 @@ Get power...
 获取功率...
 ====================
 [English]
+Get probability
+[Chinese]
+获取概率
+====================
+[English]
+Get probability (label)...
+[Chinese]
+获取概率 (按标签)...
+====================
+[English]
 Get quantile of bandwidth...
 [Chinese]
 获取quantile of bandwidth...
@@ -6580,6 +7700,16 @@ Get root-mean-square...
 Get row distance
 [Chinese]
 获取row distance
+====================
+[English]
+Get row index
+[Chinese]
+获取行序号
+====================
+[English]
+Get row index...
+[Chinese]
+获取行序号...
 ====================
 [English]
 Get row label
@@ -6862,6 +7992,26 @@ Get string...
 获取string...
 ====================
 [English]
+Get string1
+[Chinese]
+获取字符串 1
+====================
+[English]
+Get string1...
+[Chinese]
+获取字符串 1...
+====================
+[English]
+Get string2
+[Chinese]
+获取字符串 2
+====================
+[English]
+Get string2...
+[Chinese]
+获取字符串 2...
+====================
+[English]
 Get sum
 [Chinese]
 获取sum
@@ -6972,6 +8122,11 @@ Get total duration || Get duration
 获取总时长 || 获取时长
 ====================
 [English]
+Get value
+[Chinese]
+获取值
+====================
+[English]
 Get value at frequency...
 [Chinese]
 获取value at frequency...
@@ -7025,6 +8180,11 @@ Get value in frame
 Get value in frame...
 [Chinese]
 获取value in frame...
+====================
+[English]
+Get value...
+[Chinese]
+获取值...
 ====================
 [English]
 Get voicing amplitude at time...
@@ -7097,6 +8257,11 @@ Goodies
 小工具 (Goodies)
 ====================
 [English]
+Goodness of fit
+[Chinese]
+拟合优度
+====================
+[English]
 Green
 [Chinese]
 绿色
@@ -7112,9 +8277,29 @@ Group
 分组
 ====================
 [English]
+Group 1
+[Chinese]
+组 1
+====================
+[English]
+Group 2
+[Chinese]
+组 2
+====================
+[English]
+Group column
+[Chinese]
+分组列
+====================
+[English]
 Group...
 [Chinese]
 分组...
+====================
+[English]
+HMM: To Table
+[Chinese]
+隐马尔可夫模型 (HMM)：转为表格
 ====================
 [English]
 Hack
@@ -7247,14 +8432,34 @@ Hide menu command...
 隐藏菜单命令...
 ====================
 [English]
+Hierarchical clustering
+[Chinese]
+层次聚类 (Hierarchical Clustering)
+====================
+[English]
 Hint: to label or segment an existing Sound,
 [Chinese]
 提示：若要对现有声音进行标注或切分，
 ====================
 [English]
+Histogram
+[Chinese]
+直方图 (Histogram)
+====================
+[English]
 Home
 [Chinese]
 主页
+====================
+[English]
+Horizontal column
+[Chinese]
+水平轴对应列
+====================
+[English]
+Horizontal factor
+[Chinese]
+水平因子
 ====================
 [English]
 Horizontal mm to world coordinates... || Horizontal mm to wc...
@@ -7295,6 +8500,11 @@ How to view...
 Hum
 [Chinese]
 蜂鸣声
+====================
+[English]
+Hypothesis test
+[Chinese]
+假设检验
 ====================
 [English]
 ISpline help
@@ -7357,6 +8567,11 @@ Include phonemes
 包含音素
 ====================
 [English]
+Include row numbers
+[Chinese]
+包含行号
+====================
+[English]
 Include tier names
 [Chinese]
 包含层名称
@@ -7365,6 +8580,11 @@ Include tier names
 Include words
 [Chinese]
 包含单词
+====================
+[English]
+Individual Differences Scaling (INDSCAL)
+[Chinese]
+个体差异多维缩放 (INDSCAL)
 ====================
 [English]
 Info
@@ -7412,6 +8632,21 @@ Insert boundary...
 插入边界...
 ====================
 [English]
+Insert column
+[Chinese]
+插入列
+====================
+[English]
+Insert column (index)...
+[Chinese]
+插入列 (按序号)...
+====================
+[English]
+Insert column...
+[Chinese]
+插入列...
+====================
+[English]
 Insert interval tier...
 [Chinese]
 插入区间层...
@@ -7435,6 +8670,21 @@ Insert point tier...
 Insert point...
 [Chinese]
 插入点...
+====================
+[English]
+Insert row
+[Chinese]
+插入行
+====================
+[English]
+Insert row (index)...
+[Chinese]
+插入行 (按序号)...
+====================
+[English]
+Insert row...
+[Chinese]
+插入行...
 ====================
 [English]
 Insert string...
@@ -7652,6 +8902,11 @@ Intro 6.2. Configuring the intensity contour
 Intro 6.2. 配置音强曲线
 ====================
 [English]
+Invert colours
+[Chinese]
+反转颜色
+====================
+[English]
 Is interval tier...
 [Chinese]
 是否为区间层？...
@@ -7672,6 +8927,11 @@ It is where your next drawing will appear.
 您的下一次绘制将显示在此处。
 ====================
 [English]
+K-means clustering
+[Chinese]
+K-均值聚类 (K-means)
+====================
+[English]
 Keep visible version
 [Chinese]
 保留当前可见版本
@@ -7685,6 +8945,11 @@ Kill octave jumps
 KlattGrid help
 [Chinese]
 KlattGrid 帮助
+====================
+[English]
+Kruskal-Wallis test
+[Chinese]
+Kruskal-Wallis 检验
 ====================
 [English]
 LPC -- Pitch  ("LPC pitch manipulation")
@@ -7802,6 +9067,11 @@ Linear
 线性
 ====================
 [English]
+Linear Discriminant Analysis (LDA)
+[Chinese]
+线性判别分析 (LDA)
+====================
+[English]
 Links to this page
 [Chinese]
 指向此页面的链接
@@ -7867,9 +9137,19 @@ Log 1
 记录 1
 ====================
 [English]
+Log 1 format:
+[Chinese]
+日志 1 格式：
+====================
+[English]
 Log 2
 [Chinese]
 记录 2
+====================
+[English]
+Log 2 format:
+[Chinese]
+日志 2 格式：
 ====================
 [English]
 Log files
@@ -7925,6 +9205,11 @@ Logarithmic marks right...
 Logarithmic marks top...
 [Chinese]
 顶部对数刻度...
+====================
+[English]
+LogisticRegression: Draw boundary
+[Chinese]
+逻辑回归：绘制决策边界
 ====================
 [English]
 LongSound help
@@ -8092,6 +9377,11 @@ Magenta
 品红
 ====================
 [English]
+Mahalanobis distance
+[Chinese]
+马氏距离
+====================
+[English]
 Manipulate -
 [Chinese]
 操作 -
@@ -8100,6 +9390,11 @@ Manipulate -
 Manipulation help
 [Chinese]
 操纵对象帮助
+====================
+[English]
+Mann-Whitney test
+[Chinese]
+Mann-Whitney 检验
 ====================
 [English]
 Manual help
@@ -8115,6 +9410,16 @@ Margins
 Margins:
 [Chinese]
 边距：
+====================
+[English]
+Mark size (mm)
+[Chinese]
+标记尺寸 (毫米)
+====================
+[English]
+Mark string (+xo.)
+[Chinese]
+标记字符 (+xo.)
 ====================
 [English]
 Marks
@@ -8602,6 +9907,11 @@ Movie: Paint one image
 电影：绘制单帧图像
 ====================
 [English]
+Multidimensional Scaling (MDS)
+[Chinese]
+多维缩放 (MDS)
+====================
+[English]
 Multidimensional scaling
 [Chinese]
 多维标度分析
@@ -8637,6 +9947,11 @@ Multiply...
 乘...
 ====================
 [English]
+Multivariate Analysis of Variance (MANOVA)
+[Chinese]
+多元方差分析 (MANOVA)
+====================
+[English]
 Mute channels
 [Chinese]
 静音通道
@@ -8647,9 +9962,19 @@ Mute channels...
 静音通道...
 ====================
 [English]
+Name of first Strings
+[Chinese]
+第一个 Strings 的名称
+====================
+[English]
 Name of new object
 [Chinese]
 新对象名称
+====================
+[English]
+Name of second Strings
+[Chinese]
+第二个 Strings 的名称
 ====================
 [English]
 Name:
@@ -8707,6 +10032,11 @@ New interval:
 新建区间：
 ====================
 [English]
+New label
+[Chinese]
+新标签
+====================
+[English]
 New name
 [Chinese]
 新名称
@@ -8715,6 +10045,11 @@ New name
 New tier:
 [Chinese]
 新建层：
+====================
+[English]
+New weight
+[Chinese]
+新权重
 ====================
 [English]
 Next not allowed word...
@@ -8787,6 +10122,11 @@ No tier
 无层
 ====================
 [English]
+Non-metric Multidimensional Scaling
+[Chinese]
+非度量多维缩放 (NMDS)
+====================
+[English]
 Non-speech interval label
 [Chinese]
 非言语区间标签
@@ -8807,6 +10147,26 @@ Note: this setting works for the next long sound file that you open,
 注意：此设置仅对下一次打开的长音频文件生效，
 ====================
 [English]
+Number of clusters
+[Chinese]
+聚类簇数
+====================
+[English]
+Number of columns
+[Chinese]
+列数
+====================
+[English]
+Number of components
+[Chinese]
+主成分数量
+====================
+[English]
+Number of factors
+[Chinese]
+因子数量
+====================
+[English]
 Number of formants
 [Chinese]
 共振峰数量
@@ -8820,6 +10180,21 @@ Number of frequency steps
 Number of frequency steps:
 [Chinese]
 频率步数：
+====================
+[English]
+Number of rows
+[Chinese]
+行数
+====================
+[English]
+Number of sigmas
+[Chinese]
+标准差倍数 (sigmas)
+====================
+[English]
+Number of strings
+[Chinese]
+字符串数量
 ====================
 [English]
 Number of threads for diarization:
@@ -8887,6 +10262,16 @@ Octave-jump cost
 倍频程跳跃惩罚
 ====================
 [English]
+Old label
+[Chinese]
+旧标签
+====================
+[English]
+Old name
+[Chinese]
+旧名称
+====================
+[English]
 Olive
 [Chinese]
 橄榄绿
@@ -8935,6 +10320,16 @@ One mark right...
 One mark top...
 [Chinese]
 顶部单刻度...
+====================
+[English]
+One-tailed unconfidence
+[Chinese]
+单尾不置信度
+====================
+[English]
+One-way ANOVA
+[Chinese]
+单因素方差分析 (One-way ANOVA)
 ====================
 [English]
 Open
@@ -9117,6 +10512,26 @@ Paint...
 绘制...
 ====================
 [English]
+Pair number
+[Chinese]
+对序号
+====================
+[English]
+PairDistribution & Distributions: Get fraction correct
+[Chinese]
+PairDistribution & Distributions：获取正确率
+====================
+[English]
+PairDistribution help
+[Chinese]
+PairDistribution 帮助
+====================
+[English]
+Pairwise comparisons
+[Chinese]
+事后两两比较 (Pairwise comparisons)
+====================
+[English]
 Palatino
 [Chinese]
 Palatino 优雅体
@@ -9125,6 +10540,11 @@ Palatino 优雅体
 ParamCurve help
 [Chinese]
 参数曲线帮助
+====================
+[English]
+Partial correlation
+[Chinese]
+偏相关 (Partial Correlation)
 ====================
 [English]
 Pass band...
@@ -10017,6 +11437,11 @@ PortAudio cannot open sound output:
 PortAudio 无法打开声音输出：
 ====================
 [English]
+Position
+[Chinese]
+位置
+====================
+[English]
 PostScript settings
 [Chinese]
 PostScript 设置
@@ -10372,6 +11797,11 @@ Pre-emphasize (in-place)... || Pre-emphasize (in-line)...
 预加重 (就地)... || 预加重 (行)...
 ====================
 [English]
+Precision
+[Chinese]
+精度
+====================
+[English]
 Preferences
 [Chinese]
 偏好设置
@@ -10390,6 +11820,21 @@ Preserve times
 Previous page
 [Chinese]
 上一页
+====================
+[English]
+Principal Component Analysis (PCA)
+[Chinese]
+主成分分析 (PCA)
+====================
+[English]
+Principal Component Analysis...
+[Chinese]
+主成分分析 (PCA)...
+====================
+[English]
+Principal components
+[Chinese]
+主成分
 ====================
 [English]
 Print
@@ -10425,6 +11870,26 @@ Print...
 Privacy and security
 [Chinese]
 隐私与安全
+====================
+[English]
+Probability density function
+[Chinese]
+概率密度函数 (PDF)
+====================
+[English]
+Procrustes analysis
+[Chinese]
+普氏分析 (Procrustes Analysis)
+====================
+[English]
+Procrustes: Draw transformation
+[Chinese]
+普氏分析：绘制变换
+====================
+[English]
+Procrustes: To Configuration
+[Chinese]
+普氏分析：转为配置
 ====================
 [English]
 Programming
@@ -10515,6 +11980,16 @@ Pulses settings:
 Purple
 [Chinese]
 紫色
+====================
+[English]
+Quadratic Discriminant Analysis (QDA)
+[Chinese]
+二次判别分析 (QDA)
+====================
+[English]
+Quantile
+[Chinese]
+分位数
 ====================
 [English]
 Query
@@ -10620,6 +12095,11 @@ Quit Praat
 Randomize
 [Chinese]
 随机化
+====================
+[English]
+Randomize rows
+[Chinese]
+随机打乱行
 ====================
 [English]
 Range in semitones re 100 Hz:
@@ -10937,6 +12417,16 @@ Reduce noise...
 降噪...
 ====================
 [English]
+Reflect rows
+[Chinese]
+反转行顺序
+====================
+[English]
+Regression analysis
+[Chinese]
+回归分析
+====================
+[English]
 Remove
 [Chinese]
 移除
@@ -10975,6 +12465,11 @@ Remove channel...
 Remove column
 [Chinese]
 移除列
+====================
+[English]
+Remove column (index)...
+[Chinese]
+删除列 (按序号)...
 ====================
 [English]
 Remove column...
@@ -11077,6 +12572,11 @@ Remove row
 移除行
 ====================
 [English]
+Remove row (index)...
+[Chinese]
+删除行 (按序号)...
+====================
+[English]
 Remove row...
 [Chinese]
 移除行...
@@ -11102,6 +12602,31 @@ Remove unshared stimuli
 删除未共享刺激
 ====================
 [English]
+Remove zero weights
+[Chinese]
+删除零权重项
+====================
+[English]
+Rename column
+[Chinese]
+重命名列
+====================
+[English]
+Rename column (by column number)
+[Chinese]
+重命名列 (按列号)
+====================
+[English]
+Rename column (by number)... || Set column label (index)...
+[Chinese]
+重命名列 (按列号)... || 设置列标签 (按序号)...
+====================
+[English]
+Rename column... || Set column label (label)...
+[Chinese]
+重命名列... || 设置列标签 (按标签)...
+====================
+[English]
 Rename object
 [Chinese]
 重命名对象
@@ -11125,6 +12650,11 @@ Rename...
 Reopen from disk
 [Chinese]
 从磁盘重新打开
+====================
+[English]
+Repeated measures ANOVA
+[Chinese]
+重复测量方差分析
 ====================
 [English]
 Replace
@@ -11177,6 +12707,36 @@ Report app properties
 报告应用属性
 ====================
 [English]
+Report correlation (Kendall tau)
+[Chinese]
+报告相关性 (Kendall tau)
+====================
+[English]
+Report correlation (Kendall tau)...
+[Chinese]
+报告相关性 (Kendall tau)...
+====================
+[English]
+Report correlation (Pearson r)
+[Chinese]
+报告相关性 (Pearson r)
+====================
+[English]
+Report correlation (Pearson r)...
+[Chinese]
+报告相关性 (Pearson r)...
+====================
+[English]
+Report difference (Student t)
+[Chinese]
+报告差异 (Student t 检验)
+====================
+[English]
+Report difference (Student t)...
+[Chinese]
+报告差异 (Student t 检验)...
+====================
+[English]
 Report difference of two proportions
 [Chinese]
 报告两个比例的差异
@@ -11202,9 +12762,49 @@ Report graphical properties
 报告图形属性
 ====================
 [English]
+Report group difference (Student t)
+[Chinese]
+报告组间差异 (Student t 检验)
+====================
+[English]
+Report group difference (Student t)...
+[Chinese]
+报告组间差异 (Student t 检验)...
+====================
+[English]
+Report group difference (Wilcoxon rank sum)
+[Chinese]
+报告组间差异 (Wilcoxon 秩和检验)
+====================
+[English]
+Report group difference (Wilcoxon rank sum)...
+[Chinese]
+报告组间差异 (Wilcoxon 秩和检验)...
+====================
+[English]
+Report group mean (Student t)
+[Chinese]
+报告组均值 (Student t 检验)
+====================
+[English]
+Report group mean (Student t)...
+[Chinese]
+报告组均值 (Student t 检验)...
+====================
+[English]
 Report integer properties
 [Chinese]
 报告整型属性
+====================
+[English]
+Report mean (Student t)
+[Chinese]
+报告均值 (Student t 检验)
+====================
+[English]
+Report mean (Student t)...
+[Chinese]
+报告均值 (Student t 检验)...
 ====================
 [English]
 Report memory use
@@ -11215,6 +12815,11 @@ Report memory use
 Report sound server properties
 [Chinese]
 报告声音服务器属性
+====================
+[English]
+Report standard deviation...
+[Chinese]
+报告标准差...
 ====================
 [English]
 Report system properties
@@ -11240,6 +12845,11 @@ Reporting a problem?
 Resample...
 [Chinese]
 重采样...
+====================
+[English]
+Residual sum of squares
+[Chinese]
+残差平方和 (RSS)
 ====================
 [English]
 ResultsMFC: Get response
@@ -11317,6 +12927,11 @@ Roots: Draw
 根：绘制
 ====================
 [English]
+Rotation method
+[Chinese]
+旋转方法
+====================
+[English]
 Row
 [Chinese]
 行
@@ -11325,6 +12940,16 @@ Row
 Row label
 [Chinese]
 行标签
+====================
+[English]
+Row number
+[Chinese]
+行号
+====================
+[English]
+Rows to columns...
+[Chinese]
+行列转置...
 ====================
 [English]
 Run
@@ -11347,6 +12972,11 @@ Run selection
 运行选区 (代码)
 ====================
 [English]
+SSCP: To Covariance
+[Chinese]
+SSCP：转为协方差矩阵
+====================
+[English]
 Salesperson...
 [Chinese]
 旅行商问题 (TSP)...
@@ -11355,6 +12985,11 @@ Salesperson...
 Sample number
 [Chinese]
 采样号
+====================
+[English]
+Sample size
+[Chinese]
+样本量
 ====================
 [English]
 Sampling
@@ -11757,6 +13392,11 @@ Save as short text file... || Write to short text file...
 保存为短文本文件... || 写入短文本文件...
 ====================
 [English]
+Save as tab-separated file... || Save as table file... || Write to table file...
+[Chinese]
+保存为制表符分隔文件... || 保存为表格文件... || 写入表格文件...
+====================
+[English]
 Save as text file without Sound... || Write to text file without Sound...
 [Chinese]
 保存为text file without 声音... || 写入text file without 声音...
@@ -12137,9 +13777,24 @@ Scatter plot
 散点图
 ====================
 [English]
+Scatter plot (mark)...
+[Chinese]
+散点图 (标记)...
+====================
+[English]
+Scatter plot (marks)
+[Chinese]
+散点图 (标记)
+====================
+[English]
 Scatter plot...
 [Chinese]
 散点图...
+====================
+[English]
+Scree plot
+[Chinese]
+碎石图 (Scree plot)
 ====================
 [English]
 Scripting tutorial
@@ -12170,6 +13825,11 @@ Search Praat manual
 Search Praat manual...
 [Chinese]
 搜索 Praat 手册...
+====================
+[English]
+Search column...
+[Chinese]
+搜索列...
 ====================
 [English]
 Search for page
@@ -12205,6 +13865,16 @@ Search manual...
 Search:
 [Chinese]
 搜索:
+====================
+[English]
+Secondary column
+[Chinese]
+次要列
+====================
+[English]
+Secondary sorting keys:
+[Chinese]
+次要排序键：
 ====================
 [English]
 Segmentation step (0-1)
@@ -12429,6 +14099,11 @@ Set column label
 设置列标签
 ====================
 [English]
+Set column label (index)...
+[Chinese]
+设置列标签 (按序号)...
+====================
+[English]
 Set column label (label)...
 [Chinese]
 设置列标签(标签)...
@@ -12489,6 +14164,11 @@ Set length
 设置长度
 ====================
 [English]
+Set numeric value...
+[Chinese]
+设置数值...
+====================
+[English]
 Set part to zero...
 [Chinese]
 设置部分为零...
@@ -12514,6 +14194,11 @@ Set row label
 设置行标签
 ====================
 [English]
+Set row label (index)...
+[Chinese]
+设置行标签 (按序号)...
+====================
+[English]
 Set row label (label)...
 [Chinese]
 设置行标签(标签)...
@@ -12529,6 +14214,11 @@ Set selection:
 设置选择部分：
 ====================
 [English]
+Set string value...
+[Chinese]
+设置字符串值...
+====================
+[English]
 Set string...
 [Chinese]
 设置string...
@@ -12537,6 +14227,11 @@ Set string...
 Set tier name...
 [Chinese]
 设置层名称...
+====================
+[English]
+Set value
+[Chinese]
+设置值
 ====================
 [English]
 Set value at sample number...
@@ -12587,6 +14282,11 @@ Settings that influence both jitter and shimmer:
 Settings...
 [Chinese]
 设置...
+====================
+[English]
+Shepard plot
+[Chinese]
+谢泼德图 (Shepard plot)
 ====================
 [English]
 Shift
@@ -12686,7 +14386,7 @@ Show all
 [English]
 Show analyses
 [Chinese]
-显示分析
+显示分析项
 ====================
 [English]
 Show analyses...
@@ -12744,6 +14444,11 @@ Show spectrogram
 显示声谱图
 ====================
 [English]
+Significance level
+[Chinese]
+显著性水平 (alpha)
+====================
+[English]
 Silence after (s)
 [Chinese]
 后置静音 (秒)
@@ -12762,6 +14467,11 @@ Silence threshold
 Silver
 [Chinese]
 银色
+====================
+[English]
+Similarity matrix
+[Chinese]
+相似度矩阵 (Similarity Matrix)
 ====================
 [English]
 Slope constraint
@@ -12797,6 +14507,31 @@ Solid line
 Sort
 [Chinese]
 排序
+====================
+[English]
+Sort by column...
+[Chinese]
+按列排序...
+====================
+[English]
+Sort by label...
+[Chinese]
+按标签排序...
+====================
+[English]
+Sort rows by column
+[Chinese]
+按列对行排序
+====================
+[English]
+Sort rows by label
+[Chinese]
+按标签对行排序
+====================
+[English]
+Sort rows...
+[Chinese]
+对行排序...
 ====================
 [English]
 Sound
@@ -13324,6 +15059,11 @@ Speaker help
 说话人帮助
 ====================
 [English]
+Speckle
+[Chinese]
+散点 (Speckle)
+====================
+[English]
 Speckle erb...
 [Chinese]
 绘制散点图 (等效矩形带宽/ERB)...
@@ -13384,6 +15124,16 @@ Spectrogram analysis settings:
 声谱图分析设置：
 ====================
 [English]
+Spectrogram colour settings
+[Chinese]
+声谱图颜色设置
+====================
+[English]
+Spectrogram colour settings...
+[Chinese]
+声谱图颜色设置...
+====================
+[English]
 Spectrogram help
 [Chinese]
 声谱图帮助
@@ -13406,7 +15156,7 @@ Spectrogram view settings
 [English]
 Spectrogram view settings:
 [Chinese]
-声谱图显示设置：
+声谱图视图设置：
 ====================
 [English]
 Spectrogram: Formula
@@ -13654,6 +15404,11 @@ Spell
 拼写 (Spell)
 ====================
 [English]
+Standardized coefficients
+[Chinese]
+标准化系数
+====================
+[English]
 Standards
 [Chinese]
 标准值
@@ -13712,6 +15467,21 @@ Stop band...
 Stop playing sound
 [Chinese]
 停止播放声音
+====================
+[English]
+Stress formula 1
+[Chinese]
+压力值公式 1 (Stress 1)
+====================
+[English]
+Stress formula 2
+[Chinese]
+压力值公式 2 (Stress 2)
+====================
+[English]
+String value
+[Chinese]
+字符串值
 ====================
 [English]
 Strings
@@ -13784,9 +15554,19 @@ Subtract trend line...
 减去趋势线...
 ====================
 [English]
+Summary statistics
+[Chinese]
+统计摘要 (Summary Statistics)
+====================
+[English]
 Suppress "Links to this page"
 [Chinese]
 取消“指向此页面的链接”
+====================
+[English]
+Swap inputs and outputs
+[Chinese]
+交换输入与输出
 ====================
 [English]
 Symmetric
@@ -13834,6 +15614,21 @@ Table: Append difference column
 表格：追加差异列
 ====================
 [English]
+Table: Append product column
+[Chinese]
+表格：追加乘积列
+====================
+[English]
+Table: Append quotient column
+[Chinese]
+表格：追加商列
+====================
+[English]
+Table: Append sum column
+[Chinese]
+表格：追加求和列
+====================
+[English]
 Table: Bar plot
 [Chinese]
 表格：条形图
@@ -13849,9 +15644,34 @@ Table: Collapse rows
 表格：折叠行
 ====================
 [English]
+Table: Down to TableOfReal
+[Chinese]
+表格：降为实数表格 (TableOfReal)
+====================
+[English]
+Table: Draw row from distribution
+[Chinese]
+表格：按分布绘制行
+====================
+[English]
+Table: Extract rows where column (number)
+[Chinese]
+表格：按列值提取行 (数值)
+====================
+[English]
+Table: Extract rows where column (text)
+[Chinese]
+表格：按列值提取行 (文本)
+====================
+[English]
 Table: Formula
 [Chinese]
 表格：公式
+====================
+[English]
+Table: Formula (column range)
+[Chinese]
+表格：公式 (列范围)
 ====================
 [English]
 Table: Formula...
@@ -13859,14 +15679,94 @@ Table: Formula...
 表格：公式...
 ====================
 [English]
+Table: Get all numbers in column
+[Chinese]
+表格：获取列中所有数字
+====================
+[English]
+Table: Get all texts in column
+[Chinese]
+表格：获取列中所有文本
+====================
+[English]
+Table: Get column index
+[Chinese]
+表格：获取列序号
+====================
+[English]
 Table: Get column label
 [Chinese]
 表格：获取列标签
 ====================
 [English]
+Table: Get group mean
+[Chinese]
+表格：获取分组均值
+====================
+[English]
+Table: Get maximum
+[Chinese]
+表格：获取最大值
+====================
+[English]
+Table: Get mean
+[Chinese]
+表格：获取均值
+====================
+[English]
+Table: Get minimum
+[Chinese]
+表格：获取最小值
+====================
+[English]
+Table: Get quantile
+[Chinese]
+表格：获取分位数
+====================
+[English]
+Table: Get standard deviation
+[Chinese]
+表格：获取标准差
+====================
+[English]
+Table: Get sum
+[Chinese]
+表格：获取总和
+====================
+[English]
+Table: Get value
+[Chinese]
+表格：获取值
+====================
+[English]
+Table: Group by
+[Chinese]
+表格：分组汇总 (Group by)
+====================
+[English]
+Table: Insert column
+[Chinese]
+表格：插入列
+====================
+[English]
+Table: Insert row
+[Chinese]
+表格：插入行
+====================
+[English]
 Table: List
 [Chinese]
 表格：列表
+====================
+[English]
+Table: Merge by key
+[Chinese]
+表格：按主键合并 (Merge)
+====================
+[English]
+Table: Pivot
+[Chinese]
+表格：透视表 (Pivot)
 ====================
 [English]
 Table: Remove column
@@ -13877,6 +15777,51 @@ Table: Remove column
 Table: Remove row
 [Chinese]
 表格：移除行
+====================
+[English]
+Table: Rows to columns
+[Chinese]
+表格：行列转置
+====================
+[English]
+Table: Search column
+[Chinese]
+表格：搜索列
+====================
+[English]
+Table: Set numeric value
+[Chinese]
+表格：设置数值
+====================
+[English]
+Table: Set string value
+[Chinese]
+表格：设置字符串值
+====================
+[English]
+Table: Sort rows
+[Chinese]
+表格：对行排序
+====================
+[English]
+Table: To LogisticRegression
+[Chinese]
+表格：转为逻辑回归 (LogisticRegression)
+====================
+[English]
+Table: To RealTier
+[Chinese]
+表格：转为实数层 (RealTier)
+====================
+[English]
+Table: Unpivot
+[Chinese]
+表格：逆透视 (Unpivot)
+====================
+[English]
+TableEditor settings
+[Chinese]
+表格编辑器设置
 ====================
 [English]
 TableOfReal help
@@ -13902,6 +15847,11 @@ TableOfReal: Draw scatter plots matrix
 TableOfReal: Formula
 [Chinese]
 实数表：公式
+====================
+[English]
+TableOfReal: To Table
+[Chinese]
+实数表格：转为表格 (Table)
 ====================
 [English]
 TableOfReal: tab-separated file
@@ -14619,6 +16569,11 @@ This setting determines the maximum number of seconds
 此设置决定在长音频 (LongSound) 窗口中
 ====================
 [English]
+Three channels is RGB
+[Chinese]
+三通道为 RGB
+====================
+[English]
 Tier
 [Chinese]
 层
@@ -14656,7 +16611,7 @@ Time (s)
 [English]
 Time and frequency resolutions:
 [Chinese]
-时间与频率分辨率：
+时间和频率分辨率：
 ====================
 [English]
 Time at x (s)
@@ -15249,6 +17204,21 @@ To Strings
 转为字符串列表
 ====================
 [English]
+To Strings (exact)
+[Chinese]
+转为 Strings (精确匹配)
+====================
+[English]
+To Strings (exact)...
+[Chinese]
+转为 Strings (精确匹配)...
+====================
+[English]
+To Stringses...
+[Chinese]
+转为多个 Strings...
+====================
+[English]
 To Table
 [Chinese]
 转为表格
@@ -15339,6 +17309,31 @@ To WordList
 转为单词列表
 ====================
 [English]
+To column
+[Chinese]
+结束列
+====================
+[English]
+To column (name)
+[Chinese]
+目标列 (名称)
+====================
+[English]
+To linear regression
+[Chinese]
+转为线性回归
+====================
+[English]
+To logistic regression...
+[Chinese]
+转为逻辑回归...
+====================
+[English]
+To row
+[Chinese]
+结束行
+====================
+[English]
 Total duration
 [Chinese]
 总时长
@@ -15389,6 +17384,16 @@ Transition: Power...
 转移：乘方 (能量)...
 ====================
 [English]
+Transpose
+[Chinese]
+转置
+====================
+[English]
+Two-way ANOVA
+[Chinese]
+双因素方差分析 (Two-way ANOVA)
+====================
+[English]
 Type any numeric formula or string formula
 [Chinese]
 输入任何数值公式或字符串公式
@@ -15412,6 +17417,11 @@ Union
 Unit
 [Chinese]
 单位
+====================
+[English]
+Unweighted pair-group method (UPGMA)
+[Chinese]
+非加权组平均法 (UPGMA)
 ====================
 [English]
 Up to IntensityTier...
@@ -15449,9 +17459,19 @@ Use text styles
 使用文本样式
 ====================
 [English]
+Value
+[Chinese]
+值
+====================
+[English]
 Values:
 [Chinese]
 值：
+====================
+[English]
+Varimax rotation
+[Chinese]
+方差最大化正交旋转 (Varimax)
 ====================
 [English]
 Vertical column
@@ -15462,6 +17482,11 @@ Vertical column
 Vertical column(s)
 [Chinese]
 垂直列 (s)
+====================
+[English]
+Vertical factor
+[Chinese]
+垂直因子
 ====================
 [English]
 Vertical mm to world coordinates... || Vertical mm to wc...
@@ -15619,6 +17644,11 @@ Vowel marks...
 元音标记...
 ====================
 [English]
+Ward's minimum variance method
+[Chinese]
+Ward 最小方差法
+====================
+[English]
 Warning: this simply picks peaks from 0 Hz up!
 [Chinese]
 警告：这仅仅是从 0 Hz 开始往上提取峰值！
@@ -15694,6 +17724,11 @@ Width 3
 宽度 3
 ====================
 [English]
+Wilcoxon signed-rank test
+[Chinese]
+Wilcoxon 符号秩检验
+====================
+[English]
 Window length (s)
 [Chinese]
 窗长 (秒)
@@ -15712,6 +17747,11 @@ Window shape:
 With the shift key, you drag
 [Chinese]
 配合 Shift 键，可以拖拽
+====================
+[English]
+Within-groups SSCP
+[Chinese]
+组内离差平方和与交叉积 (Within-groups SSCP)
 ====================
 [English]
 Word
@@ -15762,6 +17802,16 @@ Write left channel to NeXT/Sun file...
 Write left channel to WAV file...
 [Chinese]
 将左声道写入 WAV 文件...
+====================
+[English]
+Write log 1 to
+[Chinese]
+写入日志 1 至
+====================
+[English]
+Write log 2 to
+[Chinese]
+写入日志 2 至
 ====================
 [English]
 Write name at top:
@@ -16444,6 +18494,26 @@ left Columns
 左列
 ====================
 [English]
+left Horizontal range
+[Chinese]
+左侧水平范围
+====================
+[English]
+left Pitch floor and ceiling (Hz)
+[Chinese]
+左侧音高下限与上限 (Hz)
+====================
+[English]
+left Pitch floor and top (Hz)
+[Chinese]
+左侧音高下限与顶部 (Hz)
+====================
+[English]
+left Pitch range (Hz)
+[Chinese]
+左侧音高范围 (Hz)
+====================
+[English]
 left Row 1
 [Chinese]
 左 第 1 行
@@ -16462,6 +18532,26 @@ left Start time
 left Start time (s)
 [Chinese]
 左开始时间 (s)
+====================
+[English]
+left Vertical range
+[Chinese]
+左侧垂直范围
+====================
+[English]
+left View range (Hz)
+[Chinese]
+左侧视图范围 (Hz)
+====================
+[English]
+left View range (dB)
+[Chinese]
+左侧视图范围 (dB)
+====================
+[English]
+left View range (units)
+[Chinese]
+左侧视图范围 (单位)
 ====================
 [English]
 line
@@ -16689,6 +18779,26 @@ right End time (s)
 右结束时间 (s)
 ====================
 [English]
+right Horizontal range
+[Chinese]
+右侧水平范围
+====================
+[English]
+right Pitch floor and ceiling (Hz)
+[Chinese]
+右侧音高下限与上限 (Hz)
+====================
+[English]
+right Pitch floor and top (Hz)
+[Chinese]
+右侧音高下限与顶部 (Hz)
+====================
+[English]
+right Pitch range (Hz)
+[Chinese]
+右侧音高范围 (Hz)
+====================
+[English]
 right Row 1
 [Chinese]
 右 第 1 行
@@ -16697,6 +18807,26 @@ right Row 1
 right Row 2
 [Chinese]
 右 第 2 行
+====================
+[English]
+right Vertical range
+[Chinese]
+右侧垂直范围
+====================
+[English]
+right View range (Hz)
+[Chinese]
+右侧视图范围 (Hz)
+====================
+[English]
+right View range (dB)
+[Chinese]
+右侧视图范围 (dB)
+====================
+[English]
+right View range (units)
+[Chinese]
+右侧视图范围 (单位)
 ====================
 [English]
 row
