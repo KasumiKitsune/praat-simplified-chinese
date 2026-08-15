@@ -3155,6 +3155,9 @@ EXACT_MAP = {
     "Rename take": "重命名",
     "Delete take": "删除",
     "Play take": "播放",
+    "Not recording.": "未在录音。",
+    "Buffer usage:": "缓冲区使用率：",
+    "Buffer usage": "缓冲区使用率",
     # ==========================================================================
     # Spectrogram Settings & Statistics and Table Data Analysis (Category 3)
     # ==========================================================================

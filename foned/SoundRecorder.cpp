@@ -304,7 +304,7 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 		#endif
 		Graphics_setTextAlignment (my graphics.get(), Graphics_CENTRE, Graphics_HALF);
 		Graphics_setColour (my graphics.get(), Melder_BLACK);
-		Graphics_text (my graphics.get(), 0.5, 0.5, U"Not recording.");
+		Graphics_text (my graphics.get(), 0.5, 0.5, praat_translate (U"Not recording."));
 		return;
 	}
 	if (my instancePref_meter_which() == kSoundRecorder_meter::INTENSITY) {
@@ -1120,8 +1120,9 @@ void structSoundRecorder :: v_createChildren ()
 	}
 	GuiRadioGroup_end ();
 
+	GuiLabel_createShown (our windowForm, 10, 130, -128, -108, U"Buffer usage:", 0);
 	our progressScale = GuiScale_createShown (our windowForm,
-			10, -10, -135, -105,
+			135, -10, -126, -110,
 			0, 1000, 0, 0);
 
 	/*
