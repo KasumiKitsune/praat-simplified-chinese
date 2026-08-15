@@ -3192,7 +3192,7 @@ void OTGrammar_writeToHeaderlessSpreadsheetFile (OTGrammar me, MelderFile file) 
 				MelderString_appendCharacter (& buffer, U'\n');
 			}
 		}
-		MelderFile_writeText (file, buffer.string, Melder_getOutputEncoding ());
+		MelderFile_writeText_e (file, buffer.string, Melder_getOutputEncoding ());
 	} catch (MelderError) {
 		Melder_throw (me, U": not saved to tab-separated file ", file, U".");
 	}

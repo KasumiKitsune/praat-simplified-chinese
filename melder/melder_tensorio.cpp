@@ -54,7 +54,7 @@
 	void matrix_writeText_##storage (const constmatrix<T>& mat, MelderFile file, conststring32 name) { \
 		texputintro (file, name, U" [] []: ", mat.nrow >= 1 ? nullptr : U"(empty)", 0,0,0); \
 		for (integer irow = 1; irow <= mat.nrow; irow ++) { \
-			texputintro (file, name, U" [", Melder_integer (irow), U"]:", 0,0); \
+			texputintro (file, name, U" [", Melder_integer (irow), U"] []:", 0,0); \
 			for (integer icol = 1; icol <= mat.ncol; icol ++) { \
 				texput##storage (file, mat [irow] [icol], name, U" [", Melder_integer (irow), U"] [", Melder_integer (icol), U"]"); \
 			} \
@@ -90,9 +90,9 @@
 	void tensor3_writeText_##storage (const consttensor3<T>& ten3, MelderFile file, conststring32 name) { \
 		texputintro (file, name, U" [] [] []: ", ten3.ndim1 >= 1 && ten3.ndim2 >= 1 && ten3.ndim3 >= 1 ? nullptr : U"(empty)", 0,0,0); \
 		for (integer idim1 = 1; idim1 <= ten3.ndim1; idim1 ++) { \
-			texputintro (file, name, U" [", Melder_integer (idim1), U"]:", 0,0); \
+			texputintro (file, name, U" [", Melder_integer (idim1), U"] [] []:", 0,0); \
 			for (integer idim2 = 1; idim2 <= ten3.ndim2; idim2 ++) { \
-				texputintro (file, name, U" [", Melder_integer (idim1), U"] [", Melder_integer (idim2), U"]:", 0,0); \
+				texputintro (file, name, U" [", Melder_integer (idim1), U"] [", Melder_integer (idim2), U"] []:", 0,0); \
 				for (integer idim3 = 1; idim3 <= ten3.ndim3; idim3 ++) { \
 					texput##storage (file, ten3 [idim1] [idim2] [idim3], name, U" [", Melder_integer (idim1), U"] [", Melder_integer (idim2), U"] [", Melder_integer (idim3), U"]"); \
 				} \

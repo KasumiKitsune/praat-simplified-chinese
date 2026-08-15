@@ -79,7 +79,7 @@ void soundFrameIntoLPCFrame_auto (VEC soundFrame, LPC_Frame lpcFrame, VEC a, VEC
 			The sound frame contains only zero's
 		*/
 		lpcFrame -> gain = 0.0;
-		lpcFrame -> resize (0_integer); // maintain invariant
+		lpcFrame -> resize (0_integer);   // maintain invariant
 		info = 1;
 		return;
 	}
@@ -161,7 +161,7 @@ void soundFrameIntoLPCFrame_covar (VEC soundFrame, LPC_Frame lpcFrame, VEC a, VE
 	if (gain == 0.0) {
 		info = 1;
 		lpcFrame -> gain = gain;
-		lpcFrame -> resize (0_integer); //maintain invariant
+		lpcFrame -> resize (0_integer);   //maintain invariant
 		return;
 	}
 	b  <<=  0.0;
@@ -649,7 +649,7 @@ void structRobustLPCWorkspace :: solvelpc () {
 	svdwork2.resize (currentPredictionOrder);
 	SVD_compute (svd.get(), svdwork1.get());
 	SVD_solve_preallocated (svd.get(), covariancesw.get(), coefficients.get(), svdwork2.get());
-	coefficients.resize (currentPredictionOrder); // maintain invariant
+	coefficients.resize (currentPredictionOrder);   // maintain invariant
 }
 
 void structRobustLPCWorkspace :: inputFrameIntoOutputFrame (LPC_Frame inputLPCFrame, LPC_Frame outputLPCFrame, VEC soundFrame, integer& info) {

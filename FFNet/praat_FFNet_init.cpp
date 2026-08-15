@@ -320,7 +320,7 @@ DO
 
 FORM (NEW_FFNet_weightsToMatrix, U"FFNet: Weights to Matrix ", nullptr) {
 	COMMENT (U"Warning: Use \"Extract weights..\" instead.")
-	NATURAL (layer, U"Layer number", U"1")
+	NATURAL1 (layer, U"Layer number", U"1")
 	OK
 DO
 	CONVERT_EACH_TO_ONE (FFNet)
@@ -358,8 +358,8 @@ DO
 /******************* FFNet && Eigen ******************************************/
 
 FORM (GRAPHICS_ONE_AND_ONE__FFNet_Eigen_drawIntersection, U"FFnet & Eigen: Draw intersection", 0) {
-	NATURAL (pcx, U"X-component", U"1")
-	NATURAL (pcy, U"Y-component", U"2")
+	NATURAL1 (pcx, U"X-component", U"1")
+	NATURAL1 (pcy, U"Y-component", U"2")
 	REAL (xmin, U"Xmin", U"0.0")
 	REAL (xmax, U"Xmax", U"0.0")
 	REAL (ymin, U"Ymin", U"0.0")
@@ -382,7 +382,7 @@ DIRECT (CONVERT_ONE_AND_ONE_TO_ONE__FFNet_Categories_to_ActivationList) {
 /************************* FFNet && Matrix **********************************/
 
 FORM (CONVERT_ONE_AND_ONE_TO_ONE__FFNet_weightsFromMatrix, U"Replace weights by values from Matrix", nullptr) {
-	NATURAL (layer, U"Layer", U"1")
+	NATURAL1 (layer, U"Layer", U"1")
 	OK
 DO
 	CONVERT_ONE_AND_ONE_TO_ONE (FFNet, Matrix)
@@ -393,7 +393,7 @@ DO
 /************************* FFNet && PatternList **********************************/
 
 FORM (GRAPHICS_ONE_AND_ONE__FFNet_PatternList_drawActivation, U"Draw an activation", nullptr) {
-	NATURAL (row, U"PatternList (row) number", U"1");
+	NATURAL1 (row, U"PatternList (row) number", U"1");
 	OK
 DO
 	GRAPHICS_ONE_AND_ONE (FFNet, PatternList)
@@ -413,7 +413,7 @@ DO
 }
 
 FORM (CONVERT_ONE_AND_ONE_TO_ONE__FFNet_PatternList_to_ActivationList, U"To activations in layer", nullptr) {
-	NATURAL (layer, U"Layer", U"1")
+	NATURAL (layer, U"Layer", U"1") //TODO Change behaviour layer==0 now giveslayer = my numberOfLayers ??
 	OK
 DO
 	CONVERT_ONE_AND_ONE_TO_ONE (FFNet, PatternList)
@@ -447,7 +447,7 @@ DO
 
 FORM (MODIFY_FIRST_OF_ONE_AND_ONE_AND_ONE__FFNet_PatternList_ActivationList_learn, U"FFNet & PatternList & ActivationList: Learn", nullptr) {
 	// NATURAL (U"Layer", U"1")
-	NATURAL (maximumNumberOfEpochs, U"Maximum number of epochs", U"100")
+	NATURAL1 (maximumNumberOfEpochs, U"Maximum number of epochs", U"100")
 	POSITIVE (tolerance, U"Tolerance of minimizer", U"1e-7")
 	CHOICE (costFunctionType, U"Cost function", 1)
 		OPTION (U"minimum-squared-error")
@@ -533,10 +533,10 @@ DO
 /*********** FFNet & PCA **********************************/
 
 FORM (GRAPHICS_ONE_AND_ONE__FFNet_PCA_drawDecisionPlaneInEigenspace, U"FFNet & PCA: Draw decision plane", nullptr) {
-	NATURAL (unitNumber, U"Unit number", U"1")
-	NATURAL (layer, U"Layer number", U"1")
-	NATURAL (horizontalEigenvectorNumber, U"Horizontal eigenvector number", U"1")
-	NATURAL (verticalEigenvectorNumber, U"Vertical eigenvector number", U"2")
+	NATURAL1 (unitNumber, U"Unit number", U"1")
+	NATURAL1 (layer, U"Layer number", U"1")
+	NATURAL1 (horizontalEigenvectorNumber, U"Horizontal eigenvector number", U"1")
+	NATURAL1 (verticalEigenvectorNumber, U"Vertical eigenvector number", U"2")
 	REAL (xmin, U"left Horizontal range", U"0.0")
 	REAL (xmax, U"right Horizontal range", U"0.0")
 	REAL (ymin, U"left Vertical range", U"0.0")
@@ -551,8 +551,8 @@ DO
 /*********** PatternList & Categories **********************************/
 
 FORM (CONVERT_ONE_AND_ONE_TO_ONE__PatternList_Categories_to_FFNet, U"PatternList & Categories: To FFNet", U"PatternList & Categories: To FFNet...") {
-	INTEGER (numberOfUnitsInHiddenLayer1, U"Number of units in hidden layer 1", U"0")
-	INTEGER (numberOfUnitsInHiddenLayer2, U"Number of units in hidden layer 2", U"0")
+	NATURAL0 (numberOfUnitsInHiddenLayer1, U"Number of units in hidden layer 1", U"0")
+	NATURAL0 (numberOfUnitsInHiddenLayer2, U"Number of units in hidden layer 2", U"0")
 	OK
 DO
 	CONVERT_ONE_AND_ONE_TO_ONE (PatternList, Categories)

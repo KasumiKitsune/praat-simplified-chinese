@@ -122,7 +122,7 @@ static void Diagonalizer_CrossCorrelationTableList_ffdiag (Diagonalizer me, Cros
 				for (integer i = 1; i <= dimension; i ++) {
 					for (integer j = i + 1; j <= dimension; j ++) {
 						longdouble zii = 0.0, zij = 0.0, zjj = 0.0, yij = 0.0, yji = 0.0;   // zij == zji
-						for (integer k = 1; k <= ccts -> size; k ++) {
+						for (integer k = 1; k <= ccts->size; k ++) {
 							CrossCorrelationTable ct = ccts -> at [k];
 							zii += ct -> data [i] [i] * ct -> data [i] [i];
 							zij += ct -> data [i] [i] * ct -> data [j] [j];
@@ -165,8 +165,8 @@ static void Diagonalizer_CrossCorrelationTableList_ffdiag (Diagonalizer me, Cros
 				// update V
 				vnew.all()  <<=  my data.all();
 				mul_MAT_out (my data.get(), w.get(), vnew.get());
-				for (integer k = 1; k <= ccts -> size; k ++) {
-					const CrossCorrelationTable ct = ccts -> at [k];
+				for (integer k = 1; k <= ccts->size; k ++) {
+					const CrossCorrelationTable ct = ccts->at [k];
 					Melder_assert (ct -> data.nrow == dimension && ct -> data.ncol == dimension);   // ppgb 20180913
 					cc.all()  <<=  ct -> data.all();
 					MATmul_VCVt_preallocated (ct -> data.get(), w.get(), cc.get(), true);

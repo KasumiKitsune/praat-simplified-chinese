@@ -1,6 +1,6 @@
 /* praat_David_init.cpp
  *
- * Copyright (C) 1993-2025 David Weenink, 2015,2023-2026 Paul Boersma
+ * Copyright (C) 1993-2026 David Weenink, 2015-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1133,7 +1133,7 @@ DIRECT (CREATE_ONE__Covariances_to_CovarianceList) {
 			autoCovariance cov = Data_copy (me);
 			result -> addItem_move (cov.move());
 		}
-	CREATE_ONE_END (U"List_of_", Melder_integer (result -> size))
+	CREATE_ONE_END (U"List_of_", Melder_integer (result->size))
 }
 
 FORM (CONVERT_ONE_AND_ONE_TO_ONE__Covariance_TableOfReal_mahalanobis, U"Covariance & TableOfReal: To TableOfReal (mahalanobis)", U"Covariance & TableOfReal: To TableOfReal (mahalanobis)...") {
@@ -2399,7 +2399,7 @@ DIRECT (HELP__Index_help) {
 
 DIRECT (QUERY_ONE_FOR_INTEGER__Index_getNumberOfClasses) {
 	QUERY_ONE_FOR_INTEGER (Index)
-		const integer result = my classes -> size;
+		const integer result = my classes->size;
 	QUERY_ONE_FOR_INTEGER_END (U" (number of classes)")
 }
 

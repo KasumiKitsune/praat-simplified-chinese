@@ -119,7 +119,7 @@ static void newDocument (TextEditor me) {
 
 static void saveDocument (TextEditor me, MelderFile file) {
 	autostring32 text = GuiText_getString (my textWidget);
-	MelderFile_writeText (file, text.get(), Melder_getOutputEncoding ());
+	MelderFile_writeText_e (file, text.get(), Melder_getOutputEncoding ());
 	my dirty = false;
 	MelderFile_copy (file, & my file);   // not until the file has been safely written
 	if (my v_fileBased ())

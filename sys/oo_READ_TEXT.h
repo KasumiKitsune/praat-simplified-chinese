@@ -1,10 +1,10 @@
 /* oo_READ_TEXT.h
  *
- * Copyright (C) 1994-2009,2011-2020,2022,2024 Paul Boersma
+ * Copyright (C) 1994-2009,2011-2020,2022,2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -36,19 +36,19 @@
 
 #define oo_ANYVEC(type, storage, x, sizeExpression)  \
 	{ \
-		integer _size = (sizeExpression); \
+		const integer _size = (sizeExpression); \
 		our x = vector_readText_##storage (_size, _textSource_, #x); \
 	}
 
 #define oo_ANYMAT(type, storage, x, nrowExpression, ncolExpression)  \
 	{ \
-		integer _nrow = (nrowExpression), _ncol = (ncolExpression); \
+		const integer _nrow = (nrowExpression), _ncol = (ncolExpression); \
 		our x = matrix_readText_##storage (_nrow, _ncol, _textSource_, #x); \
 	}
 
 #define oo_ANYTEN3(type, storage, x, ndim1Expression, ndim2Expression, ndim3Expression)  \
 	{ \
-		integer _ndim1 = (ndim1Expression), _ndim2 = (ndim2Expression), _ndim3 = (ndim3Expression); \
+		const integer _ndim1 = (ndim1Expression), _ndim2 = (ndim2Expression), _ndim3 = (ndim3Expression); \
 		our x = tensor3_readText_##storage (_ndim1, _ndim2, _ndim3, _textSource_, #x); \
 	}
 
@@ -67,10 +67,10 @@
 		our x [_i] = texget##storage (_textSource_); \
 	}
 
-#define oo_STRINGx_VECTOR(storage, x, n)  \
+#define oo_STRINGx_VECTOR(storage, x, sizeExpression)  \
 	{ \
-		integer _size = (n); \
-		if (_size >= 1) { \
+		const integer _size = (sizeExpression); \
+		if (_size > 0) { \
 			our x = autoSTRVEC (_size); \
 			for (integer _i = 1; _i <= _size; _i ++) { \
 				try { \
@@ -90,10 +90,10 @@
 		our x [_i]. readText (_textSource_, _formatVersion_); \
 	}
 
-#define oo_STRUCTVEC(Type, x, n)  \
+#define oo_STRUCTVEC(Type, x, sizeExpression)  \
 { \
-	integer _size = (n); \
-	if (_size >= 1) { \
+	const integer _size = (sizeExpression); \
+	if (_size > 0) { \
 		our x = newvectorzero <struct##Type> (_size); \
 		for (integer _i = 1; _i <= _size; _i ++) { \
 			our x [_i]. readText (_textSource_, _formatVersion_); \
@@ -101,9 +101,22 @@
 	} \
 }
 
+#define oo_STRUCTMAT(Type, x, nrowExpression, ncolExpression)  \
+	{ \
+		const integer _nrow = (nrowExpression), _ncol = (ncolExpression); \
+		if (_nrow > 0 && _ncol > 0) { \
+			our x = newmatrixzero <struct##Type> (_nrow, _ncol); \
+			for (integer _irow = 1; _irow <= _nrow; _irow ++) { \
+				for (integer _icol = 1; _icol <= _ncol; _icol ++) { \
+					our x [_irow] [_icol]. readText (_textSource_, _formatVersion_); \
+				} \
+			} \
+		} \
+	}
+
 #define oo_OBJECT(Class, formatVersion, x)  \
 	{ \
-		int _formatVersion = (formatVersion); \
+		const int _formatVersion = (formatVersion); \
 		if (texgetex (_textSource_) == 1) { \
 			our x = Thing_new (Class); \
 			our x -> v1_readText (_textSource_, _formatVersion); \
@@ -112,8 +125,8 @@
 
 #define oo_COLLECTION_OF(Class, x, ItemClass, formatVersion)  \
 	{ \
-		int _formatVersion = (formatVersion); \
-		integer _n = texgetinteger (_textSource_); \
+		const int _formatVersion = (formatVersion); \
+		const integer _n = texgetinteger (_textSource_); \
 		for (integer _i = 1; _i <= _n; _i ++) { \
 			auto##ItemClass _item = Thing_new (ItemClass); \
 			_item -> v1_readText (_textSource_, _formatVersion); \
@@ -123,8 +136,8 @@
 
 #define oo_COLLECTION(Class, x, ItemClass, formatVersion)  \
 	{ \
-		int _formatVersion = (formatVersion); \
-		integer _n = texgetinteger (_textSource_); \
+		const int _formatVersion = (formatVersion); \
+		const integer _n = texgetinteger (_textSource_); \
 		our x = Class##_create (); \
 		for (integer _i = 1; _i <= _n; _i ++) { \
 			auto##ItemClass _item = Thing_new (ItemClass); \
@@ -159,7 +172,7 @@
 
 #define oo_FROM(from)  \
 	{ \
-		int _from = (from); \
+		const int _from = (from); \
 		if (_formatVersion_ >= _from) {
 
 #define oo_ENDFROM  \

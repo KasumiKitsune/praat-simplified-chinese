@@ -1,4 +1,4 @@
-=== Praat Chinese Translation Database (Total: 3375 entries) ===
+=== Praat Chinese Translation Database (Total: 3376 entries) ===
 Format: [English] block followed by [Chinese] block, separated by '===================='.
 This structure prevents ambiguity with newlines or special characters in the text.
 
@@ -8260,6 +8260,11 @@ Matrix: To Sound (mono)
 Max. number of candidates
 [Chinese]
 最大候选音高数量
+====================
+[English]
+Max. number of threads
+[Chinese]
+最大线程数
 ====================
 [English]
 Max. number of threads for diarization

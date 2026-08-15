@@ -572,7 +572,7 @@ void HMM_addObservation_move (HMM me, autoHMMObservation thee) {
 }
 
 void HMM_addState_move (HMM me, autoHMMState thee) {
-	const integer ns = my states -> size + 1;
+	const integer ns = my states->size + 1;
 	Melder_require (ns <= my numberOfStates, U"States list is full.");
 	my states -> addItemAtPosition_move (thee.move(), ns);
 }
@@ -824,7 +824,7 @@ void HMMBaumWelch_reInit (HMMBaumWelch me) {
 }
 
 static integer HMM_getState_notHidden (HMM me, conststring32 stateLabel) {
-	for (integer istate = 1; istate <= my states -> size; istate ++)
+	for (integer istate = 1; istate <= my states->size; istate ++)
 		if (Melder_cmp (my states -> at [istate] -> label.get(), stateLabel) == 0)
 			return istate;
 	return 0;	

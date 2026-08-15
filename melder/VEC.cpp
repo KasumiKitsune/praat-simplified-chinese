@@ -1,6 +1,6 @@
 /* VEC.cpp
  *
- * Copyright (C) 2017-2021,2023,2025 Paul Boersma
+ * Copyright (C) 2017-2021,2023,2025,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include "melder.h"
 #include "../dwsys/NUM2.h"   /* for NUMsort2 */
+#include "../external/blake3/blake3.h"
 
 #ifdef macintosh
 	#include "macport_on.h"
@@ -342,6 +343,85 @@ autoINTVEC to_INTVEC (integer to) {
 	for (integer i = 1; i <= numberOfElements; i ++)
 		result [i] = i;
 	return result;
+}
+
+static autoVEC outputBlake3 (blake3_hasher *hasher) {
+	uint8 output [32];
+	blake3_hasher_finalize (hasher, output, 32);   // 256 bits
+	autoVEC result = raw_VEC (8);
+	result [1] = ((uint32) output [0] << 0) | ((uint32) output [1] << 8)
+			| ((uint32) output [2] << 16) | ((uint32) output [3] << 24);
+	result [2] = ((uint32) output [4] << 0) | ((uint32) output [5] << 8)
+			| ((uint32) output [6] << 16) | ((uint32) output [7] << 24);
+	result [3] = ((uint32) output [8] << 0) | ((uint32) output [9] << 8)
+			| ((uint32) output [10] << 16) | ((uint32) output [11] << 24);
+	result [4] = ((uint32) output [12] << 0) | ((uint32) output [13] << 8)
+			| ((uint32) output [14] << 16) | ((uint32) output [15] << 24);
+	result [5] = ((uint32) output [16] << 0) | ((uint32) output [17] << 8)
+			| ((uint32) output [18] << 16) | ((uint32) output [19] << 24);
+	result [6] = ((uint32) output [20] << 0) | ((uint32) output [21] << 8)
+			| ((uint32) output [22] << 16) | ((uint32) output [23] << 24);
+	result [7] = ((uint32) output [24] << 0) | ((uint32) output [25] << 8)
+			| ((uint32) output [26] << 16) | ((uint32) output [27] << 24);
+	result [8] = ((uint32) output [28] << 0) | ((uint32) output [29] << 8)
+			| ((uint32) output [30] << 16) | ((uint32) output [31] << 24);
+	return result;
+}
+
+autoVEC blake3_VEC (constVECVU const& vec) {
+	blake3_hasher hasher;
+	blake3_hasher_init (& hasher);
+	for (integer i = 1; i <= vec.size; i ++) {
+		const double value_float = vec [i];
+		const uint64 value_int = * (uint64 *) & value_float;
+		uint8 bytes [8];
+		bytes [0] = (uint8) (value_int >> 0);   // little-endian
+		bytes [1] = (uint8) (value_int >> 8);   // little-endian
+		bytes [2] = (uint8) (value_int >> 16);   // little-endian
+		bytes [3] = (uint8) (value_int >> 24);   // little-endian
+		bytes [4] = (uint8) (value_int >> 32);   // little-endian
+		bytes [5] = (uint8) (value_int >> 40);   // little-endian
+		bytes [6] = (uint8) (value_int >> 48);   // little-endian
+		bytes [7] = (uint8) (value_int >> 56);   // little-endian
+		blake3_hasher_update (& hasher, bytes, 8);
+	}
+	return outputBlake3 (& hasher);
+}
+
+autoVEC blake3_VEC (constMATVU const& mat) {
+	blake3_hasher hasher;
+	blake3_hasher_init (& hasher);
+	for (integer irow = 1; irow <= mat.nrow; irow ++)
+		for (integer icol = 1; icol <= mat.ncol; icol ++) {
+			const double value_float = mat [irow] [icol];
+			const uint64 value_int = * (uint64 *) & value_float;
+			uint8 bytes [8];
+			bytes [0] = (uint8) (value_int >> 0);   // little-endian
+			bytes [1] = (uint8) (value_int >> 8);   // little-endian
+			bytes [2] = (uint8) (value_int >> 16);   // little-endian
+			bytes [3] = (uint8) (value_int >> 24);   // little-endian
+			bytes [4] = (uint8) (value_int >> 32);   // little-endian
+			bytes [5] = (uint8) (value_int >> 40);   // little-endian
+			bytes [6] = (uint8) (value_int >> 48);   // little-endian
+			bytes [7] = (uint8) (value_int >> 56);   // little-endian
+			blake3_hasher_update (& hasher, bytes, 8);
+		}
+	return outputBlake3 (& hasher);
+}
+
+autoVEC blake3_VEC (conststring32 str) {
+	blake3_hasher hasher;
+	blake3_hasher_init (& hasher);
+	for (const char32 *p = & str [0]; *p != U'\0'; p ++) {
+		const uint32 value_int = (uint32) *p;
+		uint8 bytes [4];
+		bytes [0] = (uint8) (value_int >> 0);   // little-endian
+		bytes [1] = (uint8) (value_int >> 8);   // little-endian
+		bytes [2] = (uint8) (value_int >> 16);   // little-endian
+		bytes [3] = (uint8) (value_int >> 24);   // little-endian
+		blake3_hasher_update (& hasher, bytes, 4);
+	}
+	return outputBlake3 (& hasher);
 }
 
 /* End of file VEC.cpp */

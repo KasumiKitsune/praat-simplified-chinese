@@ -2,11 +2,11 @@
 #define _Photo_h_
 /* Photo.h
  *
- * Copyright (C) 2013-2017,2019 Paul Boersma
+ * Copyright (C) 2013-2017,2019,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -90,8 +90,10 @@ void Photo_replaceGreen (Photo me, Matrix green);
 void Photo_replaceBlue (Photo me, Matrix blue);
 void Photo_replaceTransparency (Photo me, Matrix transparency);
 
+void Photo_paintImageInside (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax);
 void Photo_paintImage (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax);
 
+void Photo_paintCellsInside (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax);
 void Photo_paintCells (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax);
 /*
 	Every sample is drawn as a rectangle.

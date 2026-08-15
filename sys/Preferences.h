@@ -2,11 +2,11 @@
 #define _Preferences_h_
 /* Preferences.h
  *
- * Copyright (C) 1996-2008,2011,2013,2015-2018,2022,2023 Paul Boersma
+ * Copyright (C) 1996-2008,2011,2013,2015-2018,2022,2023,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -46,8 +46,8 @@ void _Preferences_addEnum    (conststring32 string /* cattable */, int *value, i
 	_Preferences_addEnum (string, (int *) value, (int) enumerated::MIN, (int) enumerated::MAX, \
 	(conststring32 (*) (int)) enumerated##_getText, (enum_generic_getValue) enumerated##_getValue, (int) defaultValue)
 
-void Preferences_read (MelderFile file);
-void Preferences_write (MelderFile file);
+void Preferences_read_i (MelderFile file);   // "_i" means: ignore errors (such as that the file doesn't exist)
+void Preferences_write_i (MelderFile file);   // "_i" means: ignore errors (such as that the file cannot be written)
 
 void Preferences_exit_optimizeByLeaking ();
 

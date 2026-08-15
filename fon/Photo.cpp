@@ -460,7 +460,6 @@ static void _Photo_cellArrayOrImage (Photo me, Graphics g, double xmin, double x
 	}
 	if (xmin >= xmax || ymin >= ymax)
 		return;
-	Graphics_setInner (g);
 	Graphics_setWindow (g, xmin, xmax, ymin, ymax);
 	automatrix z = newmatrixraw <MelderColour> (iymax - (iymin - 1), ixmax - (ixmin - 1));
 	for (integer iy = iymin; iy <= iymax; iy ++) {
@@ -481,15 +480,26 @@ static void _Photo_cellArrayOrImage (Photo me, Graphics g, double xmin, double x
 			Sampled_indexToX   (me, ixmin - 0.5), Sampled_indexToX   (me, ixmax + 0.5),
 			SampledXY_indexToY (me, iymin - 0.5), SampledXY_indexToY (me, iymax + 0.5), 0.0, 1.0);
 	//Graphics_rectangle (g, xmin, xmax, ymin, ymax);
-	Graphics_unsetInner (g);
 }
 
-void Photo_paintImage (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax) {
+void Photo_paintImageInside (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax) {
 	_Photo_cellArrayOrImage (me, g, xmin, xmax, ymin, ymax, true);
 }
 
-void Photo_paintCells (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax) {
+void Photo_paintImage (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax) {
+	Graphics_setInner (g);
+	_Photo_cellArrayOrImage (me, g, xmin, xmax, ymin, ymax, true);
+	Graphics_unsetInner (g);
+}
+
+void Photo_paintCellsInside (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax) {
 	_Photo_cellArrayOrImage (me, g, xmin, xmax, ymin, ymax, false);
+}
+
+void Photo_paintCells (Photo me, Graphics g, double xmin, double xmax, double ymin, double ymax) {
+	Graphics_setInner (g);
+	_Photo_cellArrayOrImage (me, g, xmin, xmax, ymin, ymax, false);
+	Graphics_unsetInner (g);
 }
 
 /* End of file Photo.cpp */

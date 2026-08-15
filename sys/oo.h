@@ -2,11 +2,11 @@
 #define _oo_h_
 /* oo.h
  *
- * Copyright (C) 1994-2013,2015-2020,2022-2024 Paul Boersma
+ * Copyright (C) 1994-2013,2015-2020,2022-2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -130,9 +130,9 @@
 
 #define oo_SIMPLE(type,storage,x)  type x;
 #define oo_SET(type,storage,x,setType)  type x [1 + (int) setType::MAX];
-#define oo_ANYVEC(type,storage,x,size)  autovector <type> x;
-#define oo_ANYMAT(type,storage,x,nrow,ncol)  automatrix <type> x;
-#define oo_ANYTEN3(type,storage,x,ndim1,ndim2,ndim3)  autotensor3 <type> x;
+#define oo_ANYVEC(type,storage,x,sizeExpression)  autovector <type> x;
+#define oo_ANYMAT(type,storage,x,nrowExpression,ncolExpression)  automatrix <type> x;
+#define oo_ANYTEN3(type,storage,x,ndim1Expression,ndim2Expression,ndim3Expression)  autotensor3 <type> x;
 
 #define oo_ENUMx(kType,storage,x)  kType x;
 //#define oo_ENUMx_SET(kType,storage,x,setType)  kType x [1 + (int) setType::MAX];
@@ -143,7 +143,8 @@
 
 #define oo_STRUCT(Type,x)  struct struct##Type x;
 #define oo_STRUCT_SET(Type,x,setType)  struct struct##Type x [1 + (int) setType::MAX];
-#define oo_STRUCTVEC(Type,x,size)   autovector <struct##Type> x;
+#define oo_STRUCTVEC(Type,x,sizeExpression)   autovector <struct##Type> x;
+#define oo_STRUCTMAT(Type,x,nrowExpression,ncolExpression)   automatrix <struct##Type> x;
 
 #define oo_OBJECT(Class,version,x)  auto##Class x;
 #define oo_COLLECTION_OF(Class,x,ItemClass,version)  Class<struct##ItemClass> x;

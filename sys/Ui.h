@@ -40,7 +40,7 @@ Thing_declare (EditorCommand);
 			U"Create person...",   // the invoking button title
 			U"Create person...");   // the help string; may be nullptr
 		static integer age;
-		UiForm_addNatural (dia.get(), & age, U"age", U"Age (years)", U"18");
+		UiForm_addNatural0 (dia.get(), & age, U"age", U"Age (years)", U"18");
 		static double length;
 		UiForm_addPositive (dia.get(), & length, U"length", U"Length (metres)", U"1.68 (= average)");
 		static bool beard;
@@ -52,7 +52,7 @@ Thing_declare (EditorCommand);
 		UiForm_addWord (dia.get(), colour, U"colour", U"Colour", U"black");
 		UiForm_addComment (dia.get(), U"features", U"Some less conspicuous features:");
 		static integer numberOfBirthMarks;
-		UiForm_addNatural (dia.get(), & numberOfBirthMarks, U"numberOfBirthMarks", U"Number of birth marks", U"28");
+		UiForm_addNatural0 (dia.get(), & numberOfBirthMarks, U"numberOfBirthMarks", U"Number of birth marks", U"28");
 		static char *favouriteGreeting;
 		UiForm_addSentence (dia.get(), & favouriteGreeting, U"favouriteGreeting", U"Favourite greeting", U"Good morning");
 		UiForm_finish (dia.get());
@@ -61,7 +61,7 @@ Thing_declare (EditorCommand);
 	UiForm_setInteger (dia.get(), & numberOfBirthMarks, 30);
 	UiForm_do (dia.get(), false);   // show dialog box
 }
-	Real, Positive, Integer, Natural, Channel, Word, and Sentence show a label and an editable text field.
+	Real, Nonnegative, Positive, Integer, Natural0, Natural1, Channel, Word, and Sentence show a label and an editable text field.
 	Choice shows a label and has Option children stacked below it.
 	OptionMenu shows a label and has Option children in a menu.
 	Heading and Comment show only their value.
@@ -71,7 +71,7 @@ Thing_declare (EditorCommand);
 	List shows a scrollable list.
 	Colour shows a label and an editable text field for a grey value between 0.0 and 1.0, a colour name, or {r,g,b}.
 	Channel shows a label and an editable text field for a natural number or one of the texts "Left", "Right", "Mono" or "Stereo".
-	As shown in the example, Real, Positive, Integer, and Natural may contain extra text;
+	As shown in the example, Real, Nonnegative, Positive, Integer, Natural 0 and Natural1 may contain extra text;
 	this text is considered a comment.
 	When you click "Standards", the standard values (including comments)
 	are restored to all items in the form.
@@ -86,36 +86,40 @@ enum class _kUiField_type {
 	REAL_ = 1,
 		LABELLED_TEXT_MIN_ = REAL_,
 	REAL_OR_UNDEFINED_ = 2,
-	POSITIVE_ = 3,
-	INTEGER_ = 4,
-	NATURAL_ = 5,
-	WORD_ = 6,
-	SENTENCE_ = 7,
-	COLOUR_ = 8,
-	CHANNEL_ = 9,
+	NONNEGATIVE_ = 3,
+	POSITIVE_ = 4,
+	INTEGER_ = 5,
+	NATURAL0_ = 6,
+	NATURAL1_ = 7,
+	WORD_ = 8,
+	SENTENCE_ = 9,
+	COLOUR_ = 10,
+	CHANNEL_ = 11,
 		LABELLED_TEXT_MAX_ = CHANNEL_,
 
-	HEADING_ = 10,
+	HEADING_ = 12,
 		COMMENT_MIN_ = HEADING_,
-	COMMENT_ = 11,
-	CAPTION_ = 12,
+	COMMENT_ = 13,
+	CAPTION_ = 14,
 		COMMENT_MAX_ = CAPTION_,
 
-	TEXT_ = 13,
-	FORMULA_ = 14,
-	INFILE_ = 15,
-	OUTFILE_ = 16,
-	FOLDER_ = 17,
-	REALVECTOR_ = 18,
-	POSITIVEVECTOR_ = 19,
-	INTEGERVECTOR_ = 20,
-	NATURALVECTOR_ = 21,
-	REALMATRIX_ = 22,
-	STRINGARRAY_ = 23,
-	BOOLEAN_ = 24,
-	CHOICE_ = 25,
-	OPTIONMENU_ = 26,
-	LIST_ = 27,
+	TEXT_ = 15,
+	FORMULA_ = 16,
+	INFILE_ = 17,
+	OUTFILE_ = 18,
+	FOLDER_ = 19,
+	REALVECTOR_ = 20,
+	NONNEGATIVEVECTOR_ = 21,
+	POSITIVEVECTOR_ = 22,
+	INTEGERVECTOR_ = 23,
+	NATURAL0VECTOR_ = 24,
+	NATURAL1VECTOR_ = 25,
+	REALMATRIX_ = 26,
+	STRINGARRAY_ = 27,
+	BOOLEAN_ = 28,
+	CHOICE_ = 29,
+	OPTIONMENU_ = 30,
+	LIST_ = 31,
 };
 inline bool _kUiField_type_isLabelledText (_kUiField_type type) {
 	return type >= _kUiField_type :: LABELLED_TEXT_MIN_ && type <= _kUiField_type :: LABELLED_TEXT_MAX_;
@@ -130,10 +134,10 @@ Thing_define (UiField, Thing) {
 	double realValue;
 	integer integerValue, integerDefaultValue;
 	autostring32 stringValue, stringDefaultValue;
-	kUi_realVectorFormat realVectorDefaultFormat;   // for REALVECTOR_, POSITIVEVECTOR_
-	autoVEC realVectorValue, realVectorDefaultValue;   // for REALVECTOR_, POSITIVEVECTOR_
-	kUi_integerVectorFormat integerVectorDefaultFormat;   // for INTEGERVECTOR_, NATURALVECTOR_
-	autoINTVEC integerVectorValue, integerVectorDefaultValue;   // for INTEGERVECTOR_, NATURALVECTOR_
+	kUi_realVectorFormat realVectorDefaultFormat;   // for REALVECTOR_, NONNEGATIVEVECTOR_, POSITIVEVECTOR_
+	autoVEC realVectorValue, realVectorDefaultValue;   // for REALVECTOR_, NONNEGATIVEVECTOR_, POSITIVEVECTOR_
+	kUi_integerVectorFormat integerVectorDefaultFormat;   // for INTEGERVECTOR_, NATURAL0VECTOR_, NATURAL1VECTOR_
+	autoINTVEC integerVectorValue, integerVectorDefaultValue;   // for INTEGERVECTOR_, NATURAL0VECTOR_, NATURAL1VECTOR_
 	autoMAT numericMatrixValue, numericMatrixDefaultValue;   // for REALMATRIX_
 	kUi_stringArrayFormat stringArrayFormat;   // for STRINGARRAY_
 	autoSTRVEC stringArrayValue, stringArrayDefaultValue;   // for STRINGARRAY_
@@ -221,11 +225,15 @@ UiField UiForm_addReal (UiForm me, double *variable, conststring32 variableName,
 		conststring32 labelText, conststring32 defaultValue);
 UiField UiForm_addRealOrUndefined (UiForm me, double *variable, conststring32 variableName,
 		conststring32 labelText, conststring32 defaultValue);
+UiField UiForm_addNonnegative (UiForm me, double *variable, conststring32 variableName,
+		conststring32 labelText, conststring32 defaultValue);
 UiField UiForm_addPositive (UiForm me, double *variable, conststring32 variableName,
 		conststring32 labelText, conststring32 defaultValue);
 UiField UiForm_addInteger (UiForm me, integer *variable, conststring32 variableName,
 		conststring32 labelText, conststring32 defaultValue);
-UiField UiForm_addNatural (UiForm me, integer *variable, conststring32 variableName,
+UiField UiForm_addNatural0 (UiForm me, integer *variable, conststring32 variableName,
+		conststring32 labelText, conststring32 defaultValue);
+UiField UiForm_addNatural1 (UiForm me, integer *variable, conststring32 variableName,
 		conststring32 labelText, conststring32 defaultValue);
 UiField UiForm_addWord (UiForm me, conststring32 *variable, conststring32 variableName,
 		conststring32 labelText, conststring32 defaultValue);
@@ -248,11 +256,15 @@ UiField UiForm_addFolder (UiForm me, conststring32 *variable, conststring32 vari
 		conststring32 labelText, conststring32 defaultValue, integer numberOfLines = 3);
 UiField UiForm_addRealVector (UiForm me, constVEC *variable, conststring32 variableName,
 		conststring32 labelText, kUi_realVectorFormat defaultFormat, conststring32 defaultValue, integer numberOfLines = 7);
+UiField UiForm_addNonnegativeVector (UiForm me, constVEC *variable, conststring32 variableName,
+		conststring32 labelText, kUi_realVectorFormat defaultFormat, conststring32 defaultValue, integer numberOfLines = 7);
 UiField UiForm_addPositiveVector (UiForm me, constVEC *variable, conststring32 variableName,
 		conststring32 labelText, kUi_realVectorFormat defaultFormat, conststring32 defaultValue, integer numberOfLines = 7);
 UiField UiForm_addIntegerVector (UiForm me, constINTVEC *variable, conststring32 variableName,
 		conststring32 labelText, kUi_integerVectorFormat defaultFormat, conststring32 defaultValue, integer numberOfLines = 7);
-UiField UiForm_addNaturalVector (UiForm me, constINTVEC *variable, conststring32 variableName,
+UiField UiForm_addNatural0Vector (UiForm me, constINTVEC *variable, conststring32 variableName,
+		conststring32 labelText, kUi_integerVectorFormat defaultFormat, conststring32 defaultValue, integer numberOfLines = 7);
+UiField UiForm_addNatural1Vector (UiForm me, constINTVEC *variable, conststring32 variableName,
 		conststring32 labelText, kUi_integerVectorFormat defaultFormat, conststring32 defaultValue, integer numberOfLines = 7);
 UiField UiForm_addRealMatrix (UiForm me, constMAT *variable, conststring32 variableName,
 		conststring32 labelText, constMATVU defaultValue, integer numberOfLines = 10);
@@ -289,10 +301,10 @@ void UiForm_setPauseForm (UiForm me,
 /* 'fieldName' is name from UiForm_addXXXXXX (), */
 /* without anything from and including the first " (" or ":". */
 
-/* Real, RealOrUndefined, and Positive fields: */
+/* Real, RealOrUndefined, Nonnegative, and Positive fields: */
 	void UiForm_setReal (UiForm me, double *p_variable, double value);
 	void UiForm_setRealAsString (UiForm me, double *p_variable, conststring32 stringValue /* cattable */);
-/* Integer, Natural, Channel, and List fields: */
+/* Integer, Natural0, Natural1, Channel, and List fields: */
 	void UiForm_setInteger (UiForm me, integer *p_variable, integer value);
 	void UiForm_setIntegerAsString (UiForm me, integer *p_variable, conststring32 stringValue /* cattable */);
 /* Word, Sentence, Text, Heading and Comment fields: */
@@ -341,11 +353,11 @@ void UiForm_info (UiForm me, integer narg);
 	without anything from parentheses or from a colon.
 	These functions work from the GUI as well as from a script.
 */
-integer UiForm_getInteger (UiForm me, conststring32 fieldName);   // Integer, Natural, Boolean, Choice, OptionMenu, List
+integer UiForm_getInteger (UiForm me, conststring32 fieldName);   // Integer, Natural0, Natural1, Boolean, Choice, OptionMenu, List
 char32 * UiForm_getString (UiForm me, conststring32 fieldName);   // Word, Sentence, Text, RealMatrix, Choice, OptionMenu, List
 MelderFile UiForm_getFile (UiForm me, conststring32 fieldName);   // Infile, Outfile
-VEC UiForm_getRealVector (UiForm me, conststring32 fieldName);   // RealVector
-INTVEC UiForm_getIntegerVector (UiForm me, conststring32 fieldName);   // IntegerVector
+VEC UiForm_getRealVector (UiForm me, conststring32 fieldName);   // RealVector, NonnegativeVector, PositiveVector
+INTVEC UiForm_getIntegerVector (UiForm me, conststring32 fieldName);   // IntegerVector, Natural0Vector, Natural1Vector
 
 double UiForm_getReal_check (UiForm me, conststring32 fieldName);
 integer UiForm_getInteger_check (UiForm me, conststring32 fieldName);

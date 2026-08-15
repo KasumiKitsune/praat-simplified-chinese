@@ -36,7 +36,7 @@ oo_DEFINE_STRUCT (LPC_Frame)
 	#if oo_DECLARING
 		void resize (integer newSize) {
 			a.resize (newSize);
-			nCoefficients = newSize; // maintain invariant
+			nCoefficients = newSize;   // maintain invariant
 		}
 	#endif
 

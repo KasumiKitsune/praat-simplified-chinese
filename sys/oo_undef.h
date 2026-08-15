@@ -1,10 +1,10 @@
 /* oo_undef.h
  *
- * Copyright (C) 1994-2005,2007,2011,2013,2015-2020,2024 Paul Boersma
+ * Copyright (C) 1994-2005,2007,2011,2013,2015-2020,2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -32,6 +32,7 @@
 #undef oo_STRUCT
 #undef oo_STRUCT_SET
 #undef oo_STRUCTVEC
+#undef oo_STRUCTMAT
 
 #undef oo_OBJECT
 #undef oo_COLLECTION_OF

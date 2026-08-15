@@ -1,10 +1,10 @@
 /* Discriminant.cpp
  *
- * Copyright (C) 1993-2019, 2026 David Weenink
+ * Copyright (C) 1993-2019,2026 David Weenink
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -151,14 +151,14 @@ autoStrings Discriminant_extractGroupLabels (Discriminant me) {
 
 autoTableOfReal Discriminant_extractGroupCentroids (Discriminant me) {
 	try {
-		autoTableOfReal thee = TableOfReal_create (my groups -> size, my eigen -> dimension);
+		autoTableOfReal thee = TableOfReal_create (my groups->size, my eigen -> dimension);
 
-		for (integer i = 1; i <= my groups -> size; i ++) {
+		for (integer i = 1; i <= my groups->size; i ++) {
 			const SSCP sscp = my groups->at [i];
 			TableOfReal_setRowLabel (thee.get(), i, Thing_getName (sscp));
 			thy data.row (i)  <<=  sscp -> centroid.all();
 		}
-		thy columnLabels.all()  <<=  my groups->at [my groups -> size] -> columnLabels.part (1, my eigen -> dimension);
+		thy columnLabels.all()  <<=  my groups->at [my groups->size] -> columnLabels.part (1, my eigen -> dimension);
 		// The elements in my groups always have my eigen -> dimension columns
 		return thee;
 	} catch (MelderError) {

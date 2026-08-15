@@ -1,10 +1,10 @@
 /* SpectrogramArea.cpp
  *
- * Copyright (C) 1992-2005,2007-2012,2014-2022 Paul Boersma
+ * Copyright (C) 1992-2005,2007-2012,2014-2022,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -31,7 +31,7 @@ void structSpectrogramArea :: v_drawInside () {
 
 	Graphics_setWindow (our graphics(), our startWindow(), our endWindow(), 0.0, our maximum);
 	Spectrogram_paintInside (our spectrogram(), our graphics(), our startWindow(), our endWindow(), 0, 0, 0.0, true,
-		 60, 6.0, 0);
+			60, 6.0, 0, kSpectrogram_colourMap::GREY, false);
 
 	/*
 		Horizontal scaling lines.

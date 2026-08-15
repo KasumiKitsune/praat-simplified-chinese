@@ -2,7 +2,7 @@
 #define _praatM_h_
 /* praatM.h
  *
- * Copyright (C) 1992-2025 Paul Boersma
+ * Copyright (C) 1992-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,11 @@
 		`title` is the title of the form, shown in its title bar.
 		`helpString` may be null.
 	INTEGER (variable, labelText, defaultStringValue)
-	NATURAL (variable, labelText, defaultStringValue)
+	NATURAL0 (variable, labelText, defaultStringValue)
+	NATURAL1 (variable, labelText, defaultStringValue)
 	REAL (variable, labelText, defaultStringValue)
 	REAL_OR_UNDEFINED (variable, labelText, defaultStringValue)
+	NONNEGATIVE (variable, labelText, defaultStringValue)
 	POSITIVE (variable, labelText, defaultStringValue)
 	WORD (variable, labelText, defaultStringValue)
 	SENTENCE (variable, labelText, defaultStringValue)
@@ -95,6 +97,10 @@
 		static double realVariable; \
 		UiForm_addRealOrUndefined (_dia_.get(), & realVariable, U"" #realVariable, labelText, defaultStringValue);
 
+#define NONNEGATIVE(realVariable, labelText, defaultStringValue)  \
+		static double realVariable; \
+		UiForm_addNonnegative (_dia_.get(), & realVariable, U"" #realVariable, labelText, defaultStringValue);
+
 #define POSITIVE(realVariable, labelText, defaultStringValue)  \
 		static double realVariable; \
 		UiForm_addPositive (_dia_.get(), & realVariable, U"" #realVariable, labelText, defaultStringValue);
@@ -103,9 +109,15 @@
 		static integer integerVariable; \
 		UiForm_addInteger (_dia_.get(), & integerVariable, U"" #integerVariable, labelText, defaultStringValue);
 
-#define NATURAL(integerVariable, labelText, defaultStringValue)  \
+#define NATURAL0(integerVariable, labelText, defaultStringValue)  \
 		static integer integerVariable; \
-		UiForm_addNatural (_dia_.get(), & integerVariable, U"" #integerVariable, labelText, defaultStringValue);
+		UiForm_addNatural0 (_dia_.get(), & integerVariable, U"" #integerVariable, labelText, defaultStringValue);
+
+#define NATURAL1(integerVariable, labelText, defaultStringValue)  \
+		static integer integerVariable; \
+		UiForm_addNatural1 (_dia_.get(), & integerVariable, U"" #integerVariable, labelText, defaultStringValue);
+/* TODO: remove: */
+#define NATURAL NATURAL1
 
 #define WORD(stringVariable, labelText, defaultStringValue)  \
 		static conststring32 stringVariable; \
@@ -164,9 +176,20 @@
 		UiForm_addIntegerVector (_dia_.get(), & integerVectorVariable, U"" #integerVectorVariable, \
 				labelText, kUi_integerVectorFormat::defaultFormat, defaultStringValue);
 
+#define NATURAL0VECTOR(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
+		static constINTVEC integerVectorVariable; \
+		UiForm_addNatural0Vector (_dia_.get(), & integerVectorVariable, U"" #integerVectorVariable, \
+				labelText, kUi_integerVectorFormat::defaultFormat, defaultStringValue);
+
+#define NATURAL1VECTOR(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
+		static constINTVEC integerVectorVariable; \
+		UiForm_addNatural1Vector (_dia_.get(), & integerVectorVariable, U"" #integerVectorVariable, \
+				labelText, kUi_integerVectorFormat::defaultFormat, defaultStringValue);
+
+/* TODO: remove */
 #define NATURALVECTOR(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
 		static constINTVEC integerVectorVariable; \
-		UiForm_addNaturalVector (_dia_.get(), & integerVectorVariable, U"" #integerVectorVariable, \
+		UiForm_addNatural1Vector (_dia_.get(), & integerVectorVariable, U"" #integerVectorVariable, \
 				labelText, kUi_integerVectorFormat::defaultFormat, defaultStringValue);
 
 #define REALMATRIX(numericMatrixVariable, labelText, defaultNumericMatrixValue)  \

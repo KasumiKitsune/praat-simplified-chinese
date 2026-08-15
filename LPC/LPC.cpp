@@ -71,7 +71,7 @@ void structLPC :: v1_info () {
 void LPC_Frame_init (LPC_Frame me, integer nCoefficients) {
 	if (nCoefficients != 0)
 		my a = zero_VEC (nCoefficients);
-	my nCoefficients = my a.size; // maintain invariant
+	my nCoefficients = my a.size;   // maintain invariant
 }
 
 void LPC_init (LPC me, double tmin, double tmax, integer nt, double dt, double t1, integer predictionOrder, double samplingPeriod) {

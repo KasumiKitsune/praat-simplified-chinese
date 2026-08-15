@@ -1,10 +1,10 @@
 /* CategoriesEditor.cpp
  *
- * Copyright (C) 1993-2019 David Weenink, 2008,2015-2018 Paul Boersma
+ * Copyright (C) 1993-2019 David Weenink, 2008,2011-2013,2015-2018,2022,2023,2025,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -128,7 +128,7 @@ static void notifyNumberOfSelected (CategoriesEditor me) {
 }
 
 static void updateWidgets (CategoriesEditor me) {   // all buttons except undo & redo
-	const integer size = my categories() -> size;
+	const integer size = my categories()->size;
 
 	autoINTVEC posList = GuiList_getSelectedPositions (my list);
 	
@@ -174,7 +174,7 @@ static void updateWidgets (CategoriesEditor me) {   // all buttons except undo &
 }
 
 static void update (CategoriesEditor me, integer from, integer to, constINTVEC select, integer nSelect) {
-	const integer size = my categories() -> size;
+	const integer size = my categories()->size;
 
 	if (size == 0) {
 		autoSimpleString str = SimpleString_create (CategoriesEditor_EMPTYLABEL);

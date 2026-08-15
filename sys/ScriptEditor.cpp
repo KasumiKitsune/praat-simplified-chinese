@@ -77,9 +77,7 @@ void structScriptEditor :: v_nameChanged () {
 	}
 }
 
-static void args_ok (UiForm sendingForm, integer /* narg */, Stackel /* args */, conststring32 /* sendingString */,
-	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* modified */, void *void_me, Editor optionalEditor)
-{
+static void common_args_ok (UiForm sendingForm, void *void_me, Editor optionalEditor, const bool fullTrust) {
 	iam (ScriptEditor);
 	autostring32 text = GuiText_getString (my textWidget);
 	if (! MelderFile_isNull (& my file))
@@ -93,17 +91,23 @@ static void args_ok (UiForm sendingForm, integer /* narg */, Stackel /* args */,
 	Interpreter_getArgumentsFromDialog (my interpreterStack -> interpreters [1].get(), sendingForm);
 
 	autoPraatBackground background;
-	if (! MelderFile_isNull (& my file)) {
+	if (! MelderFile_isNull (& my file))
 		MelderFile_setDefaultDir (& my file);
-		autoScript script = Script_createFromFile (& my file);
-		Script_rememberDuringThisAppSession_move (script.move());
-		my interpreterStack -> interpreters [1] -> scriptReference = Script_find (MelderFile_peekPath (& my file));
-	}
+	Interpreter_rememberScript (my interpreterStack -> interpreters [1].get(), & my file, fullTrust);   // right before running! (not at interpreter creation, because the name may change)
 	my interpreterStack -> runDown (autoInterpreter(), text.move(), false);
 }
-
-static void args_ok_selectionOnly (UiForm sendingForm, integer /* narg */, Stackel /* args */, conststring32 /* sendingString */,
+static void args_ok (UiForm sendingForm, integer /* narg */, Stackel /* args */, conststring32 /* sendingString */,
 	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* modified */, void *void_me, Editor optionalEditor)
+{
+	common_args_ok (sendingForm, void_me, optionalEditor, false);
+}
+static void args_ok_FULL_TRUST (UiForm sendingForm, integer /* narg */, Stackel /* args */, conststring32 /* sendingString */,
+	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* modified */, void *void_me, Editor optionalEditor)
+{
+	common_args_ok (sendingForm, void_me, optionalEditor, true);
+}
+
+static void common_args_ok_selectionOnly (UiForm sendingForm, void *void_me, Editor optionalEditor, const bool fullTrust)
 {
 	iam (ScriptEditor);
 	autostring32 text = GuiText_getSelection (my textWidget);
@@ -120,27 +124,31 @@ static void args_ok_selectionOnly (UiForm sendingForm, integer /* narg */, Stack
 	Interpreter_getArgumentsFromDialog (my interpreterStack -> interpreters [1].get(), sendingForm);
 
 	autoPraatBackground background;
-	if (! MelderFile_isNull (& my file)) {
+	if (! MelderFile_isNull (& my file))
 		MelderFile_setDefaultDir (& my file);
-		autoScript script = Script_createFromFile (& my file);
-		Script_rememberDuringThisAppSession_move (script.move());
-		my interpreterStack -> interpreters [1] -> scriptReference = Script_find (MelderFile_peekPath (& my file));
-	}
+	Interpreter_rememberScript (my interpreterStack -> interpreters [1].get(), & my file, fullTrust);
 	my interpreterStack -> runDown (autoInterpreter(), text.move(), false);
 }
+static void args_ok_selectionOnly (UiForm sendingForm, integer /* narg */, Stackel /* args */, conststring32 /* sendingString */,
+	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* modified */, void *void_me, Editor optionalEditor)
+{
+	common_args_ok_selectionOnly (sendingForm, void_me, optionalEditor, false);
+}
+static void args_ok_selectionOnly_FULL_TRUST (UiForm sendingForm, integer /* narg */, Stackel /* args */, conststring32 /* sendingString */,
+	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* modified */, void *void_me, Editor optionalEditor)
+{
+	common_args_ok_selectionOnly (sendingForm, void_me, optionalEditor, true);
+}
 
-static void menu_cb_run (ScriptEditor me, EDITOR_ARGS) {
-	//UiPause_cleanUp ();   // destroy the previous pause window, because it just might be using the same InterpreterStack, so its Interpreter reference will go stale
-	//if (my interpreter -> running)
-	//	//Melder_throw (U"The script is already running (paused). Please close or continue the pause, trust or demo window.");
-	//	Interpreter_stop (my interpreter.get());
+static void common_menu_cb_run (ScriptEditor me, const bool fullTrust) {
 	try {
 		Melder_assert (my interpreterStack);
 		my interpreterStack -> emptyAll ();
 		autoInterpreter interpreter = Interpreter_createFromEnvironment (
 			my interpreterStack.get(),
 			my optionalReferenceToOwningEditor,
-			& my file);
+			& my file
+		);
 		autostring32 text = GuiText_getString (my textWidget);
 		if (! MelderFile_isNull (& my file))
 			MelderFile_setDefaultDir (& my file);   // TODO: can be wrong
@@ -150,17 +158,15 @@ static void menu_cb_run (ScriptEditor me, EDITOR_ARGS) {
 			/*
 				Pop up a dialog box for querying the arguments.
 			*/
-			my argsDialog = Interpreter_createForm (interpreter.get(), my windowForm, my optionalReferenceToOwningEditor, nullptr, args_ok, me, false);
+			my argsDialog = Interpreter_createForm (interpreter.get(), my windowForm, my optionalReferenceToOwningEditor, nullptr,
+					fullTrust ? args_ok_FULL_TRUST : args_ok, me, false);   // trust setting cannot be done earlier 
 			my interpreterStack -> interpreters [1] = interpreter.move();
 			UiForm_do (my argsDialog.get(), false);
 		} else {
 			autoPraatBackground background;
-			if (! MelderFile_isNull (& my file)) {
+			if (! MelderFile_isNull (& my file))
 				MelderFile_setDefaultDir (& my file);
-				autoScript script = Script_createFromFile (& my file);
-				Script_rememberDuringThisAppSession_move (script.move());
-				interpreter -> scriptReference = Script_find (MelderFile_peekPath (& my file));
-			}
+			Interpreter_rememberScript (interpreter.get(), & my file, fullTrust);
 			Melder_assert (interpreter -> owningInterpreterStack);
 			interpreter -> owningInterpreterStack -> emptyAll ();   // TODO: should we create a new InterpreterStack instead, owned by the script editor?
 			interpreter -> owningInterpreterStack -> runDown (interpreter.move(), text.move(), false);
@@ -169,12 +175,14 @@ static void menu_cb_run (ScriptEditor me, EDITOR_ARGS) {
 		Melder_flushError (U"The script didn’t run to its completion.");
 	}
 }
+static void menu_cb_run (ScriptEditor me, EDITOR_ARGS) {
+	common_menu_cb_run (me, false);
+}
+static void menu_cb_runWithFullTrust (ScriptEditor me, EDITOR_ARGS) {
+	common_menu_cb_run (me, true);
+}
 
-static void menu_cb_runSelection (ScriptEditor me, EDITOR_ARGS) {
-	//UiPause_cleanUp ();
-	//if (my interpreter -> running)
-	//	//Melder_throw (U"The script is already running (paused). Please close or continue the pause, trust or demo window.");
-	//	Interpreter_stop (my interpreter.get());
+static void common_menu_cb_runSelection (ScriptEditor me, const bool fullTrust) {
 	try {
 		Melder_assert (my interpreterStack);
 		my interpreterStack -> emptyAll ();
@@ -231,12 +239,9 @@ static void menu_cb_runSelection (ScriptEditor me, EDITOR_ARGS) {
 			UiForm_do (my argsDialog.get(), false);
 		} else {
 			autoPraatBackground background;
-			if (! MelderFile_isNull (& my file)) {
+			if (! MelderFile_isNull (& my file))
 				MelderFile_setDefaultDir (& my file);
-				autoScript script = Script_createFromFile (& my file);
-				Script_rememberDuringThisAppSession_move (script.move());
-				interpreter -> scriptReference = Script_find (MelderFile_peekPath (& my file));
-			}
+			Interpreter_rememberScript (interpreter.get(), & my file, fullTrust);
 			Melder_assert (interpreter -> owningInterpreterStack);
 			interpreter -> owningInterpreterStack -> emptyAll ();   // TODO: should we create a new InterpreterStack instead, owned by the script editor?
 			interpreter -> owningInterpreterStack -> runDown (interpreter.move(), Melder_dup (textPlusProcedures.string), false);
@@ -244,6 +249,12 @@ static void menu_cb_runSelection (ScriptEditor me, EDITOR_ARGS) {
 	} catch (MelderError) {
 		Melder_flushError (U"The script selection didn’t run to its completion.");
 	}
+}
+static void menu_cb_runSelection (ScriptEditor me, EDITOR_ARGS) {
+	common_menu_cb_runSelection (me, false);
+}
+static void menu_cb_runSelectionWithFullTrust (ScriptEditor me, EDITOR_ARGS) {
+	common_menu_cb_runSelection (me, true);
 }
 
 static void menu_cb_addToMenu (ScriptEditor me, EDITOR_ARGS) {
@@ -373,6 +384,9 @@ void structScriptEditor :: v_createMenus () {
 	Editor_addMenu (this, U"Run", 0);
 	Editor_addCommand (this, U"Run", U"Run", 'R', menu_cb_run);
 	Editor_addCommand (this, U"Run", U"Run selection", 'T', menu_cb_runSelection);
+	Editor_addCommand (this, U"Run", U"-- run with full trust --", 0, nullptr);
+	Editor_addCommand (this, U"Run", U"Run with FULL TRUST", 0, menu_cb_runWithFullTrust);
+	Editor_addCommand (this, U"Run", U"Run selection with FULL TRUST", 0, menu_cb_runSelectionWithFullTrust);
 }
 
 void structScriptEditor :: v_createMenuItems_help (EditorMenu menu) {

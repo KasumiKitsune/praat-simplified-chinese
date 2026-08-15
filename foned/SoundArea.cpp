@@ -702,7 +702,7 @@ static void menu_cb_ReverseSelection (SoundArea me, EDITOR_ARGS) {
 
 static void menu_cb_soundMuteChannels (SoundArea me, EDITOR_ARGS) {
 	EDITOR_FORM (U"Mute channels", nullptr)
-		NATURALVECTOR (channels, U"Channels to mute", WHITESPACE_SEPARATED_, U"2")
+		NATURAL1VECTOR (channels, U"Channels to mute", WHITESPACE_SEPARATED_, U"2")
 	EDITOR_OK
 	EDITOR_DO
 		const integer numberOfChannels = my soundOrLongSound() -> ny;

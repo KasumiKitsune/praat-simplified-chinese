@@ -18,6 +18,7 @@
 
 #include "melder.h"
 #include "../kar/UnicodeData.h"
+#include "../external/zlib/zlib.h"
 
 char32 MelderReadText_getChar (MelderReadText me) {
 	if (my string32) {
@@ -184,28 +185,66 @@ conststring32 MelderReadText_getLineNumber (MelderReadText me) {
 
 autoMelderReadText MelderReadText_createFromFile (MelderFile file) {
 	autoMelderReadText me = std::make_unique <structMelderReadText> ();
-	my string32 = MelderFile_readText (file, & my string8);
-	if (my string32) {
-		my readPointer32 = & my string32 [0];
-	} else {
-		Melder_assert (my string8);
+	autoMelderFile mfile = MelderFile_open (file);
+	byte header [2];
+	const size_t nreadFromHeader = fread (header, 1, 2, file -> filePointer);
+	if (nreadFromHeader == 2 && header [0] == 0x1F && header [1] == 0x8B) {
+		//TRACE
+		/*
+			This is a Gzipped file.
+
+			How big will it be?
+		*/
+		MelderFile_seek (file, -4, SEEK_END);
+		byte tail [4];
+		const size_t nreadFromTail = fread (tail, 1, 4, file -> filePointer);
+		Melder_require (nreadFromTail == 4,
+			U"Incomplete zip file.");
+		const integer size = tail [0]  | (tail [1] << 8) | (tail [2] << 16) | (tail [3] << 24);
+		trace (U"Size after gunzip: ", size);
+		MelderFile_close (file);
+		autostring8 buffer (size);
+		#ifdef _WIN32
+			FILE *f = Melder_fopen (file, "rb");
+			gzFile gz = gzdopen (_fileno (f), "rb");
+		#else
+			gzFile gz = gzopen (Melder_peek32to8_fileSystem (MelderFile_peekPath (file)), "rb");
+		#endif
+		if (! gz) {
+			Melder_free (buffer);
+			Melder_throw (U"Could not open GZIP file.");
+		}
+		integer nread = gzread (gz, buffer.get(), uint32 (size));   // TODO: use integer_to_uint32_a
+		gzclose (gz);
+		my string8 = buffer.move();
 		my readPointer8 = & my string8 [0];
-		my input8Encoding = Melder_getInputEncoding ();
-		if (my input8Encoding == kMelder_textInputEncoding::UTF8 ||
-			my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_ISO_LATIN1 ||
-			my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_WINDOWS_LATIN1 ||
-			my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_MACROMAN)
-		{
-			if (Melder_str8IsValidUtf8 (my string8.get())) {
-				my input8Encoding = kMelder_textInputEncoding::UTF8;
-			} else if (my input8Encoding == kMelder_textInputEncoding::UTF8) {
-				Melder_throw (U"Text is not valid UTF-8; please try a different text input encoding.");
-			} else if (my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_ISO_LATIN1) {
-				my input8Encoding = kMelder_textInputEncoding::ISO_LATIN1;
-			} else if (my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_WINDOWS_LATIN1) {
-				my input8Encoding = kMelder_textInputEncoding::WINDOWS_LATIN1;
-			} else if (my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_MACROMAN) {
-				my input8Encoding = kMelder_textInputEncoding::MACROMAN;
+		my input8Encoding = kMelder_textInputEncoding::WINDOWS_LATIN1;
+		Melder_assert (my string8 [nread] == U'\0');
+	} else {
+		MelderFile_close (file);
+		my string32 = MelderFile_readText (file, & my string8);
+		if (my string32) {
+			my readPointer32 = & my string32 [0];
+		} else {
+			Melder_assert (my string8);
+			my readPointer8 = & my string8 [0];
+			my input8Encoding = Melder_getInputEncoding ();
+			if (my input8Encoding == kMelder_textInputEncoding::UTF8 ||
+				my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_ISO_LATIN1 ||
+				my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_WINDOWS_LATIN1 ||
+				my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_MACROMAN)
+			{
+				if (Melder_str8IsValidUtf8 (my string8.get())) {
+					my input8Encoding = kMelder_textInputEncoding::UTF8;
+				} else if (my input8Encoding == kMelder_textInputEncoding::UTF8) {
+					Melder_throw (U"Text is not valid UTF-8; please try a different text input encoding.");
+				} else if (my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_ISO_LATIN1) {
+					my input8Encoding = kMelder_textInputEncoding::ISO_LATIN1;
+				} else if (my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_WINDOWS_LATIN1) {
+					my input8Encoding = kMelder_textInputEncoding::WINDOWS_LATIN1;
+				} else if (my input8Encoding == kMelder_textInputEncoding::UTF8_THEN_MACROMAN) {
+					my input8Encoding = kMelder_textInputEncoding::MACROMAN;
+				}
 			}
 		}
 	}

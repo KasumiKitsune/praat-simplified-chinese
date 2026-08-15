@@ -24,7 +24,7 @@
 void Formant_Frame_init (Formant_Frame me, integer numberOfFormants) {
 	if (numberOfFormants > 0)
 		my formant = newvectorzero <structFormant_Formant> (numberOfFormants);
-	my numberOfFormants = my formant.size; // maintain invariant
+	my numberOfFormants = my formant.size;   // maintain invariant
 }
 
 void LPC_into_Formant (constLPC inputLPC, mutableFormant outputFormant, double margin) {
@@ -45,7 +45,7 @@ void LPC_into_Formant (constLPC inputLPC, mutableFormant outputFormant, double m
 			formantFrame -> intensity = inputLPCFrame -> gain;
 			if (inputLPCFrame -> nCoefficients == 0) {
 				formantFrame -> numberOfFormants = 0; // TODO Formant_Frame -> resize (newNumberOfFormants)
-				formantFrame -> formant.resize (formantFrame -> numberOfFormants); // maintain invariant
+				formantFrame -> formant.resize (formantFrame -> numberOfFormants);   // maintain invariant
 			} else {
 				LPC_Frame_into_Polynomial (inputLPCFrame, p.get());
 				Polynomial_into_Roots (p.get(), roots.get(), buffer.get());
@@ -92,7 +92,7 @@ void LPC_Frame_into_Formant_Frame (constLPC_Frame me, Formant_Frame thee, double
 	thy intensity = my gain;
 	if (my nCoefficients == 0) {
 		thy formant. resize (0);
-		thy numberOfFormants = thy formant.size; // maintain invariant
+		thy numberOfFormants = thy formant.size;   // maintain invariant
 		return;
 	}
 	autoPolynomial p = LPC_Frame_to_Polynomial (me);

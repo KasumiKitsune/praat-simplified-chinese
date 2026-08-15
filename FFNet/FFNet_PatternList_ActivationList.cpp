@@ -130,6 +130,7 @@ void FFNet_PatternList_ActivationList_learnSD (FFNet me, PatternList p, Activati
 }
 
 void FFNet_PatternList_ActivationList_learnSM (FFNet me, PatternList p, ActivationList a, integer maxNumOfEpochs, double tolerance, int costFunctionType) {
+	Melder_assert (maxNumOfEpochs > 0);
 	bool resetMinimizer = false;
 	/*
 		Did we choose another minimizer

@@ -2,7 +2,7 @@
 #define _FunctionEditor_h_
 /* FunctionEditor.h
  *
- * Copyright (C) 1992-2023,2025 Paul Boersma
+ * Copyright (C) 1992-2023,2025,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,6 +115,12 @@ Thing_define (FunctionEditor, Editor) {
 			our SELECTION_VIEWER_MARGIN, our height_pxlt - our space - our SELECTION_VIEWER_MARGIN
 		);
 		Graphics_setWindow (our graphics.get(), 0.0, 1.0, 0.0, 1.0);
+	}
+	double functionViewerLeft_WC () const {
+		return our startWindow - our MARGIN * (our endWindow - our startWindow) / (our dataRight_pxlt() - our dataLeft_pxlt());
+	}
+	double functionViewerRight_WC () const {
+		return our endWindow + our MARGIN * (our endWindow - our startWindow) / (our dataRight_pxlt() - our dataLeft_pxlt());
 	}
 
 	GuiText textArea;   // optional text at top

@@ -34,8 +34,8 @@ void ExcitationList_addItem_copy (ExcitationList me, Excitation you) {
 }
 
 void ExcitationList_addItems (ExcitationList me, OrderedOf <structExcitation> * list) {
-	for (integer item = 1; item <= list -> size; item ++) {
-		ExcitationList_addItem_copy (me, list -> at [item]);
+	for (integer item = 1; item <= list->size; item ++) {
+		ExcitationList_addItem_copy (me, list->at [item]);
 	}
 }
 

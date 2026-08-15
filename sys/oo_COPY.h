@@ -1,10 +1,10 @@
 /* oo_COPY.h
  *
- * Copyright (C) 1994-2007,2009,2011-2020,2022,2024 Paul Boersma
+ * Copyright (C) 1994-2007,2009,2011-2020,2022,2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -39,7 +39,8 @@
 	thy x = our x;
 
 //#define oo_ENUMx_SET(kType, storage, x, setType)  \
-//	for (int _i = 0; _i <= (int) setType::MAX; _i ++) thy x [_i] = our x [_i];
+//	for (int _i = 0; _i <= (int) setType::MAX; _i ++) \
+//		thy x [_i] = our x [_i];
 
 #define oo_STRINGx(storage, x)  \
 	if (our x) \
@@ -51,14 +52,15 @@
 			thy x [_i] = Melder_dup (our x [_i].get()); \
 	}
 
-#define oo_STRINGx_VECTOR(storage, x, n)  \
+#define oo_STRINGx_VECTOR(storage, x, sizeExpression)  \
 	{ \
-		integer _size = (n); \
+		const integer _size = (sizeExpression); \
 		Melder_assert (_size == our x.size); \
 		if (our x) { \
 			thy x = autoSTRVEC (_size); \
 			for (integer _i = 1; _i <= _size; _i ++) { \
-				if (our x [_i]) thy x [_i] = Melder_dup (our x [_i].get()); \
+				if (our x [_i]) \
+					thy x [_i] = Melder_dup (our x [_i].get()); \
 			} \
 		} \
 	}
@@ -71,20 +73,35 @@
 		our x [_i]. copy (& thy x [_i]); \
 	}
 
-#define oo_STRUCTVEC(Type, x, n)  \
-{ \
-	integer _size = (n); \
-	Melder_assert (_size == our x.size); \
-	if (_size > 0) { \
-		thy x = newvectorzero <struct##Type> (_size); \
-		for (integer _i = 1; _i <= _size; _i ++) { \
-			our x [_i]. copy (& thy x [_i]); \
+#define oo_STRUCTVEC(Type, x, sizeExpression)  \
+	{ \
+		const integer _size = (sizeExpression); \
+		Melder_assert (_size == our x.size); \
+		if (_size > 0) { \
+			thy x = newvectorzero <struct##Type> (_size); \
+			for (integer _i = 1; _i <= _size; _i ++) { \
+				our x [_i]. copy (& thy x [_i]); \
+			} \
 		} \
-	} \
-}
+	}
+
+#define oo_STRUCTMAT(Type, x, nrowExpression, ncolExpression)  \
+	{ \
+		const integer _nrow = (nrowExpression), _ncol = (nrowExpression); \
+		Melder_assert (_nrow == our x.nrow && _ncol == our x.ncol); \
+		if (_nrow > 0 && _ncol > 0) { \
+			thy x = newmatrixzero <struct##Type> (_nrow, _ncol); \
+			for (integer _irow = 1; _irow <= _nrow; _irow ++) { \
+				for (integer _icol = 1; _icol <= _ncol; _icol ++) { \
+					our x [_irow] [_icol]. copy (& thy x [_irow] [_icol]); \
+				} \
+			} \
+		} \
+	}
 
 #define oo_OBJECT(Class, version, x)  \
-	if (our x) thy x = Data_copy (our x.get());
+	if (our x) \
+		thy x = Data_copy (our x.get());
 
 #define oo_COLLECTION_OF(Class, x, ItemClass, version)  \
 	if (our x._capacity > 0) { \

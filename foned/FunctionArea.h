@@ -28,13 +28,13 @@ Thing_define (FunctionArea, DataGui) {
 public:   // all readonly
 	Function function() const { Thing_cast (Function, function, our data()); return function; }
 	FunctionEditor functionEditor() const { Thing_cast (FunctionEditor, functionEditor, our boss()); return functionEditor; }
-	double startWindow() const { return functionEditor() -> startWindow; }
-	double endWindow() const { return functionEditor() -> endWindow; }
-	double startSelection() const { return functionEditor() -> startSelection; }
-	double endSelection() const { return functionEditor() -> endSelection; }
-	double tmin() const { return functionEditor() -> tmin; }
-	double tmax() const { return functionEditor() -> tmax; }
-	Graphics graphics() const { return functionEditor() -> graphics.get(); }
+	double startWindow() const { return our functionEditor() -> startWindow; }
+	double endWindow() const { return our functionEditor() -> endWindow; }
+	double startSelection() const { return our functionEditor() -> startSelection; }
+	double endSelection() const { return our functionEditor() -> endSelection; }
+	double tmin() const { return our functionEditor() -> tmin; }
+	double tmax() const { return our functionEditor() -> tmax; }
+	Graphics graphics() const { return our functionEditor() -> graphics.get(); }
 
 	/*
 		Initialization.
@@ -45,7 +45,7 @@ public:
 		my _optionalFunctionCopy = Data_copy (optionalFunctionToCopy);
 	}
 	bool functionHasBeenCopied () {
-		return !! _optionalFunctionCopy;
+		return !! our _optionalFunctionCopy;
 	}
 private:
 	autoFunction _optionalFunctionCopy;
@@ -70,8 +70,8 @@ public:
 		To be called just before drawing or tracking:
 	*/
 	void setGlobalYRange_fraction (double ymin_fraction, double ymax_fraction) {
-		_ymin_fraction = ymin_fraction;
-		_ymax_fraction = ymax_fraction;
+		our _ymin_fraction = ymin_fraction;
+		our _ymax_fraction = ymax_fraction;
 	}
 	/*
 		FunctionArea_setViewport() is used both for drawing and for mousing.
@@ -144,8 +144,8 @@ protected:
 public:
 	void setSelection (double startSelection, double endSelection) {
 		Melder_sort (& startSelection, & endSelection);
-		functionEditor() -> startSelection = startSelection;
-		functionEditor() -> endSelection = endSelection;
+		our functionEditor() -> startSelection = startSelection;
+		our functionEditor() -> endSelection = endSelection;
 	}
 	bool isClickAnchor = false;
 	bool y_fraction_globalIsInside (double globalY_fraction) const {
@@ -156,20 +156,23 @@ public:
 		const double y_pxlt = globalY_fraction_to_pxlt (globalY_fraction);
 		return (y_pxlt - our bottom_pxlt()) / (our top_pxlt() - our bottom_pxlt());
 	}
+	double functionViewerRight_WC () const {
+		return our functionEditor() -> functionViewerRight_WC();
+	}
 private:
 	double _ymin_fraction, _ymax_fraction;
 	double globalY_fraction_to_pxlt (double globalY_fraction) const {
-		return functionEditor() -> dataBottom_pxlt() +
-				globalY_fraction * (functionEditor() -> dataTop_pxlt() - functionEditor() -> dataBottom_pxlt());
+		return our functionEditor() -> dataBottom_pxlt() +
+				globalY_fraction * (our functionEditor() -> dataTop_pxlt() - our functionEditor() -> dataBottom_pxlt());
 	}
-	double left_pxlt() const { return functionEditor() -> dataLeft_pxlt(); }
-	double right_pxlt() const { return functionEditor() -> dataRight_pxlt(); }
+	double left_pxlt() const { return our functionEditor() -> dataLeft_pxlt(); }
+	double right_pxlt() const { return our functionEditor() -> dataRight_pxlt(); }
 	double bottom_pxlt() const {
 		return globalY_fraction_to_pxlt (_ymin_fraction);
 	}
 	double top_pxlt() const {
 		constexpr double legendMargin = 23.0;
-		return globalY_fraction_to_pxlt (_ymax_fraction) - legendMargin;
+		return globalY_fraction_to_pxlt (our _ymax_fraction) - legendMargin;
 	}
 public:
 	virtual void v_form_pictureSelection (EditorCommand);

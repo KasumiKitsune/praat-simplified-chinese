@@ -1,10 +1,10 @@
 /* oo_DESCRIPTION.h
  *
- * Copyright (C) 1994-2013,2015-2020,2023,2024 Paul Boersma
+ * Copyright (C) 1994-2013,2015-2020,2023,2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -137,6 +137,7 @@
 #define oo_STRUCT(Type,x)  { U"" #x, structwa, Melder_offsetof (ooSTRUCT, x), sizeof (struct struct##Type), U"" #Type, & struct##Type :: s_description, 0, nullptr, nullptr, nullptr, nullptr },
 #define oo_STRUCT_SET(Type,x,setType)  { U"" #x, structwa, Melder_offsetof (ooSTRUCT, x), sizeof (struct struct##Type), U"" #Type, & struct##Type :: s_description, 3, (conststring32) setType##_getText, (conststring32) setType##_getValue, nullptr, nullptr },
 #define oo_STRUCTVEC(Type,x,n)  { U"" #x, structwa, Melder_offsetof (ooSTRUCT, x), sizeof (struct struct##Type), U"" #Type, & struct##Type :: s_description, 1, nullptr, U"" #n, nullptr, nullptr },
+#define oo_STRUCTMAT(Type,x,nrow,ncol)  { U"" #x, structwa, Melder_offsetof (ooSTRUCT, x), sizeof (struct struct##Type), U"" #Type, & struct##Type :: s_description, 2, nullptr, U"" #nrow, nullptr, U"" #ncol },
 
 #define oo_OBJECT(Type,version,x)  { U"" #x, objectwa, Melder_offsetof (ooSTRUCT, x), sizeof (Type), U"" #Type, & theClassInfo_##Type, 0, nullptr, nullptr, nullptr, nullptr },
 #define oo_COLLECTION_OF(Type,x,ItemType,version)  { U"" #x, collectionofwa, Melder_offsetof (ooSTRUCT, x), sizeof (class struct##ItemType), U"" #Type, & theClassInfo_Collection, 0, (conststring32) & theClassInfo_##ItemType, nullptr, nullptr, nullptr },

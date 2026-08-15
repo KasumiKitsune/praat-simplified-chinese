@@ -1,6 +1,6 @@
 /* Table.cpp
  *
- * Copyright (C) 2002-2025 Paul Boersma
+ * Copyright (C) 2002-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2085,7 +2085,7 @@ static void writeToCharacterSeparatedFile (Table me, MelderFile file, char32 sep
 		}
 		MelderString_appendCharacter (& buffer, U'\n');
 	}
-	MelderFile_writeText (file, buffer.string, Melder_getOutputEncoding ());
+	MelderFile_writeText_e (file, buffer.string, Melder_getOutputEncoding ());
 }
 
 void Table_writeToTabSeparatedFile (Table me, MelderFile file) {

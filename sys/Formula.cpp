@@ -184,7 +184,7 @@ enum { NO_SYMBOL_,
 		RANDOM_GAMMA_VEC_, RANDOM_GAMMA_MAT_,
 		SOLVE_SPARSE_VEC_, SOLVE_NONNEGATIVE_VEC_,
 		PEAKS_MAT_,
-		SIZE_, NUMBER_OF_ROWS_, NUMBER_OF_COLUMNS_, COMBINE_VEC_, PART_VEC_, PART_MAT_, EDITOR_,
+		SIZE_, NUMBER_OF_ROWS_, NUMBER_OF_COLUMNS_, COMBINE_VEC_, BLAKE3_VEC_, PART_VEC_, PART_MAT_, EDITOR_,
 		RANDOM__INITIALIZE_WITH_SEED_UNSAFELY_BUT_PREDICTABLY_, RANDOM__INITIALIZE_SAFELY_AND_UNPREDICTABLY_,
 		HASH_, HEX_STR_, UNHEX_STR_,
 		EMPTY_STRVEC_, READ_LINES_FROM_FILE_STRVEC_,
@@ -201,8 +201,9 @@ enum { NO_SYMBOL_,
 			CREATE_FOLDER_, CREATE_DIRECTORY_, SET_WORKING_DIRECTORY_, VARIABLE_EXISTS_,
 			READ_FILE_, READ_FILE_STR_, READ_FILE_VEC_, READ_FILE_MAT_,
 			UNICODE_TO_BACKSLASH_TRIGRAPHS_STR_, BACKSLASH_TRIGRAPHS_TO_UNICODE_STR_, ENVIRONMENT_STR_,
-			BIG_INTEGER_STR_, GRAPHICAL_HALF_STR_, GRAPHICAL_SINGLE_STR_, GRAPHICAL_DOUBLE_STR_,
-		#define HIGH_FUNCTION_STR1  GRAPHICAL_DOUBLE_STR_
+			BIG_INTEGER_STR_, HALF_STR_, GRAPHICAL_HALF_STR_, SINGLE_STR_, GRAPHICAL_SINGLE_STR_, DOUBLE_STR_, GRAPHICAL_DOUBLE_STR_,
+			NATURAL_LOGARITHM_STR_, GRAPHICAL_NATURAL_LOGARITHM_STR_,
+		#define HIGH_FUNCTION_STR1  GRAPHICAL_NATURAL_LOGARITHM_STR_
 		#define LOW_FUNCTION_STR0  DATE_STR_
 			DATE_STR_, DATE_UTC_STR_, DATE_ISO_STR_, DATE_UTC_ISO_STR_, DATE_VEC_, DATE_UTC_VEC_, INFO_STR_,   // TODO: two of those aren't really string functions
 		#define HIGH_FUNCTION_STR0  INFO_STR_
@@ -261,7 +262,7 @@ enum { NO_SYMBOL_,
 /* The names that start with an underscore (_) do not occur in the formula text: */
 /* they are used in error messages and in debugging (see Formula_print). */
 
-static const conststring32 Formula_instructionNames [1 + highestSymbol] = { U"",
+static const conststring32 Formula_instructionNames [] = { U"",
 	#define NAME_WITH_TENSORS(name)  \
 		U"" #name, U"" #name "#", U"" #name "##",
 
@@ -347,7 +348,7 @@ static const conststring32 Formula_instructionNames [1 + highestSymbol] = { U"",
 	U"randomGauss#", U"randomGauss##",
 	U"randomGamma#", U"randomGamma##", U"solveSparse#", U"solveNonnegative#",
 	U"peaks##",
-	U"size", U"numberOfRows", U"numberOfColumns", U"combine#", U"part#", U"part##", U"editor",
+	U"size", U"numberOfRows", U"numberOfColumns", U"combine#", U"blake3#", U"part#", U"part##", U"editor",
 	U"random_initializeWithSeedUnsafelyButPredictably", U"random_initializeSafelyAndUnpredictably",
 	U"hash", U"hex$", U"unhex$",
 	U"empty$#", U"readLinesFromFile$#",
@@ -361,7 +362,8 @@ static const conststring32 Formula_instructionNames [1 + highestSymbol] = { U"",
 		U"createFolder", U"createDirectory", U"setWorkingDirectory", U"variableExists",
 		U"readFile", U"readFile$", U"readFile#", U"readFile##",
 		U"unicodeToBackslashTrigraphs$", U"backslashTrigraphsToUnicode$", U"environment$",
-		U"bigInteger$", U"graphicalHalf$", U"graphicalSingle$", U"graphicalDouble$",
+		U"bigInteger$", U"half$", U"graphicalHalf$", U"single$", U"graphicalSingle$", U"double$", U"graphicalDouble$",
+		U"naturalLogarithm$", U"graphicalNaturalLogarithm$",
 	// HIGH_FUNCTION_STR1
 	U"date$", U"date_utc$", U"date_iso$", U"date_utc_iso$", U"date#", U"date_utc#", U"info$",
 	// LOW_FUNCTION_STR2
@@ -397,6 +399,7 @@ static const conststring32 Formula_instructionNames [1 + highestSymbol] = { U"",
 	U"a variable name", U"an indexed numeric variable", U"an indexed string variable",
 	U"the end of the formula"
 };
+static_assert (sizeof (Formula_instructionNames) == (1 + END_) * sizeof (conststring32));
 
 #define newlabel (-- ilabel)
 #define newread (lexan [++ ilexan]. symbol)
@@ -4282,7 +4285,7 @@ static void do_writeFile () {
 	structMelderFile file { };
 	Melder_relativePathToFile (fileName->getString(), & file);
 	Melder_checkTrust (theInterpreter, U"save some text to the file\n", & file);
-	MelderFile_writeText (& file, text.string, Melder_getOutputEncoding ());
+	MelderFile_writeText_e (& file, text.string, Melder_getOutputEncoding ());
 	pushNumber (1);
 }
 static void do_writeFileLine () {
@@ -4301,7 +4304,7 @@ static void do_writeFileLine () {
 	structMelderFile file { };
 	Melder_relativePathToFile (fileName->getString(), & file);
 	Melder_checkTrust (theInterpreter, U"save a line of text to the file\n", & file);
-	MelderFile_writeText (& file, text.string, Melder_getOutputEncoding ());
+	MelderFile_writeText_e (& file, text.string, Melder_getOutputEncoding ());
 	pushNumber (1);
 }
 static void do_appendFile () {
@@ -4319,7 +4322,7 @@ static void do_appendFile () {
 	structMelderFile file { };
 	Melder_relativePathToFile (elFileName->getString(), & file);
 	Melder_checkTrust (theInterpreter, U"append some text to the file\n", & file);
-	MelderFile_appendText (& file, text.string);
+	MelderFile_appendText_e (& file, text.string);
 	pushNumber (1);
 }
 static void do_appendFileLine () {
@@ -4338,7 +4341,7 @@ static void do_appendFileLine () {
 	structMelderFile file { };
 	Melder_relativePathToFile (fileName->getString(), & file);
 	Melder_checkTrust (theInterpreter, U"append a line of text to the file\n", & file);
-	MelderFile_appendText (& file, text.string);
+	MelderFile_appendText_e (& file, text.string);
 	pushNumber (1);
 }
 static void do_pauseScript () {
@@ -4431,6 +4434,7 @@ static void do_runScript () {
 	try {
 		const Editor optionalNewInterpreterOwningWindow = theInterpreter -> optionalDynamicEnvironmentEditor();
 		Melder_assert (theInterpreter -> owningInterpreterStack);
+		Melder_assert (theInterpreter -> owningInterpreterStack -> current_a() == theInterpreter);   // the parent interpreter
 		praat_runScript (theInterpreter -> owningInterpreterStack, fileName->getString(), numberOfArguments - 1, & theStack [stackPointer + 1], optionalNewInterpreterOwningWindow);
 		theLevel -= 1;
 	} catch (MelderError) {
@@ -4455,7 +4459,7 @@ static void do_runScriptWithForm () {
 		Melder_throw (U"Cannot call runScriptWithForm() more than ", MAXIMUM_NUMBER_OF_LEVELS, U" levels deep.");
 	}
 	try {
-		praat_runScriptWithForm (fileName->getString());
+		praat_runScriptWithForm (fileName->getString(), false);   // TODO: inherit trust
 		theLevel -= 1;
 	} catch (MelderError) {
 		theLevel -= 1;
@@ -5445,6 +5449,21 @@ static void do_combine_VEC () {
 		}
 	}
 	pushNumericVector (result.move());
+}
+static void do_blake3_VEC () {
+	const Stackel narg = pop;
+	Melder_assert (narg->which == Stackel_NUMBER);
+	Melder_require (narg->number == 1,
+		U"The function “blake3#” requires exactly one argument (namely a vector, matrix or string), not the ", narg->number, U" given.");
+	const Stackel arg = pop;
+	if (arg->which == Stackel_NUMERIC_VECTOR)
+		pushNumericVector (blake3_VEC (arg->numericVector));
+	else if (arg->which == Stackel_NUMERIC_MATRIX)
+		pushNumericVector (blake3_VEC (arg->numericMatrix));
+	else if (arg->which == Stackel_STRING)
+		pushNumericVector (blake3_VEC (arg->getString()));
+	else
+		Melder_throw (U"The argument of the function “blake3#” should be a vector, a matrix or a string, not ", arg->whichText(), U".");
 }
 static void do_part_VEC () {
 	/*
@@ -6871,6 +6890,15 @@ static void do_percent_STR () {
 		Melder_throw (U"The function “percent$” requires two numbers (value and precision), not ", value->whichText(), U" and ", precision->whichText(), U".");
 	}
 }
+static void do_graphicalPercent_STR () {
+	const Stackel precision = pop, value = pop;
+	if (value->which == Stackel_NUMBER && precision->which == Stackel_NUMBER) {
+		autostring32 result = Melder_dup (Melder_graphicalPercent (value->number, Melder_iround (precision->number)));
+		pushString (result.move());
+	} else {
+		Melder_throw (U"The function “graphicalPercent$” requires two numbers (value and precision), not ", value->whichText(), U" and ", precision->whichText(), U".");
+	}
+}
 static void do_bigInteger_STR () {
 	const Stackel value = pop;
 	if (value->which == Stackel_NUMBER) {
@@ -6882,6 +6910,15 @@ static void do_bigInteger_STR () {
 		Melder_throw (U"The function “bigInteger$” requires a number, not ", value->whichText(), U".");
 	}
 }
+static void do_half_STR () {
+	const Stackel value = pop;
+	if (value->which == Stackel_NUMBER) {
+		autostring32 result = Melder_dup (Melder_half (value->number));
+		pushString (result.move());
+	} else {
+		Melder_throw (U"The function “half$” requires a number, not ", value->whichText(), U".");
+	}
+}
 static void do_graphicalHalf_STR () {
 	const Stackel value = pop;
 	if (value->which == Stackel_NUMBER) {
@@ -6889,6 +6926,15 @@ static void do_graphicalHalf_STR () {
 		pushString (result.move());
 	} else {
 		Melder_throw (U"The function “graphicalHalf$” requires a number, not ", value->whichText(), U".");
+	}
+}
+static void do_single_STR () {
+	const Stackel value = pop;
+	if (value->which == Stackel_NUMBER) {
+		autostring32 result = Melder_dup (Melder_single (value->number));
+		pushString (result.move());
+	} else {
+		Melder_throw (U"The function “single$” requires a number, not ", value->whichText(), U".");
 	}
 }
 static void do_graphicalSingle_STR () {
@@ -6900,6 +6946,15 @@ static void do_graphicalSingle_STR () {
 		Melder_throw (U"The function “graphicalSingle$” requires a number, not ", value->whichText(), U".");
 	}
 }
+static void do_double_STR () {
+	const Stackel value = pop;
+	if (value->which == Stackel_NUMBER) {
+		autostring32 result = Melder_dup (Melder_double (value->number));
+		pushString (result.move());
+	} else {
+		Melder_throw (U"The function “double$” requires a number, not ", value->whichText(), U".");
+	}
+}
 static void do_graphicalDouble_STR () {
 	const Stackel value = pop;
 	if (value->which == Stackel_NUMBER) {
@@ -6909,13 +6964,22 @@ static void do_graphicalDouble_STR () {
 		Melder_throw (U"The function “graphicalDouble$” requires a number, not ", value->whichText(), U".");
 	}
 }
-static void do_graphicalPercent_STR () {
-	const Stackel precision = pop, value = pop;
-	if (value->which == Stackel_NUMBER && precision->which == Stackel_NUMBER) {
-		autostring32 result = Melder_dup (Melder_graphicalPercent (value->number, Melder_iround (precision->number)));
+static void do_naturalLogarithm_STR () {
+	const Stackel value = pop;
+	if (value->which == Stackel_NUMBER) {
+		autostring32 result = Melder_dup (Melder_naturalLogarithm (value->number));
 		pushString (result.move());
 	} else {
-		Melder_throw (U"The function “graphicalPercent$” requires two numbers (value and precision), not ", value->whichText(), U" and ", precision->whichText(), U".");
+		Melder_throw (U"The function “naturalLogarithm$” requires a number, not ", value->whichText(), U".");
+	}
+}
+static void do_graphicalNaturalLogarithm_STR () {
+	const Stackel value = pop;
+	if (value->which == Stackel_NUMBER) {
+		autostring32 result = Melder_dup (Melder_graphicalNaturalLogarithm (value->number));
+		pushString (result.move());
+	} else {
+		Melder_throw (U"The function “graphicalNaturalLogarithm$” requires a number, not ", value->whichText(), U".");
 	}
 }
 static void do_hexadecimal_STR () {
@@ -9146,6 +9210,7 @@ CASE_NUM_WITH_TENSORS (LOG10_, do_log10)
 } break; case NUMBER_OF_ROWS_: { do_numberOfRows ();
 } break; case NUMBER_OF_COLUMNS_: { do_numberOfColumns ();
 } break; case COMBINE_VEC_: { do_combine_VEC ();
+} break; case BLAKE3_VEC_: { do_blake3_VEC ();
 } break; case PART_VEC_: { do_part_VEC ();
 } break; case PART_MAT_: { do_part_MAT ();
 } break; case EDITOR_: { do_editor ();
@@ -9242,11 +9307,16 @@ CASE_NUM_WITH_TENSORS (LOG10_, do_log10)
 } break; case UNICODE_STR_: { do_unicode_STR ();
 } break; case FIXED_STR_: { do_fixed_STR ();
 } break; case PERCENT_STR_: { do_percent_STR ();
-} break; case BIG_INTEGER_STR_: { do_bigInteger_STR ();
-} break; case GRAPHICAL_HALF_STR_: { do_graphicalHalf_STR ();
-} break; case GRAPHICAL_SINGLE_STR_: { do_graphicalSingle_STR ();
-} break; case GRAPHICAL_DOUBLE_STR_: { do_graphicalDouble_STR ();
 } break; case GRAPHICAL_PERCENT_STR_: { do_graphicalPercent_STR ();
+} break; case BIG_INTEGER_STR_: { do_bigInteger_STR ();
+} break; case HALF_STR_: { do_half_STR ();
+} break; case GRAPHICAL_HALF_STR_: { do_graphicalHalf_STR ();
+} break; case SINGLE_STR_: { do_single_STR ();
+} break; case GRAPHICAL_SINGLE_STR_: { do_graphicalSingle_STR ();
+} break; case DOUBLE_STR_: { do_double_STR ();
+} break; case GRAPHICAL_DOUBLE_STR_: { do_graphicalDouble_STR ();
+} break; case NATURAL_LOGARITHM_STR_: { do_naturalLogarithm_STR ();
+} break; case GRAPHICAL_NATURAL_LOGARITHM_STR_: { do_graphicalNaturalLogarithm_STR ();
 } break; case HEXADECIMAL_STR_: { do_hexadecimal_STR ();
 } break; case DELETE_FILE_: { do_deleteFile ();
 } break; case MOVE_AND_OR_RENAME_FILE_: { do_moveAndOrRenameFile ();

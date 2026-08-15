@@ -1,0 +1,49 @@
+<html><head><meta name="robots" content="index,follow"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>speech activity detection with Silero VAD</title>
+<style>
+   td { padding-left: 5pt; padding-right: 5pt; }
+   th { padding-left: 5pt; padding-right: 5pt; }
+   code { white-space: pre-wrap; }
+   dd { white-space: pre-wrap; }
+</style>
+</head><body bgcolor="#FFFFFF">
+
+<table border=0 cellpadding=0 cellspacing=0><tr><td bgcolor="#CCCC00"><table border=4 cellpadding=9><tr><td align=middle bgcolor="#000000"><font face="Palatino,Times" size=6 color="#999900"><b>
+speech activity detection with Silero VAD
+</b></font></table></table>
+<p>Praat uses the <a href="whisper_cpp.html">whisper.cpp</a> implementation of the <a href="Silero_VAD.html">Silero VAD</a> speech activity detector. The pre-trained Silero VAD model weights have been converted to ggml format and compiled into Praat, so no external model files are required. The sound is automatically resampled to 16 kHz (the sampling frequency expected by the Silero VAD model) before being processed by the model.</p>
+<h2>Purpose</h2>
+<p>to detect which parts of a sound contain speech. The output is a list of speech segments, each defined by a start and an end time.</p>
+<h2>Algorithm</h2>
+<p>The Silero VAD model processes the sound in fixed frames of 512 samples (32 ms, since the sound is resampled to 16 kHz). For each frame, it outputs a probability that the frame contains speech. Based on this output, the list of speech segments is constructed as described below. This description reflects the whisper.cpp implementation, which differs slightly from Silero&#8217;s original implementation.</p>
+<p>A speech segment begins at the first frame whose speech probability exceeds the <b>Speech probability threshold</b>. The segment continues as long as the speech probability stays above a lower threshold (called the &#8220;negative threshold&#8221; in the Silero source code, equal to the speech probability threshold minus 0.15). The segment ends only when the probability stays below the negative threshold for at least <b>Min. gap between speech segments</b>. When a segment ends, it is kept only if it is longer than <b>Min. speech segment</b>.</p>
+<p>After all segments have been formed, segments separated by a gap shorter than 0.2 s are merged (this is hardcoded in whisper.cpp and not configurable). After that, padding is applied: each segment is extended on both sides by <b>Padding around speech segments</b>. If padding would cause two segments to overlap, they instead meet at the midpoint of the gap between them.</p>
+<p>The result is a list of speech segments.</p>
+<h2>Settings</h2>
+<dl>
+<dt><b>Speech probability threshold (0-1)</b> (standard value: 0.5)
+<dd>determines the sensitivity of the speech detector. Higher values make the detector less sensitive, meaning that a frame requires a higher speech probability to be considered part of a speech segment. This reduces false positives (non-speech incorrectly classified as speech), but may cause some speech to be missed. Lower values make the detector more sensitive. The default of 0.5 works well for most use cases.</dd>
+<dt><b>Min. gap between speech segments (s)</b> (standard value: 0.1)
+<dd>the minimum duration of a gap between two speech segments. You might want to increase this value if short silences within speech (e.g. plosive closures) are splitting speech into multiple segments. Note that gaps shorter than 0.2 s are removed from the output (with their adjacent speech segments merged), regardless of this setting.</dd>
+<dt><b>Min. speech segment (s)</b> (standard value: 0.25)
+<dd>the minimum duration of a speech segment. Shorter segments are discarded.</dd>
+<dt><b>Padding around speech segments (s)</b> (standard value: 0.0)
+<dd>extends each detected speech segment by this amount on both sides. You might want to increase this value if speech onsets and offsets are being clipped.</dd>
+</dl>
+<h2>Availability in Praat</h2>
+<p>Silero VAD speech activity detection is available in Praat:</p>
+<dl>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; as part of transcription, running just before it to remove non-speech regions from the analysed sound (see <a href="transcription_with_whisper_cpp.html">transcription with whisper.cpp</a>);</dd>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; standalone, producing a new <a href="TextGrid.html">TextGrid</a> with non-speech and speech intervals (see <a href="Sound__To_TextGrid__speech_activity__Silero____.html">Sound: To TextGrid (speech activity, Silero)...</a>).</dd>
+</dl>
+<h3>Links to this page</h3>
+<ul>
+<li><a href="Speech_recognition.html">Speech recognition</a>
+<li><a href="SpeechRecognizer___Sound__Transcribe.html">SpeechRecognizer & Sound: Transcribe</a>
+</ul>
+<hr>
+<address>
+	<p>© Anastasia Shchupak 2026-06-01</p>
+</address>
+</body>
+</html>

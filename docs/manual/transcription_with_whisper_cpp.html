@@ -1,0 +1,64 @@
+<html><head><meta name="robots" content="index,follow"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>transcription with whisper.cpp</title>
+<style>
+   td { padding-left: 5pt; padding-right: 5pt; }
+   th { padding-left: 5pt; padding-right: 5pt; }
+   code { white-space: pre-wrap; }
+   dd { white-space: pre-wrap; }
+</style>
+</head><body bgcolor="#FFFFFF">
+
+<table border=0 cellpadding=0 cellspacing=0><tr><td bgcolor="#CCCC00"><table border=4 cellpadding=9><tr><td align=middle bgcolor="#000000"><font face="Palatino,Times" size=6 color="#999900"><b>
+transcription with whisper.cpp
+</b></font></table></table>
+<p>Praat can perform automatic transcription of a sound using <a href="whisper_cpp.html">whisper.cpp</a>. To do this, at least one Whisper model must be installed on your computer. You can find the details about how to install models and how to use transcription in the <a href="Speech_recognition.html">Speech recognition</a> tutorial. The sound is automatically resampled to 16 kHz (the sampling frequency expected by whisper.cpp) before being transcribed. This page documents the transcription settings.</p>
+<h2>Behaviour</h2>
+<p>When transcription is run on a <a href="TextGrid.html">TextGrid</a> interval, it modifies the TextGrid: intervals are split, tiers may be added or renamed. The exact resulting TextGrid structure depends on the combination of the <b>Include words</b> and <b>Include diarization</b> settings. See the <a href="Speech_recognition.html">Speech recognition</a> tutorial for the details of the transcription output under different combinations of these settings.</p>
+<h2>Settings</h2>
+<dl>
+<dt><b>Whisper model</b>
+<dd>determines which Whisper model is used. The list is populated with the <code><font size=+1>.bin</font></code> files found in the <code><font size=+1>whispercpp</font></code> subfolder of the <code><font size=+1>models</font></code> folder in the Praat preferences folder. See the <a href="Speech_recognition.html">Speech recognition</a> tutorial for details on how to install models.</dd>
+<dt><b>Language</b> (standard value: <b>Autodetect language</b>)
+<dd>determines the language to be used for transcription. Choose <b>Autodetect language</b> to let the model detect the language automatically. If you know the language you want to use for transcription, selecting it explicitly may improve transcription accuracy. Note that English-only models (those with <b>.en</b> in the name) can only be used with <b>Autodetect language</b> or <b>English</b>.</dd>
+<dt><b>Include words</b> (standard: on)
+<dd>if on, each transcribed word is given a start and an end time, computed using whisper.cpp&#8217;s internal dynamic time warping (DTW) algorithm.</dd>
+<dt><b>Detect non-speech</b> (standard: on)
+<dd>if on, <a href="speech_activity_detection_with_Silero_VAD.html">speech activity detection with Silero VAD</a> runs before transcription to identify speech regions. Only those regions are then passed to the Whisper model. This generally improves both speed and accuracy of transcription. Speed is improved by reducing the length of the sound sent to the model, and accuracy by preventing the model from hallucinating text for silent regions.</dd>
+<dt><b>Speech probability threshold (0-1)</b> (standard value: 0.5)
+<dd>see <a href="speech_activity_detection_with_Silero_VAD.html">speech activity detection with Silero VAD</a>.</dd>
+<dt><b>Min. gap between speech segments (s)</b> (standard value: 0.1)
+<dd>see <a href="speech_activity_detection_with_Silero_VAD.html">speech activity detection with Silero VAD</a>.</dd>
+<dt><b>Min. speech segment (s)</b> (standard value: 0.25)
+<dd>see <a href="speech_activity_detection_with_Silero_VAD.html">speech activity detection with Silero VAD</a>.</dd>
+<dt><b>Padding around speech segments (s)</b> (standard value: 0.0)
+<dd>see <a href="speech_activity_detection_with_Silero_VAD.html">speech activity detection with Silero VAD</a>.</dd>
+<dt><b>Include diarization</b> (standard: off)
+<dd>if on, speaker diarization is run alongside transcription (see <a href="speaker_diarization_with_adapted_pyannote_audio.html">speaker diarization with adapted pyannote.audio</a>). The results of both are later combined to attribute portions of transcribed speech to different speakers.</dd>
+<dt><b>Max. number of speakers (&#8805; 2)</b> (standard value: 2)
+<dd>see <a href="speaker_diarization_with_adapted_pyannote_audio.html">speaker diarization with adapted pyannote.audio</a>.</dd>
+<dt><b>Allow speakers to overlap</b> (standard: on)
+<dd>see <a href="speaker_diarization_with_adapted_pyannote_audio.html">speaker diarization with adapted pyannote.audio</a>.</dd>
+<dt><b>Clustering threshold (0-2)</b> (standard value: 0.7)
+<dd>see <a href="speaker_diarization_with_adapted_pyannote_audio.html">speaker diarization with adapted pyannote.audio</a>.</dd>
+<dt><b>Segmentation step (0-1)</b> (standard value: 0.1)
+<dd>see <a href="speaker_diarization_with_adapted_pyannote_audio.html">speaker diarization with adapted pyannote.audio</a>.</dd>
+</dl>
+<h2>Availability in Praat</h2>
+<p>Transcription with whisper.cpp is available in two ways in Praat:</p>
+<dl>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; if you select a <a href="Sound.html">Sound</a> together with its <a href="TextGrid.html">TextGrid</a> and choose <a href="TextGrid___Sound__Transcribe_interval___.html">Transcribe interval...</a>;</dd>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; via <b>Transcribe interval</b> from the <b>Interval</b> menu in the <a href="TextGridEditor.html">TextGridEditor</a>. The settings for this command are set via <b>Transcription settings...</b> in the same menu and are remembered across Praat sessions.</dd>
+</dl>
+<h3>Links to this page</h3>
+<ul>
+<li><a href="Acknowledgments.html">Acknowledgments</a>
+<li><a href="Create_SpeechRecognizer___.html">Create SpeechRecognizer...</a>
+<li><a href="SpeechRecognizer.html">SpeechRecognizer</a>
+<li><a href="SpeechRecognizer___Sound__Transcribe.html">SpeechRecognizer & Sound: Transcribe</a>
+</ul>
+<hr>
+<address>
+	<p>© Anastasia Shchupak 2026-06-01</p>
+</address>
+</body>
+</html>

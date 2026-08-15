@@ -22,6 +22,7 @@
 #include "UiPause.h"
 #include "DemoEditor.h"
 #include "Formula.h"
+#include "Notebook.h"
 #include "../kar/UnicodeData.h"
 
 #include "../fon/Vector.h"
@@ -35,30 +36,34 @@
 #define Interpreter_FOLDER 6
 
 #define Interpreter_REAL 7
-#define Interpreter_POSITIVE 8
-#define Interpreter_INTEGER 9
-#define Interpreter_NATURAL 10
-#define Interpreter_BOOLEAN 11
+#define Interpreter_NONNEGATIVE 8
+#define Interpreter_POSITIVE 9
+#define Interpreter_INTEGER 10
+#define Interpreter_NATURAL0 11
+#define Interpreter_NATURAL1 12
+#define Interpreter_BOOLEAN 13
 #define Interpreter_MINIMUM_TYPE_FOR_NUMERIC_VARIABLE  Interpreter_REAL
 #define Interpreter_MAXIMUM_TYPE_FOR_NUMERIC_VARIABLE  Interpreter_BOOLEAN
 
-#define Interpreter_REALVECTOR 12
-#define Interpreter_POSITIVEVECTOR 13
-#define Interpreter_INTEGERVECTOR 14
-#define Interpreter_NATURALVECTOR 15
+#define Interpreter_REALVECTOR 14
+#define Interpreter_NONNEGATIVEVECTOR 15
+#define Interpreter_POSITIVEVECTOR 16
+#define Interpreter_INTEGERVECTOR 17
+#define Interpreter_NATURAL0VECTOR 18
+#define Interpreter_NATURAL1VECTOR 19
 #define Interpreter_MINIMUM_TYPE_FOR_NUMERIC_VECTOR_VARIABLE  Interpreter_REALVECTOR
-#define Interpreter_MAXIMUM_TYPE_FOR_NUMERIC_VECTOR_VARIABLE  Interpreter_NATURALVECTOR
+#define Interpreter_MAXIMUM_TYPE_FOR_NUMERIC_VECTOR_VARIABLE  Interpreter_NATURAL1VECTOR
 
-#define Interpreter_REALMATRIX 16
-#define Interpreter_CHOICE 17
-#define Interpreter_OPTIONMENU 18
+#define Interpreter_REALMATRIX 20
+#define Interpreter_CHOICE 21
+#define Interpreter_OPTIONMENU 22
 #define Interpreter_MAXIMUM_TYPE_WITH_VARIABLE_NAME  Interpreter_OPTIONMENU
 
-#define Interpreter_BUTTON 19
-#define Interpreter_OPTION 20
-#define Interpreter_HEADING 21
-#define Interpreter_COMMENT 22
-#define Interpreter_CAPTION 23
+#define Interpreter_BUTTON 23
+#define Interpreter_OPTION 24
+#define Interpreter_HEADING 25
+#define Interpreter_COMMENT 26
+#define Interpreter_CAPTION 27
 
 Thing_implement (InterpreterVariable, SimpleString, 0);
 
@@ -152,6 +157,34 @@ void Interpreters_undangleEnvironment (Editor environment) noexcept {
 		if (interpreter -> optionalDynamicEnvironmentEditor() == environment)
 			interpreter -> undangleDynamicEditor();
 	}
+}
+
+void Interpreter_rememberScript (Interpreter me, MelderFile scriptFile, const bool fullTrust) {
+	if (MelderFile_isNull (scriptFile))
+		return;
+	autoScript script = Script_createFromFile (scriptFile);
+	Script_rememberDuringThisAppSession_move (script.move());
+	my scriptReference = Script_find (MelderFile_peekPath (scriptFile));
+	my scriptReference -> trusted |= fullTrust;
+}
+void Interpreter_rememberScript_override (Interpreter me, MelderFile scriptFile, const bool fullTrust) {
+	if (MelderFile_isNull (scriptFile))
+		return;
+	autoScript script = Script_createFromFile (scriptFile);
+	Script_rememberDuringThisAppSession_move (script.move());
+	my scriptReference = Script_find (MelderFile_peekPath (scriptFile));
+	my scriptReference -> trusted = fullTrust;
+}
+
+void Interpreter_rememberNotebook (Interpreter me, MelderFile notebookFile, const bool fullTrust) {
+	TRACE
+	trace (U"Remembering notebook file ", notebookFile);
+	if (MelderFile_isNull (notebookFile))
+		return;
+	autoNotebook notebook = Notebook_createFromFile (notebookFile);
+	Notebook_rememberDuringThisAppSession_move (notebook.move());
+	my notebookReference = Notebook_find (MelderFile_peekPath (notebookFile));
+	my notebookReference -> trusted |= fullTrust;
 }
 
 static bool Melder_scriptTextIsNotebookText (conststring32 text) {
@@ -406,6 +439,10 @@ integer Interpreter_readParameters (Interpreter me, mutablestring32 text) {
 				type = Interpreter_REAL;
 				hasColon = ( startOfLine [4] == U':' );
 				p = startOfLine + 4 + hasColon;
+			} else if (str32nequ (startOfLine, U"nonnegative", 11) && isEndOfInkOrColon (startOfLine [11])) {
+				type = Interpreter_NONNEGATIVE;
+				hasColon = ( startOfLine [11] == U':' );
+				p = startOfLine + 11 + hasColon;
 			} else if (str32nequ (startOfLine, U"positive", 8) && isEndOfInkOrColon (startOfLine [8])) {
 				type = Interpreter_POSITIVE;
 				hasColon = ( startOfLine [8] == U':' );
@@ -414,8 +451,16 @@ integer Interpreter_readParameters (Interpreter me, mutablestring32 text) {
 				type = Interpreter_INTEGER;
 				hasColon = ( startOfLine [7] == U':' );
 				p = startOfLine + 7 + hasColon;
+			} else if (str32nequ (startOfLine, U"natural0", 8) && isEndOfInkOrColon (startOfLine [8])) {
+				type = Interpreter_NATURAL0;
+				hasColon = ( startOfLine [8] == U':' );
+				p = startOfLine + 8 + hasColon;
+			} else if (str32nequ (startOfLine, U"natural1", 8) && isEndOfInkOrColon (startOfLine [8])) {
+				type = Interpreter_NATURAL1;
+				hasColon = ( startOfLine [8] == U':' );
+				p = startOfLine + 8 + hasColon;
 			} else if (str32nequ (startOfLine, U"natural", 7) && isEndOfInkOrColon (startOfLine [7])) {
-				type = Interpreter_NATURAL;
+				type = Interpreter_NATURAL1;
 				hasColon = ( startOfLine [7] == U':' );
 				p = startOfLine + 7 + hasColon;
 			} else if (str32nequ (startOfLine, U"boolean", 7) && isEndOfInkOrColon (startOfLine [7])) {
@@ -426,6 +471,10 @@ integer Interpreter_readParameters (Interpreter me, mutablestring32 text) {
 				type = Interpreter_REALVECTOR;
 				hasColon = ( startOfLine [10] == U':' );
 				p = startOfLine + 10 + hasColon;
+			} else if (str32nequ (startOfLine, U"nonnegativevector", 17) && isEndOfInkOrColon (startOfLine [17])) {
+				type = Interpreter_NONNEGATIVEVECTOR;
+				hasColon = ( startOfLine [17] == U':' );
+				p = startOfLine + 17 + hasColon;
 			} else if (str32nequ (startOfLine, U"positivevector", 14) && isEndOfInkOrColon (startOfLine [14])) {
 				type = Interpreter_POSITIVEVECTOR;
 				hasColon = ( startOfLine [14] == U':' );
@@ -434,8 +483,16 @@ integer Interpreter_readParameters (Interpreter me, mutablestring32 text) {
 				type = Interpreter_INTEGERVECTOR;
 				hasColon = ( startOfLine [13] == U':' );
 				p = startOfLine + 13 + hasColon;
-			} else if (str32nequ (startOfLine, U"naturalvector", 14) && isEndOfInkOrColon (startOfLine [14])) {
-				type = Interpreter_NATURALVECTOR;
+			} else if (str32nequ (startOfLine, U"natural0vector", 14) && isEndOfInkOrColon (startOfLine [14])) {
+				type = Interpreter_NATURAL1VECTOR;
+				hasColon = ( startOfLine [14] == U':' );
+				p = startOfLine + 14 + hasColon;
+			} else if (str32nequ (startOfLine, U"natural1vector", 14) && isEndOfInkOrColon (startOfLine [14])) {
+				type = Interpreter_NATURAL1VECTOR;
+				hasColon = ( startOfLine [14] == U':' );
+				p = startOfLine + 14 + hasColon;
+			} else if (str32nequ (startOfLine, U"naturalvector", 13) && isEndOfInkOrColon (startOfLine [13])) {
+				type = Interpreter_NATURAL1VECTOR;
 				hasColon = ( startOfLine [13] == U':' );
 				p = startOfLine + 13 + hasColon;
 			} else if (str32nequ (startOfLine, U"realmatrix", 10) && isEndOfInkOrColon (startOfLine [10])) {
@@ -713,7 +770,8 @@ autoUiForm Interpreter_createForm (Interpreter me, GuiWindow parent, Editor opti
 {
 	autoUiForm form = UiForm_create (parent, optionalEditor,
 		Melder_cat (selectionOnly ? U"Run script (selection only): " : U"Run script: ", my dialogTitle.get()),
-		okCallback, okClosure, nullptr, nullptr);
+		okCallback, okClosure, nullptr, nullptr
+	);
 	if (path)
 		form -> scriptFilePath = Melder_dup (path);
 	for (int ipar = 1; ipar <= my numberOfParameters; ipar ++) {
@@ -758,12 +816,16 @@ autoUiForm Interpreter_createForm (Interpreter me, GuiWindow parent, Editor opti
 							my numbersOfLines [ipar]);
 			} break; case Interpreter_REAL: {
 				UiForm_addReal (form.get(), nullptr, nullptr, parameter, my arguments [ipar].get());   // TODO: an address of a real variable
+			} break; case Interpreter_NONNEGATIVE: {
+				UiForm_addNonnegative (form.get(), nullptr, nullptr, parameter, my arguments [ipar].get());
 			} break; case Interpreter_POSITIVE: {
 				UiForm_addPositive (form.get(), nullptr, nullptr, parameter, my arguments [ipar].get());
 			} break; case Interpreter_INTEGER: {
 				UiForm_addInteger (form.get(), nullptr, nullptr, parameter, my arguments [ipar].get());
-			} break; case Interpreter_NATURAL: {
-				UiForm_addNatural (form.get(), nullptr, nullptr, parameter, my arguments [ipar].get());
+			} break; case Interpreter_NATURAL0: {
+				UiForm_addNatural0 (form.get(), nullptr, nullptr, parameter, my arguments [ipar].get());
+			} break; case Interpreter_NATURAL1: {
+				UiForm_addNatural1 (form.get(), nullptr, nullptr, parameter, my arguments [ipar].get());
 			} break; case Interpreter_BOOLEAN: {
 				mutablestring32 arg = & my arguments [ipar] [0];
 				if (
@@ -793,6 +855,15 @@ autoUiForm Interpreter_createForm (Interpreter me, GuiWindow parent, Editor opti
 				else
 					UiForm_addRealVector (form.get(), nullptr, nullptr, parameter, format, my arguments [ipar].get(),
 							my numbersOfLines [ipar]);
+			} break; case Interpreter_NONNEGATIVEVECTOR: {
+				kUi_realVectorFormat format = kUi_realVectorFormat_getValue (my formats [ipar]);
+				if (format == kUi_realVectorFormat::UNDEFINED)
+					Melder_throw (U"Undefined nonnegative vector format “", my formats [ipar], U"”.");
+				if (my numbersOfLines [ipar] == 0)
+					UiForm_addNonnegativeVector (form.get(), nullptr, nullptr, parameter, format, my arguments [ipar].get());
+				else
+					UiForm_addNonnegativeVector (form.get(), nullptr, nullptr, parameter, format, my arguments [ipar].get(),
+							my numbersOfLines [ipar]);
 			} break; case Interpreter_POSITIVEVECTOR: {
 				kUi_realVectorFormat format = kUi_realVectorFormat_getValue (my formats [ipar]);
 				if (format == kUi_realVectorFormat::UNDEFINED)
@@ -811,16 +882,29 @@ autoUiForm Interpreter_createForm (Interpreter me, GuiWindow parent, Editor opti
 				else
 					UiForm_addIntegerVector (form.get(), nullptr, nullptr, parameter, format, my arguments [ipar].get(),
 							my numbersOfLines [ipar]);
-			} break; case Interpreter_NATURALVECTOR: {
+			} break; case Interpreter_NATURAL0VECTOR: {
 				kUi_integerVectorFormat format = kUi_integerVectorFormat_getValue (my formats [ipar]);
 				if (format == kUi_integerVectorFormat::UNDEFINED)
 					Melder_throw (U"Undefined natural vector format “", my formats [ipar], U"”.");
 				if (my numbersOfLines [ipar] == 0)
-					UiForm_addNaturalVector (form.get(), nullptr, nullptr, parameter,
+					UiForm_addNatural0Vector (form.get(), nullptr, nullptr, parameter,
 						kUi_integerVectorFormat_getValue (my formats [ipar]), my arguments [ipar].get()
 					);
 				else
-					UiForm_addNaturalVector (form.get(), nullptr, nullptr, parameter,
+					UiForm_addNatural0Vector (form.get(), nullptr, nullptr, parameter,
+						kUi_integerVectorFormat_getValue (my formats [ipar]), my arguments [ipar].get(),
+						my numbersOfLines [ipar]
+					);
+			} break; case Interpreter_NATURAL1VECTOR: {
+				kUi_integerVectorFormat format = kUi_integerVectorFormat_getValue (my formats [ipar]);
+				if (format == kUi_integerVectorFormat::UNDEFINED)
+					Melder_throw (U"Undefined natural vector format “", my formats [ipar], U"”.");
+				if (my numbersOfLines [ipar] == 0)
+					UiForm_addNatural1Vector (form.get(), nullptr, nullptr, parameter,
+						kUi_integerVectorFormat_getValue (my formats [ipar]), my arguments [ipar].get()
+					);
+				else
+					UiForm_addNatural1Vector (form.get(), nullptr, nullptr, parameter,
 						kUi_integerVectorFormat_getValue (my formats [ipar]), my arguments [ipar].get(),
 						my numbersOfLines [ipar]
 					);
@@ -885,6 +969,7 @@ void Interpreter_getArgumentsFromDialog (Interpreter me, UiForm dialog) {
 				break;
 			}
 			case Interpreter_REAL:
+			case Interpreter_NONNEGATIVE:
 			case Interpreter_POSITIVE:
 			{
 				const double value = UiForm_getReal_check (dialog, parameter);
@@ -893,7 +978,8 @@ void Interpreter_getArgumentsFromDialog (Interpreter me, UiForm dialog) {
 				break;
 			}
 			case Interpreter_INTEGER:
-			case Interpreter_NATURAL:
+			case Interpreter_NATURAL0:
+			case Interpreter_NATURAL1:
 			case Interpreter_BOOLEAN:
 			{
 				const integer value = UiForm_getInteger (dialog, parameter);
@@ -902,6 +988,7 @@ void Interpreter_getArgumentsFromDialog (Interpreter me, UiForm dialog) {
 				break;
 			}
 			case Interpreter_REALVECTOR:
+			case Interpreter_NONNEGATIVEVECTOR:
 			case Interpreter_POSITIVEVECTOR:
 			{
 				const VEC realVectorValue = UiForm_getRealVector (dialog, parameter);
@@ -915,7 +1002,8 @@ void Interpreter_getArgumentsFromDialog (Interpreter me, UiForm dialog) {
 				break;
 			}
 			case Interpreter_INTEGERVECTOR:
-			case Interpreter_NATURALVECTOR:
+			case Interpreter_NATURAL0VECTOR:
+			case Interpreter_NATURAL1VECTOR:
 			{
 				const INTVEC integerVectorValue = UiForm_getIntegerVector (dialog, parameter);
 				autoMelderString buffer;
@@ -3028,13 +3116,13 @@ void Interpreter_resume (Interpreter me) {
 									InterpreterVariable var = Interpreter_hasVariable (me, variableName);
 									if (! var)
 										Melder_throw (U"Variable ", variableName, U" undefined.");
-									MelderFile_appendText (& file, var -> stringValue.get());
+									MelderFile_appendText_e (& file, var -> stringValue.get());
 								} else {
 									if (theCurrentPraatObjects != & theForegroundPraatObjects) Melder_throw (U"Commands that write to a file are not available inside pictures.");
 									InterpreterVariable var = Interpreter_hasVariable (me, variableName);
 									if (! var)
 										Melder_throw (U"Variable ", variableName, U" undefined.");
-									MelderFile_writeText (& file, var -> stringValue.get(), Melder_getOutputEncoding ());
+									MelderFile_writeText_e (& file, var -> stringValue.get(), Melder_getOutputEncoding ());
 								}
 							} else if (isCommand (p)) {
 								/*

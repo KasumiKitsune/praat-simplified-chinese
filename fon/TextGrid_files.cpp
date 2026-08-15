@@ -929,14 +929,14 @@ autoIntervalTier IntervalTier_readFromTimitLabelFile (
 				previousEndSample = startingSample;
 			}
 			Melder_require (startingSample >= previousStartingSample,
-				U"The starting sample in line ", MelderReadText_getLineNumber (text.get()),
+				U"The starting sample in line ", MelderReadText_getLineNumber (text.get()) - 1,
 				U" should be at least the starting sample of the previous line, but ",
 				startingSample, U" is less than ", previousStartingSample, U"."
 			);
 			{// scope
 				const char32 shouldBeHorizontalSpace = * line ++;
 				Melder_require (Melder_isHorizontalSpace (shouldBeHorizontalSpace),
-					U"There should be a space after the starting sample in line ", MelderReadText_getLineNumber (text.get()), U".");
+					U"There should be a space after the starting sample in line ", MelderReadText_getLineNumber (text.get()) - 1, U".");
 			}
 
 			/*
@@ -949,14 +949,14 @@ autoIntervalTier IntervalTier_readFromTimitLabelFile (
 				U" but ", endSample, U" is less than ", startingSample, U"."
 			);
 			Melder_require (endSample >= previousEndSample,
-				U"The end sample in line ", MelderReadText_getLineNumber (text.get()),
+				U"The end sample in line ", MelderReadText_getLineNumber (text.get()) - 1,
 				U" should be at least the end sample of the previous line, but ",
 				endSample, U" is less than ", previousEndSample, U"."
 			);
 			{// scope
 				const char32 shouldBeHorizontalSpace = * line ++;
 				Melder_require (Melder_isHorizontalSpace (shouldBeHorizontalSpace),
-					U"There should be a space after the end sample in line ", MelderReadText_getLineNumber (text.get()), U".");
+					U"There should be a space after the end sample in line ", MelderReadText_getLineNumber (text.get()) - 1, U".");
 			}
 
 			/*

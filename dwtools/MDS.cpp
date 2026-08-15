@@ -1,10 +1,10 @@
 /* MDS.cpp
  *
- * Copyright (C) 1993-2020, 2026 David Weenink, 2015,2017 Paul Boersma
+ * Copyright (C) 1993-2020,2026 David Weenink, 2015,2017 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -1849,7 +1849,7 @@ autoConfiguration Dissimilarity_Configuration_kruskal (Dissimilarity me, Configu
 
 static void indscal_iteration_tenBerge (ScalarProductList zc, Configuration xc, Salience weights) {
 	const integer nPoints = xc -> numberOfRows, nDimensions = xc -> numberOfColumns;
-	const integer nSources = zc -> size;
+	const integer nSources = zc->size;
 
 	const double tolerance = 1e-4; // reasonable for dominant eigenvector estimation.
 	autoMAT wsih = raw_MAT (nPoints, nPoints);
@@ -1950,7 +1950,7 @@ void ScalarProductList_Configuration_Salience_indscal (ScalarProductList sp, Con
 		if (out_varianceAccountedFor)
 			*out_varianceAccountedFor = varianceAccountedFor;
 		if (showProgress) {
-			const integer nSources = sp -> size;
+			const integer nSources = sp->size;
 			MelderInfo_writeLine (U"**************** INDSCAL results on Distances *******************\n\n",
 				Thing_className (sp), U"number of objects: ", nSources);
 			for (integer i = 1; i <= nSources; i ++) 

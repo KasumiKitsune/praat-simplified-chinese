@@ -1038,7 +1038,7 @@ autoGaussianMixture GaussianMixture_TableOfReal_to_GaussianMixture_CEMM (Gaussia
 							numberOfNonzeroComponents --;
 							probabilities.column (icomponent)  <<=  0.0;
 							responsibilities.column (icomponent)  <<=  0.0;
-							MATnormalizeRows_inplace (responsibilities.get(), 1.0, 1.0); // Maintain invariant
+							MATnormalizeRows_inplace (responsibilities.get(), 1.0, 1.0);   // maintain invariant
 							if (info)
 								MelderInfo_writeLine (U"iter = ", iter, U", component ", icomponent, U" removed.");
 						}
@@ -1072,7 +1072,7 @@ autoGaussianMixture GaussianMixture_TableOfReal_to_GaussianMixture_CEMM (Gaussia
 				numberOfNonzeroComponents --;
 				probabilities.column (componentToDelete)  <<=  0.0;
 				responsibilities.column (componentToDelete)  <<=  0.0;
-				MATnormalizeRows_inplace (responsibilities.get(), 1.0, 1.0); // Maintain invariant
+				MATnormalizeRows_inplace (responsibilities.get(), 1.0, 1.0);   // maintain invariant
 				if (info)
 					MelderInfo_writeLine (U"iter = ", iter, U", component ", componentToDelete, U" removed (after).");
 			} else {

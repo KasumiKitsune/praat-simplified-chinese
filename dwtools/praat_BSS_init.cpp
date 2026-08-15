@@ -1,6 +1,6 @@
 /* praat_BSS_init.cpp
  *
- * Copyright (C) 2010-2021 David Weenink, 2015,2018 Paul Boersma
+ * Copyright (C) 2010-2021 David Weenink, 2015-2018,2020-2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -219,7 +219,7 @@ DO
 DIRECT (COMBINE_ALL_TO_ONE__CrossCorrelationTables_to_CrossCorrelationTableList) {
 	COMBINE_ALL_TO_ONE (CrossCorrelationTable)
 		autoCrossCorrelationTableList result = CrossCorrelationTables_to_CrossCorrelationTableList (& list);
-		integer size = result -> size;
+		integer size = result->size;
 	COMBINE_ALL_TO_ONE_END (U"ct_", size)
 }
 

@@ -26,14 +26,10 @@
 #include "NUM2.h"
 
 void FFNet_Eigen_drawIntersection (FFNet me, Eigen eigen, Graphics g, integer pcx, integer pcy, double xmin, double xmax, double ymin, double ymax) {
-	const integer ix = integer_abs (pcx), iy = integer_abs (pcy);
-	const integer numberOfEigenvalues = eigen -> numberOfEigenvalues;
-	const integer dimension = eigen -> dimension;
-
-	if (ix > numberOfEigenvalues || iy > numberOfEigenvalues || my numberOfInputs != dimension)
+	Melder_assert (pcx > 0 && pcy > 0);
+	if (pcx > eigen -> numberOfEigenvalues || pcy > eigen -> numberOfEigenvalues || my numberOfInputs != eigen -> dimension)
 		return;
 
-	Melder_assert (ix > 0 && iy > 0);
 	double x1, x2, y1, y2;
 	if (xmax <= xmin || ymax <= ymin)
 		Graphics_inqWindow (g, & x1, & x2, & y1, & y2);
@@ -52,8 +48,8 @@ void FFNet_Eigen_drawIntersection (FFNet me, Eigen eigen, Graphics g, integer pc
 		const integer unitOffset = my numberOfInputs + 1;
 		double c1 = 0.0, c2 = 0.0;
 		for (integer j = 1; j <= my numberOfInputs; j ++) {
-			c1 += my w [my wFirst [unitOffset + i] + j - 1] * eigen -> eigenvectors [ix] [j];
-			c2 += my w [my wFirst [unitOffset + i] + j - 1] * eigen -> eigenvectors [iy] [j];
+			c1 += my w [my wFirst [unitOffset + i] + j - 1] * eigen -> eigenvectors [pcx] [j];
+			c2 += my w [my wFirst [unitOffset + i] + j - 1] * eigen -> eigenvectors [pcy] [j];
 		}
 		double x [6], y [6], xs [3], ys [3];
 		x [1] = x [2] = x [5] = xmin;
@@ -87,11 +83,10 @@ void FFNet_Eigen_drawIntersection (FFNet me, Eigen eigen, Graphics g, integer pc
 */
 void FFNet_Eigen_drawDecisionPlaneInEigenspace (FFNet me, Eigen thee, Graphics g, integer unit, integer layer,
 	integer pcx, integer pcy, double xmin, double xmax, double ymin, double ymax) {
-	if (layer < 1 || layer > my numberOfLayers)
-		return;
-	if (unit < 1 || unit > my numberOfUnitsInLayer [layer])
-		return;
-	if (pcx > thy numberOfEigenvalues || pcy > thy numberOfEigenvalues)
+	Melder_assert (layer > 0);
+	Melder_assert (unit > 0);
+	Melder_assert (pcx > 0 && pcy > 0);
+	if (layer > my numberOfLayers || unit > my numberOfUnitsInLayer [layer] || pcx > thy numberOfEigenvalues || pcy > thy numberOfEigenvalues)
 		return;
 	const integer numberOfUnitsInLayer_m1 = ( layer == 1 ? my numberOfInputs : my numberOfUnitsInLayer [layer - 1] );
 	if (numberOfUnitsInLayer_m1 != thy dimension)

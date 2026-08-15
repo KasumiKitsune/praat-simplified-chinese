@@ -1,5 +1,5 @@
 # meson.build of the library "melder"
-# David Weenink & Paul Boersma, 23 August 2025
+# David Weenink & Paul Boersma, 1 July 2026
 
 sources = '''
 	melder.cpp complex.cpp melder_alloc.cpp melder_str32.cpp melder_colour.cpp
@@ -19,7 +19,7 @@ libmelder = static_library (
 	'melder',
 	sources : sources,
 	dependencies : gtk_dep,
-	include_directories : [sys_inc]
+	include_directories : [sys_inc, blake3_inc]
 )
 
 libmelder_dep = declare_dependency (

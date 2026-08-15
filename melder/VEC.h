@@ -1,11 +1,11 @@
 #pragma once
 /* VEC.h
  *
- * Copyright (C) 2017-2021,2023,2024 Paul Boersma
+ * Copyright (C) 2017-2021,2023-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -401,5 +401,9 @@ extern autoINTVEC to_INTVEC (integer to);
 extern autoINTVEC from_to_INTVEC (integer from, integer to);
 extern autoINTVEC from_to_by_INTVEC (integer from, integer to, integer by);
 extern autoINTVEC from_to_count_INTVEC (integer from, integer to, integer count);
+
+extern autoVEC blake3_VEC (constVECVU const& vec);
+extern autoVEC blake3_VEC (constMATVU const& mat);
+extern autoVEC blake3_VEC (conststring32 str);
 
 /* End of file VEC.h */

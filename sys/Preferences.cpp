@@ -89,7 +89,7 @@ void _Preferences_addEnum (conststring32 string, int *value, int min, int max,
 	{ *value = defaultValue; Preferences_add (string, enumwa, value, min, max, getText, getValue); }
 }
 
-void Preferences_read (MelderFile file) {
+void Preferences_read_i (MelderFile file) {
 	/*
 		It is possible (see praat.cpp) that this routine is called
 		before any preferences have been registered.
@@ -187,30 +187,30 @@ void Preferences_read (MelderFile file) {
 	}
 }
 
-void Preferences_write (MelderFile file) {
+void Preferences_write_i (MelderFile file) {
 	if (thePreferences.size == 0)
 		return;
-	static MelderString buffer;
-	for (integer ipref = 1; ipref <= thePreferences.size; ipref ++) {
-		Preference pref = thePreferences.at [ipref];
-		MelderString_append (& buffer, pref -> string.get(), U": ");
-		switch (pref -> type) {
-			case bytewa:     MelderString_append (& buffer, (int) (* (signed char *)    pref -> value)); break;
-			case int16wa:    MelderString_append (& buffer,       (* (int16 *)          pref -> value)); break;
-			case intwa:      MelderString_append (& buffer,       (* (int *)            pref -> value)); break;
-			case integerwa:  MelderString_append (& buffer,       (* (integer *)        pref -> value)); break;
-			case ubytewa:    MelderString_append (& buffer, (int) (* (unsigned char *)  pref -> value)); break;
-			case uintwa:     MelderString_append (& buffer,       (* (unsigned int *)   pref -> value)); break;
-			case uintegerwa: MelderString_append (& buffer,       (* (uinteger *)       pref -> value)); break;
-			case doublewa:   MelderString_append (& buffer,       (* (double *)         pref -> value)); break;
-			case stringwa:   MelderString_append (& buffer,         ((conststring32)    pref -> value)); break;
-			case enumwa:     MelderString_append (& buffer,  pref -> getText (* (int *) pref -> value)); break;
-			case questionwa: MelderString_append (& buffer,       (* (bool *)           pref -> value)); break;
-		}
-		MelderString_appendCharacter (& buffer, U'\n');
-	}
 	try {
-		MelderFile_writeText (file, buffer.string, kMelder_textOutputEncoding::ASCII_THEN_UTF16);
+		static MelderString buffer;
+		for (integer ipref = 1; ipref <= thePreferences.size; ipref ++) {
+			Preference pref = thePreferences.at [ipref];
+			MelderString_append (& buffer, pref -> string.get(), U": ");
+			switch (pref -> type) {
+				case bytewa:     MelderString_append (& buffer, (int) (* (signed char *)    pref -> value)); break;
+				case int16wa:    MelderString_append (& buffer,       (* (int16 *)          pref -> value)); break;
+				case intwa:      MelderString_append (& buffer,       (* (int *)            pref -> value)); break;
+				case integerwa:  MelderString_append (& buffer,       (* (integer *)        pref -> value)); break;
+				case ubytewa:    MelderString_append (& buffer, (int) (* (unsigned char *)  pref -> value)); break;
+				case uintwa:     MelderString_append (& buffer,       (* (unsigned int *)   pref -> value)); break;
+				case uintegerwa: MelderString_append (& buffer,       (* (uinteger *)       pref -> value)); break;
+				case doublewa:   MelderString_append (& buffer,       (* (double *)         pref -> value)); break;
+				case stringwa:   MelderString_append (& buffer,         ((conststring32)    pref -> value)); break;
+				case enumwa:     MelderString_append (& buffer,  pref -> getText (* (int *) pref -> value)); break;
+				case questionwa: MelderString_append (& buffer,       (* (bool *)           pref -> value)); break;
+			}
+			MelderString_appendCharacter (& buffer, U'\n');
+		}
+		MelderFile_writeText_e (file, buffer.string, kMelder_textOutputEncoding::ASCII_THEN_UTF16);
 	} catch (MelderError) {
 		Melder_clearError ();
 	}

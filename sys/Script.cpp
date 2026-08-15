@@ -1,6 +1,6 @@
 /* Script.cpp
  *
- * Copyright (C) 1997-2005,2009,2011,2015,2016,2020,2024,2025 Paul Boersma
+ * Copyright (C) 1997-2005,2009,2011,2015,2016,2020,2024-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ void Script_rememberDuringThisAppSession_move (autoScript me) {
 }
 
 Script Script_find (conststring32 filePath) {
-	integer position = theKnownScripts -> lookUp (filePath);
+	const integer position = theKnownScripts -> lookUp (filePath);
 	Melder_assert (position != 0);
 	return theKnownScripts -> at [position];
 }

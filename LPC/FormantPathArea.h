@@ -2,11 +2,11 @@
 #define _FormantPathArea_h_
 /* FormantPathEditor.h
  *
- * Copyright (C) 2020-2023 David Weenink, 2022-2024 Paul Boersma
+ * Copyright (C) 2020-2023 David Weenink, 2022-2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -52,7 +52,7 @@ Thing_define (FormantPathArea, SoundAnalysisArea) {
 	bool v_mouse (GuiDrawingArea_MouseEvent event, double x_world, double localY_fraction)
 		override;
 	void v_reset_analysis () override {
-		our d_spectrogram. reset();
+		our d_spectrogramList. reset();
 		our d_pitch. reset();
 		our d_intensity. reset();
 		our d_pulses. reset();

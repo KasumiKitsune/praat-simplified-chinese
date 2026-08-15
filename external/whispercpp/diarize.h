@@ -46,7 +46,7 @@ struct diarize_full_params {
 	float   seg_step_ratio;     // step as fraction of duration (default: 0.1 = 90% overlap)
 
 	// Clustering: threshold and large-vs-small split (always applied)
-	float   cluster_threshold;  // agglomerative clustering threshold (default: 0.7045654963945799f)
+	float   cluster_threshold;  // agglomerative clustering threshold (default: 0.7)
 	int     cluster_min_size;   // minimum cluster size (default: 12)
 
 	// Embedding filter

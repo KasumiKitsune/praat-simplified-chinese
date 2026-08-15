@@ -37,6 +37,7 @@
 #include "LPC_to_Spectrum.h"
 #include "NUM2.h"
 #include "PowerCepstrum.h"
+#include "PowerCepstrogram.h"
 #include "Sound_to_PowerCepstrogram.h"
 #include "Sound_and_LPC.h"
 #include "Sound_to_Formant_mt.h"
@@ -58,6 +59,22 @@ static const conststring32 MODIFY_BUTTON   = U"Modify -";
 
 void praat_CC_init (ClassInfo klas);
 void praat_TimeFrameSampled_query_init (ClassInfo klas);
+
+DIRECT (HELP__CPP_help) {
+	HELP (U"CPP")
+}
+
+FORM (GRAPHICS_EACH__CPP_draw, U"CPP: Draw", U"") {
+	REAL (tmin, U"left Time range (s)", U"0.0")
+	REAL (tmax, U"right Time range (s)", U"0.0 (=all)")
+	POSITIVE (cppmax, U"Maximum CPP (dB)", U"100.0")
+	BOOLEAN (garnish, U"Garnish", U"yes");
+	OK
+DO
+	GRAPHICS_EACH (CPP)
+		CPP_draw (me, GRAPHICS, tmin, tmax, 0.0, cppmax, garnish);
+	GRAPHICS_EACH_END
+}
 
 DIRECT (HELP__FormantPath_help) {
 	HELP (U"FormantPath")
@@ -93,19 +110,19 @@ FORM (GRAPHICS_EACH__FormantPath_drawAsGrid, U"FormantPath: Draw as grid", nullp
 	REAL (tmin, U"left Time range (s)", U"0.0")
 	REAL (tmax, U"right Time range (s)", U"0.1")
 	POSITIVE (fmax, U"Maximum frequency", U"6200.0")
-	NATURAL (fromFormant, U"left Formant range", U"1")
-	NATURAL (toFormant, U"right Formant range", U"5")
+	NATURAL1 (fromFormant, U"left Formant range", U"1")
+	NATURAL1 (toFormant, U"right Formant range", U"5")
 	BOOLEAN (showBandwidths, U"Show bandwidths", true)
 	COLOUR (odd, U"Colour of F1, F3, F5", U"red")
 	COLOUR (even, U"Colour of F2, F4", U"purple")
-	INTEGER (numberOfRows, U"Number of rows", U"0")
-	INTEGER (numberOfColumns, U"Number of columns", U"0")
+	NATURAL0 (numberOfRows, U"Number of rows", U"0")
+	NATURAL0 (numberOfColumns, U"Number of columns", U"0")
 	POSITIVE (xSpaceFraction, U"X space fraction", U"0.1")
 	POSITIVE (ySpaceFraction, U"Y space fraction", U"0.2")
 	POSITIVE (lineEvery_Hz, U"Horizontal line every (Hz)", U"1000.0")
 	REAL (xCursor, U"X cursor line at (s)", U"-0.1 (= no line)")
 	REAL (yCursor, U"Y cursor at (Hz)", U"-100.0 (= no line)")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3 3")
 	BOOLEAN (markCandidatesWithinPath, U"Mark candidates within path", false)
 	COLOUR (markColour, U"Mark colour", U"{0.984,0.984, 0.7}")
 	BOOLEAN (showStress, U"Show stress", true)
@@ -131,11 +148,11 @@ FORM (NEW__FormantPath_downTo_Table_optimalInterval, U"FormantPath: Down to Tabl
 	POSITIVE (powerf, U"Power", U"1.25")
 	BOOLEAN (includeFrameNumber, U"Include frame number", false)
 	BOOLEAN (includeTime, U"Include time", true)
-	NATURAL (numberOfTimeDecimals, U"Number of time decimals", U"6")
+	NATURAL0 (numberOfTimeDecimals, U"Number of time decimals", U"6")
 	BOOLEAN (includeIntensity, U"Include intensity", false)
-	NATURAL (numberOfIntensityDecimals, U"Number of intensity decimals", U"3")
+	NATURAL0 (numberOfIntensityDecimals, U"Number of intensity decimals", U"3")
 	BOOLEAN (includeNumberOfFormants, U"Include number of formants", true)
-	NATURAL (numberOfFrequencyDecimals, U"Number of frequency decimals", U"3")
+	NATURAL0 (numberOfFrequencyDecimals, U"Number of frequency decimals", U"3")
 	BOOLEAN (includeBandwidths, U"Include bandwidths", true)
 	BOOLEAN (includeOptimumCeiling, U"Include optimal ceiling", true)
 	BOOLEAN (includeMinimumStress, U"Include minimum stress", false)
@@ -153,11 +170,11 @@ DO
 FORM (NEW__FormantPath_downTo_Table_stresses, U"FormantPath: Down to Table (stresses)", U"FormantPath: Down to Table (stresses)...") {
 	REAL (tmin, U"left Time range (s)", U"0.1")
 	REAL (tmax, U"right Time range (s)", U"0.2")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
-	NATURAL (numberOfStressDecimals, U"Number of stress decimals", U"2")
+	NATURAL0 (numberOfStressDecimals, U"Number of stress decimals", U"2")
 	BOOLEAN (includeIntervalTimes, U"Include interval times", true)
-	NATURAL (numberOfTimeDecimals, U"Number of time decimals", U"6")
+	NATURAL0 (numberOfTimeDecimals, U"Number of time decimals", U"6")
 	OK
 DO
 	CONVERT_EACH_TO_ONE (FormantPath)
@@ -181,7 +198,7 @@ DIRECT (QUERY_ONE_FOR_REAL_VECTOR__FormantPath_listCeilingFrequencies) {
 FORM (QUERY_ONE_FOR_REAL__FormantPath_getOptimalCeiling, U"FormantPath: Get optimal ceiling", U"") {
 	REAL (tmin, U"left Time range (s)", U"0.0")
 	REAL (tmax, U"right Time range (s)", U"0.0 (= all)")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
 	OK
 DO
@@ -193,8 +210,8 @@ DO
 FORM (QUERY_ONE_FOR_REAL__FormantPath_getStressOfCandidate, U"FormantPath: Get stress of candidate", U"") {
 	REAL (tmin, U"left Time range (s)", U"0.0")
 	REAL (tmax, U"right Time range (s)", U"0.0 (= all)")
-	NATURAL (candidate, U"Candidate number", U"5")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
+	NATURAL1 (candidate, U"Candidate number", U"5")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
 	OK
 DO
@@ -206,7 +223,7 @@ DO
 FORM (QUERY_ONE_FOR_REAL_VECTOR__FormantPath_listStressOfCandidates, U"FormantPath: List stress of candidates", U"") {
 	REAL (tmin, U"left Time range (s)", U"0.0")
 	REAL (tmax, U"right Time range (s)", U"0.0 (= all)")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
 	OK
 DO
@@ -218,7 +235,7 @@ DO
 FORM (MODIFY_EACH__FormantPath_setPath, U"FormantPath: Set path", U"") {
 	REAL (tmin, U"left Time range (s)", U"0.0")
 	REAL (tmax, U"right Time range (s)", U"0.0 (= all)")
-	NATURAL (candidate, U"Candidate number", U"5")
+	NATURAL1 (candidate, U"Candidate number", U"5")
 	OK
 DO
 	MODIFY_EACH (FormantPath)
@@ -229,7 +246,7 @@ DO
 FORM (MODIFY_EACH__FormantPath_setOptimalPath, U"", U"") {
 	REAL (tmin, U"left Time range (s)", U"0.0")
 	REAL (tmax, U"right Time range (s)", U"0.0 (= all)")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
 	OK
 DO
@@ -240,7 +257,7 @@ DO
 
 FORM (CONVERT_EACH_TO_ONE__FormantPath_to_Matrix_stress, U"FormantPath: To Matrix (stress)", nullptr) {
 	POSITIVE (windowLength, U"Window length", U"0.025")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
 	OK
 DO
@@ -250,7 +267,7 @@ DO
 }
 
 FORM (CONVERT_EACH_TO_ONE__FormantPath_to_Matrix_qsums, U"FormantPath: To Matrix (qsums)", nullptr) {
-	INTEGER (numberOfTracks, U"Number of tracks", U"4")
+	NATURAL0 (numberOfTracks, U"Number of tracks", U"4")
 	OK
 DO
 	CONVERT_EACH_TO_ONE (FormantPath)
@@ -259,7 +276,7 @@ DO
 }
 
 FORM (CONVERT_EACH_TO_ONE__FormantPath_to_Matrix_transition,  U"FormantPath: To Matrix (transition)", nullptr) {
-	INTEGER (numberOfTracks, U"Number of tracks", U"4")
+	NATURAL0 (numberOfTracks, U"Number of tracks", U"4")
 	BOOLEAN (maximumCosts, U"Maximum costs", false)
 	OK
 DO
@@ -278,7 +295,7 @@ FORM (CONVERT_EACH_TO_ONE__FormantPath_to_Matrix_deltas,  U"FormantPath: To Matr
 	POSITIVE (intensityModulationStepSize, U"Intensity modulation step size (dB)", U"5.0")
 	COMMENT (U"Global stress parameters:")
 	POSITIVE (windowLength, U"Window length", U"0.035")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
 	OK
 DO
@@ -304,7 +321,7 @@ FORM (MODIFY_EACH__FormantPath_pathFinder,  U"FormantPath: Path finder", nullptr
 	POSITIVE (intensityModulationStepSize, U"Intensity modulation step size (dB)", U"5.0")
 	COMMENT (U"Global stress parameters:")
 	POSITIVE (windowLength, U"Window length", U"0.035")
-	NATURALVECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3")
+	NATURAL1VECTOR (parameters, U"Coefficients by track", WHITESPACE_SEPARATED_, U"3 3 3 3")
 	POSITIVE (powerf, U"Power", U"1.25")
 	OK
 DO
@@ -779,6 +796,30 @@ DO
 			peakInterpolationType, fromQuefrency_trendLine, toQuefrency_trendLine, lineType, fitMethod
 		);
 	QUERY_ONE_FOR_REAL_END (U" dB");
+}
+
+FORM (CONVERT_EACH_TO_ONE__PowerCepstrogram_to_CPP, U"PowerCepstrogram: To CPP", nullptr) {
+	COMMENT (U"Smoothing of the Cepstrogram")
+	BOOLEAN (subtractTrendBeforeSmoothing, U"Subtract trend before smoothing", true)
+	REAL (smoothingWindowDuration, U"Time averaging window (s)", U"0.02")
+	REAL (quefrencySmoothingWindowDuration, U"Quefrency averaging window (s)", U"0.0005")
+	COMMENT (U"Peak search:")
+	REAL (pitchFloor, U"left Peak search pitch range (Hz)", U"60.0")
+	REAL (pitchCeiling, U"right Peak search pitch range (Hz)", U"330.0")
+	POSITIVE (tolerance, U"Tolerance (0-1)", U"0.05")
+	CHOICE_ENUM (kVector_peakInterpolation, peakInterpolationType,
+			U"Interpolation", kVector_peakInterpolation :: PARABOLIC)
+	COMMENT (U"Trend line:")
+	REAL (quefrencyFloor, U"left Trend line quefrency range (s)", U"0.001")
+	REAL (quefrencyCeiling, U"right Trend line quefrency range (s)", U"0.05")
+	OPTIONMENU_ENUM (kCepstrum_trendType, lineType, U"Trend type", kCepstrum_trendType::DEFAULT)
+	OPTIONMENU_ENUM (kCepstrum_trendFit, fitMethod, U"Fit method", kCepstrum_trendFit::DEFAULT)
+	OK
+DO
+	CONVERT_EACH_TO_ONE (PowerCepstrogram)
+		autoCPP result = PowerCepstrogram_to_CPP (me, pitchFloor, pitchCeiling, tolerance,
+			peakInterpolationType, quefrencyFloor, quefrencyCeiling, lineType, fitMethod);
+	CONVERT_EACH_TO_ONE_END (U"")
 }
 
 FORM (MODIFY__EACH_WEAK__PowerCepstrogram_formula, U"PowerCepstrogram: Formula", nullptr) {
@@ -1604,12 +1645,18 @@ void praat_uvafon_LPC_init () {
 	
 	Data_recognizeFileType (HTKParameterFileRecognizer);
 	
-	Thing_recognizeClassesByName (classCepstrumc, classPowerCepstrum, classCepstrogram, classFormantPath, classFormantPathEditor, classPowerCepstrogram, classLPC, classLFCC, classLineSpectralFrequencies, classMFCC, classVocalTractTier);
+	Thing_recognizeClassesByName (
+		classCepstrumc, classPowerCepstrum, classCepstrogram, classCPP, classFormantPath, classFormantPathEditor,
+		classPowerCepstrogram, classLPC, classLFCC, classLineSpectralFrequencies,classMFCC, classVocalTractTier
+	);
 	
 	structFormantPathArea  :: f_preferences ();
 	structFormantPathEditor  :: f_preferences ();
 
-
+	praat_addAction1 (classCPP, 0, U"CPP help", nullptr, 0,
+			HELP__CPP_help);
+	praat_addAction1 (classCPP, 0, U"Draw...", nullptr, 0, 
+			GRAPHICS_EACH__CPP_draw);
 	praat_addAction1 (classCepstrumc, 0, U"Analyse", nullptr, 0, nullptr);
 	praat_addAction1 (classCepstrumc, 0, U"To LPC", nullptr, 0,
 			CONVERT_EACH_TO_ONE__Cepstrumc_to_LPC);
@@ -1867,7 +1914,9 @@ void praat_uvafon_LPC_init () {
 			CONVERT_EACH_TO_ONE__PowerCepstrogram_smooth);
 	praat_addAction1 (classPowerCepstrogram, 0, U"Subtract trend... || Subtract tilt...",
 			nullptr, 0, CONVERT_EACH_TO_ONE__PowerCepstrogram_subtractTrend);   // alternative GuiMenu_DEPRECATED_2019
-	praat_addAction1 (classPowerCepstrogram, 0, U"To Matrix", nullptr, 0,
+	praat_addAction1 (classPowerCepstrogram, 0, U"To CPP...", nullptr, 0,
+			CONVERT_EACH_TO_ONE__PowerCepstrogram_to_CPP);
+praat_addAction1 (classPowerCepstrogram, 0, U"To Matrix", nullptr, 0,
 			CONVERT_EACH_TO_ONE__PowerCepstrogram_to_Matrix);
 
 	praat_addAction1 (classSound, 0, U"To PowerCepstrogram...", U"To Harmonicity (gne)...", 1, 

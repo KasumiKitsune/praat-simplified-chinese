@@ -124,7 +124,7 @@ autoTextGrid Sound_to_TextGrid_speechActivity_silero (constSound me, const doubl
 	const conststring32 nonSpeechLabel, const conststring32 speechLabel
 ) {
 	try {
-		Melder_require (speechProbabilityThreshold >= 0.0 && speechProbabilityThreshold <= 1.0,
+		Melder_require (speechProbabilityThreshold <= 1.0,
 				U"The speech probability threshold should be in the interval [0, 1]");
 
 		autovector <SpeechSegment> vadIntervals = doSileroVad (me, speechProbabilityThreshold,

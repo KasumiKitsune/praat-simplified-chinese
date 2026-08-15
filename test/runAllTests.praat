@@ -5,6 +5,8 @@
 #
 # This script runs all Praat scripts in its subdirectories.
 
+askForTrust()
+
 Text writing settings: "UTF-8"
 if macintosh
 	Text reading settings: "try UTF-8, then MacRoman"

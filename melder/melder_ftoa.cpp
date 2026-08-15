@@ -22,7 +22,7 @@
 
 inline constexpr int NUMBER_OF_BUFFERS = 32;   // = maximum number of arguments to a function call
 inline constexpr int extraRoom = 2;
-inline constexpr int MAXIMUM_NUMERIC_STRING_LENGTH = 1200;   // = sign + 326 + point + 60 + e + sign + 3 + null byte + ("·10^^^" - "e"), times 3, + i, + 2 extra
+inline constexpr int MAXIMUM_NUMERIC_STRING_LENGTH = 1200;   // = sign + 324 zeroes + point + 60 precision + 6 "·10^^^" + sign + 3, times 3, + i + null byte, + 10 extra
 
 static char   buffers8  [NUMBER_OF_BUFFERS] [MAXIMUM_NUMERIC_STRING_LENGTH + 1];
 static char32 buffers32 [NUMBER_OF_BUFFERS] [MAXIMUM_NUMERIC_STRING_LENGTH + 1];
@@ -35,7 +35,7 @@ static int ibuffer = 0;
 	*q = U'\0'; \
 	return buffers32 [ibuffer];
 
-const char * Melder8_integer (int64 value) {
+conststring8 Melder8_integer (int64 value) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)
 		ibuffer = 0;
 	if (sizeof (long_not_integer) == 8) {
@@ -70,7 +70,7 @@ const char * Melder8_integer (int64 value) {
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_integer (int64 value) {
-	const char *p = Melder8_integer (value);
+	conststring8 p = Melder8_integer (value);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -117,7 +117,7 @@ const char * Melder8_bigInteger (int64 value) {
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_bigInteger (int64 value) {
-	const char *p = Melder8_bigInteger (value);
+	conststring8 p = Melder8_bigInteger (value);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -144,7 +144,7 @@ conststring32 Melder_kleenean (kleenean valueK) {
 
 inline static int common_snprintf_double (const mutablestring8 buffer, const int bufferSize, const double value) {
 	Melder_pre (bufferSize > 0);   // make sure that it can be cast to size_t
-	int numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.15g", value);   // guarded cast
+	/* mutable adjust */ int numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.15g", value);   // guarded cast
 	if (strtod (buffer, nullptr) != value) {
 		numberOfPrintedCharacters = snprintf (buffer, size_t (bufferSize), "%.16g", value);   // guarded cast
 		if (strtod (buffer, nullptr) != value)
@@ -182,7 +182,7 @@ const char * Melder8_double (double value) {
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_double (double value) {
-	const char *p = Melder8_double (value);
+	conststring8 p = Melder8_double (value);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -198,7 +198,7 @@ const char * Melder8_double_overtlyReal (double value) {
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_double_overtlyReal (double value) {
-	const char *p = Melder8_double_overtlyReal (value);
+	conststring8 p = Melder8_double_overtlyReal (value);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -211,7 +211,7 @@ const char * Melder8_single (double value) {
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_single (double value) {
-	const char *p = Melder8_single (value);
+	conststring8 p = Melder8_single (value);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -224,106 +224,126 @@ const char * Melder8_half (double value) {
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_half (double value) {
-	const char *p = Melder8_half (value);
+	conststring8 p = Melder8_half (value);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
 const char * Melder8_fixed (double value, integer precision) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
-	if (isundef (value))
-		return "--undefined--";
 	if (value == 0.0)
 		return "0";
-	if (precision > 60)
-		precision = 60;
+	if (isundef (value))
+		return "--undefined--";
+	Melder_clipRight (& precision, 60_integer);
 	const int minimumPrecision = - (int) floor (log10 (fabs (value)));
-	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.*f",
-			(int) (minimumPrecision > precision ? minimumPrecision : precision), value);
+	const int numberOfPrintedCharacters = snprintf (
+		buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1,
+		"%.*f",
+		(int) std::max (minimumPrecision,
+				(int) precision),   // guarded cast
+		value
+	);
 	Melder_post (numberOfPrintedCharacters > 0);
 	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_fixed (double value, integer precision) {
-	const char *p = Melder8_fixed (value, precision);
+	conststring8 p = Melder8_fixed (value, precision);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
 const char * Melder8_fixedExponent (double value, integer exponent, integer precision) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
-	const double factor = pow (10.0, exponent);
-	if (isundef (value))
-		return "--undefined--";
 	if (value == 0.0)
 		return "0";
-	if (precision > 60)
-		precision = 60;
+	if (isundef (value))
+		return "--undefined--";
+	Melder_clipRight (& precision, 60_integer);
+	const double factor = pow (10.0, exponent);
+	if (factor == 0.0)
+		return "--undefined--";
+	if (isundef (factor))
+		return "--undefined--";
 	value /= factor;
 	const int minimumPrecision = - (int) floor (log10 (fabs (value)));
-	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.*fE%d",
-			(int) (minimumPrecision > precision ? minimumPrecision : precision), value, (int) exponent);
+	const int numberOfPrintedCharacters = snprintf (
+		buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1,
+		"%.*fE%d",
+		(int) std::max (minimumPrecision,
+				(int) precision),   // guarded cast
+		value,
+		(int) exponent
+	);
 	Melder_post (numberOfPrintedCharacters > 0);
 	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_fixedExponent (double value, integer exponent, integer precision) {
-	const char *p = Melder8_fixedExponent (value, exponent, precision);
+	conststring8 p = Melder8_fixedExponent (value, exponent, precision);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
 static const char * common_Melder8_percent (bool graphical, double value, integer precision) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
-	if (isundef (value))
-		return "--undefined--";
 	if (value == 0.0)
 		return "0";
-	if (precision > 60)
-		precision = 60;
 	value *= 100.0;
+	if (isundef (value))
+		return "--undefined--";
+	Melder_clipRight (& precision, 60_integer);
 	const int minimumPrecision = - (int) floor (log10 (fabs (value)));
-	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, graphical ? "%.*f\\%% " : "%.*f%%",
-			(int) (minimumPrecision > precision ? minimumPrecision : precision), value);
+	const int numberOfPrintedCharacters = snprintf (
+		buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1,
+		graphical ? "%.*f\\%% " : "%.*f%%",
+		(int) std::max (minimumPrecision,
+				(int) precision),   // guarded cast
+		value
+	);
 	Melder_post (numberOfPrintedCharacters > 0);
 	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
 }
-const char * Melder8_percent (double value, integer precision) {
+conststring8 Melder8_percent (double value, integer precision) {
 	return common_Melder8_percent (false, value, precision);
 }
 conststring32 Melder_percent (double value, integer precision) {
-	const char *p = Melder8_percent (value, precision);
+	conststring8 p = Melder8_percent (value, precision);
 	CONVERT_BUFFER_TO_CHAR32
 }
-const char * Melder8_graphicalPercent (double value, integer precision) {
+conststring8 Melder8_graphicalPercent (double value, integer precision) {
 	return common_Melder8_percent (true, value, precision);
 }
 conststring32 Melder_graphicalPercent (double value, integer precision) {
-	const char *p = Melder8_graphicalPercent (value, precision);
+	conststring8 p = Melder8_graphicalPercent (value, precision);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
-const char * Melder8_hexadecimal (integer value, integer precision) {
+conststring8 Melder8_hexadecimal (integer value, integer precision) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
 	if (value < 0)
 		return "--undefined--";
-	if (precision > 60)
-		precision = 60;
+	Melder_clipRight (& precision, 60_integer);
 	const integer integerValue = Melder_iround (value);
-	const int numberOfPrintedCharacters = snprintf (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1, "%.*llX",
-			(int) precision, (unsigned long long) integerValue);
+	const int numberOfPrintedCharacters = snprintf (
+		buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1,
+		"%.*llX",
+		(int) precision,   // guarded cast
+		(unsigned long long) integerValue
+	);
 	Melder_post (numberOfPrintedCharacters > 0);
 	Melder_post (numberOfPrintedCharacters < MAXIMUM_NUMERIC_STRING_LENGTH+1);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_hexadecimal (integer value, integer precision) {
-	const char *p = Melder8_hexadecimal (value, precision);
+	conststring8 p = Melder8_hexadecimal (value, precision);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
-const char * Melder8_dcomplex (dcomplex value) {
+conststring8 Melder8_dcomplex (dcomplex value) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
 	if (isundef (value.real()) || isundef (value.imag()))
@@ -344,7 +364,7 @@ conststring32 Melder_dcomplex (dcomplex value) {
 	CONVERT_BUFFER_TO_CHAR32
 }
 
-const char * Melder8_scomplex (dcomplex value) {
+conststring8 Melder8_scomplex (dcomplex value) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
 	if (isundef (value.real()) || isundef (value.imag()))
@@ -362,6 +382,38 @@ const char * Melder8_scomplex (dcomplex value) {
 }
 conststring32 Melder_scomplex (dcomplex value) {
 	const char *p = Melder8_scomplex (value);
+	CONVERT_BUFFER_TO_CHAR32
+}
+
+conststring8 Melder8_naturalLogarithm (double lnNumber) {
+	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
+		ibuffer = 0;
+	//if (lnNumber == -INFINITY) return "0";   // this would have been nice, but cannot be relied upon
+	if (isundef (lnNumber))
+		return "--undefined--";
+	const double log10Number = lnNumber * NUMlog10e;
+	if (log10Number < -1e15) {
+		return "0";
+	} else if (log10Number < -41.0) {
+		/* mutable adjust */ double ceiling = (integer) ceil (log10Number);
+		const double remainder = log10Number - ceiling;
+		double remainder10 = pow (10.0, remainder);
+		if (remainder10 == 0.0)
+			return "0";
+		while (remainder10 < 1.0) {
+			remainder10 *= 10.0;
+			ceiling --;
+		}
+		constexpr int roomForExponent = 20;
+		const int numberOfPrintedCharacters = common_snprintf_double (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1 - roomForExponent, remainder10);
+		snprintf (buffers8 [ibuffer] + numberOfPrintedCharacters, roomForExponent+1, "e%lld", (long long) ceiling);   // BUG: this just doesn't work on Windows
+	} else {
+		return Melder8_double (exp (lnNumber));
+	}
+	return buffers8 [ibuffer];
+}
+conststring32 Melder_naturalLogarithm (double lnNumber) {
+	conststring8 p = Melder8_naturalLogarithm (lnNumber);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -408,43 +460,18 @@ conststring32 Melder_graphicalSingle (double number) {
 conststring32 Melder_graphicalDouble (double number) {
 	return commmon_Melder_graphicalFloat (Melder_double (number));
 }
-
-const char * Melder8_naturalLogarithm (double lnNumber) {
-	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
-		ibuffer = 0;
-	//if (lnNumber == -INFINITY) return "0";   // this would have been nice, but cannot be relied upon
-	if (isundef (lnNumber))
-		return "--undefined--";
-	const double log10Number = lnNumber * NUMlog10e;
-	if (log10Number < -41.0) {
-		/* mutable adjust */ integer ceiling = (integer) ceil (log10Number);
-		const double remainder = log10Number - ceiling;
-		double remainder10 = pow (10.0, remainder);
-		while (remainder10 < 1.0) {
-			remainder10 *= 10.0;
-			ceiling --;
-		}
-		constexpr int roomForExponent = 20;
-		const int numberOfPrintedCharacters = common_snprintf_double (buffers8 [ibuffer], MAXIMUM_NUMERIC_STRING_LENGTH+1 - roomForExponent, remainder10);
-		snprintf (buffers8 [ibuffer] + numberOfPrintedCharacters, roomForExponent+1, "e-%td", ceiling);   // BUG: this just doesn't work on Windows
-	} else {
-		return Melder8_double (exp (lnNumber));
-	}
-	return buffers8 [ibuffer];
-}
-conststring32 Melder_naturalLogarithm (double lnNumber) {
-	const char *p = Melder8_naturalLogarithm (lnNumber);
-	CONVERT_BUFFER_TO_CHAR32
+conststring32 Melder_graphicalNaturalLogarithm (double number) {
+	return commmon_Melder_graphicalFloat (Melder_naturalLogarithm (number));
 }
 
-const char * Melder8_pointer (const void *pointer) {
+conststring8 Melder8_pointer (const void *pointer) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)
 		ibuffer = 0;
 	snprintf (buffers8 [ibuffer],MAXIMUM_NUMERIC_STRING_LENGTH+1, "%p", pointer);
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_pointer (const void *pointer) {
-	const char *p = Melder8_pointer (pointer);
+	conststring8 p = Melder8_pointer (pointer);
 	CONVERT_BUFFER_TO_CHAR32
 }
 
@@ -456,14 +483,14 @@ conststring32 Melder_character (char32 kar) {
 	return buffers32 [ibuffer];
 }
 
-const char * Melder8_colour (MelderColour colour) {
+conststring8 Melder8_colour (MelderColour colour) {
 	if (++ ibuffer == NUMBER_OF_BUFFERS)   // should come before any return!
 		ibuffer = 0;
 	if (isundef (colour.red) || isundef (colour.green) || isundef (colour.blue))
 		return "{--undefined--,--undefined--,--undefined--}";
 	char *p = & buffers8 [ibuffer] [0];
 	constexpr int roomForBracesAndCommas = 4;
-	constexpr int roomPerBraceOrComma = 2;   // rounded up; although this reserves 6 characters instead of the maximum of 2, this is possible because there won't be a "·10^^^" (saving 3*5) or "i"
+	constexpr int roomPerBraceOrComma = (roomForBracesAndCommas - 1) / 3 + 1;   // rounded up; this reserves 6 extra characters (out of a maximum of 10)
 	strcpy (p ++, "{");
 	/* mutable reuse */ int numberOfPrintedCharacters = common_snprintf_double (p, MAXIMUM_NUMERIC_STRING_LENGTH/3+1 - roomPerBraceOrComma, colour.red);
 	p += numberOfPrintedCharacters;
@@ -477,7 +504,7 @@ const char * Melder8_colour (MelderColour colour) {
 	return buffers8 [ibuffer];
 }
 conststring32 Melder_colour (MelderColour colour) {
-	const char *p = Melder8_colour (colour);
+	conststring8 p = Melder8_colour (colour);
 	CONVERT_BUFFER_TO_CHAR32
 }
 

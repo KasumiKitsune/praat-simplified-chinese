@@ -441,6 +441,7 @@ void structTextGridArea :: v_drawInside () {
 	const enum kGraphics_font oldFont = Graphics_inqFont (our graphics());
 	const double oldFontSize = Graphics_inqFontSize (our graphics());
 	Graphics_setWindow (our graphics(), our startWindow(), our endWindow(), 0.0, 1.0);
+	const double xright = our functionViewerRight_WC();
 	for (integer itier = 1; itier <= numberOfTiers; itier ++) {
 		const Function anyTier = our textGrid() -> tiers->at [itier];
 		const bool tierIsSelected = ( itier == our selectedTier );
@@ -463,19 +464,21 @@ void structTextGridArea :: v_drawInside () {
 		Graphics_text (our graphics(), our startWindow(), 0.5,   tierIsSelected ? U"☞ " : U"", itier);
 		Graphics_setFontSize (our graphics(), oldFontSize);
 		if (anyTier -> name && anyTier -> name [0]) {
-			Graphics_setTextAlignment (our graphics(), Graphics_LEFT,
-					our instancePref_showNumberOf() == kTextGridArea_showNumberOf::NOTHING ? Graphics_HALF : Graphics_BOTTOM);
-			Graphics_text (our graphics(), our endWindow(), 0.5, anyTier -> name.get());
+			Graphics_setTextAlignment (our graphics(), Graphics_LEFT, Graphics_HALF);
+			Graphics_rectangleText_maximalFit (our graphics(), our endWindow(), xright, 0.05, 0.5,
+					our instancePref_showNumberOf() == kTextGridArea_showNumberOf::NOTHING ? 0.0 : 0.5, 1.0, 0.01, 0.1, anyTier -> name.get());
 		}
 		if (our instancePref_showNumberOf() != kTextGridArea_showNumberOf::NOTHING) {
-			Graphics_setTextAlignment (our graphics(), Graphics_LEFT, Graphics_TOP);
+			Graphics_setTextAlignment (our graphics(), Graphics_LEFT, Graphics_HALF);
 			if (our instancePref_showNumberOf() == kTextGridArea_showNumberOf::INTERVALS_OR_POINTS) {
 				const integer count = ( isIntervalTier ? ((IntervalTier) anyTier) -> intervals.size : ((TextTier) anyTier) -> points.size );
 				const integer position = ( itier == our selectedTier ? ( isIntervalTier ? getSelectedInterval (this) : getSelectedPoint (this) ) : 0 );
 				if (position)
-					Graphics_text (our graphics(), our endWindow(), 0.5,   U"(", position, U"/", count, U")");
+					Graphics_rectangleText_maximalFit (our graphics(), our endWindow(), xright, 0.05, 0.5,
+							0.0, 0.5, 0.01, 0.1, Melder_cat (U"(", position, U"/", count, U")"));
 				else
-					Graphics_text (our graphics(), our endWindow(), 0.5,   U"(", count, U")");
+					Graphics_rectangleText_maximalFit (our graphics(), our endWindow(), xright, 0.05, 0.5,
+							0.0, 0.5, 0.01, 0.1, Melder_cat (U"(", count, U")"));
 			} else {
 				Melder_assert (our instancePref_showNumberOf() == kTextGridArea_showNumberOf::NONEMPTY_INTERVALS_OR_POINTS);
 				integer count = 0;
@@ -496,7 +499,8 @@ void structTextGridArea :: v_drawInside () {
 							count ++;
 					}
 				}
-				Graphics_text (our graphics(), our endWindow(), 0.5,   U"(##", count, U"#)");
+				Graphics_rectangleText_maximalFit (our graphics(), our endWindow(), xright, 0.05, 0.5,
+						0.0, 0.5, 0.01, 0.1, Melder_cat (U"(##", count, U"#)"));
 			}
 		}
 
@@ -1446,12 +1450,11 @@ static void menu_cb_TranscribeInterval (TextGridArea me, EDITOR_ARGS) {
 		FunctionArea_save (me, U"Transcribe interval");
 		TextGrid_Sound_transcribeInterval (my textGrid(), my borrowedSoundArea -> sound(), my selectedTier, intervalNumber,
 				my instancePref_transcribe_model(), my instancePref_transcribe_language(),
-				my instancePref_transcribe_includeWords(), my instancePref_transcribe_diarize(),
-				my instancePref_transcribe_useVad(), my instancePref_vad_speechThreshold(),
-				my instancePref_vad_minNonSpeech(),my instancePref_vad_minSpeech(),
-				my instancePref_vad_speechPadding(), my instancePref_diarize_numSpeakers(),
-				my instancePref_diarize_minSpeakers(), my instancePref_diarize_maxSpeakers(),
-				my instancePref_diarize_allowOverlap(),
+				my instancePref_transcribe_includeWords(), my instancePref_transcribe_useVad(),
+				my instancePref_vad_speechThreshold(), my instancePref_vad_minNonSpeech(),
+				my instancePref_vad_minSpeech(),my instancePref_vad_speechPadding(),
+				my instancePref_transcribe_diarize(),
+				my instancePref_diarize_maxNumSpeakers(), my instancePref_diarize_allowOverlap(),
 				my instancePref_diarize_clusterThreshold(), my instancePref_diarize_segmentationStep());
 	}
 	FunctionArea_broadcastDataChanged (me);
@@ -1466,17 +1469,15 @@ static void menu_cb_TranscriptionSettings (TextGridArea me, EDITOR_ARGS) {
 			OPTION (theSpeechRecognizerLanguageNames() [i]);
 		}
 		BOOLEAN (includeWords, U"Include words", my default_transcribe_includeWords())
-		BOOLEAN (includeDiarization, U"Include diarization", my default_transcribe_diarize())
-		BOOLEAN (useVad, U"Allow silences", my default_transcribe_useVad())
-		HEADING (U"Speech activity detection...")
-		REAL (speechProbabilityThreshold, U"Speech probability threshold (0-1)", my default_vad_speechThreshold())
-		POSITIVE (minNonSpeechDuration, U"Min. gap between speech segments (s)", my default_vad_minNonSpeech())
-		POSITIVE (minSpeechDuration, U"Min. speech segment (s)", my default_vad_minSpeech())
-		POSITIVE (speechPad, U"Padding around speech segments (s)", my default_vad_speechPadding())
+		HEADING (U"Non-speech detection...")
+		BOOLEAN (useVad, U"Detect non-speech", my default_transcribe_useVad())
+		NONNEGATIVE (speechProbabilityThreshold, U"Speech probability threshold (0-1)", my default_vad_speechThreshold())
+		NONNEGATIVE (minNonSpeechDuration, U"Min. gap between speech segments (s)", my default_vad_minNonSpeech())
+		NONNEGATIVE (minSpeechDuration, U"Min. speech segment (s)", my default_vad_minSpeech())
+		NONNEGATIVE (speechPad, U"Padding around speech segments (s)", my default_vad_speechPadding())
 		HEADING (U"Diarization...")
-		INTEGER (numSpeakers, U"Fixed number of speakers...", DiarizationDefaults::numSpeakers)
-		INTEGER (minSpeakers, U"left ... or range of numbers of speakers", DiarizationDefaults::minSpeakers)
-		INTEGER (maxSpeakers, U"right ... or range of numbers of speakers", DiarizationDefaults::maxSpeakers)
+		BOOLEAN (includeDiarization, U"Include diarization", my default_transcribe_diarize())
+		NATURAL (maxNumSpeakers, U"Max. number of speakers (≥ 2)", DiarizationDefaults::maxNumSpeakers)
 		BOOLEAN (allowSpeakersOverlap, U"Allow speakers to overlap", DiarizationDefaults::allowOverlap)
 		POSITIVE (clusterThreshold, U"Clustering threshold (0-2)", DiarizationDefaults::clusterThreshold)
 		POSITIVE (segmentationStep, U"Segmentation step (0-1)", DiarizationDefaults::segmentationStep)
@@ -1496,9 +1497,7 @@ static void menu_cb_TranscriptionSettings (TextGridArea me, EDITOR_ARGS) {
 		SET_REAL (minNonSpeechDuration, my instancePref_vad_minNonSpeech())
 		SET_REAL (minSpeechDuration, my instancePref_vad_minSpeech())
 		SET_REAL (speechPad, my instancePref_vad_speechPadding())
-		SET_INTEGER (numSpeakers, my instancePref_diarize_numSpeakers())
-		SET_INTEGER (minSpeakers, my instancePref_diarize_minSpeakers())
-		SET_INTEGER (maxSpeakers, my instancePref_diarize_maxSpeakers())
+		SET_INTEGER (maxNumSpeakers, my instancePref_diarize_maxNumSpeakers())
 		SET_BOOLEAN (allowSpeakersOverlap, my instancePref_diarize_allowOverlap())
 		SET_REAL (clusterThreshold, my instancePref_diarize_clusterThreshold())
 		SET_REAL (segmentationStep, my instancePref_diarize_segmentationStep())
@@ -1523,9 +1522,7 @@ static void menu_cb_TranscriptionSettings (TextGridArea me, EDITOR_ARGS) {
 		my setInstancePref_vad_minNonSpeech (minNonSpeechDuration);
 		my setInstancePref_vad_minSpeech (minSpeechDuration);
 		my setInstancePref_vad_speechPadding (speechPad);
-		my setInstancePref_diarize_numSpeakers (numSpeakers);
-		my setInstancePref_diarize_minSpeakers (minSpeakers);
-		my setInstancePref_diarize_maxSpeakers (maxSpeakers);
+		my setInstancePref_diarize_maxNumSpeakers (maxNumSpeakers);
 		my setInstancePref_diarize_allowOverlap (allowSpeakersOverlap);
 		my setInstancePref_diarize_clusterThreshold (clusterThreshold);
 		my setInstancePref_diarize_segmentationStep (segmentationStep);
@@ -1544,8 +1541,7 @@ static void menu_cb_DiarizeInterval (TextGridArea me, EDITOR_ARGS) {
 		const autoMelderProgressOff noprogress;
 		FunctionArea_save (me, U"Diarize interval");
 		TextGrid_Sound_diarizeInterval (my textGrid(), my borrowedSoundArea -> sound(), my selectedTier, intervalNumber,
-				my instancePref_diarize_numSpeakers(), my instancePref_diarize_minSpeakers(),
-				my instancePref_diarize_maxSpeakers(), my instancePref_diarize_allowOverlap(),
+				my instancePref_diarize_maxNumSpeakers(), my instancePref_diarize_allowOverlap(),
 				my instancePref_diarize_nonSpeechLabel(), my instancePref_diarize_speechLabel(),
 				my instancePref_diarize_clusterThreshold(), my instancePref_diarize_segmentationStep()
 		);
@@ -1554,28 +1550,22 @@ static void menu_cb_DiarizeInterval (TextGridArea me, EDITOR_ARGS) {
 }
 
 static void menu_cb_DiarizationSettings (TextGridArea me, EDITOR_ARGS) {
-	EDITOR_FORM (U"Diarization settings", nullptr)
-		INTEGER (numSpeakers, U"Fixed number of speakers...", DiarizationDefaults::numSpeakers)
-		INTEGER (minSpeakers, U"left ... or range of numbers of speakers", DiarizationDefaults::minSpeakers)
-		INTEGER (maxSpeakers, U"right ... or range of numbers of speakers", DiarizationDefaults::maxSpeakers)
+	EDITOR_FORM (U"Diarization settings", U"speaker diarization with adapted pyannote.audio")
+		NATURAL (maxNumSpeakers, U"Max. number of speakers (≥ 2)", DiarizationDefaults::maxNumSpeakers)
 		BOOLEAN (allowSpeakersOverlap, U"Allow speakers to overlap", DiarizationDefaults::allowOverlap)
 		WORD (nonSpeechLabel, U"Non-speech interval label", DiarizationDefaults::nonSpeechLabel)
 		WORD (speechLabel, U"Speech interval label", DiarizationDefaults::speechLabel)
 		POSITIVE (clusterThreshold, U"Clustering threshold (0-2)", DiarizationDefaults::clusterThreshold)
 		POSITIVE (segmentationStep, U"Segmentation step (0-1)", DiarizationDefaults::segmentationStep)
 	EDITOR_OK
-		SET_INTEGER (numSpeakers, my instancePref_diarize_numSpeakers())
-		SET_INTEGER (minSpeakers, my instancePref_diarize_minSpeakers())
-		SET_INTEGER (maxSpeakers, my instancePref_diarize_maxSpeakers())
+		SET_INTEGER (maxNumSpeakers, my instancePref_diarize_maxNumSpeakers())
 		SET_BOOLEAN (allowSpeakersOverlap, my instancePref_diarize_allowOverlap())
 		SET_STRING (nonSpeechLabel, my instancePref_diarize_nonSpeechLabel())
 		SET_STRING (speechLabel, my instancePref_diarize_speechLabel())
 		SET_REAL (clusterThreshold, my instancePref_diarize_clusterThreshold())
 		SET_REAL (segmentationStep, my instancePref_diarize_segmentationStep())
 	EDITOR_DO
-		my setInstancePref_diarize_numSpeakers (numSpeakers);
-		my setInstancePref_diarize_minSpeakers (minSpeakers);
-		my setInstancePref_diarize_maxSpeakers (maxSpeakers);
+		my setInstancePref_diarize_maxNumSpeakers (maxNumSpeakers);
 		my setInstancePref_diarize_allowOverlap (allowSpeakersOverlap);
 		my setInstancePref_diarize_nonSpeechLabel (nonSpeechLabel);
 		my setInstancePref_diarize_speechLabel (speechLabel);
@@ -2021,23 +2011,23 @@ void structTextGridArea :: v_createMenus () {
 		FunctionAreaMenu_addCommand (boundaryMenu, U"New boundary or point:", 0, nullptr, this);
 		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on selected tier", GuiMenu_ENTER | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnSelectedTier, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 1", GuiMenu_COMMAND | GuiMenu_F1 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 1", GuiMenu_COMMAND_EXTRA | '1' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier1, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 2", GuiMenu_COMMAND | GuiMenu_F2 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 2", GuiMenu_COMMAND_EXTRA | '2' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier2, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 3", GuiMenu_COMMAND | GuiMenu_F3 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 3", GuiMenu_COMMAND_EXTRA | '3' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier3, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 4", GuiMenu_COMMAND | GuiMenu_F4 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 4", GuiMenu_COMMAND_EXTRA | '4' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier4, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 5", GuiMenu_COMMAND | GuiMenu_F5 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 5", GuiMenu_COMMAND_EXTRA | '5' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier5, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 6", GuiMenu_COMMAND | GuiMenu_F6 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 6", GuiMenu_COMMAND_EXTRA | '6' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier6, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 7", GuiMenu_COMMAND | GuiMenu_F7 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 7", GuiMenu_COMMAND_EXTRA | '7' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier7, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 8", GuiMenu_COMMAND | GuiMenu_F8 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on tier 8", GuiMenu_COMMAND_EXTRA | '8' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnTier8, this);
-		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on all tiers", GuiMenu_COMMAND | GuiMenu_F9 | GuiMenu_DEPTH_1,
+		FunctionAreaMenu_addCommand (boundaryMenu, U"Add on all tiers", GuiMenu_COMMAND_EXTRA | '9' | GuiMenu_DEPTH_1,
 				menu_cb_InsertOnAllTiers, this);
 		FunctionAreaMenu_addCommand (boundaryMenu, U"- Modify boundary or point:", 0, nullptr, this);
 		if (our borrowedSoundArea && ! Thing_isa (our borrowedSoundArea, classLongSoundArea)) {

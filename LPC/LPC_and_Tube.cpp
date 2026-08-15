@@ -35,7 +35,7 @@
 void LPC_Frame_into_Tube_Frame_rc (LPC_Frame me, Tube_Frame thee) {
 	Melder_assert (my nCoefficients == my a.size); // check invariant
 	thy c.resize (my nCoefficients);
-	thy numberOfSegments = thy c.size; // maintain invariant
+	thy numberOfSegments = thy c.size;   // maintain invariant
 	VECrc_from_lpc (thy c.get(), my a.get());
 }
 

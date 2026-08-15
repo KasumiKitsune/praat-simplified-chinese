@@ -2853,6 +2853,7 @@ EXACT_MAP = {
     "Transcribe interval...": "转写区间...",
     "Transcription settings...": "转写设置...",
     "Transcription...": "转写...",
+    "Max. number of threads": "最大线程数",
     "Transition help": "转移 help",
     "Transition: Power...": "转移：乘方 (能量)...",
     "Type any numeric formula or string formula": "输入任何数值公式或字符串公式",

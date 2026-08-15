@@ -247,6 +247,10 @@ void Thing_setName (Thing me, conststring32 name /* cattable */);
 	Klas var = static_cast <Klas> (expr);   /* The compiler checks this. */ \
 	Melder_assert (! var || Thing_isa (var, class##Klas));
 
+#define Thing_cast_0(Klas,var,expr) \
+	Klas var = static_cast <Klas> (expr);   /* The compiler checks this. */ \
+	Thing_isa (var, class##Klas)
+
 void Thing_swap (Thing me, Thing thee);
 /*
 	Function:

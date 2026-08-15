@@ -16,32 +16,6 @@
  * along with this work. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * pb 2002/03/07 GPL
- * rvs&pb 2002/03/07 url support
- * pb 2002/03/10 Mach compatibility
- * pb 2003/09/12 MelderFile_getMacType
- * pb 2003/09/14 MelderFolder_relativePathToFile
- * pb 2004/09/25 use /tmp as temporary directory
- * pb 2004/10/16 C++ compatible structs
- * pb 2005/11/07 Windows: use %USERPROFILE% rather than %HOMESHARE%%HOMEPATH%
- * rvs&pb 2005/11/18 curl support
- * pb 2006/01/21 MelderFile_writeText does not create temporary file
- * pb 2006/08/03 openForWriting
- * rvs 2006/08/12 curl: do not fail on error
- * pb 2006/08/12 check whether unicodeName exists
- * pb 2006/10/28 erased MacOS 9 stuff
- * Erez Volk 2007/05/14 FLAC support
- * pb 2007/05/28 wchar
- * pb 2007/06/09 more wchar
- * pb 2007/08/12 more wchar
- * pb 2007/10/05 FSFindFolder
- * pb 2008/11/01 warn after finding final tabs (not just spaces) in file names
- * pb 2010/12/14 more high Unicode compatibility
- * pb 2011/04/05 C++
- * pb 2024/11/16 rid curl support
- */
-
 #if defined (UNIX)
 	#include <unistd.h>
 	#include <sys/stat.h>
@@ -594,8 +568,13 @@ MelderFolder Melder_preferencesFolder7() {
 			Melder_sprint (thePreferencesFolder7. path,kMelder_MAXPATH+1, homeFolder. path,
 					U"/Library/Application Support/", Melder_upperCaseAppName());
 		#elif defined (UNIX)
-			Melder_sprint (thePreferencesFolder7. path,kMelder_MAXPATH+1, homeFolder. path,
-					U"/.config/", Melder_lowerCaseAppName());
+			const conststring32 xdgConfigHome = Melder_getenv (U"XDG_CONFIG_HOME");
+			if (xdgConfigHome)
+				Melder_sprint (thePreferencesFolder7. path,kMelder_MAXPATH+1, xdgConfigHome,
+						U"/", Melder_lowerCaseAppName());
+			else
+				Melder_sprint (thePreferencesFolder7. path,kMelder_MAXPATH+1, homeFolder. path,
+						U"/.config/", Melder_lowerCaseAppName());
 		#elif defined (_WIN32)
 			Melder_sprint (thePreferencesFolder7. path,kMelder_MAXPATH+1, homeFolder. path,
 					U"\\AppData\\Roaming\\", Melder_upperCaseAppName());
@@ -1147,7 +1126,7 @@ void Melder_fwrite32to8 (conststring32 string, FILE *f) {
 	}
 }
 
-void MelderFile_writeText (MelderFile file, conststring32 text, kMelder_textOutputEncoding outputEncoding) {
+void MelderFile_writeText_e (MelderFile file, conststring32 text, kMelder_textOutputEncoding outputEncoding) {
 	if (! text)
 		text = U"";
 	autofile f = Melder_fopen (file, "wb");
@@ -1194,15 +1173,22 @@ void MelderFile_writeText (MelderFile file, conststring32 text, kMelder_textOutp
 	}
 	f.close (file);
 }
+void MelderFile_writeText_i (MelderFile file, conststring32 text, kMelder_textOutputEncoding outputEncoding) {
+	try {
+		MelderFile_writeText_e (file, text, outputEncoding);
+	} catch (MelderError) {
+		Melder_clearError ();
+	}
+}
 
-void MelderFile_appendText (MelderFile file, conststring32 text) {
+void MelderFile_appendText_e (MelderFile file, conststring32 text) {
 	if (! text) text = U"";
 	autofile f1;
 	try {
 		f1 = Melder_fopen (file, "rb");
 	} catch (MelderError) {
 		Melder_clearError ();   // it's OK if the file didn't exist yet...
-		MelderFile_writeText (file, text, Melder_getOutputEncoding ());   // because then we just "write"
+		MelderFile_writeText_e (file, text, Melder_getOutputEncoding ());   // because then we just "write"
 		return;
 	}
 	/*

@@ -26,7 +26,7 @@
 void LPC_Frame_into_Cepstrumc_Frame (LPC_Frame me, Cepstrumc_Frame thee) {
 	Melder_assert (my nCoefficients == my a.size); // check invariant
 	thy c.resize (my nCoefficients);
-	thy nCoefficients = thy c.size; // maintain invariant
+	thy nCoefficients = thy c.size;   // maintain invariant
 	thy c0 = 0.5 * log (my gain);
 	if (my nCoefficients == 0)
 		return;
@@ -42,7 +42,7 @@ void LPC_Frame_into_Cepstrumc_Frame (LPC_Frame me, Cepstrumc_Frame thee) {
 void Cepstrumc_Frame_into_LPC_Frame (Cepstrumc_Frame me, LPC_Frame thee) {
 	Melder_assert (my nCoefficients == my c.size); // Check invariant
 	thy a.resize (my nCoefficients);
-	thy nCoefficients = thy a.size; // maintain invariant
+	thy nCoefficients = thy a.size;   // maintain invariant
 	thy gain = exp (2.0 * my c0);
 	if (thy nCoefficients == 0)
 		return;

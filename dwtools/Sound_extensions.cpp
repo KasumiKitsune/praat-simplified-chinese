@@ -1,6 +1,6 @@
 /* Sound_extensions.cpp
  *
- * Copyright (C) 1993-2023 David Weenink, 2017,2024,2025 Paul Boersma
+ * Copyright (C) 1993-2023 David Weenink, 2017,2024-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -837,7 +837,7 @@ autoSound Sound_createHamming (double windowDuration, double samplingFrequency) 
 }
 
 static autoSound Sound_create2 (double minimumTime, double maximumTime, double samplingFrequency) {
-	return Sound_create (1, minimumTime, maximumTime, Melder_iround ( (maximumTime - minimumTime) * samplingFrequency),
+	return Sound_create (1, minimumTime, maximumTime, Melder_iround ((maximumTime - minimumTime) * samplingFrequency),
 		1.0 / samplingFrequency, minimumTime + 0.5 / samplingFrequency);
 }
 
@@ -1724,6 +1724,11 @@ autoSound Sound_trimSilences (Sound me, double trimDuration, bool onlyAtStartAnd
 	try {
 		Melder_require (my ny == 1,
 			U"The sound should be a mono sound.");
+		/*
+			The following guards against removing *all* of the sound.
+		*/
+		Melder_require (trimLabel [0] != U'\0',
+			U"The trim label should not be empty.");
 
 		const conststring32 silentLabel = U"silent", soundingLabel = U"sounding";
 		const conststring32 copyLabel = U"";
@@ -1760,6 +1765,13 @@ autoSound Sound_trimSilences (Sound me, double trimDuration, bool onlyAtStartAnd
 			}
 		}
 		autoSound thee = Sound_IntervalTier_cutPartsMatchingLabel (me, itg.get(), trimLabel);
+		/*
+			As a silent sound will lead to an error about the loudest and softest part being only 0 dB apart,
+			the following assertion will normally not fire.
+			However, this assumption is *brittle* and should be checked,
+			because otherwise we may end up with a sound with duration 0.0 and without samples.
+		*/
+		Melder_assert (thy nx > 0);
 		if (out_tg) {
 			TextGrid_addTier_copy (tg.get(), itg.get());
 			*out_tg = tg.move();

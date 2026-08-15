@@ -73,7 +73,7 @@ bool MelderFolder_isNull (MelderFolder folder);
 void MelderFolder_getFile (MelderFolder parent, conststring32 fileName, MelderFile file);
 void MelderFolder_relativePathToFile (MelderFolder folder, conststring32 path, MelderFile file);
 void MelderFile_getParentFolder (MelderFile file, MelderFolder parent);
-void MelderFolder_getParentFolder (MelderFolder file, MelderFolder parent);
+void MelderFolder_getParentFolder (MelderFolder subfolder, MelderFolder parent);
 bool MelderFolder_isDesktop (MelderFolder folder);
 void MelderFolder_getSubfolder (MelderFolder parentFolder, conststring32 subfolderName, MelderFolder subfolder);
 void Melder_rememberShellDirectory ();
@@ -201,8 +201,9 @@ public:
 /* Read and write whole text files. */
 autostring32 MelderFile_readText (MelderFile file, autostring8 *string8 = nullptr);
 void Melder_fwrite32to8 (conststring32 string, FILE *f);
-void MelderFile_writeText (MelderFile file, conststring32 text, kMelder_textOutputEncoding outputEncoding);
-void MelderFile_appendText (MelderFile file, conststring32 text);
+void MelderFile_writeText_e (MelderFile file, conststring32 text, kMelder_textOutputEncoding outputEncoding);
+void MelderFile_writeText_i (MelderFile file, conststring32 text, kMelder_textOutputEncoding outputEncoding);
+void MelderFile_appendText_e (MelderFile file, conststring32 text);
 
 /* End of file melder_files.h */
 #endif

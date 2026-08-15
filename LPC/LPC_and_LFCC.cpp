@@ -27,7 +27,7 @@
 void LPC_Frame_into_CC_Frame (LPC_Frame me, CC_Frame thee) {
 	Melder_assert (my nCoefficients == my a.size); // check invariant
 	thy c.resize (my nCoefficients);
-	thy numberOfCoefficients = thy c.size; // maintain invariant
+	thy numberOfCoefficients = thy c.size;   // maintain invariant
 	thy c0 = 0.5 * log (my gain);
 	
 	if (my nCoefficients < 1)
@@ -51,7 +51,7 @@ void LPC_Frame_into_CC_Frame (LPC_Frame me, CC_Frame thee) {
 void CC_Frame_into_LPC_Frame (CC_Frame me, LPC_Frame thee) {
 	Melder_assert (my numberOfCoefficients == my c.size); // check invariant
 	thy a.resize (my numberOfCoefficients);
-	thy nCoefficients = thy a.size; // maintain invariant
+	thy nCoefficients = thy a.size;   // maintain invariant
 	if (my numberOfCoefficients < 1)
 		return;
 	thy gain = exp (2.0 * my c0);

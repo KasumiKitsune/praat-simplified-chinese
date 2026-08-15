@@ -51,7 +51,7 @@ consult @@TextGrid file formats@.
 
 ################################################################################
 "TextGrid file formats"
-© Paul Boersma 2018-08-21
+© Paul Boersma 2018-08-21,2026
 
 This page describes the syntax and semantics of TextGrid files that Praat can read and/or write.
 
@@ -61,7 +61,7 @@ This page describes the syntax and semantics of TextGrid files that Praat can re
 If you record a Sound with a duration of 2.3 seconds, and then do ##To TextGrid...#,
 you are asked to provide tier names and to say which of these tiers are point tiers.
 If you click OK without changing the settings from their standard values,
-you obtain a TextGrid with two interval tiers, called %Mary and %John, and one point tier called %bell.
+you obtain a TextGrid with two interval tiers, called “Mary” and “John”, and one point tier called %bell.
 When you save this TextGrid to disk by choosing @@Save as text file...@ from the #New menu,
 the resulting text file, when opened in a text editor, will look as follows:
 `

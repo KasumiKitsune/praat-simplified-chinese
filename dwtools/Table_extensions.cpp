@@ -1,6 +1,6 @@
 /* Table_extensions.cpp
-	 *
- * Copyright (C) 1997-2023 David Weenink, Paul Boersma 2017
+ *
+ * Copyright (C) 1997-2023 David Weenink, 2011-2021,2023,2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -562,8 +562,8 @@ autoTable Table_getTwoWayAnalysisOfVarianceF (Table me, integer column, integer 
 		autoVEC data = raw_VEC (numberOfData);
 		for (integer irow = 1; irow <= numberOfData; irow ++)
 			data [irow] = my rows.at [irow] -> cells [column]. number;
-		const integer numberOfLevelsA = levelsA -> classes -> size;
-		const integer numberOfLevelsB = levelsB -> classes -> size;
+		const integer numberOfLevelsA = levelsA -> classes->size;
+		const integer numberOfLevelsB = levelsB -> classes->size;
 		
 
 		conststring32 label_A = my columnHeaders [factorColumnA]. label.get();
@@ -996,7 +996,7 @@ void Table_boxPlots (Table me, Graphics g, constINTVEC const& dataColumnNumbers,
 			return;
 		const integer numberOfData = my rows.size;
 		autoStringsIndex si = Table_to_StringsIndex_column (me, factorColumnNumber, kStrings_sorting::NUMBER_AWARE);
-		const integer numberOfLevels = si -> classes -> size;
+		const integer numberOfLevels = si -> classes->size;
 		if (ymin == ymax) {
 			ymin = 1e308, ymax = - ymin;
 			for (integer icol = 1; icol <= numberOfSelectedColumns; icol ++) {

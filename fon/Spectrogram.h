@@ -2,11 +2,11 @@
 #define _Spectrogram_h_
 /* Spectrogram.h
  *
- * Copyright (C) 1992-2007,2011,2012,2015-2019,2022,2023,2024 David Weenink & Paul Boersma
+ * Copyright (C) 1992-2007,2011,2012,2015-2019,2022,2023,2024,2026 David Weenink & Paul Boersma, 2026 yjzxkxdn (colour schemes)
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -20,6 +20,7 @@
 
 #include "Matrix.h"
 #include "Graphics.h"
+#include "Spectrogram_enums.h"
 
 Thing_define (Spectrogram, Matrix) {
 	void v1_info ()
@@ -62,10 +63,12 @@ autoSpectrogram Spectrogram_create (double tmin, double tmax, integer nt, double
 
 void Spectrogram_paintInside (constSpectrogram me, Graphics g,
 	double tmin, double tmax, double fmin, double fmax, double maximum, bool autoscaling,
-	double dynamicRange, double preemphasis, double dynamicCompression);
+	double dynamicRange, double preemphasis, double dynamicCompression, 
+	kSpectrogram_colourMap colourMap, bool invertColours);
 void Spectrogram_paint (constSpectrogram me, Graphics g,
 	double tmin, double tmax, double fmin, double fmax, double maximum, bool autoscaling,
 	double dynamicRange, double preemphasis, double dynamicCompression,
+	kSpectrogram_colourMap colourMap, bool invertColours,
 	bool garnish);
 /*
 	Function:
@@ -93,6 +96,19 @@ autoMatrix Spectrogram_to_Matrix (constSpectrogram me);
 	Create a Matrix from a Spectrogram,
 	with deep copy of all its attributes, except class information and methods.
 */
+
+Collection_define (SpectrogramList, OrderedOf, Spectrogram) {
+};
+
+void SpectrogramList_paintInside (constSpectrogramList me, Graphics g,
+	double tmin, double tmax, double fmin, double fmax, double maximum, bool autoscaling,
+	double dynamicRange, double preemphasis, double dynamicCompression, 
+	kSpectrogram_colourMap colourMap, bool invertColours);
+void SpectrogramList_paint (constSpectrogramList me, Graphics g,
+	double tmin, double tmax, double fmin, double fmax, double maximum, bool autoscaling,
+	double dynamicRange, double preemphasis, double dynamicCompression,
+	kSpectrogram_colourMap colourMap, bool invertColours,
+	bool garnish);
 
 /* End of file Spectrogram.h */
 #endif

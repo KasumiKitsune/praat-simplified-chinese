@@ -93,7 +93,6 @@ the behaviour of Praat will temporarily change in the following ways:
 1264: Mac: Sound_record_fixedTime uses microphone "FW Solo (1264)"
 2001: trace timing for whisper.cpp
 2002: use greedy sampling strategy for whisper.cpp (instead of the beam search)
-2003: use Silero VAD timestamps for word- and sentence- alignment at the upper borders of VAD segments instead of whisper.cpp's DTW
 2004: trace timing for diarization
 
 (negative values are for David)

@@ -78,46 +78,46 @@ static structMelderFolder homeDir { };
 
 /*
  * Melder_preferencesFolder: a folder containing preferences file, buttons file, message files, tracing file, plugins.
- *    Unix:   /home/miep/.praat-dir   (without slash)
- *    Windows XP/Vista/7/8/10:   \\myserver\myshare\Miep\Praat
- *                         or:   C:\Users\Miep\Praat
- *    MacOS:   /Users/Miep/Library/Preferences/Praat Prefs
+ *    Unix:   /home/miep/.config/praat
+ *    Windows:   C:\Users\Miep\Praat
+ *    MacOS:   /Users/Miep/Library/Application Support/Praat
  */
 // inline structMelderFolder Melder_preferencesFolder { };   // already declared in Melder_files.h (checked 2021-03-07)
 
 /*
  * prefsFile: preferences file.
- *    Unix:   /home/miep/.praat-dir/prefs5
- *    Windows XP/Vista/7/8/10:   \\myserver\myshare\Miep\Praat\Preferences5.ini
- *                         or:   C:\Users\Miep\Praat\Preferences5.ini
- *    MacOS:   /Users/Miep/Library/Preferences/Praat Prefs/Prefs5
+ *    Unix:   /home/miep/.config/praat/Preferences.txt
+ *    Windows:   C:\Users\Miep\AppData\Roaming\Praat\Preferences.txt
+ *    MacOS:   /Users/Miep/Library/Application Support/Praat/Preferences.txt
  */
-static structMelderFile prefsFile { };
+static structMelderFile prefsFile5 { }, prefsFile7 { };
 
 /*
  * buttonsFile: buttons file.
- *    Unix:   /home/miep/.praat-dir/buttons
- *    Windows XP/Vista/7/8/10:   \\myserver\myshare\Miep\Praat\Buttons5.ini
- *                         or:   C:\Users\Miep\Praat\Buttons5.ini
- *    MacOS:   /Users/Miep/Library/Preferences/Praat Prefs/Buttons5
+ *    Unix:   /home/miep/.config/praat/Buttons.txt
+ *    Windows:   C:\Users\Miep\AppData\Roaming\Praat\Buttons.txt
+ *    MacOS:   /Users/Miep/Library/Application Support/Praat/Buttons.txt
  */
-static structMelderFile buttonsFile { };
-
-#if defined (UNIX)
-	static structMelderFile pidFile { };   // like /home/miep/.praat-dir/pid
-	static structMelderFile messageFile { };   // like /home/miep/.praat-dir/message
-#elif defined (_WIN32)
-	static structMelderFile messageFile { };   // like C:\Users\Miep\Praat\Message.txt
-#endif
+static structMelderFile buttonsFile5 { }, buttonsFile7 { };
 
 /*
  * tracingFile: tracing file.
- *    Unix:   /home/miep/.praat-dir/tracing
- *    Windows XP/Vista/7/8/10:   \\myserver\myshare\Miep\Praat\Tracing.txt
- *                         or:   C:\Users\Miep\Praat\Tracing.txt
- *    MacOS:   /Users/Miep/Library/Preferences/Praat Prefs/Tracing.txt
+ *    Unix:   /home/miep/.config/praat/Tracing.txt
+ *    Windows:   C:\Users\Miep\AppData\Roaming\Praat\Tracing.txt
+ *    MacOS:   /Users/Miep/Library/Application Support/Praat/Tracing.txt
  */
 static structMelderFile tracingFile { };
+
+/*
+ * messageFile: message file: where sendpraat or --send writes its message.
+ *    Unix:   /home/miep/.config/praat/Message.txt
+ *    Windows:   C:\Users\Miep\AppData\Roaming\Praat\Message.txt
+ *    MacOS:   /Users/Miep/Library/Application Support/Praat/Message.txt
+ */
+static structMelderFile messageFile { };
+#if defined (UNIX)
+	static structMelderFile pidFile { };   // like /home/miep/.config/praat/pid
+#endif
 
 static GuiList praatList_objects;
 static GuiLabel praatLabel_objects;
@@ -562,7 +562,11 @@ static void praat_exit (int exit_code) {
 
 		trace (U"save the preferences");
 		Melder_assert (str32equ (Melder_double (1.5), U"1.5"));   // refuse to write the preferences if the locale is wrong (even if tracing is on)
-		Preferences_write (& prefsFile);
+		Preferences_write_i (& prefsFile7);
+		if (Melder_appVersion() < 8000) {   // allow the concurrent use of Praat 6 and 7, until Praat 8
+			if (MelderFile_readable (& prefsFile7))   // If successful in writing the modern (Praat 7/8) settings file...
+				MelderFile_delete (& prefsFile5);   // ... then delete the obsolete (Praat 6) settings file.
+		}
 
 		trace (U"save the script buttons");
 		if (! theCurrentPraatApplication -> batch) {
@@ -576,7 +580,11 @@ static void praat_exit (int exit_code) {
 				praat_saveToggledMenuCommands (& buffer);
 				praat_saveAddedActions (& buffer);
 				praat_saveToggledActions (& buffer);
-				MelderFile_writeText (& buttonsFile, buffer.string, kMelder_textOutputEncoding::ASCII_THEN_UTF16);
+				MelderFile_writeText_i (& buttonsFile7, buffer.string, kMelder_textOutputEncoding::ASCII_THEN_UTF16);
+				if (Melder_appVersion() < 8000) {   // allow the concurrent use of Praat 6 and 7, until Praat 8
+					if (MelderFile_readable (& buttonsFile7))   // If successful in writing the modern (Praat 7/8) buttons file...
+						MelderFile_delete (& buttonsFile5);   // ... then delete the obsolete (Praat 6) buttons file.
+				}
 			} catch (MelderError) {
 				Melder_clearError ();
 			}
@@ -937,7 +945,7 @@ void praat_dontUsePictureWindow () { praatP.dontUsePictureWindow = true; }
 			{// scope
 				autoPraatBackground background;
 				try {
-					praat_executeScript_noGUI (& messageFile);
+					praat_executeScript_noGUI (& messageFile, true);   // trust all messages, because they are sent by other apps that have control
 				} catch (MelderError) {
 					Melder_flushError (Melder_upperCaseAppName(), U": message not completely handled.");
 				}
@@ -951,12 +959,13 @@ void praat_dontUsePictureWindow () { praatP.dontUsePictureWindow = true; }
 	static int cb_userMessage () {
 		autoPraatBackground background;
 		try {
-			praat_executeScript_noGUI (& messageFile);
+			praat_executeScript_noGUI (& messageFile, true);   // trust all messages, because they are sent by other apps that have control
 		} catch (MelderError) {
 			Melder_flushError (Melder_upperCaseAppName(), U": message not completely handled.");
 		}
 		return 0;
 	}
+	#if 0
 	static void cb_openDocument (MelderFile file) {
 		char32 text [kMelder_MAXPATH+25];
 		/*
@@ -970,36 +979,39 @@ void praat_dontUsePictureWindow () { praatP.dontUsePictureWindow = true; }
 	static void cb_finishedOpeningDocuments () {
 		praat_updateSelection ();
 	}
+	#endif
 #elif macintosh
-	static int (*theUserMessageCallback) (char32 *message);
-	static void mac_setUserMessageCallback (int (*userMessageCallback) (char32 *message)) {
+	static int (*theUserMessageCallback) ();
+	static void mac_setUserMessageCallback (int (*userMessageCallback) ()) {
 		theUserMessageCallback = userMessageCallback;
 	}
 	static pascal OSErr mac_processSignal8 (const AppleEvent *theAppleEvent, AppleEvent * /* reply */, long /* handlerRefCon */) {
 		static bool duringAppleEvent = false;   // FIXME: may have to be atomic?
 		if (! duringAppleEvent) {
-			char *buffer;
-			Size actualSize;
+			//char *buffer;
+			//Size actualSize;
 			duringAppleEvent = true;
 			ProcessSerialNumber psn;
 			GetCurrentProcess (& psn);
 			SetFrontProcess (& psn);
-			AEGetParamPtr (theAppleEvent, 1, typeUTF8Text, nullptr, nullptr, 0, & actualSize);
-			buffer = (char *) malloc ((size_t) actualSize);
-			AEGetParamPtr (theAppleEvent, 1, typeUTF8Text, nullptr, & buffer [0], actualSize, nullptr);
+			//AEGetParamPtr (theAppleEvent, 1, typeUTF8Text, nullptr, nullptr, 0, & actualSize);
+			//buffer = (char *) malloc ((size_t) actualSize);
+			//AEGetParamPtr (theAppleEvent, 1, typeUTF8Text, nullptr, & buffer [0], actualSize, nullptr);
 			if (theUserMessageCallback) {
-				autostring32 buffer32 = Melder_8to32_e (buffer);
-				theUserMessageCallback (buffer32.get());
+				//autostring32 buffer32 = Melder_8to32_e (buffer);
+				//theUserMessageCallback (buffer32.get());
+				theUserMessageCallback ();
 			}
-			free (buffer);
+			//free (buffer);
 			duringAppleEvent = false;
 		}
 		return noErr;
 	}
-	static int cb_userMessage (char32 *message) {
+	static int cb_userMessage () {
 		autoPraatBackground background;
 		try {
-			praat_executeScriptFromText (message);
+			//praat_executeScriptFromText (message);
+			praat_executeScript_noGUI (& messageFile, true);   // trust all messages, because they are sent by other apps that have control
 		} catch (MelderError) {
 			Melder_flushError (Melder_upperCaseAppName(), U": message not completely handled.");
 		}
@@ -1123,6 +1135,9 @@ static void printHelp () {
 	MelderInfo_writeLine (U"   As --send, but potentially presenting a form to query for arguments:");
 	MelderInfo_writeLine (U"      praat --send-or-form [OPTION]... SCRIPT-FILE-NAME");
 	MelderInfo_writeLine (U"");
+	MelderInfo_writeLine (U"   As --new-send, but potentially presenting a form to query for arguments:");
+	MelderInfo_writeLine (U"      praat --new-send-or-form [OPTION]... SCRIPT-FILE-NAME");
+	MelderInfo_writeLine (U"");
 	MelderInfo_writeLine (U"   To start up Praat in an interactive command line session:");
 	MelderInfo_writeLine (U"      praat [OPTION]... -");
 	MelderInfo_writeLine (U"");
@@ -1133,9 +1148,10 @@ static void printHelp () {
 	MelderInfo_writeLine (U"      praat --help");
 	MelderInfo_writeLine (U"");
 	MelderInfo_writeLine (U"Options:");
+	MelderInfo_writeLine (U"  --FULL-TRUST     allow this script to save files and run system commands");
 	MelderInfo_writeLine (U"  --no-pref-files  don't read or write the preferences file and the buttons file");
 	MelderInfo_writeLine (U"  --no-plugins     don't activate the plugins");
-	MelderInfo_writeLine (U"  --pref-dir=DIR   set the preferences folder to DIR");
+	MelderInfo_writeLine (U"  --pref-dir=<DIR> set the preferences folder to <DIR>");
 	MelderInfo_writeLine (U"  -u, --utf16      use UTF-16LE output encoding, no BOM (the default on Windows)");
 	MelderInfo_writeLine (U"  -8, --utf8       use UTF-8 output encoding (the default on MacOS and Linux)");
 	MelderInfo_writeLine (U"  -a, --ansi       use ISO Latin-1 output encoding (lossy, hence not recommended)");
@@ -1274,7 +1290,7 @@ static bool tryToSwitchToRunningPraat (bool foundTheOpenOption, bool foundTheSen
 			structMelderFile file { };
 			Melder_relativePathToFile (Melder_peek8to32_u (praatP.argv [iarg]), & file);
 			conststring32 absolutePath = MelderFile_peekPath (& file);
-			MelderString_append (& text32, U"Read from file... ", absolutePath, U"\n");
+			MelderString_append (& text32, U"Read from file: ~", absolutePath, U"\n");
 			trace (U"Argument ", iarg, U": will open path ", absolutePath);
 		} // TODO: we could send an openDocuments message instead
 	} else if (foundTheSendOption) {
@@ -1314,6 +1330,21 @@ static bool tryToSwitchToRunningPraat (bool foundTheOpenOption, bool foundTheSen
 	}
 	autostring8 text8 = Melder_32to8 (text32.string);
 	#if defined (macintosh)
+		autofile f;
+		try {
+			f = Melder_fopen (& messageFile, "w");
+			if (praatP. fullTrust)
+				fprintf (f, "\n# --FULL-TRUST\n");
+			fprintf (f, "%s", text8.get());
+			f.close (& messageFile);
+		} catch (MelderError) {
+			Melder_clearError ();
+			Melder_casual (U"Cannot write message file \"", MelderFile_messageName (& messageFile),
+					U"\" (no privilege to write to folder, or disk full).");
+			return false;
+		}
+
+
 		const int timeOut = 0;
 		AESendMode aeOptions = ( timeOut == 0 ? kAENoReply : kAEWaitReply ) | kAECanInteract | kAECanSwitchLayer;
 		int appleEventVersion = 2;   // 1, 2 or 3
@@ -1369,6 +1400,8 @@ static bool tryToSwitchToRunningPraat (bool foundTheOpenOption, bool foundTheSen
 				// pidProgramDescriptor is autoreleased
 				return false;   // event not sent correctly
 			}
+			TRACE
+			trace (U"event sent successfully");
 			return true;   // we did send an event to a running non-identical Praat successfully
 		} else if (appleEventVersion == 3) {   // from 10.11 on
 			NSAppleEventDescriptor *pidProgramDescriptor = [NSAppleEventDescriptor
@@ -1477,6 +1510,9 @@ static void interpretCommandLineArguments (bool weWereStartedFromTheCommandLine,
 		} else if (strequ (argv [praatP.argumentNumber], "--new-send-or-form")) {
 			praatP.foundTheNewSwitch = true;
 			praatP.foundTheSendOrFormSwitch = true;
+			praatP.argumentNumber += 1;
+		} else if (strequ (argv [praatP.argumentNumber], "--FULL-TRUST")) {
+			praatP.fullTrust = true;
 			praatP.argumentNumber += 1;
 		} else if (strequ (argv [praatP.argumentNumber], "--no-pref-files")) {
 			praatP.ignorePreferenceFiles = true;
@@ -1788,8 +1824,8 @@ static void setPreferencesFolder () {
 	*/
 	if (MelderFolder_isNull (Melder_preferencesFolder())) {   // not yet set by the --pref-dir option?
 		try {
-			Melder_setPreferencesFolder (MelderFolder_peekPath (Melder_preferencesFolder5()));
-			MelderFolder_create (Melder_preferencesFolder());
+			Melder_setPreferencesFolder (MelderFolder_peekPath (Melder_preferencesFolder7()));
+			MelderFolder_create (Melder_preferencesFolder());   // only version 7 has to be created
 		} catch (MelderError) {
 			/*
 				If we arrive here, the directory could not be created,
@@ -1799,33 +1835,30 @@ static void setPreferencesFolder () {
 		}
 	}
 	if (! MelderFolder_isNull (Melder_preferencesFolder())) {
-		#if 0
-			MelderFolder_getFile (Melder_preferencesFolder(), U"Preferences.txt", & prefsFile);
-			MelderFolder_getFile (Melder_preferencesFolder(), U"Buttons.txt", & buttonsFile);
-			MelderFolder_getFile (Melder_preferencesFolder(), U"Tracing.txt", & tracingFile);
-			#if defined (UNIX)
-				MelderFolder_getFile (Melder_preferencesFolder(), U"pid.txt", & pidFile);
-			#endif
-			#if defined (UNIX) || defined (_WIN32)
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Message.txt", & messageFile);
-			#endif
-		#else
-			#if defined (UNIX)
-				MelderFolder_getFile (Melder_preferencesFolder(), U"prefs5", & prefsFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"buttons5", & buttonsFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"pid", & pidFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"message", & messageFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"tracing", & tracingFile);
-			#elif defined (_WIN32)
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Preferences5.ini", & prefsFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Buttons5.ini", & buttonsFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Message.txt", & messageFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Tracing.txt", & tracingFile);
-			#elif defined (macintosh)
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Prefs5", & prefsFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Buttons5", & buttonsFile);
-				MelderFolder_getFile (Melder_preferencesFolder(), U"Tracing.txt", & tracingFile);
-			#endif
+		/*
+			All the version-5 and version-7 paths.
+			The version-5 paths will have to be remembered and accessed even in version 7.
+		*/
+		#if defined (UNIX)
+			MelderFolder_getFile (Melder_preferencesFolder5(), U"prefs5", & prefsFile5);
+			MelderFolder_getFile (Melder_preferencesFolder5(), U"buttons5", & buttonsFile5);
+		#elif defined (_WIN32)
+			MelderFolder_getFile (Melder_preferencesFolder5(), U"Preferences5.ini", & prefsFile5);
+			MelderFolder_getFile (Melder_preferencesFolder5(), U"Buttons5.ini", & buttonsFile5);
+		#elif defined (macintosh)
+			MelderFolder_getFile (Melder_preferencesFolder5(), U"Prefs5", & prefsFile5);
+			MelderFolder_getFile (Melder_preferencesFolder5(), U"Buttons5", & buttonsFile5);
+		#endif
+		/*
+			All the version-7 paths.
+			It cannot hurt that they are already known in version 6.
+		*/
+		MelderFolder_getFile (Melder_preferencesFolder7(), U"Preferences.txt", & prefsFile7);
+		MelderFolder_getFile (Melder_preferencesFolder7(), U"Buttons.txt", & buttonsFile7);
+		MelderFolder_getFile (Melder_preferencesFolder7(), U"Tracing.txt", & tracingFile);
+		MelderFolder_getFile (Melder_preferencesFolder7(), U"Message.txt", & messageFile);
+		#if defined (UNIX)
+			MelderFolder_getFile (Melder_preferencesFolder7(), U"pid.txt", & pidFile);
 		#endif
 		Melder_tracingToFile (& tracingFile);
 	}
@@ -1993,8 +2026,15 @@ void praat_init (conststring32 title,
 		trace (U"showing the Objects window");
 		GuiThing_show (raam);
 		#ifdef UNIX
-			if (! praatP.ignorePreferenceFiles)
-				Preferences_read (& prefsFile);
+			if (! praatP.ignorePreferenceFiles) {
+				/*
+					TODO: explain why this is needed here.
+					could have to do with e.g. the font size setting in praat_picture_init, though that shoudl also be handlable by praat_picture_prefsChanged
+					or don't Graphics_setFontSize and/or Picture_setMouseSelectsInnerViewport work in that situation?
+				*/
+				Preferences_read_i (& prefsFile5);   // Read the old settings first...
+				Preferences_read_i (& prefsFile7);   // ... and the new settings second.
+			}
 		#endif
 		#if ! defined (macintosh)
 			trace (U"initializing the Gui late (Windows and Linux)");
@@ -2021,7 +2061,7 @@ static void executeStartUpFile (MelderFolder startUpDirectory, conststring32 fil
 		if (! MelderFile_readable (& startUp))
 			return;   // it's OK if the file doesn't exist
 		try {
-			praat_executeScript_noGUI (& startUp);
+			praat_executeScript_noGUI (& startUp, false);
 		} catch (MelderError) {
 			Melder_flushError (Melder_upperCaseAppName(), U": start-up file ", & startUp, U" not completed.");
 		}
@@ -2086,7 +2126,8 @@ void praat_run () {
 	 * (namely, the session counter and the cross-session memory counter).
 	 */
 	if (! praatP.ignorePreferenceFiles) {
-		Preferences_read (& prefsFile);
+		Preferences_read_i (& prefsFile5);   // Read the old settings first...
+		Preferences_read_i (& prefsFile7);   // ... and the new settings second.
 		if (! praatP.dontUsePictureWindow)
 			praat_picture_prefsChanged ();
 		praat_statistics_prefsChanged ();
@@ -2096,22 +2137,27 @@ void praat_run () {
 
 	trace (U"execute start-up file(s)");
 	/*
-	 * On Unix and the Mac, we try no less than three start-up file names.
-	 */
-	#if defined (UNIX) || defined (macintosh)
-		structMelderFolder usrLocal { };
-		Melder_pathToFolder (U"/usr/local", & usrLocal);
-		executeStartUpFile (& usrLocal, U"", U"-startUp");
-	#endif
-	#if defined (UNIX) || defined (macintosh)
-		executeStartUpFile (& homeDir, U".", U"-user-startUp");   // not on Windows (empty file name error)
-	#endif
-	#if defined (UNIX) || defined (macintosh) || defined (_WIN32)
-		executeStartUpFile (& homeDir, U"", U"-user-startUp");
-	#endif
+		On Unix and the Mac, we try no less than three start-up file names.
+	*/
+	if (Melder_appVersion() < 7000) {
+		#if defined (UNIX) || defined (macintosh)
+			structMelderFolder usrLocal { };
+			Melder_pathToFolder (U"/usr/local", & usrLocal);
+			executeStartUpFile (& usrLocal, U"", U"-startUp");
+		#endif
+		#if defined (UNIX) || defined (macintosh)
+			executeStartUpFile (& homeDir, U".", U"-user-startUp");   // not on Windows (empty file name error)
+		#endif
+		#if defined (UNIX) || defined (macintosh) || defined (_WIN32)
+			executeStartUpFile (& homeDir, U"", U"-user-startUp");
+		#endif
+	} else {
+		// use plug-ins instead
+	}
 
-	if (! MelderFolder_isNull (Melder_preferencesFolder()) && ! praatP.ignorePlugins) {
-		trace (U"install plug-ins");
+	autoSTRVEC pluginFolderNames7, pluginFolderNames5;
+	if (! MelderFolder_isNull (Melder_preferencesFolder7()) && ! praatP.ignorePlugins) {
+		trace (U"initialize plug-ins (", MelderFolder_peekPath (Melder_preferencesFolder7()), U")");
 		trace (U"locale is ", Melder_peek8to32_u (setlocale (LC_ALL, nullptr)));
 		/*
 			The Praat phase should remain praat_STARTING_UP,
@@ -2119,18 +2165,18 @@ void praat_run () {
 			In plug-ins, pause windows should therefore be made modal.
 		*/
 		structMelderFile searchPattern { };
-		MelderFolder_getFile (Melder_preferencesFolder(), U"plugin_*", & searchPattern);
+		MelderFolder_getFile (Melder_preferencesFolder7(), U"plugin_*", & searchPattern);
 		try {
-			autoSTRVEC folderNames = folderNames_STRVEC (MelderFile_peekPath (& searchPattern));
-			for (integer i = 1; i <= folderNames.size; i ++) {
+			pluginFolderNames7 = folderNames_STRVEC (MelderFile_peekPath (& searchPattern));
+			for (integer i = 1; i <= pluginFolderNames7.size; i ++) {
 				structMelderFolder pluginFolder { };
 				structMelderFile plugin { };
-				MelderFolder_getSubfolder (Melder_preferencesFolder(), folderNames [i].get(), & pluginFolder);
+				MelderFolder_getSubfolder (Melder_preferencesFolder7(), pluginFolderNames7 [i].get(), & pluginFolder);
 				MelderFolder_getFile (& pluginFolder, U"setup.praat", & plugin);
 				if (MelderFile_readable (& plugin)) {
 					Melder_backgrounding = true;
 					try {
-						praat_executeScript_noGUI (& plugin);
+						praat_executeScript_noGUI (& plugin, false);
 					} catch (MelderError) {
 						Melder_flushError (Melder_upperCaseAppName(), U": plugin ", & plugin, U" contains an error.");
 					}
@@ -2138,7 +2184,48 @@ void praat_run () {
 				}
 			}
 		} catch (MelderError) {
-			Melder_clearError ();   // in case Strings_createAsDirectoryList () threw an error
+			Melder_clearError ();   // in case folderNames_STRVEC() threw an error
+		}
+	}
+	if (! MelderFolder_isNull (Melder_preferencesFolder5()) && ! praatP.ignorePlugins) {
+		trace (U"initialize plug-ins (", MelderFolder_peekPath (Melder_preferencesFolder5()), U")");
+		trace (U"locale is ", Melder_peek8to32_u (setlocale (LC_ALL, nullptr)));
+		/*
+			The Praat phase should remain praat_STARTING_UP,
+			because any added commands must not be included in the buttons file.
+			In plug-ins, pause windows should therefore be made modal.
+		*/
+		structMelderFile searchPattern { };
+		MelderFolder_getFile (Melder_preferencesFolder5(), U"plugin_*", & searchPattern);
+		try {
+			pluginFolderNames5 = folderNames_STRVEC (MelderFile_peekPath (& searchPattern));
+			for (integer i = 1; i <= pluginFolderNames5.size; i ++) {
+				if (NUMfindFirst (pluginFolderNames7.get(), pluginFolderNames5 [i].get()) != 0) {
+					/*
+						Ignore this plugin, because it has already been installed.
+					*/
+					Melder_casual (U"Plugin “", pluginFolderNames5 [i].get(), U"” occurs both in “",
+						MelderFolder_peekPath (Melder_preferencesFolder7()), U"” and in “", MelderFolder_peekPath (Melder_preferencesFolder5()),
+						U"”; only the former is installed."
+					);
+				} else {
+					structMelderFolder pluginFolder { };
+					structMelderFile plugin { };
+					MelderFolder_getSubfolder (Melder_preferencesFolder5(), pluginFolderNames5 [i].get(), & pluginFolder);
+					MelderFolder_getFile (& pluginFolder, U"setup.praat", & plugin);
+					if (MelderFile_readable (& plugin)) {
+						Melder_backgrounding = true;
+						try {
+							praat_executeScript_noGUI (& plugin, false);
+						} catch (MelderError) {
+							Melder_flushError (Melder_upperCaseAppName(), U": plugin ", & plugin, U" contains an error.");
+						}
+						Melder_backgrounding = false;
+					}
+				}
+			}
+		} catch (MelderError) {
+			Melder_clearError ();   // in case folderNames_STRVEC() threw an error
 		}
 	}
 
@@ -2490,7 +2577,7 @@ void praat_run () {
 	if (Melder_batch) {
 		if (thePraatStandAloneScriptText) {
 			try {
-				praat_executeScriptFromText (thePraatStandAloneScriptText);
+				praat_executeScriptFromText (thePraatStandAloneScriptText);   // executed with full trust, because *we* made it
 				praat_exit (0);
 			} catch (MelderError) {
 				Melder_flushError (Melder_upperCaseAppName(), U": stand-alone script session interrupted.");
@@ -2548,7 +2635,7 @@ void praat_run () {
 						Melder_casual (U" ########## Running Praat script ", theCurrentPraatApplication -> batchName.string);
 				#endif
 				praat_executeScriptFromCommandLine (theCurrentPraatApplication -> batchName.string,
-						praatP.argc - praatP.argumentNumber, & praatP.argv [praatP.argumentNumber]);
+						praatP.argc - praatP.argumentNumber, & praatP.argv [praatP.argumentNumber], praatP.fullTrust);
 				#ifdef _WIN32
 					/*
 						Chunk 2 (faking an Enter):
@@ -2561,7 +2648,7 @@ void praat_run () {
 				praat_exit (0);
 			} catch (MelderError) {
 				Melder_flushError (Melder_upperCaseAppName(), U": script command <<",
-					theCurrentPraatApplication -> batchName.string, U">> not completed.");
+						theCurrentPraatApplication -> batchName.string, U">> not completed.");
 				praat_exit (-1);
 			}
 		}
@@ -2574,9 +2661,12 @@ void praat_run () {
 			{// scope
 				autostring32 buttons;
 				try {
-					buttons = MelderFile_readText (& buttonsFile);
+					if (MelderFile_readable (& buttonsFile7))
+						buttons = MelderFile_readText (& buttonsFile7);   // first choice
+					else
+						buttons = MelderFile_readText (& buttonsFile5);   // second choice; note: this will be converted to buttonsFile7 upon exit
 				} catch (MelderError) {
-					Melder_clearError ();
+					Melder_clearError ();   // ignore if a buttons file doesn't exist
 				}
 				if (buttons) {
 					char32 *line = buttons.get();
@@ -2609,11 +2699,11 @@ void praat_run () {
 				praat --open [OPTION]... FILE-NAME...   (if not yet running)
 			*/
 			for (; praatP.argumentNumber < praatP.argc; praatP.argumentNumber ++) {
-				autostring32 text = Melder_dup (Melder_cat (U"Read from file... ",   // TODO: ~
+				autostring32 text = Melder_dup (Melder_cat (U"Read from file: ~",
 															Melder_peek8to32_u (praatP.argv [praatP.argumentNumber])));
 				trace (U"Argument ", praatP.argumentNumber, U": <<", text.get(), U">>");
 				try {
-					praat_executeScriptFromText (text.get());
+					praat_executeScriptFromText (text.get());   // executed with full trust, because we just constructed the whole script
 				} catch (MelderError) {
 					Melder_flushError ();
 				}
@@ -2626,7 +2716,7 @@ void praat_run () {
 			autoPraatBackground background;   // to e.g. make audio synchronous
 			try {
 				praat_executeScriptFromCommandLine (theCurrentPraatApplication -> batchName.string,
-						praatP.argc - praatP.argumentNumber, & praatP.argv [praatP.argumentNumber]);
+						praatP.argc - praatP.argumentNumber, & praatP.argv [praatP.argumentNumber], praatP.fullTrust);
 			} catch (MelderError) {
 				Melder_flushError ();
 			}
@@ -2637,7 +2727,7 @@ void praat_run () {
 			*/
 			autoPraatBackground background;   // to e.g. make audio synchronous
 			try {
-				praat_runScriptWithForm (theCurrentPraatApplication -> batchName.string);
+				praat_runScriptWithForm (theCurrentPraatApplication -> batchName.string, praatP.fullTrust);
 			} catch (MelderError) {
 				Melder_flushError ();
 			}

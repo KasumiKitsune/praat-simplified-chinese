@@ -1646,7 +1646,7 @@ Syntax and semantics
 Usage
 =====
 This function is usually called after a user event has been detected (with @`demoWaitForInput`),
-and is typically followed by determing the location of the click
+and is typically followed by determining the location of the click
 (with @`demoX`) and @`demoY`, or with @`demoClickedIn`).
 
 ################################################################################
@@ -1717,7 +1717,7 @@ Syntax and semantics
 Usage
 =====
 This function is usually called after a user event has been detected (with @`demoWaitForInput`),
-and is typically followed by determing the key that was pressed
+and is typically followed by determining the key that was pressed
 (with @`demoKey$`), perhaps while determining which modifier keys were pressed
 (with @`demoShiftKeyPressed`, @`demoOptionKeyPressed`, and/or @`demoCommandKeyPressed`).
 
@@ -5313,7 +5313,7 @@ or if the file is (or would be) on a read-only device.
 
 For instance, if my TIMIT database is in a read-only disk image called `TIMIT.dmg`,
 and I mounted that disk image on my Mac (by double-clicking `TIMIT.dmg`), then trying
-{
+{;
 	\#{tryToAppendFile} ("/Volumes/TIMIT/readme.doc")
 }
 would return 0.
@@ -5346,7 +5346,7 @@ or if the file is (or would be) on a read-only device.
 
 For instance, if my TIMIT database is in a read-only disk image called `TIMIT.dmg`,
 and I mounted that disk image on my Mac (by double-clicking `TIMIT.dmg`), then trying
-{
+{;
 	\#{tryToWriteFile} ("/Volumes/TIMIT/hello.txt")
 }
 would return 0.

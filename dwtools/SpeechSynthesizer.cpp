@@ -705,7 +705,7 @@ autostring32 SpeechSynthesizer_getPhonemesFromText (SpeechSynthesizer me, consts
 		/*
 			Get phonemes from the phoneme tier
 		*/
-		Melder_assert (tg -> tiers -> size == 4);
+		Melder_assert (tg -> tiers->size == 4);
 		IntervalTier phonemeTier = static_cast<IntervalTier> (tg -> tiers -> at [4]);
 		const integer numberOfIntervals = phonemeTier -> intervals.size;
 		Melder_require (numberOfIntervals > 0,

@@ -99,22 +99,26 @@ conststring32 Melder_scomplex (dcomplex value);
 conststring8 Melder8_scomplex (dcomplex value);
 
 /*
-	Convert a formatted floating-point string to something suitable for visualization with the Graphics library.
-	For instance, "1e+4" is turned into "10^^4^", and "-1.23456e-78" is turned into "-1.23456\.c10^^-78^".
-*/
-conststring32 Melder_graphicalHalf (double number);
-conststring32 Melder_graphicalSingle (double number);
-conststring32 Melder_graphicalDouble (double number);
-
-conststring32 Melder_graphicalPercent (double number, integer precision);
-conststring8 Melder8_graphicalPercent (double number, integer precision);
-
-/*
 	Format the number that is specified by its natural logarithm.
 	For instance, -10000 is formatted as "1.135483865315339e-4343", which is a floating-point representation of exp(-10000).
 */
 conststring32 Melder_naturalLogarithm (double lnNumber);
 conststring8 Melder8_naturalLogarithm (double lnNumber);
+
+/*
+	Convert a formatted floating-point string to something suitable for visualization with the Graphics library.
+	For instance, "1e+4" is turned into "10^^4^", and "-1.23456e-78" is turned into "-1.23456\.c10^^-78^".
+*/
+conststring32 Melder_graphicalHalf (double number);
+conststring8 Melder8_graphicalHalf (double number);
+conststring32 Melder_graphicalSingle (double number);
+conststring8 Melder8_graphicalSingle (double number);
+conststring32 Melder_graphicalDouble (double number);
+conststring8 Melder8_graphicalDouble (double number);
+conststring32 Melder_graphicalPercent (double number, integer precision);
+conststring8 Melder8_graphicalPercent (double number, integer precision);
+conststring32 Melder_graphicalNaturalLogarithm (double number);
+conststring8 Melder8_graphicalNaturalLogarithm (double number);
 
 conststring32 Melder_pointer (const void *pointer);
 conststring8 Melder8_pointer (const void *pointer);

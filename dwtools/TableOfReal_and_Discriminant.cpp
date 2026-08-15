@@ -1,10 +1,10 @@
 /* TableOfReal_and_Discriminant.cpp
  *
- * Copyright (C) 1993-2020 David Weenink
+ * Copyright (C) 1993-2020 David Weenink, 2020,2021,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -35,7 +35,7 @@ autoDiscriminant TableOfReal_to_Discriminant (TableOfReal me) {
 		thy groups = TableOfReal_to_SSCPList_byLabel (mew.get());
 		thy total = TableOfReal_to_SSCP (mew.get(), 0, 0, 0, 0);
 
-		if ((thy numberOfGroups = thy groups -> size) < 2)
+		if ((thy numberOfGroups = thy groups->size) < 2)
 			Melder_throw (U"Number of groups should be greater than one.");
 
 		TableOfReal_centreColumns_byRowLabel (mew.get());

@@ -1,10 +1,10 @@
 /* oo_WRITE_BINARY.h
  *
- * Copyright (C) 1994-2009,2011-2020,2022,2024 Paul Boersma
+ * Copyright (C) 1994-2009,2011-2020,2022,2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -28,21 +28,21 @@
 
 #define oo_ANYVEC(type, storage, x, sizeExpression)  \
 	{ \
-		integer _size = (sizeExpression); \
+		const integer _size = (sizeExpression); \
 		Melder_assert (our x.size == _size); \
 		vector_writeBinary_##storage (our x.get(), _filePointer_); \
 	}
 
 #define oo_ANYMAT(type, storage, x, nrowExpression, ncolExpression)  \
 	{ \
-		integer _nrow = (nrowExpression), _ncol = (ncolExpression); \
+		const integer _nrow = (nrowExpression), _ncol = (ncolExpression); \
 		Melder_assert (our x.nrow == _nrow && our x.ncol == _ncol); \
 		matrix_writeBinary_##storage (our x.get(), _filePointer_); \
 	}
 
 #define oo_ANYTEN3(type, storage, x, ndim1Expression, ndim2Expression, ndim3Expression)  \
 	{ \
-		integer _ndim1 = (ndim1Expression), _ndim2 = (ndim2Expression), _ndim3 = (ndim3Expression); \
+		const integer _ndim1 = (ndim1Expression), _ndim2 = (ndim2Expression), _ndim3 = (ndim3Expression); \
 		tensor3_writeBinary_##storage (our x.get(), _filePointer_); \
 	}
 
@@ -62,9 +62,9 @@
 		binput##storage (our x [_i].get(), _filePointer_); \
 	}
 
-#define oo_STRINGx_VECTOR(storage, x, n)  \
+#define oo_STRINGx_VECTOR(storage, x, sizeExpression)  \
 	{ \
-		integer _size = (n); \
+		const integer _size = (sizeExpression); \
 		Melder_assert (_size == our x.size); \
 		for (integer _i = 1; _i <= _size; _i ++) { \
 			binput##storage (our x [_i].get(), _filePointer_);  \
@@ -79,14 +79,25 @@
 		our x [_i]. writeBinary (_filePointer_); \
 	}
 
-#define oo_STRUCTVEC(Type, x, n)  \
-{ \
-	integer _size = (n); \
-	Melder_assert (our x.size == _size); \
-	for (integer _i = 1; _i <= _size; _i ++) { \
-		our x [_i]. writeBinary (_filePointer_); \
-	} \
-}
+#define oo_STRUCTVEC(Type, x, sizeExpression)  \
+	{ \
+		const integer _size = (sizeExpression); \
+		Melder_assert (our x.size == _size); \
+		for (integer _i = 1; _i <= _size; _i ++) { \
+			our x [_i]. writeBinary (_filePointer_); \
+		} \
+	}
+
+#define oo_STRUCTMAT(Type, x, nrowExpression, ncolExpression)  \
+	{ \
+		const integer _nrow = (nrowExpression), _ncol = (ncolExpression); \
+		Melder_assert (our x.nrow == _nrow && our x.ncol == _ncol); \
+		for (integer _irow = 1; _irow <= _nrow; _irow ++) { \
+			for (integer _icol = 1; _icol <= _ncol; _icol ++) { \
+				our x [_irow] [_icol]. writeBinary (_filePointer_); \
+			} \
+		} \
+	}
 
 #define oo_OBJECT(Class, version, x)  \
 	binputex ((bool) our x, _filePointer_); \

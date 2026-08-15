@@ -22,13 +22,13 @@ energy integration continuity test
 <code>   <a href="_appendInfoLine_.html">appendInfoLine</a>: "## biggest absolute waveform step between samples: ",<br></code>
 <code>   ... biggestAbsoluteWaveformStepBetweenSamples, " Pa"<br></code>
 <code style="color:red">=&gt;</code><br>
-<code>   ## biggest absolute waveform step between samples: 0.5882017498987073 Pa<br></code>
+<code>   ## biggest absolute waveform step between samples: 0.5882017498987074 Pa<br></code>
 <p>This corresponds to the following biggest energy step between two consecutive samples:</p>
 <code>   biggestAbsoluteEnergyStepBetweenSamples = biggestAbsoluteWaveformStepBetweenSamples ^ 2 / samplingFrequency<br></code>
 <code>   <a href="_appendInfoLine_.html">appendInfoLine</a>: "## biggest absolute energy step between samples: ",<br></code>
 <code>   ... biggestAbsoluteEnergyStepBetweenSamples, " Pa²s"<br></code>
 <code style="color:red">=&gt;</code><br>
-<code>   ## biggest absolute energy step between samples: 7.845380920269874e-06 Pa²s<br></code>
+<code>   ## biggest absolute energy step between samples: 7.845380920269877e-06 Pa²s<br></code>
 <p>We&#8217;ll divide up every sample into 10 ministeps:</p>
 <code>   oversampling = 10<br></code>
 <p>Between any consecutive ministeps, the energy step should not exceed one tenth of the biggest energy step between two consecutive samples:</p>
@@ -36,7 +36,7 @@ energy integration continuity test
 <code>   <a href="_appendInfoLine_.html">appendInfoLine</a>: "## biggest absolute energy ministep: ",<br></code>
 <code>   ... biggestAbsoluteEnergyMinistep, " Pa²s"<br></code>
 <code style="color:red">=&gt;</code><br>
-<code>   ## biggest absolute energy ministep: 7.845380920269874e-07 Pa²s<br></code>
+<code>   ## biggest absolute energy ministep: 7.845380920269877e-07 Pa²s<br></code>
 <p>Large test:</p>
 <code>   <a href="_stopwatch_.html">stopwatch</a><br></code>
 <code>   minidt = 1.0 / samplingFrequency / oversampling<br></code>
@@ -71,30 +71,30 @@ energy integration continuity test
 <code>   14 5.480757833370524e-07 1.1236763131427297e-07<br></code>
 <code>   15 6.604434146513251e-07 1.123676313142727e-07<br></code>
 <code>   16 7.728110459655973e-07 1.1236763131427217e-07<br></code>
-<code>   17 8.851786772798704e-07 1.1236763131427313e-07<br></code>
-<code>   18 9.975463085941426e-07 1.1236763131427217e-07<br></code>
+<code>   17 8.851786772798705e-07 1.1236763131427323e-07<br></code>
+<code>   18 9.975463085941426e-07 1.1236763131427207e-07<br></code>
 <code>   19 1.1099139399084153e-06 1.123676313142727e-07<br></code>
 <code>   20 1.2222479420557002e-06 1.1233400214728491e-07<br></code>
 <code>   21 1.258358958404482e-06 3.611101634878181e-08<br></code>
-<code>   22 1.2944699747532645e-06 3.611101634878244e-08<br></code>
-<code>   23 1.3305809911020463e-06 3.611101634878181e-08<br></code>
+<code>   22 1.2944699747532643e-06 3.611101634878223e-08<br></code>
+<code>   23 1.3305809911020463e-06 3.611101634878202e-08<br></code>
 <code>   24 1.3666920074508283e-06 3.611101634878202e-08<br></code>
-<code>   25 1.4028030237996105e-06 3.611101634878223e-08<br></code>
-<code>   26 1.4389140401483928e-06 3.611101634878223e-08<br></code>
-<code>   27 1.4750250564971746e-06 3.611101634878181e-08<br></code>
+<code>   25 1.4028030237996103e-06 3.611101634878202e-08<br></code>
+<code>   26 1.4389140401483923e-06 3.611101634878202e-08<br></code>
+<code>   27 1.4750250564971746e-06 3.611101634878223e-08<br></code>
 <code>   28 1.5111360728459568e-06 3.611101634878223e-08<br></code>
-<code>   29 1.547247089194739e-06 3.611101634878223e-08<br></code>
-<code>   30 1.5833498977214194e-06 3.610280852668041e-08<br></code>
+<code>   29 1.5472470891947388e-06 3.611101634878202e-08<br></code>
+<code>   30 1.5833498977214194e-06 3.610280852668062e-08<br></code>
 <code>   31 1.6008490724530757e-06 1.7499174731656273e-08<br></code>
 <code>   32 1.618348247184732e-06 1.7499174731656273e-08<br></code>
 <code>   33 1.635847421916388e-06 1.749917473165606e-08<br></code>
 <code>   34 1.6533465966480443e-06 1.7499174731656273e-08<br></code>
 <code>   35 1.6708457713797006e-06 1.7499174731656273e-08<br></code>
-<code>   36 1.6883449461113567e-06 1.749917473165606e-08<br></code>
-<code>   37 1.705844120843013e-06 1.7499174731656273e-08<br></code>
-<code>   38 1.723343295574669e-06 1.749917473165606e-08<br></code>
-<code>   39 1.7408424703063253e-06 1.7499174731656273e-08<br></code>
-<code>   40 1.7583484457624646e-06 1.7505975456139326e-08<br></code>
+<code>   36 1.6883449461113564e-06 1.749917473165585e-08<br></code>
+<code>   37 1.705844120843013e-06 1.7499174731656484e-08<br></code>
+<code>   38 1.7233432955746688e-06 1.749917473165585e-08<br></code>
+<code>   39 1.740842470306325e-06 1.7499174731656273e-08<br></code>
+<code>   40 1.7583484457624646e-06 1.7505975456139537e-08<br></code>
 <code>   41 1.7912687645441031e-06 3.292031878163856e-08<br></code>
 <code>   42 1.8241890833257415e-06 3.2920318781638346e-08<br></code>
 <code>   43 1.8571094021073796e-06 3.2920318781638134e-08<br></code>
@@ -104,26 +104,26 @@ energy integration continuity test
 <code>   47 1.9887906772339334e-06 3.292031878163856e-08<br></code>
 <code>   48 2.021710996015572e-06 3.292031878163856e-08<br></code>
 <code>   49 2.05463131479721e-06 3.2920318781638134e-08<br></code>
-<code>   50 2.087554901614122e-06 3.292358681691197e-08<br></code>
-<code>   51 2.1278857312678284e-06 4.033082965370634e-08<br></code>
-<code>   52 2.1682165609215343e-06 4.0330829653705916e-08<br></code>
+<code>   50 2.0875549016141217e-06 3.292358681691155e-08<br></code>
+<code>   51 2.127885731267828e-06 4.033082965370634e-08<br></code>
+<code>   52 2.1682165609215343e-06 4.033082965370634e-08<br></code>
 <code>   53 2.2085473905752407e-06 4.033082965370634e-08<br></code>
 <code>   54 2.248878220228946e-06 4.033082965370549e-08<br></code>
 <code>   55 2.2892090498826525e-06 4.033082965370634e-08<br></code>
 <code>   56 2.3295398795363584e-06 4.0330829653705916e-08<br></code>
 <code>   57 2.3698707091900648e-06 4.033082965370634e-08<br></code>
 <code>   58 2.4102015388437707e-06 4.0330829653705916e-08<br></code>
-<code>   59 2.4505323684974775e-06 4.0330829653706764e-08<br></code>
-<code>   60 2.490865592939e-06 4.033322444152237e-08<br></code>
-<code>   61 2.536626780487469e-06 4.576118754846905e-08<br></code>
-<code>   62 2.582387968035937e-06 4.5761187548468205e-08<br></code>
-<code>   63 2.6281491555844057e-06 4.576118754846863e-08<br></code>
+<code>   59 2.450532368497477e-06 4.033082965370634e-08<br></code>
+<code>   60 2.490865592939e-06 4.033322444152279e-08<br></code>
+<code>   61 2.5366267804874685e-06 4.576118754846863e-08<br></code>
+<code>   62 2.5823879680359367e-06 4.5761187548468205e-08<br></code>
+<code>   63 2.6281491555844057e-06 4.576118754846905e-08<br></code>
 <code>   64 2.6739103431328743e-06 4.576118754846863e-08<br></code>
 <code>   65 2.7196715306813425e-06 4.5761187548468205e-08<br></code>
-<code>   66 2.7654327182298116e-06 4.576118754846905e-08<br></code>
-<code>   67 2.81119390577828e-06 4.5761187548468205e-08<br></code>
-<code>   68 2.856955093326749e-06 4.576118754846905e-08<br></code>
-<code>   69 2.902716280875217e-06 4.5761187548468205e-08<br></code>
+<code>   66 2.765432718229811e-06 4.576118754846863e-08<br></code>
+<code>   67 2.8111939057782794e-06 4.5761187548468205e-08<br></code>
+<code>   68 2.8569550933267484e-06 4.576118754846905e-08<br></code>
+<code>   69 2.902716280875217e-06 4.576118754846863e-08<br></code>
 <code>   70 2.948506879878777e-06 4.579059900356002e-08<br></code>
 <code>   71 3.0609607097784683e-06 1.1245382989969118e-07<br></code>
 <code>   72 3.173414539678161e-06 1.1245382989969288e-07<br></code>
@@ -144,17 +144,17 @@ energy integration continuity test
 <code>   87 4.306292249774701e-06 3.3325995181984736e-08<br></code>
 <code>   88 4.339618244956687e-06 3.332599518198558e-08<br></code>
 <code>   89 4.372944240138672e-06 3.3325995181984736e-08<br></code>
-<code>   90 4.406255566082367e-06 3.3311325943695143e-08<br></code>
-<code>   91 4.40631798216653e-06 6.241608416314356e-11<br></code>
-<code>   92 4.406380398250693e-06 6.241608416314356e-11<br></code>
-<code>   93 4.406442814334856e-06 6.241608416314356e-11<br></code>
-<code>   94 4.406505230419019e-06 6.241608416314356e-11<br></code>
+<code>   90 4.406255566082368e-06 3.331132594369599e-08<br></code>
+<code>   91 4.406317982166531e-06 6.241608416314356e-11<br></code>
+<code>   92 4.406380398250694e-06 6.241608416314356e-11<br></code>
+<code>   93 4.406442814334857e-06 6.241608416314356e-11<br></code>
+<code>   94 4.406505230419019e-06 6.241608416229652e-11<br></code>
 <code>   95 4.4065676465031825e-06 6.241608416314356e-11<br></code>
 <code>   96 4.406630062587346e-06 6.241608416314356e-11<br></code>
-<code>   97 4.406692478671508e-06 6.241608416229652e-11<br></code>
-<code>   98 4.406754894755671e-06 6.241608416314356e-11<br></code>
-<code>   99 4.406817310839834e-06 6.241608416314356e-11<br></code>
-<code>   ## time elapsed: 103.769 ms<br></code>
+<code>   97 4.406692478671509e-06 6.241608416314356e-11<br></code>
+<code>   98 4.406754894755672e-06 6.241608416314356e-11<br></code>
+<code>   99 4.406817310839835e-06 6.241608416314356e-11<br></code>
+<code>   ## time elapsed: 80.728 ms<br></code>
 <hr>
 <address>
 	<p>© Paul Boersma 2025-05-14</p>

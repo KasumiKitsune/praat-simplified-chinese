@@ -108,26 +108,26 @@ namespace TranscriptionDefaults {
 	inline constexpr bool includeWords = true;
 	inline constexpr bool includeDiarization = false;
 	inline constexpr bool useVad = true;
+	inline const integer n_threads = MelderThread_getNumberOfProcessors () / 2;
 }
 
 namespace VadDefaults {
 	inline constexpr conststring32 speechThreshold = U"0.5";
 	inline constexpr conststring32 minNonSpeechDuration = U"0.1";
 	inline constexpr conststring32 minSpeechDuration = U"0.25";
-	inline constexpr conststring32 speechPad = U"0.03";
-	inline constexpr conststring32 nonSpeechLabel = U"non-speech";
+	inline constexpr conststring32 speechPad = U"0.0";
+	inline constexpr conststring32 nonSpeechLabel = U"";
 	inline constexpr conststring32 speechLabel = U"speech";
 }
 
 namespace DiarizationDefaults {
-	inline constexpr conststring32 numSpeakers = U"0 (= auto)";
-	inline constexpr conststring32 minSpeakers = U"0";
-	inline constexpr conststring32 maxSpeakers = U"0 (= unlimited)";
+	inline constexpr conststring32 maxNumSpeakers = U"2";
 	inline constexpr bool allowOverlap = true;
-	inline constexpr conststring32 nonSpeechLabel = U"non-speech";
+	inline constexpr conststring32 nonSpeechLabel = U"";
 	inline constexpr conststring32 speechLabel = U"speech";
-	inline constexpr conststring32 clusterThreshold = U"0.7045654963945799";
+	inline constexpr conststring32 clusterThreshold = U"0.7";
 	inline constexpr conststring32 segmentationStep = U"0.1";
+	inline const integer n_threads = MelderThread_getNumberOfProcessors () / 2;
 }
 
 struct SpeechSegment {
@@ -173,7 +173,7 @@ autovector <SpeechSegment> doSileroVad (constSound sound, double speechProbabili
 	labeled `nonSpeechLabel` and `speechLabel` respectively.
 */
 autovector <autovector <SpeechSegment>> doDiarization (constSound sound,
-	integer numSpeakers, integer minSpeakers, integer maxSpeakers, bool allowSpeakersOverlap,
+	integer maxNumSpeakers, bool allowSpeakersOverlap,
 	double clusterThreshold, double segmentationStep,
 	conststring32 nonSpeechLabel, conststring32 speechLabel);
 

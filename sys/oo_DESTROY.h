@@ -1,10 +1,10 @@
 /* oo_DESTROY.h
  *
- * Copyright (C) 1994-2007,2009-2020,2022-2024 Paul Boersma
+ * Copyright (C) 1994-2007,2009-2020,2022-2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -53,7 +53,7 @@
 		} \
 	} else { }
 
-#define oo_STRINGx_VECTOR(storage, x, n)  \
+#define oo_STRINGx_VECTOR(storage, x, sizeExpression)  \
 	if (! _thisStructCanAutodestroyItsMembers_) { \
 		our x. reset(); \
 	} else { }
@@ -66,10 +66,22 @@
 		our x [_i]. destroy (); \
 	}
 
-#define oo_STRUCTVEC(Type, x, n)  \
+#define oo_STRUCTVEC(Type, x, sizeExpression)  \
 { \
 	for (integer _i = 1; _i <= our x.size; _i ++) { \
 		our x [_i]. destroy (); \
+	} \
+	if (! _thisStructCanAutodestroyItsMembers_) { \
+		our x. reset(); \
+	} else { } \
+}
+
+#define oo_STRUCTMAT(Type, x, nrowExpression, ncolExpression)  \
+{ \
+	for (integer _irow = 1; _irow <= our x.nrow; _irow ++) { \
+		for (integer _icol = 1; _icol <= our x.ncol; _icol ++) { \
+			our x [_irow] [_icol]. destroy (); \
+		} \
 	} \
 	if (! _thisStructCanAutodestroyItsMembers_) { \
 		our x. reset(); \

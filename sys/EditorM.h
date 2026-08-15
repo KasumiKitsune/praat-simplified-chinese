@@ -2,11 +2,11 @@
 #define _EditorM_h_
 /* EditorM.h
  *
- * Copyright (C) 1992-2013,2015-2024 Paul Boersma
+ * Copyright (C) 1992-2013,2015-2024,2026 Paul Boersma, 2026 Anastasia Shchupak
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -119,6 +119,17 @@ _form_inited_: \
 	POSITIVE_FIELD (realVariable, labelText, defaultStringValue)
 
 
+#define NONNEGATIVE_VARIABLE(realVariable)  \
+	static double realVariable;
+
+#define NONNEGATIVE_FIELD(realVariable, labelText, defaultStringValue)  \
+	UiForm_addNonnegative (cmd -> d_uiform.get(), & realVariable, nullptr, labelText, defaultStringValue);
+
+#define NONNEGATIVE(realVariable, labelText, defaultStringValue)  \
+	NONNEGATIVE_VARIABLE (realVariable) \
+	NONNEGATIVE_FIELD (realVariable, labelText, defaultStringValue)
+
+
 #define INTEGER_VARIABLE(integerVariable)  \
 	static integer integerVariable;
 
@@ -130,11 +141,34 @@ _form_inited_: \
 	INTEGER_FIELD (integerVariable, labelText, defaultStringValue)
 
 
+#define NATURAL0_VARIABLE(integerVariable)  \
+	static integer integerVariable;
+
+#define NATURAL0_FIELD(integerVariable, labelText, defaultStringValue)  \
+	UiForm_addNatural0 (cmd -> d_uiform.get(), & integerVariable, nullptr, labelText, defaultStringValue);
+
+#define NATURAL0(integerVariable, labelText, defaultStringValue)  \
+	NATURAL0_VARIABLE (integerVariable) \
+	NATURAL0_FIELD (integerVariable, labelText, defaultStringValue)
+
+
+#define NATURAL1_VARIABLE(integerVariable)  \
+	static integer integerVariable;
+
+#define NATURAL1_FIELD(integerVariable, labelText, defaultStringValue)  \
+	UiForm_addNatural1 (cmd -> d_uiform.get(), & integerVariable, nullptr, labelText, defaultStringValue);
+
+#define NATURAL1(integerVariable, labelText, defaultStringValue)  \
+	NATURAL1_VARIABLE (integerVariable) \
+	NATURAL1_FIELD (integerVariable, labelText, defaultStringValue)
+
+
+/* TODO: remove */
 #define NATURAL_VARIABLE(integerVariable)  \
 	static integer integerVariable;
 
 #define NATURAL_FIELD(integerVariable, labelText, defaultStringValue)  \
-	UiForm_addNatural (cmd -> d_uiform.get(), & integerVariable, nullptr, labelText, defaultStringValue);
+	UiForm_addNatural1 (cmd -> d_uiform.get(), & integerVariable, nullptr, labelText, defaultStringValue);
 
 #define NATURAL(integerVariable, labelText, defaultStringValue)  \
 	NATURAL_VARIABLE (integerVariable) \
@@ -296,15 +330,26 @@ _form_inited_: \
 	REALVECTOR_FIELD (realVectorVariable, labelText, defaultFormat, defaultStringValue)
 
 
-#define NATURALVECTOR_VARIABLE(integerVectorVariable)  \
+#define NATURAL0VECTOR_VARIABLE(integerVectorVariable)  \
 	static constINTVEC integerVectorVariable;
 
-#define NATURALVECTOR_FIELD(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
-	UiForm_addNaturalVector (cmd -> d_uiform.get(), & integerVectorVariable, nullptr, labelText, kUi_integerVectorFormat::defaultFormat, defaultStringValue);
+#define NATURAL0VECTOR_FIELD(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
+	UiForm_addNatural0Vector (cmd -> d_uiform.get(), & integerVectorVariable, nullptr, labelText, kUi_integerVectorFormat::defaultFormat, defaultStringValue);
 
-#define NATURALVECTOR(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
-	NATURALVECTOR_VARIABLE (integerVectorVariable) \
-	NATURALVECTOR_FIELD (integerVectorVariable, labelText, defaultFormat, defaultStringValue)
+#define NATURAL0VECTOR(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
+	NATURAL0VECTOR_VARIABLE (integerVectorVariable) \
+	NATURAL0VECTOR_FIELD (integerVectorVariable, labelText, defaultFormat, defaultStringValue)
+
+
+#define NATURAL1VECTOR_VARIABLE(integerVectorVariable)  \
+	static constINTVEC integerVectorVariable;
+
+#define NATURAL1VECTOR_FIELD(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
+	UiForm_addNatural1Vector (cmd -> d_uiform.get(), & integerVectorVariable, nullptr, labelText, kUi_integerVectorFormat::defaultFormat, defaultStringValue);
+
+#define NATURAL1VECTOR(integerVectorVariable, labelText, defaultFormat, defaultStringValue)  \
+	NATURAL1VECTOR_VARIABLE (integerVectorVariable) \
+	NATURAL1VECTOR_FIELD (integerVectorVariable, labelText, defaultFormat, defaultStringValue)
 
 
 #define CHOICE_VARIABLE(optionVariable)  \

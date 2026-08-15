@@ -1,10 +1,10 @@
 /* FFNet.cpp
  *
- * Copyright (C) 1997-2020 David Weenink
+ * Copyright (C) 1997-2020 David Weenink, 2015-2023,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -313,7 +313,7 @@ void FFNet_reset (FFNet me, double weightRange) {
 
 conststring32 FFNet_getCategoryOfOutputUnit (FFNet me, integer outputUnit) {
 	conststring32 result = U"-- undefined --";
-	if (my outputCategories && outputUnit <= my outputCategories -> size) {
+	if (my outputCategories && outputUnit <= my outputCategories->size) {
 		const SimpleString ss = my outputCategories->at [outputUnit];
 		result = ss -> string.get();
 	}
@@ -323,7 +323,7 @@ conststring32 FFNet_getCategoryOfOutputUnit (FFNet me, integer outputUnit) {
 integer FFNet_getOutputUnitOfCategory (FFNet me, const char32* category) {
 	integer result = 0;
 	if (my outputCategories) {
-		for (integer i = 1; i <= my outputCategories -> size; i ++) {
+		for (integer i = 1; i <= my outputCategories->size; i ++) {
 			const SimpleString s = my outputCategories->at [i];
 			if (Melder_equ (s -> string.get(), category)) {
 				result = i;
@@ -759,8 +759,7 @@ autoTableOfReal FFNet_extractWeights (FFNet me, integer layer) {
 
 autoFFNet PatternList_Categories_to_FFNet (PatternList me, Categories you, integer numberOfUnits1, integer numberOfUnits2) {
 	try {
-		numberOfUnits1 = numberOfUnits1 > 0 ? numberOfUnits1 : 0;
-		numberOfUnits2 = numberOfUnits2 > 0 ? numberOfUnits2 : 0;
+		Melder_assert (numberOfUnits1 >= 0 && numberOfUnits2 >= 0);
 		autoCategories uniq = Categories_selectUniqueItems (you);
 		const integer numberOfOutputs = uniq -> size;
 		Melder_require (numberOfOutputs > 0,

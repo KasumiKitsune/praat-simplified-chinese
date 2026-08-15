@@ -2443,7 +2443,7 @@ double KlattGrid_getAmplitudeAtTime (KlattGrid me, kKlattGridFormantType formant
 
 void KlattGrid_addAmplitudePoint (KlattGrid me, kKlattGridFormantType formantType, integer iformant, double t, double value) {
 	const OrderedOf<structIntensityTier>* ordered = KlattGrid_getAddressOfAmplitudes (me, formantType);
-	Melder_require (iformant > 0 && iformant <= ordered -> size,
+	Melder_require (iformant > 0 && iformant <= ordered->size,
 		U"Formant amplitude tier ", iformant, U"does not exist.");
 	RealTier_addPoint (ordered->at [iformant], t, value);
 }
@@ -2460,7 +2460,7 @@ autoIntensityTier KlattGrid_extractAmplitudeTier (KlattGrid me, kKlattGridForman
 		const OrderedOf<structIntensityTier>* ordered = KlattGrid_getAddressOfAmplitudes (me, formantType);
 		Melder_require (ordered != nullptr,
 			U"This amplitude tier does not exist.");
-		Melder_require (iformant > 0 && iformant <= ordered -> size,
+		Melder_require (iformant > 0 && iformant <= ordered->size,
 			U"Formant amplitude tier ", iformant, U"does not exist.");
 		autoIntensityTier thee = Data_copy (ordered->at [iformant]);
 		return thee;
@@ -2476,7 +2476,7 @@ void KlattGrid_replaceAmplitudeTier (KlattGrid me, kKlattGridFormantType formant
 		OrderedOf<structIntensityTier>* ordered = KlattGrid_getAddressOfAmplitudes (me, formantType);
 		Melder_require (ordered != nullptr,
 			U"This amplitude tier does not exist.");
-		Melder_require (iformant > 0 && iformant <= ordered -> size,
+		Melder_require (iformant > 0 && iformant <= ordered->size,
 			U"Formant amplitude tier ", iformant, U" does not exist.");
 		autoIntensityTier any = Data_copy (thee);
 		ordered -> replaceItem_move (any.move(), iformant);

@@ -1,10 +1,10 @@
 /* Roots_and_Formant.cpp
  *
- * Copyright (C) 1994-2024 David Weenink
+ * Copyright (C) 1994-2026 David Weenink
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -30,14 +30,14 @@ static void Formant_Frame_sort (Formant_Frame me) {
 			}
 		if (imin != i)
 			std::swap (my formant [imin], my formant [i]);
-	}	
+	}
 }
 
 void Roots_into_Formant_Frame (constRoots me, Formant_Frame thee, double samplingFrequency, double margin) {
 	/*
 		Determine the formants and bandwidths
 	*/
-	Melder_assert (my numberOfRoots == my roots.size); // check invariant
+	Melder_pre (my numberOfRoots == my roots.size);   // check invariant
 	thy formant. resize (0);
 	const double nyquistFrequency = 0.5 * samplingFrequency;
 	const double fLow = margin, fHigh = nyquistFrequency - margin;
@@ -52,9 +52,8 @@ void Roots_into_Formant_Frame (constRoots me, Formant_Frame thee, double samplin
 			newff -> bandwidth = bandwidth;
 		}
 	}
-	thy numberOfFormants = thy formant.size; // maintain invariant
+	thy numberOfFormants = thy formant.size;   // maintain invariant
 	Formant_Frame_sort (thee);
 }
 
-/* End  of file Roots_and_Formant.h */
-
+/* End of file Roots_and_Formant.h */

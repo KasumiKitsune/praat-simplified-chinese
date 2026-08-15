@@ -1,10 +1,10 @@
 /* Strings.cpp
  *
- * Copyright (C) 1992-2008,2011-2020,2022 Paul Boersma
+ * Copyright (C) 1992-2008,2011-2020,2022-2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -115,7 +115,7 @@ void Strings_writeToRawTextFile (Strings me, MelderFile file) {
 		autoMelderString buffer;
 		for (integer i = 1; i <= my numberOfStrings; i ++)
 			MelderString_append (& buffer, my strings [i].get(), U"\n");
-		MelderFile_writeText (file, buffer.string, Melder_getOutputEncoding ());
+		MelderFile_writeText_e (file, buffer.string, Melder_getOutputEncoding ());
 	} catch (MelderError) {
 		Melder_throw (U"Strings not written to raw text file ", file, U".");
 	}

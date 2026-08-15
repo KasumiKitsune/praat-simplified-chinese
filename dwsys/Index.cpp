@@ -1,10 +1,10 @@
 /* Index.cpp
  *
- * Copyright (C) 2005-2022 David Weenink
+ * Copyright (C) 2005-2022 David Weenink, 2011,2012,2015-2018,2020,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -15,14 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this work. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- djmw 20050724
- djmw 20061212 Changed info to Melder_writeLine<x> format.
- djmw 20070102
- djmw 20071012 Added: o_CAN_WRITE_AS_ENCODING.h
- djmw 20110304 Thing_new
-*/
 
 #include <time.h>
 #include "Index.h"
@@ -156,7 +148,7 @@ int StringsIndex_getClassIndexFromClassLabel (StringsIndex me, conststring32 kla
 
 conststring32 StringsIndex_getClassLabelFromClassIndex (StringsIndex me, integer klasIndex) {
 	conststring32 result = undefinedClassLabel;
-	if (klasIndex > 0 && klasIndex <= my classes -> size) {
+	if (klasIndex > 0 && klasIndex <= my classes->size) {
 		const SimpleString ss = (SimpleString) my classes->at [klasIndex];   // FIXME cast
 		result = ss -> string.get();
 	}
@@ -196,7 +188,7 @@ autoSTRVEC StringsIndex_listAllClasses ( StringsIndex me) {
 }
 void StringsIndex_sortNumerically (StringsIndex me) {
 	try {
-		const integer numberOfClasses = my classes -> size;
+		const integer numberOfClasses = my classes->size;
 		autoSTRVEC numberstrings (numberOfClasses);
 		autoVEC numbers = raw_VEC (numberOfClasses);
 		for (integer i = 1; i <= numberOfClasses; i ++) {

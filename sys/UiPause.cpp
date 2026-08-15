@@ -184,10 +184,20 @@ void UiPause_integer (conststring32 label, conststring32 defaultValue) {
 		Melder_throw (U"The function “integer” should be between a “beginPause” and an “endPause”.");
 	UiForm_addInteger (thePauseForm.get(), nullptr, nullptr, label, defaultValue);
 }
+void UiPause_natural0 (conststring32 label, conststring32 defaultValue) {
+	if (! thePauseForm)
+		Melder_throw (U"The function “natural0” should be between a “beginPause” and an “endPause”.");
+	UiForm_addNatural0 (thePauseForm.get(), nullptr, nullptr, label, defaultValue);
+}
+void UiPause_natural1 (conststring32 label, conststring32 defaultValue) {
+	if (! thePauseForm)
+		Melder_throw (U"The function “natural1” should be between a “beginPause” and an “endPause”.");
+	UiForm_addNatural1 (thePauseForm.get(), nullptr, nullptr, label, defaultValue);
+}
 void UiPause_natural (conststring32 label, conststring32 defaultValue) {
 	if (! thePauseForm)
 		Melder_throw (U"The function “natural” should be between a “beginPause” and an “endPause”.");
-	UiForm_addNatural (thePauseForm.get(), nullptr, nullptr, label, defaultValue);
+	UiForm_addNatural1 (thePauseForm.get(), nullptr, nullptr, label, defaultValue);
 }
 void UiPause_word (conststring32 label, conststring32 defaultValue) {
 	if (! thePauseForm)

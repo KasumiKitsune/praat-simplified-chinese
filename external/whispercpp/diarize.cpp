@@ -1422,7 +1422,7 @@ struct diarization_params {
     bool    emb_exclude_overlap = true;
 
     // Clustering
-    double  cluster_threshold  = 0.7045654963945799;   // https://huggingface.co/pyannote/speaker-diarization-3.1/blob/main/config.yaml
+    double  cluster_threshold  = 0.7f;   // https://huggingface.co/pyannote/speaker-diarization-3.1/blob/main/config.yaml
     int     cluster_min_size   = 12;
     float   min_active_ratio   = 0.2f;    // for filter_embeddings
 	int     num_speakers       = 0;   // unspecified
@@ -1861,11 +1861,10 @@ static std::vector<int32_t> agglomerative_cluster(
 
         clusters = std::move(best_clusters);
         n_large  = best_n_large;
-    	if (num_clusters > 0 && n_large != num_clusters) {
-    		Melder_warning (U"Diarization: found only ", n_large,
-							U" clusters (requested ", num_clusters,
-							U"). Lowering 'cluster_min_size' might help.");
-    	}
+
+    	const bool max_only_constraint = (num_clusters_in == 0 && min_clusters_in == 0 && max_clusters_in > 0);
+    	if (!max_only_constraint && num_clusters > 0 && n_large != num_clusters)
+    		Melder_warning (U"Diarization: detected only ", n_large, U" speakers (requested ", num_clusters, U").");
     }
 
     // Large/small split
@@ -2274,7 +2273,7 @@ struct diarize_full_params diarize_default_params(void) {
 	p.n_threads			= (int32_t) std::thread::hardware_concurrency() / 2;
     p.seg_duration      = 10.0f;
     p.seg_step_ratio    = 0.1f;
-    p.cluster_threshold = 0.7045654963945799f;
+    p.cluster_threshold = 0.7f;
     p.cluster_min_size  = 12;
     p.min_active_ratio  = 0.2f;
 	p.num_speakers      = 0;

@@ -1,0 +1,44 @@
+# -*- shell-script -*-
+# Bash command completion for ‘praat(1)’.
+#
+# Copyright (C) 2025, 2026 Rafael Laboissière
+#
+# This script is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# This script is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+# Public License for more details.
+#
+# See <https://www.gnu.org/licenses/>.
+
+shopt -s progcomp
+
+_praat_completion () {
+    COMPREPLY=()
+
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    local opts="--help --version"
+    opts+=" --run --open --new-open --send --new-send --send-or-form"
+    opts+=" --FULL-TRUST --no-pref-files --no-plugins --pref-dir -u --utf16"
+    opts+=" -8 --utf8 -a --ansi --trace --hide-picture --debug"
+
+    case "${prev}" in
+        --run|--open|--new-open|--send|--new-send|--send-or-form)
+            COMPREPLY=( $(compgen -A file -- ${cur}) )
+            ;;
+        --pref-dir)
+            COMPREPLY=( $(compgen -A directory -- ${cur}) )
+            ;;
+        *)
+            COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+            ;;
+    esac
+}
+
+complete -F _praat_completion praat

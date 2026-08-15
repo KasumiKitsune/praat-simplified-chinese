@@ -38,7 +38,7 @@ oo_DEFINE_CLASS (FunctionSeries, Function)
 		}
 		virtual void resize (integer newNumberOfCoefficients) {
 			coefficients.resize (newNumberOfCoefficients);
-			numberOfCoefficients = newNumberOfCoefficients; // maintain invariant
+			numberOfCoefficients = newNumberOfCoefficients;   // maintain invariant
 		}
 	#endif
 	

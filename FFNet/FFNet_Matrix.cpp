@@ -1,6 +1,6 @@
 /* FFNet_Matrix.cpp
  *
- * Copyright (C) 1997-2019 David Weenink
+ * Copyright (C) 1997-2019, 2026 David Weenink
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@
 
 autoMatrix FFNet_weightsToMatrix (FFNet me, integer layer, bool deltaWeights) {
 	try {
-		Melder_require (layer > 0 && layer <= my numberOfLayers,
+		Melder_assert (layer > 0);
+		Melder_require (layer <= my numberOfLayers,
 			U"Layer should be in [1, ", my numberOfLayers, U"].");
 		const integer numberOfUnitsInPreviousLayer = ( layer == 1 ? my numberOfInputs : my numberOfUnitsInLayer [layer - 1] );
 
@@ -48,7 +49,8 @@ autoMatrix FFNet_weightsToMatrix (FFNet me, integer layer, bool deltaWeights) {
 
 autoFFNet FFNet_weightsFromMatrix (FFNet me, Matrix him, integer layer) {
 	try {
-		Melder_require (layer > 0 && layer <= my numberOfLayers,
+		Melder_assert (layer > 0);
+		Melder_require (layer <= my numberOfLayers,
 			U"Layer should be in [1, ", my numberOfLayers, U"].");
 		Melder_require (my numberOfUnitsInLayer [layer] == his nx,
 			U"The number of columns (", his nx, U") should equal the number of units (", my numberOfUnitsInLayer [layer], U") in layer ", layer, U".");

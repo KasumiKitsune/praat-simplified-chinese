@@ -28,12 +28,23 @@ void MelderTrust::_defaultProc (void *void_interpreter, conststring32 message) {
 		if (Melder_appVersion() < 7000)
 			return;   // no trust checking before Praat 7.0
 		if (script && ! script -> trusted)
-			Melder_throw (U"The following potentially dangerous action was requested but is not allowed:\n", message);
+			Melder_throw (U"The following potentially dangerous action was requested by the script “", script -> string.get(),
+				U"” but is not allowed without --FULL-TRUST:\n\n", message,
+				U"\n\nUse --FULL-TRUST to prevent this message, but of course only if you indeed trust"
+				" the intentions and skills of the authors of the script and of the scripts or notebooks it calls."
+			);
 		if (notebook && ! notebook -> trusted)
-			Melder_throw (U"The following potentially dangerous action was requested but is not allowed:\n", message);
+			Melder_throw (U"The following potentially dangerous action was requested by the notebook “", notebook -> string.get(),
+				U"” but is not allowed without --FULL-TRUST:\n\n", message,
+				U"\n\nUse --FULL-TRUST to prevent this message, but of course only if you indeed trust"
+				" the intentions and skills of the authors of the notebook and of the scripts or notebooks it calls."
+			);
 		if (! script && ! notebook)
-			Melder_throw (U"The following potentially dangerous action was requested but is not allowed:\n", message,
-					U"\nUse --fullyTrustThisScript to prevent this message.");
+			Melder_throw (U"The following potentially dangerous action was requested"
+				" but is not allowed without --FULL-TRUST:\n\n", message,
+				U"\n\nUse --FULL-TRUST to prevent this message, but of course only if you indeed trust"
+				" the intentions and skills of the authors of the script or notebook and of the scripts or notebooks it calls."
+			);
 	}
 }
 

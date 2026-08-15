@@ -1,0 +1,66 @@
+<html><head><meta name="robots" content="index,follow"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>speaker diarization with adapted pyannote.audio</title>
+<style>
+   td { padding-left: 5pt; padding-right: 5pt; }
+   th { padding-left: 5pt; padding-right: 5pt; }
+   code { white-space: pre-wrap; }
+   dd { white-space: pre-wrap; }
+</style>
+</head><body bgcolor="#FFFFFF">
+
+<table border=0 cellpadding=0 cellspacing=0><tr><td bgcolor="#CCCC00"><table border=4 cellpadding=9><tr><td align=middle bgcolor="#000000"><font face="Palatino,Times" size=6 color="#999900"><b>
+speaker diarization with adapted pyannote.audio
+</b></font></table></table>
+<p>Speaker diarization detects which parts of a sound contain speech, and attributes each part to one or more speakers. The output is a list of segments, each segment defined by a start time, an end time and a speaker identifier. Speaker identifiers are natural numbers (1, 2, 3, ...); they are arbitrary labels that roughly follow the order in which the speakers first appear in the sound.</p>
+<p>Diarization in Praat always modifies an existing TextGrid by producing one tier per detected speaker. It can be done as part of transcription (so that the transcribed text is split between speaker tiers) or standalone (so that each speaker tier contains the intervals labelled as non-speech or speech). See <a href="Speech_recognition.html">Speech recognition</a> tutorial for details on how to use it.</p>
+<p>Praat performs speaker diarization using a C++/ggml adaptation of <a href="pyannote_audio.html">pyannote.audio</a>&#8217;s <code><font size=+1>pyannote/speaker-diarization-3.1</font></code> pipeline. The two neural models used by the pipeline, <code><font size=+1>pyannote/segmentation-3.0</font></code> (for segmentation) and <code><font size=+1>wespeaker-voxceleb-resnet34-LM</font></code> (for speaker embedding, see <a href="WeSpeaker.html">WeSpeaker</a>), have been converted to ggml format and compiled into Praat, so no external model files are required. The sound is automatically resampled to 16 kHz (the sampling frequency expected by both models) before being processed.</p>
+<h2>Settings</h2>
+<dl>
+<dt><b>Max. number of speakers (&#8805; 2)</b> (standard value: 2)
+<dd>an upper bound on the number of speakers the algorithm may produce. Must be at least 2. There is no matching &#8220;minimum number of speakers&#8221; setting; if you want to push the algorithm towards distinguishing more speakers, you might try lowering the <b>Clustering threshold</b>.</dd>
+<dt><b>Allow speakers to overlap</b> (standard: on)
+<dd>if on, at most two speakers may be active at the same moment. If off, every moment is attributed to a single speaker, the one most active at that moment.</dd>
+<dt><b>Clustering threshold (0-2)</b> (standard value: 0.7)
+<dd>controls the number of detected speakers. Lower thresholds produce more speakers (but anyway up to <b>Max. number of speakers (&#8805; 2)</b>); higher thresholds produce fewer speakers. This is the setting that can push the number of detected speakers up, so consider lowering its value if fewer speakers are detected than are actually present in your sound.</dd>
+<dt><b>Segmentation step (0-1)</b> (standard value: 0.1)
+<dd>the distance between the starts of consecutive overlapping analysis windows, as a fraction of the analysis window&#8217;s length. The sound is analysed in 10-second overlapping segments called <i>analysis windows</i>; because of the overlap, each moment in time is covered by several analysis windows. A smaller segmentation step ensures more analysis windows with more overlap, which is generally more accurate but takes longer. A larger segmentation step ensures fewer windows with less overlap, which is faster but generally less accurate. You may try increasing this value if you want diarization to run faster, but it&#8217;s best to keep it below 0.5 so that every moment in the sound is covered by at least two analysis windows.</dd>
+</dl>
+<h2>Algorithm</h2>
+<p>The algorithm is a port of <a href="pyannote_audio.html">pyannote.audio</a>&#8217;s <code><font size=+1>pyannote/speaker-diarization-3.1</font></code> pipeline (see <a href="Bredin__2023_.html">Bredin (2023)</a>) with some adaptations. It has four stages.</p>
+<p><b>1. Segmentation</b>. The sound is divided into overlapping 10-second <i>analysis windows</i>. The distance between the starts of two consecutive windows is defined by the <b>Segmentation step (0-1)</b> as a fraction of the window length. For example, a segmentation step of 0.1 makes this distance 1 second, so that consecutive windows have a 90% overlap.</p>
+<p>The sound from each analysis window is then sent to the <i>segmentation model</i>, which divides it into 589 frames (each frame spanning approximately 17 milliseconds) and assigns a label to each frame in the following way:</p>
+<dl>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; the model assumes that there are at most three speakers in one analysis window, of whom at most two can be active in each frame;</dd>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; for every frame, the model computes a 7-dimensional vector of probabilities for the following combinations of active speakers: {}, {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3};</dd>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; the most probable combination is then taken as that frame&#8217;s label.</dd>
+</dl>
+<p>The speaker numbers 1, 2 and 3 are local to each analysis window: speaker 1 in one window is not necessarily the same person as speaker 1 in another. Mapping the window-local speakers to the global ones is the task of stages 2 and 3.</p>
+<p><b>2. Speaker embeddings</b>. The previous stage determined which speaker is active in which frame (for every analysis window). Now, for each window and each speaker active somewhere in it, the frames where this speaker is active are glued together into a single sound, which is then sent to the <i>embedding model</i>. For every such sound, the model produces an <i>embedding</i>: a 256-dimensional vector representing one particular speaker in one particular analysis window. The embeddings of the same speaker (from different analysis windows) tend to be closer to each other than the embeddings of different speakers. This makes the next stage possible.</p>
+<p><b>3. Clustering</b>. The previous stage produces one embedding for each active speaker in each analysis window (so, up to three embeddings per window). The embeddings that are backed by enough non-overlapping speech are considered to be &#8220;reliable&#8221; and are used in the clustering process; the others are set aside for now.</p>
+<p>The reliable embeddings from all analysis windows are first L2-normalized so that they are all located on a 256-dimensional unit hypersphere. They are then grouped using <i>agglomerative hierarchical clustering with centroid linkage</i>. Grouping starts with each embedding forming its own group (with the centre of the group being the embedding itself). At each step, the two groups whose centres are the closest (as measured by Euclidean distance between them) are merged, and the centre of the newly formed group is the mean of all the embeddings in this group. This centre is not L2-normalized, therefore the centres of merged groups lie inside the 256-dimensional hypersphere and become slightly shorter with every merge. This process stops when the distance between the next two closest groups is larger than the <b>Clustering threshold (0-2)</b>.</p>
+<p>Because the embeddings are L2-normalized, the distance between any two of them lies between 0 (identical) and 2 (opposite), which explains the range of possible values for the clustering threshold.</p>
+<p>Each final group represents one speaker; if after reaching the threshold there are still more groups than <b>Max. number of speakers (&#8805; 2)</b>, the merging continues until the resulting number of groups does not exceed that maximum.</p>
+<p>Finally, the unreliable embeddings (those not used to form the groups) are attached to their nearest groups. In this way, each window-local speaker is assigned to a global speaker.</p>
+<p>The two figures below show an example of the clustering process for four embeddings in a two-dimensional space. Each group centre is drawn as a solid arrow surrounded by a grey circle whose radius is the clustering threshold (here 0.7, the default). Two groups can be merged only if both their centres lie inside each other&#8217;s grey circles (or, in other words, if they are closer than the clustering threshold).</p>
+<p>The <b>left figure</b> shows the initial four group centres (the same as the four embeddings). The closest two group centres are drawn in red; these groups are merged first. The next merge involves the groups with the next two closest centres (those drawn in blue). The <b>right figure</b> shows the state after the two merges: the solid arrows are the centres of the two newly formed groups; the dotted arrows are the original embeddings making up each group. Now, neither of the two group centres lies inside the grey circle surrounding the other one. So the two groups are further apart than the clustering threshold; therefore, the clustering process stops, leaving these two groups as the final result.</p>
+<p align=middle><img height=300 width=550 src=speaker_diarization_with_adapted_pyannote_audio_1.png></p><p><b>4. Reconstruction</b>. At stage 1, each analysis window was divided into 589 frames of approximately 17 milliseconds, and each window-frame received a 7-dimensional vector with probabilities of different combinations of local speakers being active. Because the analysis windows overlap, each frame on the global timeline is covered by several windows. The goal of the current stage is to combine the window-frame information across all covering windows, using the local-to-global speaker mapping established at stage 3.</p>
+<p>Using the 7-dimensional vectors from stage 1, for each speaker in each window-frame, <i>soft activations</i> are computed, by adding together the probabilities of all combinations in which that speaker is active. This is a number between 0 and 1 (where 0 means definitely silent and 1 means definitely active). These local speakers&#8217; soft activations are then attributed to the global speakers using the mapping from stage 3. After that they are averaged across all the covering windows, to produce an <i>average activation</i> for each global speaker in each global frame.</p>
+<p>Separately, the number of simultaneously active speakers in each global frame is found in a similar way. Each window-frame had a winning combination of active speakers (the frame label from stage 1), containing 0, 1 or 2 speakers. For each global frame, this number is averaged across all covering windows, rounded, and capped at 1 when <b>Allow speakers to overlap</b> is off. The resulting number determines how many speakers (those with the highest average activations) are marked active in this frame.</p>
+<p>Finally, for each speaker, every uninterrupted sequence of frames in which that speaker is active becomes one <i>segment</i>. The result is a list of segments, where each segment is attributed to one speaker.</p>
+<h2>Availability in Praat</h2>
+<p>For diarization as part of transcription, see <a href="transcription_with_whisper_cpp.html">transcription with whisper.cpp</a>.</p>
+<p>Standalone diarization is available in two ways:</p>
+<dl>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; if you select a <a href="Sound.html">Sound</a> together with its <a href="TextGrid.html">TextGrid</a> and choose <a href="TextGrid___Sound__Diarize_interval___.html">Diarize interval...</a>;</dd>
+<dd style="position:relative;padding-left:1em;text-indent:-2em">&#8226; via <b>Diarize interval</b> from the <b>Interval</b> menu in the <a href="TextGridEditor.html">TextGridEditor</a>. The settings for this command are set via <b>Diarization settings...</b> in the same menu and are remembered across Praat sessions.</dd>
+</dl>
+<h3>Links to this page</h3>
+<ul>
+<li><a href="Acknowledgments.html">Acknowledgments</a>
+</ul>
+<hr>
+<address>
+	<p>© Anastasia Shchupak 2026-06-01</p>
+</address>
+</body>
+</html>

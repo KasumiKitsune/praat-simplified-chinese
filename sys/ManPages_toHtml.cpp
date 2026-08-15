@@ -1,10 +1,10 @@
 /* ManPages_toHtml.cpp
  *
- * Copyright (C) 1996-2025 Paul Boersma
+ * Copyright (C) 1996-2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -905,7 +905,7 @@ void ManPages_writeOneToHtmlFile (ManPages me, Interpreter optionalInterpreterRe
 	static MelderString buffer;
 	MelderString_empty (& buffer);
 	writePageAsHtml (me, optionalInterpreterReference, file, ipage, & buffer);
-	MelderFile_writeText (file, buffer.string, kMelder_textOutputEncoding::UTF8);
+	MelderFile_writeText_e (file, buffer.string, kMelder_textOutputEncoding::UTF8);
 }
 
 void ManPages_writeAllToHtmlDir (ManPages me, Interpreter optionalInterpreterReference, conststring32 dirPath) {
@@ -964,7 +964,7 @@ void ManPages_writeAllToHtmlDir (ManPages me, Interpreter optionalInterpreterRef
 		if (! oldText   // doesn't the file exist yet?
 			|| str32cmp (buffer.string, oldText.get()))   // isn't the old file identical to the new text?
 		{
-			MelderFile_writeText (& file, buffer.string, kMelder_textOutputEncoding::UTF8);   // then write the new text
+			MelderFile_writeText_e (& file, buffer.string, kMelder_textOutputEncoding::UTF8);   // then write the new text
 		}
 	}
 }

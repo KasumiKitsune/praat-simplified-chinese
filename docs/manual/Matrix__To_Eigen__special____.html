@@ -1,0 +1,29 @@
+<html><head><meta name="robots" content="index,follow"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Matrix: To Eigen (special)...</title>
+<style>
+   td { padding-left: 5pt; padding-right: 5pt; }
+   th { padding-left: 5pt; padding-right: 5pt; }
+   code { white-space: pre-wrap; }
+   dd { white-space: pre-wrap; }
+</style>
+</head><body bgcolor="#FFFFFF">
+
+<table border=0 cellpadding=0 cellspacing=0><tr><td bgcolor="#CCCC00"><table border=4 cellpadding=9><tr><td align=middle bgcolor="#000000"><font face="Palatino,Times" size=6 color="#999900"><b>
+Matrix: To Eigen (special)...
+</b></font></table></table>
+<p>A command to get the <a href="Eigen.html">Eigen</a> structure of a square matrix.</p>
+<h2>Settings</h2>
+<dl>
+<dt><b>Matrix type</b>
+<dd>determines the matrix type. Symmetric matrices always have real eigenvalues and eigenvectors, while a general matrix can have complex eigenvalues and eigenvectors. For a general matrix the complex eigenvalues always occur in pairs with equal real parts and complex parts with opposite signs. </dd>
+<dt><b>Number of eigenvalues</b>
+<dd>The number of eigenvalues you need. If you choose the default, 0, the number of eigenvalues will be equal to the dimension of the square matrix. If the number you choose is less than the dimension of the matrix then if the sort is <i>ascending</i> the smallest eigenvalues are selected. If the sort is <i>descending</i> the largest eigenvalues are selected.</dd>
+<dt><b>Sort ascending</b>
+<dd>if true, the eigenvalues and corresponding eigenvectors are sorted from smallest to largest, if false the values are sorted from largest to smallest. For a general matrix the eigenvalues/vectors are not sorted.</dd>
+</dl>
+<hr>
+<address>
+	<p>© djmw 20260328</p>
+</address>
+</body>
+</html>

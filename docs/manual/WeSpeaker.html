@@ -1,0 +1,25 @@
+<html><head><meta name="robots" content="index,follow"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>WeSpeaker</title>
+<style>
+   td { padding-left: 5pt; padding-right: 5pt; }
+   th { padding-left: 5pt; padding-right: 5pt; }
+   code { white-space: pre-wrap; }
+   dd { white-space: pre-wrap; }
+</style>
+</head><body bgcolor="#FFFFFF">
+
+<table border=0 cellpadding=0 cellspacing=0><tr><td bgcolor="#CCCC00"><table border=4 cellpadding=9><tr><td align=middle bgcolor="#000000"><font face="Palatino,Times" size=6 color="#999900"><b>
+WeSpeaker
+</b></font></table></table>
+<p>WeSpeaker is a speaker embedding learning toolkit developed by WeNet Community (see <a href="Wang_et_al___2023_.html">Wang et al. (2023)</a> and <a href="Wang_et_al___2024_.html">Wang et al. (2024)</a>). Praat uses one of its pretrained models, the <code><font size=+1>wespeaker-voxceleb-resnet34-LM</font></code> embedding model, as part of <a href="pyannote_audio.html">pyannote.audio</a>&#8217;s <code><font size=+1>pyannote/speaker-diarization-3.1</font></code> pipeline.</p>
+<p><code><font size=+1>wespeaker-voxceleb-resnet34-LM</font></code> was trained on the VoxCeleb2 dataset (see <a href="Chung__Nagrani___Zisserman__2018_.html">Chung, Nagrani & Zisserman (2018)</a> and <a href="Nagrani__Chung___Zisserman__2017_.html">Nagrani, Chung & Zisserman (2017)</a>). The model weights have been converted to ggml format and embedded into Praat (see <a href="Acknowledgments.html">Acknowledgments</a>). Praat contains a C++/ggml port of WeSpeaker&#8217;s ResNet34 architecture with TSTP pooling, used for inference on this model.</p>
+<h3>Links to this page</h3>
+<ul>
+<li><a href="speaker_diarization_with_adapted_pyannote_audio.html">speaker diarization with adapted pyannote.audio</a>
+</ul>
+<hr>
+<address>
+	<p>© Anastasia Shchupak 2026-06-01</p>
+</address>
+</body>
+</html>

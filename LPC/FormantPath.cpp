@@ -389,6 +389,7 @@ integer FormantPath_getNumberOfFormantTracks (FormantPath me) {
 
 autoMatrix FormantPath_to_Matrix_qSums (FormantPath me, integer numberOfTracks) {
 	try {
+		Melder_assert (numberOfTracks >= 0);
 		const integer numberOfCandidates = my formantCandidates.size;
 		autoMatrix thee = Matrix_create (my xmin, my xmax, my nx, my dx, my x1, 0.5, numberOfCandidates + 0.5, numberOfCandidates, 1.0, 1.0);
 		const integer maxnFormants = FormantPath_getNumberOfFormantTracks (me);
@@ -412,6 +413,7 @@ autoMatrix FormantPath_to_Matrix_qSums (FormantPath me, integer numberOfTracks) 
 
 autoMatrix FormantPath_to_Matrix_transition (FormantPath me, integer numberOfTracks, bool maximumCosts) {
 	try {
+		Melder_assert (numberOfTracks >= 0);
 		const integer numberOfCandidates = my formantCandidates.size;
 		autoMatrix thee = Matrix_create (my xmin, my xmax, my nx, my dx, my x1, 0.5, numberOfCandidates + 0.5, numberOfCandidates, 1.0, 1.0);
 		const integer maxnFormants = FormantPath_getNumberOfFormantTracks (me);
@@ -489,7 +491,8 @@ autoMatrix FormantPath_to_Matrix_stress (FormantPath me, double windowLength, co
 double FormantPath_getStressOfCandidate (FormantPath me, double tmin, double tmax, integer fromFormant, integer toFormant,
 	constINTVEC const& parameters, double powerf, integer candidate)
 {
-	Melder_require (candidate > 0 && candidate <= my formantCandidates.size,
+	Melder_assert (candidate > 0);
+	Melder_require (candidate <= my formantCandidates.size,
 		U"The candidate number should be between 1 and ", my formantCandidates.size, U".");
 	const Formant formant = (Formant) my formantCandidates.at [candidate];
 	autoFormantModeler fm = Formant_to_FormantModeler (formant, tmin, tmax,  parameters);
@@ -512,7 +515,8 @@ double FormantPath_getOptimalCeiling (FormantPath me, double tmin, double tmax, 
 }
 
 void FormantPath_setPath (FormantPath me, double tmin, double tmax, integer selectedCandidate) {
-	Melder_require (selectedCandidate > 0 && selectedCandidate <= my formantCandidates.size,
+	Melder_assert (selectedCandidate > 0);
+	Melder_require (selectedCandidate <= my formantCandidates.size,
 		U"The candidate number should be between 1 and ", my formantCandidates.size, U".");
 	Function_unidirectionalAutowindow (me, & tmin, & tmax);
 	Function_intersectRangeWithDomain (me, & tmin, & tmax);
@@ -572,6 +576,7 @@ autoTable FormantPath_downTo_Table_optimalInterval (FormantPath me, double tmin,
 	bool includeBandwidths, bool includeOptimumCeiling, bool includeMinimumStress)
 {
 	try {
+		Melder_assert (numberOfTimeDecimals >= 0 && numberOfIntensityDecimals >= 0 && numberOfFrequencyDecimals >= 0);
 		autoVEC stresses = FormantPath_getStressOfCandidates (me, tmin, tmax, 0, 0, parameters, powerf);
 		const integer minPos = NUMminPos (stresses.get());
 		const integer minPosFallBack = ( minPos != 0 ? minPos : stresses.size / 2 );
@@ -658,6 +663,7 @@ void FormantPath_drawAsGrid_inside (FormantPath me, Graphics g, double tmin, dou
 	double xCursor, double yCursor, MelderColour selectedCeilingsColour, constINTVEC const& parameters,
 	bool markCandidatesWithinPath, bool showStress, double powerf, bool showEstimatedModels, bool garnish)
 {
+	Melder_assert (nrow >= 0 && ncol >= 0);
 	constexpr double fmin = 0.0;
 	const integer numberOfCandidates = my formantCandidates.size;
 	if (nrow <= 0 || ncol <= 0)

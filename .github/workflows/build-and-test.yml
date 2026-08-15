@@ -1,0 +1,24 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Compile binary
+      run: make PRAAT_GRAPHICS=barren PRAAT_AUDIO=none
+
+    - name: Run /test scripts
+      run: ./praat_barren --FULL-TRUST --run test/runAllTests_batch.praat
+
+    - name: Run /dwtest scripts
+      run: ./praat_barren --FULL-TRUST --run dwtest/runAllTests_batch.praat

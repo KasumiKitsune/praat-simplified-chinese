@@ -2,11 +2,11 @@
 #define _SoundAnalysisArea_h_
 /* SoundAnalysisArea.h
  *
- * Copyright (C) 1992-2005,2007-2024 Paul Boersma
+ * Copyright (C) 1992-2005,2007-2024,2026 Paul Boersma
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -37,7 +37,7 @@ Thing_define (SoundAnalysisArea, FunctionArea) {
 		return our soundOrLongSound() && Thing_isa (our soundOrLongSound(), classLongSound) ? (LongSound) our soundOrLongSound() : nullptr;
 	}
 
-	autoSpectrogram d_spectrogram;
+	autoSpectrogramList d_spectrogramList;
 	double d_spectrogram_cursor;
 	autoPitch d_pitch;
 	autoIntensity d_intensity;

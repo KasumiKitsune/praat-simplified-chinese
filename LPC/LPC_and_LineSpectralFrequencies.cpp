@@ -182,7 +182,7 @@ void LPC_into_LineSpectralFrequencies (constLPC inputLPC, mutableLineSpectralFre
 				else
 					outputFrame -> numberOfFrequencies --;
 			}
-			outputFrame -> frequencies.resize (outputFrame -> numberOfFrequencies); // maintain invariant
+			outputFrame -> frequencies.resize (outputFrame -> numberOfFrequencies);   // maintain invariant
 
 		}
 

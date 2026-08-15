@@ -4,7 +4,7 @@
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -289,7 +289,12 @@ autoDaata Data_readFromFile (MelderFile file) {
 	/*
 		Possibility 1: is this file a text file as defined in Data.cpp?
 	*/
-
+	if (nread > 9 && header [0] == 0x1F && header [1] == 0x8B) {
+		/*
+			A gzipped file. Assume that it is a text file (e.g. a gzipped TextGrid text file in the Corpus Gesproken Nederlands).
+		*/
+		return Data_readFromTextFile (file);
+	}
 	if (nread > 11) {
 		int numberOfBytesInFileType = 0;
 		char *p = strstr (header, "TextFile");

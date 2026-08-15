@@ -1,7 +1,7 @@
 # File: Makefile
 
 # Makefile for Praat
-# Paul Boersma, 28 May 2026
+# Paul Boersma, 19 July 2026
 
 ##########################
 #
@@ -264,9 +264,10 @@ else ifeq ($(OS_IS_LINUX),1)
 
   # Default settings for where the executable will be installed,
   # overridable by environment variables (or on the `make` command line).
+  DESTDIR ?=
   PREFIX ?= /usr/local
-  BINDIR ?= $(PREFIX)/bin
-  DATADIR ?= $(PREFIX)/share
+  BINDIR ?= $(DESTDIR)$(PREFIX)/bin
+  DATADIR ?= $(DESTDIR)$(PREFIX)/share
 
   PKG_CONFIG ?= pkg-config
 
@@ -315,8 +316,8 @@ else ifeq ($(OS_IS_LINUX),1)
     SHARED_COMPILER_FLAGS += -Dchrome
   endif
 
-  CFLAGS := -std=gnu99 $(SHARED_COMPILER_FLAGS) -Werror=missing-prototypes -Werror=implicit
-  CXXFLAGS := -std=c++17 $(SHARED_COMPILER_FLAGS) -Wshadow
+  CFLAGS += -std=gnu99 $(SHARED_COMPILER_FLAGS) -Werror=missing-prototypes -Werror=implicit
+  CXXFLAGS += -std=c++17 $(SHARED_COMPILER_FLAGS) -Wshadow
 
   ifeq ($(PRAAT_COMPILER),clang)
     CC := clang
@@ -352,17 +353,25 @@ else ifeq ($(OS_IS_LINUX),1)
   ICON =
   MAIN_ICON =
 
-  INSTALL = install -pDm0755 praat -t $(BINDIR)
-  INSTALL_METAINFO = install -Dm0644 org.praat.Praat.metainfo.xml -t $(DATADIR)/metainfo
-  INSTALL_DESKTOP = install -Dm0644 main/praat.desktop $(DATADIR)/applications/org.praat.Praat.desktop
+  INSTALL ?= install
+ifeq ($(OS_IS_LINUX),1)
+  BINARIES = $(shell find . -maxdepth 1 -name praat -o -name praat_nogui -o -name praat_barren)
+  INSTALL_BIN = $(INSTALL) -pDm0755 $(BINARIES) -t $(BINDIR)
+  INSTALL_BASHCOMPLETION = $(INSTALL) -Dm0644 main/praat.bash-completion $(DATADIR)/bash-completion/completions/praat
+else
+  INSTALL_BIN = $(INSTALL) -pDm0755 praat -t $(BINDIR)
+  INSTALL_BASHCOMPLETION =
+endif
+  INSTALL_METAINFO = $(INSTALL) -Dm0644 org.praat.Praat.metainfo.xml -t $(DATADIR)/metainfo
+  INSTALL_DESKTOP = $(INSTALL) -Dm0644 main/praat.desktop $(DATADIR)/applications/org.praat.Praat.desktop
   INSTALL_ICONS = \
-	install -Dm0644 main/praat-480.svg $(DATADIR)/icons/hicolor/scalable/apps/org.praat.Praat.svg && \
-	install -Dm0644 main/praat-16.png $(DATADIR)/icons/hicolor/16x16/apps/org.praat.Praat.png && \
-	install -Dm0644 main/praat-32.png $(DATADIR)/icons/hicolor/32x32/apps/org.praat.Praat.png && \
-	install -Dm0644 main/praat-48.png $(DATADIR)/icons/hicolor/48x48/apps/org.praat.Praat.png && \
-	install -Dm0644 main/praat-128.png $(DATADIR)/icons/hicolor/128x128/apps/org.praat.Praat.png && \
-	install -Dm0644 main/praat-256.png $(DATADIR)/icons/hicolor/256x256/apps/org.praat.Praat.png && \
-	install -Dm0644 main/praat-512.png $(DATADIR)/icons/hicolor/512x512/apps/org.praat.Praat.png
+	$(INSTALL) -Dm0644 main/praat-480.svg $(DATADIR)/icons/hicolor/scalable/apps/org.praat.Praat.svg && \
+	$(INSTALL) -Dm0644 main/praat-16.png $(DATADIR)/icons/hicolor/16x16/apps/org.praat.Praat.png && \
+	$(INSTALL) -Dm0644 main/praat-32.png $(DATADIR)/icons/hicolor/32x32/apps/org.praat.Praat.png && \
+	$(INSTALL) -Dm0644 main/praat-48.png $(DATADIR)/icons/hicolor/48x48/apps/org.praat.Praat.png && \
+	$(INSTALL) -Dm0644 main/praat-128.png $(DATADIR)/icons/hicolor/128x128/apps/org.praat.Praat.png && \
+	$(INSTALL) -Dm0644 main/praat-256.png $(DATADIR)/icons/hicolor/256x256/apps/org.praat.Praat.png && \
+	$(INSTALL) -Dm0644 main/praat-512.png $(DATADIR)/icons/hicolor/512x512/apps/org.praat.Praat.png
 endif
 
 # Export some variables to the makefiles in the subdirectories.
@@ -396,7 +405,9 @@ all: all-external all-self
 		external/vorbis/libvorbis.a \
 		external/opusfile/libopusfile.a \
 		external/whispercpp/libwhisper.a \
-		$(NON_PRAAT_LIBRARIES)
+		external/blake3/libblake3.a \
+		external/zlib/libzlib.a \
+               $(NON_PRAAT_LIBRARIES) $(LDFLAGS)
 
 all-external:
 	$(MAKE) -C external/clapack
@@ -411,6 +422,8 @@ all-external:
 	$(MAKE) -C external/vorbis
 	$(MAKE) -C external/opusfile
 	$(MAKE) -C external/whispercpp
+	$(MAKE) -C external/blake3
+	$(MAKE) -C external/zlib
 
 all-self:
 	$(MAKE) -C kar
@@ -429,7 +442,7 @@ all-self:
 	$(MAKE) -C artsynth
 	$(MAKE) -C main main_Praat.o $(ICON)
 
-clean: clean-external clean-self
+clean: clean-external clean-self clean-test
 	$(RM) praat
 
 clean-external:
@@ -445,6 +458,8 @@ clean-external:
 	$(MAKE) -C external/vorbis clean
 	$(MAKE) -C external/opusfile clean
 	$(MAKE) -C external/whispercpp clean
+	$(MAKE) -C external/blake3 clean
+	$(MAKE) -C external/zlib clean
 
 clean-self:
 	$(MAKE) -C kar clean
@@ -463,8 +478,18 @@ clean-self:
 	$(MAKE) -C artsynth clean
 	$(MAKE) -C main clean
 
+clean-test:
+	$(MAKE) -C dwtest clean
+	$(MAKE) -C test/dwtools clean
+	$(MAKE) -C test/fon clean
+	$(MAKE) -C test/kar clean
+	$(MAKE) -C test/script clean
+	$(MAKE) -C test/stat clean
+	$(MAKE) -C test/sys clean
+
 install:
-	$(INSTALL)
+	$(INSTALL_BIN)
 	$(INSTALL_METAINFO)
 	$(INSTALL_DESKTOP)
 	$(INSTALL_ICONS)
+	$(INSTALL_BASHCOMPLETION)

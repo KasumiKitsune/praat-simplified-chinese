@@ -1699,6 +1699,7 @@ static const std::unordered_map<std::u32string, std::u32string> g_translation_ma
 	{ U"Matrix: To RealTier", U"\u77e9\u9635\uff1a\u8f6c\u4e3a\u5b9e\u6570\u5c42" },
 	{ U"Matrix: To Sound (mono)", U"\u77e9\u9635\uff1a\u8f6c\u4e3a\u58f0\u97f3 (mono)" },
 	{ U"Max. number of candidates", U"\u6700\u5927\u5019\u9009\u97f3\u9ad8\u6570\u91cf" },
+	{ U"Max. number of threads", U"\u6700\u5927\u7ebf\u7a0b\u6570" },
 	{ U"Max. number of threads for diarization", U"\u8bf4\u8bdd\u4eba\u65e5\u5fd7\u6700\u5927\u7ebf\u7a0b\u6570" },
 	{ U"Max. number of threads for transcription", U"\u8f6c\u5199\u6700\u5927\u7ebf\u7a0b\u6570" },
 	{ U"Maximum (dB/Hz)", U"\u6700\u5927\u503c (dB/Hz)" },
