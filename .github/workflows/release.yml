@@ -117,7 +117,8 @@ jobs:
 
             echo "Downloading Xcode project from $XCODEPROJ_URL"
             curl -fL "$XCODEPROJ_URL" -o praat_xcodeproj.zip
-            ditto -x -k praat_xcodeproj.zip .
+            python3 -c "import zipfile; zipfile.ZipFile('praat_xcodeproj.zip').extractall('.')"
+            rm praat_xcodeproj.zip
           fi
 
           test -d praat.xcodeproj
@@ -126,7 +127,7 @@ jobs:
           from pathlib import Path
 
           project_path = Path("praat.xcodeproj/project.pbxproj")
-          project = project_path.read_text()
+          project = project_path.read_text(encoding="utf-8")
 
           if "praat_translate.cpp" not in project:
               file_ref = "CDFE00000000000000000001"
@@ -159,30 +160,28 @@ jobs:
               project = project.replace(
                   "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n",
                   "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n"
-                  f"\t\t\t\t{file_ref} /* praat_translate.cpp */,\n"
-                  f"\t\t\t\t{header_ref} /* praat_translate.h */,\n",
+                  f"\t\t{file_ref} /* praat_translate.cpp */,\n"
+                  f"\t\t{header_ref} /* praat_translate.h */,\n",
                   1,
               )
               project = project.replace(
                   "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n",
                   "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n"
-                  f"\t\t\t\t{build_file} /* praat_translate.cpp in Sources */,\n",
+                  f"\t\t{build_file} /* praat_translate.cpp in Sources */,\n",
                   1,
               )
               project = project.replace(
                   "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n",
                   "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n"
-                  f"\t\t\t\t{header_build} /* praat_translate.h in Headers */,\n",
+                  f"\t\t{header_build} /* praat_translate.h in Headers */,\n",
                   1,
               )
 
-              project_path.write_text(project)
+              project_path.write_text(project, encoding="utf-8")
               print("Added sys/praat_translate.cpp and sys/praat_translate.h to praat_mac Xcode target.")
           else:
               print("sys/praat_translate.cpp is already present in the Xcode project.")
           PY
-
-          xcodebuild -list -project praat.xcodeproj
 
       - name: Build Praat.app
         shell: bash
