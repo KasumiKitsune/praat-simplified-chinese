@@ -129,6 +129,13 @@ jobs:
           project_path = Path("praat.xcodeproj/project.pbxproj")
           project = project_path.read_text(encoding="utf-8")
 
+          project = project.replace('DEVELOPMENT_TEAM = J9C6R9XA5W;', 'DEVELOPMENT_TEAM = "";')
+          project = project.replace('CODE_SIGN_IDENTITY = "Apple Development";', 'CODE_SIGN_IDENTITY = "-";')
+          project = project.replace('"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";', '"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";')
+          project = project.replace('CODE_SIGN_STYLE = Automatic;', 'CODE_SIGN_STYLE = Manual;')
+          project = project.replace('CODE_SIGN_ENTITLEMENTS = main/Praat.entitlements;', 'CODE_SIGN_ENTITLEMENTS = "";')
+          project = project.replace('INFOPLIST_PREFIX_HEADER = /Users/pboersma/Dropbox/Praats/src/sys/praat_version.h;', 'INFOPLIST_PREFIX_HEADER = main/main_Praat.h;')
+
           if "praat_translate.cpp" not in project:
               file_ref = "CDFE00000000000000000001"
               build_file = "CDFE00000000000000000002"
@@ -197,6 +204,8 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
             build
 
       - name: Prepare release package
