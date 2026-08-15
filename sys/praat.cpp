@@ -1901,7 +1901,8 @@ void praat_init (conststring32 title,
 
 	installPraatShellPreferences ();
 	if (! praatP.ignorePreferenceFiles) {
-		Preferences_read (& prefsFile);
+		Preferences_read_i (& prefsFile5);
+		Preferences_read_i (& prefsFile7);
 	}
 
 	theCurrentPraatApplication -> batch = Melder_batch;
