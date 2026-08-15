@@ -198,7 +198,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          xcodebuild             -project praat.xcodeproj             -target praat_mac             -configuration Configuration64             -derivedDataPath "$PWD/build/macos"             CODE_SIGNING_ALLOWED=NO             CODE_SIGNING_REQUIRED=NO             CODE_SIGN_IDENTITY=""             CODE_SIGN_ENTITLEMENTS=""             DEVELOPMENT_TEAM=""             build
+          xcodebuild \
+            -project praat.xcodeproj \
+            -target praat_mac \
+            -configuration Configuration64 \
+            SYMROOT="$PWD/build/macos/products" \
+            OBJROOT="$PWD/build/macos/intermediates" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            build
 
       - name: Prepare release package
         shell: bash
