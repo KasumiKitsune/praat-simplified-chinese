@@ -406,16 +406,25 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 		/*
 			Set the buttons according to the audio parameters.
 		*/
+		bool hasTakes = (my recordedSounds.size > 0);
 		if (my recordButton)
 			GuiThing_setSensitive (my recordButton, ! my recording);
 		if (my stopButton)
 			GuiThing_setSensitive (my stopButton, my recording);
 		if (my playButton)
 			GuiThing_setSensitive (my playButton, ! my recording && my nsamp > 0);
+		if (my playTakeButton)
+			GuiThing_setSensitive (my playTakeButton, ! my recording && hasTakes);
+		if (my renameTakeButton)
+			GuiThing_setSensitive (my renameTakeButton, ! my recording && hasTakes);
+		if (my deleteTakeButton)
+			GuiThing_setSensitive (my deleteTakeButton, ! my recording && hasTakes);
+		if (my publishAllButton)
+			GuiThing_setSensitive (my publishAllButton, ! my recording && (hasTakes || my nsamp > 0));
 		if (my applyButton)
-			GuiThing_setSensitive (my applyButton, ! my recording && my nsamp > 0);
+			GuiThing_setSensitive (my applyButton, ! my recording && (hasTakes || my nsamp > 0));
 		if (my okButton)
-			GuiThing_setSensitive (my okButton, ! my recording && my nsamp > 0);
+			GuiThing_setSensitive (my okButton, ! my recording && (hasTakes || my nsamp > 0));
 		if (my monoButton && my numberOfChannels == 1)
 			GuiRadioButton_set (my monoButton);
 		if (my stereoButton && my numberOfChannels == 2)
@@ -554,7 +563,7 @@ static int portaudioStreamCallback (
 	return paContinue;
 }
 
-static void gui_button_cb_record (SoundRecorder me, GuiButtonEvent /* event */) {
+static void startRecording (SoundRecorder me) {
 	try {
 		if (my recording)
 			return;
@@ -618,30 +627,22 @@ static void gui_button_cb_record (SoundRecorder me, GuiButtonEvent /* event */) 
 	}
 }
 
-static void gui_button_cb_stop (SoundRecorder me, GuiButtonEvent /* event */) {
-	stopRecording (me);
-	Graphics_updateWs (my graphics.get());
+static void gui_button_cb_record (SoundRecorder me, GuiButtonEvent /* event */) {
+	startRecording (me);
 }
 
-static void gui_button_cb_play (SoundRecorder me, GuiButtonEvent /* event */) {
-	if (my recording || my nsamp == 0)
-		return;
-	MelderAudio_play16 (my recordBuffer.asArgumentToFunctionThatExpectsZeroBasedArray(),
-			theControlPanel. sampleRate, my nsamp, my numberOfChannels, nullptr, nullptr);
-}
-
-static void publish (SoundRecorder me) {
-	autoSound sound;
-	if (my nsamp == 0)
-		return;
+static autoSound createRecordedSound (SoundRecorder me) {
+	if (my nsamp <= 0)
+		return autoSound();
 	double fsamp = theControlPanel. sampleRate;
 	if (fsamp <= 0.0)
 		fsamp = 44100.0;   // safe
+	autoSound sound;
 	try {
 		sound = Sound_createSimple (my numberOfChannels, (double) my nsamp / fsamp, fsamp);
 	} catch (MelderError) {
-		Melder_flushError (U"You can still save to file.");
-		return;
+		Melder_flushError (U"Could not create Sound object.");
+		return autoSound();
 	}
 	if (my numberOfChannels == 1) {
 		for (integer i = 1; i <= my nsamp; i ++)
@@ -652,6 +653,222 @@ static void publish (SoundRecorder me) {
 			sound -> z [2] [i] = my recordBuffer [i + i] * (1.0 / 32768);
 		}
 	}
+	return sound;
+}
+
+static void addCurrentRecordingToTakes (SoundRecorder me) {
+	if (my nsamp <= 0)
+		return;
+	autoSound sound = createRecordedSound (me);
+	if (! sound)
+		return;
+
+	autostring32 baseName;
+	if (my soundName)
+		baseName = GuiText_getString (my soundName);
+	if (! baseName || Melder_length (baseName.get()) == 0)
+		baseName = Melder_dup (U"untitled");
+
+	char32 takeName [300];
+	Melder_sprint (takeName, 300, baseName.get(), U"_", my takeIndex ++);
+	Thing_setName (sound.get(), takeName);
+
+	my recordedSounds.addItem_move (sound.move());
+
+	if (my takeList) {
+		GuiList_insertItem (my takeList, takeName, my recordedSounds.size);
+		GuiList_selectItem (my takeList, my recordedSounds.size);
+	}
+}
+
+static void drawHoldRecordButton (SoundRecorder me) {
+	if (! my holdRecordGraphics || ! my holdRecordButton)
+		return;
+	Graphics graphics = my holdRecordGraphics.get();
+	Graphics_setWindow (graphics, 0.0, 1.0, 0.0, 1.0);
+	if (my recording && my isHoldingRecord) {
+		Graphics_setColour (graphics, Melder_RED);
+		Graphics_fillRectangle (graphics, 0.0, 1.0, 0.0, 1.0);
+		Graphics_setColour (graphics, Melder_WHITE);
+		Graphics_setTextAlignment (graphics, Graphics_CENTRE, Graphics_HALF);
+		Graphics_text (graphics, 0.5, 0.5, U"● 录音中... (松开停止)");
+	} else {
+		Graphics_setGrey (graphics, 0.85);
+		Graphics_fillRectangle (graphics, 0.0, 1.0, 0.0, 1.0);
+		Graphics_setColour (graphics, Melder_BLACK);
+		Graphics_rectangle (graphics, 0.0, 1.0, 0.0, 1.0);
+		Graphics_setTextAlignment (graphics, Graphics_CENTRE, Graphics_HALF);
+		Graphics_text (graphics, 0.5, 0.5, U"按住录音 (松开停止)");
+	}
+	Graphics_updateWs (graphics);
+}
+
+static void gui_drawingarea_cb_holdRecord_expose (SoundRecorder me, GuiDrawingArea_ExposeEvent /* event */) {
+	drawHoldRecordButton (me);
+}
+
+static void gui_drawingarea_cb_holdRecord_mouse (SoundRecorder me, GuiDrawingArea_MouseEvent event) {
+	if (event -> isClick()) {
+		if (! my recording) {
+			my isHoldingRecord = true;
+			startRecording (me);
+			drawHoldRecordButton (me);
+		}
+	} else if (event -> isDrop()) {
+		if (my isHoldingRecord) {
+			my isHoldingRecord = false;
+			stopRecording (me);
+			addCurrentRecordingToTakes (me);
+			drawHoldRecordButton (me);
+			Graphics_updateWs (my graphics.get());
+		}
+	}
+}
+
+static integer getSelectedTakeIndex (SoundRecorder me) {
+	if (! my takeList || my recordedSounds.size == 0)
+		return 0;
+	autoINTVEC selected = GuiList_getSelectedPositions (my takeList);
+	if (selected.size == 0)
+		return 0;
+	return selected [1];
+}
+
+static void gui_list_cb_takeSelectionChanged (SoundRecorder me, GuiList_SelectionChangedEvent /* event */) {
+	integer index = getSelectedTakeIndex (me);
+	if (index >= 1 && index <= my recordedSounds.size) {
+		Sound sound = my recordedSounds.at [index];
+		if (sound && my soundName)
+			GuiText_setString (my soundName, Thing_getName (sound));
+	}
+}
+
+static void gui_list_cb_takeDoubleClick (SoundRecorder me, GuiList_DoubleClickEvent /* event */) {
+	integer index = getSelectedTakeIndex (me);
+	if (index >= 1 && index <= my recordedSounds.size) {
+		Sound sound = my recordedSounds.at [index];
+		if (sound)
+			Sound_play (sound, nullptr, nullptr);
+	}
+}
+
+static void gui_button_cb_takePlay (SoundRecorder me, GuiButtonEvent /* event */) {
+	integer index = getSelectedTakeIndex (me);
+	if (index >= 1 && index <= my recordedSounds.size) {
+		Sound sound = my recordedSounds.at [index];
+		if (sound)
+			Sound_play (sound, nullptr, nullptr);
+	}
+}
+
+static void gui_button_cb_takeRename (SoundRecorder me, GuiButtonEvent /* event */) {
+	integer index = getSelectedTakeIndex (me);
+	if (index < 1 || index > my recordedSounds.size)
+		return;
+	Sound sound = my recordedSounds.at [index];
+	if (! sound)
+		return;
+
+	autostring32 newName;
+	if (my soundName)
+		newName = GuiText_getString (my soundName);
+	if (newName && Melder_length (newName.get()) > 0) {
+		Thing_setName (sound, newName.get());
+		GuiList_replaceItem (my takeList, newName.get(), index);
+		GuiList_selectItem (my takeList, index);
+	}
+}
+
+static void gui_button_cb_takeDelete (SoundRecorder me, GuiButtonEvent /* event */) {
+	integer index = getSelectedTakeIndex (me);
+	if (index < 1 || index > my recordedSounds.size)
+		return;
+	my recordedSounds.removeItem (index);
+	GuiList_deleteItem (my takeList, index);
+	if (my recordedSounds.size > 0) {
+		integer newSelect = index <= my recordedSounds.size ? index : my recordedSounds.size;
+		GuiList_selectItem (my takeList, newSelect);
+		Sound sound = my recordedSounds.at [newSelect];
+		if (sound && my soundName)
+			GuiText_setString (my soundName, Thing_getName (sound));
+	}
+}
+
+static void gui_button_cb_publishAll (SoundRecorder me, GuiButtonEvent /* event */) {
+	if (my recordedSounds.size == 0) {
+		if (my nsamp > 0) {
+			autoSound sound = createRecordedSound (me);
+			if (sound) {
+				if (my soundName) {
+					autostring32 name = GuiText_getString (my soundName);
+					Thing_setName (sound.get(), name.get());
+				}
+				Editor_broadcastPublication (me, sound.move());
+			}
+		}
+		return;
+	}
+	for (integer i = 1; i <= my recordedSounds.size; i ++) {
+		Sound sound = my recordedSounds.at [i];
+		if (sound) {
+			autoSound soundCopy = Data_copy (sound);
+			Editor_broadcastPublication (me, soundCopy.move());
+		}
+	}
+}
+
+static void gui_button_cb_stop (SoundRecorder me, GuiButtonEvent /* event */) {
+	stopRecording (me);
+	if (my isHoldingRecord)
+		my isHoldingRecord = false;
+	addCurrentRecordingToTakes (me);
+	drawHoldRecordButton (me);
+	Graphics_updateWs (my graphics.get());
+}
+
+static void gui_button_cb_play (SoundRecorder me, GuiButtonEvent /* event */) {
+	if (my recording)
+		return;
+	integer index = getSelectedTakeIndex (me);
+	if (index >= 1 && index <= my recordedSounds.size) {
+		Sound sound = my recordedSounds.at [index];
+		if (sound) {
+			Sound_play (sound, nullptr, nullptr);
+			return;
+		}
+	}
+	if (my nsamp > 0) {
+		MelderAudio_play16 (my recordBuffer.asArgumentToFunctionThatExpectsZeroBasedArray(),
+				theControlPanel. sampleRate, my nsamp, my numberOfChannels, nullptr, nullptr);
+	}
+}
+
+static void publish (SoundRecorder me) {
+	if (my recordedSounds.size > 0) {
+		integer sel = getSelectedTakeIndex (me);
+		if (sel >= 1 && sel <= my recordedSounds.size) {
+			Sound sound = my recordedSounds.at [sel];
+			if (sound) {
+				autoSound soundCopy = Data_copy (sound);
+				Editor_broadcastPublication (me, soundCopy.move());
+				return;
+			}
+		} else {
+			for (integer i = 1; i <= my recordedSounds.size; i ++) {
+				Sound sound = my recordedSounds.at [i];
+				if (sound) {
+					autoSound soundCopy = Data_copy (sound);
+					Editor_broadcastPublication (me, soundCopy.move());
+				}
+			}
+			return;
+		}
+	}
+	if (my nsamp == 0)
+		return;
+	autoSound sound = createRecordedSound (me);
+	if (! sound)
+		return;
 	if (my soundName) {
 		autostring32 name = GuiText_getString (my soundName);
 		Thing_setName (sound.get(), name.get());
@@ -671,7 +888,17 @@ static void gui_button_cb_apply (SoundRecorder me, GuiButtonEvent /* event */) {
 
 static void gui_button_cb_ok (SoundRecorder me, GuiButtonEvent /* event */) {
 	stopRecording (me);
-	publish (me);
+	if (my recordedSounds.size > 0) {
+		for (integer i = 1; i <= my recordedSounds.size; i ++) {
+			Sound sound = my recordedSounds.at [i];
+			if (sound) {
+				autoSound soundCopy = Data_copy (sound);
+				Editor_broadcastPublication (me, soundCopy.move());
+			}
+		}
+	} else if (my nsamp > 0) {
+		publish (me);
+	}
 	forget (me);
 }
 
@@ -839,60 +1066,38 @@ static void gui_drawingarea_cb_resize (SoundRecorder me, GuiDrawingArea_ResizeEv
 
 void structSoundRecorder :: v_createChildren ()
 {
-	/*
-		Channels.
-	*/
-	#if 0
-	integer y = Machine_getMenuBarBottom () + 20;
-	GuiLabel_createShown (our windowForm, 10, 160, y, y + Gui_LABEL_HEIGHT, U"Channels:", 0);
-
-	GuiRadioGroup_begin ();
-	y += Gui_RADIOBUTTON_HEIGHT + Gui_RADIOBUTTON_SPACING;
-	our monoButton = GuiRadioButton_createShown (our windowForm, 20, 170, y, y + Gui_RADIOBUTTON_HEIGHT,
-			U"Mono", nullptr, nullptr, 0);
-	y += Gui_RADIOBUTTON_HEIGHT + Gui_RADIOBUTTON_SPACING;
-	our stereoButton = GuiRadioButton_createShown (our windowForm, 20, 170, y, y + Gui_RADIOBUTTON_HEIGHT,
-			U"Stereo", nullptr, nullptr, 0);
-	GuiRadioGroup_end ();
-	#endif
+	integer y = Machine_getMenuBarBottom () + 15;
 
 	/*
-		Input source.
+		Takes list (Left region: x: 10 ~ 280).
 	*/
-	//y = Machine_getMenuBarBottom () + 140;
-	integer y = Machine_getMenuBarBottom () + 20;
-	#if defined (_WIN32)
-		GuiLabel_createShown (our windowForm, 10, 320, y, y + Gui_LABEL_HEIGHT, U"(use Windows mixer", 0);
-		y += Gui_LABEL_HEIGHT + 10;
-		GuiLabel_createShown (our windowForm, 10, 320, y, y + Gui_LABEL_HEIGHT, U"   without meters)", 0);
-	#else
-		GuiLabel_createShown (our windowForm, 10, 320, y, y + Gui_LABEL_HEIGHT, U"Input source:", 0);
-		GuiRadioGroup_begin ();
-		for (integer i = 1; i <= SoundRecorder_IDEVICE_MAX; i ++) {
-			if (our devices [i]. canDo) {
-				y += Gui_RADIOBUTTON_HEIGHT + Gui_RADIOBUTTON_SPACING;
-				our devices [i]. button = GuiRadioButton_createShown (our windowForm, 20, 320, y, y + Gui_RADIOBUTTON_HEIGHT,
-						our devices [i]. fullName, gui_radiobutton_cb_input, this, 0);
-			}
-		}
-		GuiRadioGroup_end ();
-	#endif
-	
+	GuiLabel_createShown (our windowForm, 10, 280, y, y + Gui_LABEL_HEIGHT, U"Recorded takes:", 0);
+	our takeList = GuiList_createShown (our windowForm, 10, 280, y + Gui_LABEL_HEIGHT + 2, -180, false, U" Takes ");
+	GuiList_setSelectionChangedCallback (our takeList, gui_list_cb_takeSelectionChanged, this);
+	GuiList_setDoubleClickCallback (our takeList, gui_list_cb_takeDoubleClick, this);
+
+	// Action buttons below take list (y = -175)
+	our playTakeButton = GuiButton_createShown (our windowForm, 10, 70, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+			U"Play", gui_button_cb_takePlay, this, 0);
+	our renameTakeButton = GuiButton_createShown (our windowForm, 75, 140, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+			U"Rename...", gui_button_cb_takeRename, this, 0);
+	our deleteTakeButton = GuiButton_createShown (our windowForm, 145, 205, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+			U"Delete", gui_button_cb_takeDelete, this, 0);
+	our publishAllButton = GuiButton_createShown (our windowForm, 210, 280, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+			U"Save all", gui_button_cb_publishAll, this, 0);
+
 	/*
-		Meter box.
+		Meter box (Center: x: 290 ~ -170).
 	*/
-	y = Machine_getMenuBarBottom () + 20;
-	GuiLabel_createShown (our windowForm, 320, -170, y, y + Gui_LABEL_HEIGHT, U"Meter", GuiLabel_CENTRE);
-	y += Gui_LABEL_HEIGHT;
-	our meter = GuiDrawingArea_createShown (our windowForm, 320, -170, y, -150,
+	GuiLabel_createShown (our windowForm, 290, -170, y, y + Gui_LABEL_HEIGHT, U"Meter", GuiLabel_CENTRE);
+	our meter = GuiDrawingArea_createShown (our windowForm, 290, -170, y + Gui_LABEL_HEIGHT + 2, -145,
 		gui_drawingarea_cb_expose, nullptr,
 		nullptr, gui_drawingarea_cb_resize, nullptr, this, GuiDrawingArea_BORDER
 	);
 
 	/*
-		Sampling frequency.
+		Sampling frequency (Right: x: -160 ~ -10).
 	*/
-	y = Machine_getMenuBarBottom () + 20;
 	GuiLabel_createShown (our windowForm, -160, -10, y, y + Gui_LABEL_HEIGHT, U"Sampling frequency:", 0);
 	GuiRadioGroup_begin ();
 	for (integer i = 1; i <= SoundRecorder_IFSAMP_MAX; i ++) {
@@ -909,34 +1114,43 @@ void structSoundRecorder :: v_createChildren ()
 	GuiRadioGroup_end ();
 
 	our progressScale = GuiScale_createShown (our windowForm,
-			10, -10, -130, -90,
+			10, -10, -135, -105,
 			0, 1000, 0, 0);
 
-	y = 60;
-	our recordButton = GuiButton_createShown (our windowForm, 20, 90, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	/*
+		Control buttons row (y = 65).
+	*/
+	y = 65;
+	our recordButton = GuiButton_createShown (our windowForm, 10, 75, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Record", gui_button_cb_record, this, 0);
-	our stopButton = GuiButton_createShown (our windowForm, 100, 170, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	our holdRecordButton = GuiDrawingArea_createShown (our windowForm, 80, 260, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+			gui_drawingarea_cb_holdRecord_expose, gui_drawingarea_cb_holdRecord_mouse,
+			nullptr, nullptr, nullptr, this, GuiDrawingArea_BORDER);
+	our stopButton = GuiButton_createShown (our windowForm, 265, 330, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Stop", gui_button_cb_stop, this, 0);
 	if (inputUsesPortAudio) {
-		our playButton = GuiButton_createShown (our windowForm, 180, 250, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+		our playButton = GuiButton_createShown (our windowForm, 335, 400, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 				U"Play", gui_button_cb_play, this, 0);
 	} else {
 		#if defined (_WIN32) || defined (macintosh)
-			our playButton = GuiButton_createShown (our windowForm, 180, 250, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+			our playButton = GuiButton_createShown (our windowForm, 335, 400, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 					U"Play", gui_button_cb_play, this, 0);
 		#endif
 	}
 	
-	GuiLabel_createShown (our windowForm, -200, -130, -y - 2 - Gui_TEXTFIELD_HEIGHT, -y - 2, U"Name:", GuiLabel_RIGHT);
-	our soundName = GuiText_createShown (our windowForm, -120, -20, -y - 2 - Gui_TEXTFIELD_HEIGHT, -y - 2, 0);
+	GuiLabel_createShown (our windowForm, -240, -170, -y - 2 - Gui_TEXTFIELD_HEIGHT, -y - 2, U"Name:", GuiLabel_RIGHT);
+	our soundName = GuiText_createShown (our windowForm, -160, -10, -y - 2 - Gui_TEXTFIELD_HEIGHT, -y - 2, 0);
 	GuiText_setString (our soundName, U"untitled");
 
+	/*
+		Bottom row (y = 20).
+	*/
 	y = 20;
-	our cancelButton = GuiButton_createShown (our windowForm, -350, -280, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	our cancelButton = GuiButton_createShown (our windowForm, -370, -300, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Close", gui_button_cb_cancel, this, 0);
-	our applyButton = GuiButton_createShown (our windowForm, -270, -170, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	our applyButton = GuiButton_createShown (our windowForm, -290, -170, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Save to list", gui_button_cb_apply, this, GuiButton_DEFAULT);
-	our okButton = GuiButton_createShown (our windowForm, -160, -20, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	our okButton = GuiButton_createShown (our windowForm, -160, -10, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Save to list & Close", gui_button_cb_ok, this, 0);
 }
 
@@ -1206,9 +1420,14 @@ autoSoundRecorder SoundRecorder_create (int numberOfChannels) {
 
 		autoMelderString title;
 		MelderString_copy (& title, U"SoundRecorder (", ( numberOfChannels == 1 ? U"mono" : U"stereo" ), U")");
-		Editor_init (me.get(), 100, 100, 800, 600, title.string, nullptr);
+		my takeIndex = 1;
+		my isHoldingRecord = false;
+		Editor_init (me.get(), 100, 100, 840, 620, title.string, nullptr);
 		my graphics = Graphics_create_xmdrawingarea (my meter);
 		Melder_assert (my graphics);
+		if (my holdRecordButton) {
+			my holdRecordGraphics = Graphics_create_xmdrawingarea (my holdRecordButton);
+		}
 
 struct structGuiDrawingArea_ResizeEvent event { my meter, 0 };
 event. width  = GuiControl_getWidth  (my meter);

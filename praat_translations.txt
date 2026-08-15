@@ -1,4 +1,4 @@
-=== Praat Chinese Translation Database (Total: 3802 entries) ===
+=== Praat Chinese Translation Database (Total: 3810 entries) ===
 Format: [English] block followed by [Chinese] block, separated by '===================='.
 This structure prevents ambiguity with newlines or special characters in the text.
 
@@ -81,6 +81,11 @@ This structure prevents ambiguity with newlines or special characters in the tex
  ...the text
 [Chinese]
  ……文本：
+====================
+[English]
+ Takes 
+[Chinese]
+ 暂存录音 
 ====================
 [English]
  seconds,
@@ -4360,6 +4365,11 @@ Delete log file 1
 Delete log file 2
 [Chinese]
 删除记录文件 2
+====================
+[English]
+Delete take
+[Chinese]
+删除
 ====================
 [English]
 Demo window
@@ -11152,6 +11162,11 @@ Play special...
 播放特殊...
 ====================
 [English]
+Play take
+[Chinese]
+播放
+====================
+[English]
 Play window
 [Chinese]
 播放视口内声音
@@ -12392,6 +12407,11 @@ Record stereo Sound...
 录制双声道声音...
 ====================
 [English]
+Recorded takes:
+[Chinese]
+录音暂存列表：
+====================
+[English]
 Rectangle text (maximal fit)...
 [Chinese]
 矩形区域文本 (最大拟合)...
@@ -12630,6 +12650,11 @@ Rename column... || Set column label (label)...
 Rename object
 [Chinese]
 重命名对象
+====================
+[English]
+Rename take
+[Chinese]
+重命名
 ====================
 [English]
 Rename tier
@@ -13047,9 +13072,24 @@ Save Object(s) as one text file
 保存多个对象为一个文本文件
 ====================
 [English]
+Save all
+[Chinese]
+全部保存
+====================
+[English]
+Save all & Close
+[Chinese]
+全部保存并关闭
+====================
+[English]
 Save all pages as HTML files
 [Chinese]
 保存所有页面为 HTML 文件
+====================
+[English]
+Save all to list
+[Chinese]
+全部保存到列表
 ====================
 [English]
 Save as 24-bit WAV file...

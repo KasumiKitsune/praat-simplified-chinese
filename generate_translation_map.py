@@ -3139,6 +3139,18 @@ EXACT_MAP = {
     "Cannot write first bytes of file.": "无法写入文件的前几个字节。",
     "Demo window not created.": "未创建演示窗口。",
 
+
+    # ==========================================================================
+    # SoundRecorder Enhancement (Takes List & Push-to-talk)
+    # ==========================================================================
+    "Recorded takes:": "录音暂存列表：",
+    " Takes ": " 暂存录音 ",
+    "Save all": "全部保存",
+    "Save all to list": "全部保存到列表",
+    "Save all & Close": "全部保存并关闭",
+    "Rename take": "重命名",
+    "Delete take": "删除",
+    "Play take": "播放",
     # ==========================================================================
     # Spectrogram Settings & Statistics and Table Data Analysis (Category 3)
     # ==========================================================================

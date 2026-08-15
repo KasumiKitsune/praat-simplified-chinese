@@ -88,10 +88,16 @@ Thing_define (SoundRecorder, Editor) {
 	GuiDrawingArea meter;
 	GuiScale progressScale;
 	GuiButton recordButton, stopButton, playButton;
+	GuiDrawingArea holdRecordButton;
+	bool isHoldingRecord;
+	OrderedOf <structSound> recordedSounds;
+	integer takeIndex;
+	GuiList takeList;
+	GuiButton playTakeButton, renameTakeButton, deleteTakeButton, publishAllButton;
 	GuiText soundName;
 	GuiButton cancelButton, applyButton, okButton;
 	GuiMenuItem meterIntensityButton, meterCentreOfGravityVersusIntensityButton;
-	autoGraphics graphics;
+	autoGraphics graphics, holdRecordGraphics;
 	bool inputUsesPortAudio;
 
 	const PaDeviceInfo *deviceInfos [1+SoundRecorder_IDEVICE_MAX];
