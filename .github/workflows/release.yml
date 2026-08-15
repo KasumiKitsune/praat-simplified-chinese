@@ -4,23 +4,24 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: "Release tag, e.g. v6.4.67-zh.1"
+        description: "Release tag, e.g. v7.0-zh.1"
         required: true
+        default: "v7.0-zh.1"
         type: string
       release_name:
         description: "Release title"
         required: false
-        default: "Praat 6.4.67 中文版"
+        default: "Praat 7.0 简体中文版 (v7.0-zh.1)"
         type: string
       praat_upstream_tag:
-        description: "Upstream Praat tag used for the Xcode project, e.g. v6.4.67"
+        description: "Upstream Praat tag used for the Xcode project, e.g. v7.0"
         required: false
-        default: "v6.4.67"
+        default: "v7.0"
         type: string
       praat_version_digits:
-        description: "Praat version digits used in upstream asset names, e.g. 6467"
+        description: "Praat version digits used in upstream asset names, e.g. 7000"
         required: false
-        default: "6467"
+        default: "7000"
         type: string
       xcodeproj_url:
         description: "Optional direct URL to praatXXXX_xcodeproj.zip; leave blank to use upstream tag/version"
@@ -30,7 +31,7 @@ on:
       draft:
         description: "Create as draft release"
         required: false
-        default: true
+        default: false
         type: boolean
       prerelease:
         description: "Mark as prerelease"
@@ -74,12 +75,7 @@ jobs:
         run: |
           mkdir -p dist
           cp Praat.exe dist/Praat.exe
-          cat > dist/README.txt <<'EOF'
-          Praat 简体中文本地化版本。
-
-          双击 Praat.exe 运行。
-          本版本基于官方 Praat 源码构建，是非官方中文本地化版本。
-          EOF
+          cp README.txt dist/README.txt
           cd dist
           zip -9 "$PACKAGE_NAME" Praat.exe README.txt
 
@@ -91,7 +87,7 @@ jobs:
 
   build-macos:
     name: Build macOS universal
-    runs-on: macos-26
+    runs-on: macos-14
 
     steps:
       - name: Check out source
@@ -237,13 +233,16 @@ jobs:
       - build-macos
 
     steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
 
-      - name: Create GitHub release
+      - name: Create or update GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -254,21 +253,26 @@ jobs:
         run: |
           set -euo pipefail
 
-          args=(
-            release create "$TAG_NAME"
-            dist/Praat-"$TAG_NAME"-Windows-x64.zip
-            dist/Praat-"$TAG_NAME"-macOS-universal.dmg
-            --repo "$GH_REPO"
-            --target "${{ github.sha }}"
-            --title "$RELEASE_NAME"
-            --notes "基于 Praat 6.4.67 的非官方简体中文本地化版本。包含 Windows x64 与 macOS universal 构建产物。"
-          )
+          if gh release view "$TAG_NAME" --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "Release $TAG_NAME exists, uploading artifacts..."
+            gh release upload "$TAG_NAME" dist/* --repo "$GH_REPO" --clobber
+            gh release edit "$TAG_NAME" --repo "$GH_REPO" --title "$RELEASE_NAME"
+          else
+            args=(
+              release create "$TAG_NAME"
+              dist/*
+              --repo "$GH_REPO"
+              --target "${{ github.sha }}"
+              --title "$RELEASE_NAME"
+              --notes "基于 Praat 7.0 的非官方简体中文本地化版本。包含 Windows x64 与 macOS universal 构建产物。"
+            )
 
-          if [ "$DRAFT" = "true" ]; then
-            args+=(--draft)
-          fi
-          if [ "$PRERELEASE" = "true" ]; then
-            args+=(--prerelease)
-          fi
+            if [ "$DRAFT" = "true" ]; then
+              args+=(--draft)
+            fi
+            if [ "$PRERELEASE" = "true" ]; then
+              args+=(--prerelease)
+            fi
 
-          gh "${args[@]}"
+            gh "${args[@]}"
+          fi
