@@ -33,8 +33,16 @@
 /********** Callbacks of the fixed buttons. **********/
 
 DIRECT (PRAAT_Remove) {
-	WHERE_DOWN (SELECTED)
+	integer lastSelected = 0;
+	WHERE_DOWN (SELECTED) {
+		lastSelected = IOBJECT;
 		praat_removeObject (IOBJECT);
+	}
+	if (theCurrentPraatObjects -> totalSelection == 0 && theCurrentPraatObjects -> n > 0 && lastSelected > 0) {
+		integer newSelect = ( lastSelected <= theCurrentPraatObjects -> n ? lastSelected : theCurrentPraatObjects -> n );
+		if (newSelect >= 1)
+			praat_select (newSelect);
+	}
 	praat_show ();
 	END_NO_NEW_DATA
 }

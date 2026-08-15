@@ -293,10 +293,32 @@ static void showMaximum (SoundRecorder me, int channel, double maximum) {
 	}
 }
 
+static integer getSelectedTakeIndex (SoundRecorder me) {
+	if (! my takeList || my recordedSounds.size == 0)
+		return 0;
+	autoINTVEC selected = GuiList_getSelectedPositions (my takeList);
+	if (selected.size == 0)
+		return 0;
+	return selected [1];
+}
+
 static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) {
 	Melder_assert (my graphics);
 	Graphics_clearWs (my graphics.get());
 	if (nsamp < 1) {
+		integer sel = getSelectedTakeIndex (me);
+		Sound sound = nullptr;
+		if (sel >= 1 && sel <= my recordedSounds.size)
+			sound = my recordedSounds.at [sel];
+
+		if (sound) {
+			Graphics_setColour (my graphics.get(), Melder_WHITE);
+			Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
+			Graphics_setColour (my graphics.get(), Melder_BLACK);
+			Sound_draw (sound, my graphics.get(), 0.0, 0.0, 0.0, 0.0, true, U"curve");
+			return;
+		}
+
 		Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
 		#if defined (macintosh)
 			Graphics_setColour (my graphics.get(), Melder_WHITE);
@@ -707,21 +729,16 @@ static LRESULT CALLBACK holdRecordWndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 }
 #endif
 
-static integer getSelectedTakeIndex (SoundRecorder me) {
-	if (! my takeList || my recordedSounds.size == 0)
-		return 0;
-	autoINTVEC selected = GuiList_getSelectedPositions (my takeList);
-	if (selected.size == 0)
-		return 0;
-	return selected [1];
-}
-
 static void gui_list_cb_takeSelectionChanged (SoundRecorder me, GuiList_SelectionChangedEvent /* event */) {
 	integer index = getSelectedTakeIndex (me);
 	if (index >= 1 && index <= my recordedSounds.size) {
 		Sound sound = my recordedSounds.at [index];
 		if (sound && my soundName)
 			GuiText_setString (my soundName, Thing_getName (sound));
+	}
+	if (! my recording && my graphics) {
+		showMeter (me, nullptr, 0);
+		Graphics_updateWs (my graphics.get());
 	}
 }
 
@@ -792,6 +809,10 @@ static void gui_button_cb_takeDelete (SoundRecorder me, GuiButtonEvent /* event 
 		Sound sound = my recordedSounds.at [newSelect];
 		if (sound && my soundName)
 			GuiText_setString (my soundName, Thing_getName (sound));
+	}
+	if (! my recording && my graphics) {
+		showMeter (me, nullptr, 0);
+		Graphics_updateWs (my graphics.get());
 	}
 }
 
