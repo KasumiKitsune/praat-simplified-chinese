@@ -34,6 +34,7 @@
 #include "Sound_and_Spectrum.h"
 #include "machine.h"
 #include "EditorM.h"
+#include "GuiP.h"
 #if defined (macintosh)
 	#include "pa_mac_core.h"
 #endif
@@ -681,49 +682,30 @@ static void addCurrentRecordingToTakes (SoundRecorder me) {
 	}
 }
 
-static void drawHoldRecordButton (SoundRecorder me) {
-	if (! my holdRecordGraphics || ! my holdRecordButton)
-		return;
-	Graphics graphics = my holdRecordGraphics.get();
-	Graphics_setWindow (graphics, 0.0, 1.0, 0.0, 1.0);
-	if (my recording && my isHoldingRecord) {
-		Graphics_setColour (graphics, Melder_RED);
-		Graphics_fillRectangle (graphics, 0.0, 1.0, 0.0, 1.0);
-		Graphics_setColour (graphics, Melder_WHITE);
-		Graphics_setTextAlignment (graphics, Graphics_CENTRE, Graphics_HALF);
-		Graphics_text (graphics, 0.5, 0.5, U"● 录音中... (松开停止)");
-	} else {
-		Graphics_setGrey (graphics, 0.85);
-		Graphics_fillRectangle (graphics, 0.0, 1.0, 0.0, 1.0);
-		Graphics_setColour (graphics, Melder_BLACK);
-		Graphics_rectangle (graphics, 0.0, 1.0, 0.0, 1.0);
-		Graphics_setTextAlignment (graphics, Graphics_CENTRE, Graphics_HALF);
-		Graphics_text (graphics, 0.5, 0.5, U"按住录音 (松开停止)");
-	}
-	Graphics_updateWs (graphics);
-}
-
-static void gui_drawingarea_cb_holdRecord_expose (SoundRecorder me, GuiDrawingArea_ExposeEvent /* event */) {
-	drawHoldRecordButton (me);
-}
-
-static void gui_drawingarea_cb_holdRecord_mouse (SoundRecorder me, GuiDrawingArea_MouseEvent event) {
-	if (event -> isClick()) {
-		if (! my recording) {
+#if defined (_WIN32)
+static WNDPROC g_originalHoldRecordWndProc = nullptr;
+static LRESULT CALLBACK holdRecordWndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	SoundRecorder me = (SoundRecorder) GetWindowLongPtr (hwnd, GWLP_USERDATA);
+	if (me) {
+		if (msg == WM_LBUTTONDOWN) {
 			my isHoldingRecord = true;
 			startRecording (me);
-			drawHoldRecordButton (me);
-		}
-	} else if (event -> isDrop()) {
-		if (my isHoldingRecord) {
-			my isHoldingRecord = false;
-			stopRecording (me);
-			addCurrentRecordingToTakes (me);
-			drawHoldRecordButton (me);
-			Graphics_updateWs (my graphics.get());
+			if (my holdRecordButton)
+				GuiButton_setText (my holdRecordButton, U"● 录音中... (松开停止)");
+		} else if (msg == WM_LBUTTONUP || msg == WM_CAPTURECHANGED) {
+			if (my isHoldingRecord) {
+				my isHoldingRecord = false;
+				stopRecording (me);
+				addCurrentRecordingToTakes (me);
+				if (my holdRecordButton)
+					GuiButton_setText (my holdRecordButton, U"按住录音 (松开停止)");
+				Graphics_updateWs (my graphics.get());
+			}
 		}
 	}
+	return CallWindowProc (g_originalHoldRecordWndProc, hwnd, msg, wParam, lParam);
 }
+#endif
 
 static integer getSelectedTakeIndex (SoundRecorder me) {
 	if (! my takeList || my recordedSounds.size == 0)
@@ -769,14 +751,33 @@ static void gui_button_cb_takeRename (SoundRecorder me, GuiButtonEvent /* event 
 	if (! sound)
 		return;
 
-	autostring32 newName;
-	if (my soundName)
-		newName = GuiText_getString (my soundName);
-	if (newName && Melder_length (newName.get()) > 0) {
-		Thing_setName (sound, newName.get());
-		GuiList_replaceItem (my takeList, newName.get(), index);
-		GuiList_selectItem (my takeList, index);
+	const int diaWidth = 320, diaHeight = 140;
+	GuiDialog dia = GuiDialog_create (my windowForm, 250, 180, diaWidth, diaHeight,
+			U"Rename recorded take", nullptr, nullptr, GuiDialog_Modality::BLOCKING);
+	GuiLabel_createShown (dia, 20, diaWidth - 20, 15, 35, U"New name:", 0);
+	GuiText text = GuiText_createShown (dia, 20, diaWidth - 20, 40, 68, 0);
+	GuiText_setString (text, Thing_getName (sound));
+
+	int btnWidth = 90, btnY = 80;
+	GuiButton_createShown (dia, diaWidth - 20 - btnWidth, diaWidth - 20, btnY, btnY + Gui_PUSHBUTTON_HEIGHT,
+			U"OK", nullptr, nullptr, GuiButton_DEFAULT);
+	GuiButton_createShown (dia, diaWidth - 30 - 2 * btnWidth, diaWidth - 30 - btnWidth, btnY, btnY + Gui_PUSHBUTTON_HEIGHT,
+			U"Cancel", nullptr, nullptr, GuiButton_CANCEL);
+
+	GuiThing_show (dia);
+	const integer clicked = GuiDialog_run (dia);
+	if (clicked == 1) {   // OK button
+		autostring32 newName = GuiText_getString (text);
+		if (newName && Melder_length (newName.get()) > 0) {
+			Thing_setName (sound, newName.get());
+			GuiList_replaceItem (my takeList, newName.get(), index);
+			GuiList_selectItem (my takeList, index);
+			if (my soundName)
+				GuiText_setString (my soundName, newName.get());
+		}
 	}
+	GuiThing_hide (dia);
+	forget (dia);
 }
 
 static void gui_button_cb_takeDelete (SoundRecorder me, GuiButtonEvent /* event */) {
@@ -819,10 +820,12 @@ static void gui_button_cb_publishAll (SoundRecorder me, GuiButtonEvent /* event 
 
 static void gui_button_cb_stop (SoundRecorder me, GuiButtonEvent /* event */) {
 	stopRecording (me);
-	if (my isHoldingRecord)
+	if (my isHoldingRecord) {
 		my isHoldingRecord = false;
+		if (my holdRecordButton)
+			GuiButton_setText (my holdRecordButton, U"按住录音 (松开停止)");
+	}
 	addCurrentRecordingToTakes (me);
-	drawHoldRecordButton (me);
 	Graphics_updateWs (my graphics.get());
 }
 
@@ -1072,18 +1075,18 @@ void structSoundRecorder :: v_createChildren ()
 		Takes list (Left region: x: 10 ~ 280).
 	*/
 	GuiLabel_createShown (our windowForm, 10, 280, y, y + Gui_LABEL_HEIGHT, U"Recorded takes:", 0);
-	our takeList = GuiList_createShown (our windowForm, 10, 280, y + Gui_LABEL_HEIGHT + 2, -180, false, U" Takes ");
+	our takeList = GuiList_createShown (our windowForm, 10, 280, y + Gui_LABEL_HEIGHT + 2, -215, false, U" Takes ");
 	GuiList_setSelectionChangedCallback (our takeList, gui_list_cb_takeSelectionChanged, this);
 	GuiList_setDoubleClickCallback (our takeList, gui_list_cb_takeDoubleClick, this);
 
-	// Action buttons below take list (y = -175)
-	our playTakeButton = GuiButton_createShown (our windowForm, 10, 70, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+	// 2x2 Action buttons below take list (Row 1: y = -205 ~ -180; Row 2: y = -175 ~ -150)
+	our playTakeButton = GuiButton_createShown (our windowForm, 10, 140, -205, -180,
 			U"Play", gui_button_cb_takePlay, this, 0);
-	our renameTakeButton = GuiButton_createShown (our windowForm, 75, 140, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+	our renameTakeButton = GuiButton_createShown (our windowForm, 150, 280, -205, -180,
 			U"Rename...", gui_button_cb_takeRename, this, 0);
-	our deleteTakeButton = GuiButton_createShown (our windowForm, 145, 205, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+	our deleteTakeButton = GuiButton_createShown (our windowForm, 10, 140, -175, -150,
 			U"Delete", gui_button_cb_takeDelete, this, 0);
-	our publishAllButton = GuiButton_createShown (our windowForm, 210, 280, -175, -175 + Gui_PUSHBUTTON_HEIGHT,
+	our publishAllButton = GuiButton_createShown (our windowForm, 150, 280, -175, -150,
 			U"Save all", gui_button_cb_publishAll, this, 0);
 
 	/*
@@ -1123,9 +1126,17 @@ void structSoundRecorder :: v_createChildren ()
 	y = 65;
 	our recordButton = GuiButton_createShown (our windowForm, 10, 75, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Record", gui_button_cb_record, this, 0);
-	our holdRecordButton = GuiDrawingArea_createShown (our windowForm, 80, 260, -y - Gui_PUSHBUTTON_HEIGHT, -y,
-			gui_drawingarea_cb_holdRecord_expose, gui_drawingarea_cb_holdRecord_mouse,
-			nullptr, nullptr, nullptr, this, GuiDrawingArea_BORDER);
+	our holdRecordButton = GuiButton_createShown (our windowForm, 80, 260, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+			U"按住录音 (松开停止)", nullptr, this, 0);
+	#if defined (_WIN32)
+		if (our holdRecordButton && our holdRecordButton -> d_widget) {
+			HWND hwnd = our holdRecordButton -> d_widget -> window;
+			if (hwnd) {
+				SetWindowLongPtr (hwnd, GWLP_USERDATA, (LONG_PTR) this);
+				g_originalHoldRecordWndProc = (WNDPROC) SetWindowLongPtr (hwnd, GWLP_WNDPROC, (LONG_PTR) holdRecordWndProc);
+			}
+		}
+	#endif
 	our stopButton = GuiButton_createShown (our windowForm, 265, 330, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Stop", gui_button_cb_stop, this, 0);
 	if (inputUsesPortAudio) {
@@ -1425,9 +1436,6 @@ autoSoundRecorder SoundRecorder_create (int numberOfChannels) {
 		Editor_init (me.get(), 100, 100, 840, 620, title.string, nullptr);
 		my graphics = Graphics_create_xmdrawingarea (my meter);
 		Melder_assert (my graphics);
-		if (my holdRecordButton) {
-			my holdRecordGraphics = Graphics_create_xmdrawingarea (my holdRecordButton);
-		}
 
 struct structGuiDrawingArea_ResizeEvent event { my meter, 0 };
 event. width  = GuiControl_getWidth  (my meter);
