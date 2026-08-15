@@ -957,6 +957,8 @@ void praat_dontUsePictureWindow () { praatP.dontUsePictureWindow = true; }
 	#endif
 #elif defined (_WIN32)
 	static int cb_userMessage () {
+		if (! MelderFile_exists (& messageFile))
+			return 0;
 		autoPraatBackground background;
 		try {
 			praat_executeScript_noGUI (& messageFile, true);   // trust all messages, because they are sent by other apps that have control

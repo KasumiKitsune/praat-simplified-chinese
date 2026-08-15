@@ -8,8 +8,9 @@
 > 本文档是 Praat 英文 `README.md` 的中文翻译版本，旨在为中文用户提供更好的阅读和开发参考。
 
 <div align="center">
-  <img src="docs/pictures/praat-zh-main-window.png" width="49%" alt="Praat 简体中文主窗口" />
-  <img src="docs/pictures/praat-zh-manuel.png" width="49%" alt="Praat 简体中文帮助手册" />
+  <img src="docs/pictures/praat-zh-main-window.png" width="32%" alt="Praat 简体中文主窗口" />
+  <img src="docs/pictures/praat-zh-manuel.png" width="32%" alt="Praat 简体中文帮助手册" />
+  <img src="docs/pictures/praat-zh-sound-recorder.png" width="32%" alt="Praat 录音窗口增强" />
 </div>
 
 > [!TIP]
@@ -28,7 +29,14 @@
 > * **CJK/中文无空格排版折行支持 (CJK Word Wrapping Support)**
 >   * **特性描述**：解决了 Praat 官方源码中长句中无空格字符（如中文、日文等）无法折行、从而导致右侧显示被截断的缺陷。新增了字符级（character-level）换行机制，让长篇中文文本能够根据窗口大小完美自适应换行。
 > * **中英文界面切换与配置持久化 (Bilingual Interface Toggle & Persistent Settings)**
->   * **特性描述**：在主窗口的 **`Settings` (设置)** -> **`Language settings...` (语言设置...)** 中，支持一键在中文和英文界面之间切换。切换后的偏好设置将自动保存，再次启动程序时会自动加载上次选择的语言，避免了重启后语言设置失效的问题。
+>   * **特性描述**：在主窗口的 **`Settings` (设置)** -> **`Language settings...` (语言设置...)** 中，支持一键在中文和英文界面之间切换。切换后的偏好设置将自动保存，再次启动程序时会自动加载上次选择的语言。
+> * **录音窗口 (SoundRecorder) 功能增强**
+>   * **按住录音模式**：新增“按住录音 (松开停止)”按钮，按住鼠标即可开始录音，松开后停止并自动保存。
+>   * **暂存列表与自动编号**：左侧新增录音暂存列表，单次录音结束后自动按序号入库暂存（如 untitled_1、untitled_2），支持双击试听、重命名、删除以及批量保存到主对象窗口。
+>   * **智能波形图预览**：非录音状态下在中间区域展示当前选中的录音波形；音频超过 10 秒时自适应按 10 秒一段上下折行分层显示（最多显示前 30 秒）。
+>   * **精简进度条**：调整了缓冲区进度条高度并增加了“缓冲区使用率”说明标签。
+> * **主对象窗口删除条目自动转移焦点**
+>   * **特性描述**：在主对象窗口点击【移除】（Remove）删除条目后，自动将选中状态转移至相邻条目，避免失去焦点导致操作按钮置灰。
 > 
 
 
