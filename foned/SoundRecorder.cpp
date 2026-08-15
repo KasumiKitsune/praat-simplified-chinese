@@ -818,6 +818,10 @@ static void gui_button_cb_publishAll (SoundRecorder me, GuiButtonEvent /* event 
 	}
 }
 
+static void gui_button_cb_holdRecord (SoundRecorder /* me */, GuiButtonEvent /* event */) {
+	// Push-to-talk is handled by window subclassing
+}
+
 static void gui_button_cb_stop (SoundRecorder me, GuiButtonEvent /* event */) {
 	stopRecording (me);
 	if (my isHoldingRecord) {
@@ -1127,7 +1131,7 @@ void structSoundRecorder :: v_createChildren ()
 	our recordButton = GuiButton_createShown (our windowForm, 10, 75, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Record", gui_button_cb_record, this, 0);
 	our holdRecordButton = GuiButton_createShown (our windowForm, 80, 260, -y - Gui_PUSHBUTTON_HEIGHT, -y,
-			U"按住录音 (松开停止)", nullptr, this, 0);
+			U"按住录音 (松开停止)", gui_button_cb_holdRecord, this, 0);
 	#if defined (_WIN32)
 		if (our holdRecordButton && our holdRecordButton -> d_widget) {
 			HWND hwnd = our holdRecordButton -> d_widget -> window;
