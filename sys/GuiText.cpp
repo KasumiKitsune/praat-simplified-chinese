@@ -762,7 +762,7 @@ GuiText GuiText_create (GuiForm parent, int left, int right, int top, int bottom
 		my d_editable = (flags & GuiText_NONEDITABLE) == 0;
 		my d_widget -> window = CreateWindow (L"edit", nullptr, WS_CHILD | WS_BORDER
 			| ( flags & GuiText_ANYWRAP ? ES_AUTOVSCROLL : ES_AUTOHSCROLL )
-			| ES_MULTILINE | WS_CLIPSIBLINGS
+			| ES_MULTILINE | ES_WANTRETURN | WS_CLIPSIBLINGS
 			| ( flags & GuiText_SCROLLED ? WS_VSCROLL | ( flags & GuiText_ANYWRAP ? 0 : WS_HSCROLL ) : 0 ),
 			my d_widget -> x, my d_widget -> y, my d_widget -> width, my d_widget -> height,
 			my d_widget -> parent -> window, (HMENU) 1, theGui.instance, nullptr);

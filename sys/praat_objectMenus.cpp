@@ -27,6 +27,8 @@
 #include "GraphicsP.h"
 #include "DemoEditor.h"
 #include "praat_translate.h"
+#include "praat_python.h"
+#include "PythonScriptEditor.h"
 
 #define EDITOR  theCurrentPraatObjects -> list [IOBJECT]. editors
 
@@ -47,32 +49,79 @@ DIRECT (PRAAT_Remove) {
 	END_NO_NEW_DATA
 }
 
-FORM (MODIFY_Rename, U"Rename object", U"Rename...") {
-	TEXTFIELD (newName, U"New name", U"", 3)
+FORM (MODIFY_Rename, U"Rename object(s)", U"Rename...") {
+	TEXTFIELD (newName, U"New name(s)", U"", 10)
 OK
-	WHERE (SELECTED)
-		SET_STRING (newName, NAME)
+	if (theCurrentPraatObjects -> totalSelection == 1) {
+		WHERE (SELECTED)
+			SET_STRING (newName, NAME)
+	} else if (theCurrentPraatObjects -> totalSelection > 1) {
+		autoMelderString defaultNames;
+		integer count = 0;
+		WHERE (SELECTED) {
+			if (count > 0)
+				MelderString_appendCharacter (& defaultNames, U'\n');
+			MelderString_append (& defaultNames, NAME);
+			count ++;
+		}
+		SET_STRING (newName, defaultNames.string)
+	}
 DO
 	if (theCurrentPraatObjects -> totalSelection == 0)
 		Melder_throw (U"Selection changed!\nNo object selected. Cannot rename.");
-	if (theCurrentPraatObjects -> totalSelection > 1)
-		Melder_throw (U"Selection changed!\nCannot rename more than one object at a time.");
-	WHERE (SELECTED)
-		break;
-	static MelderString string;
-	MelderString_copy (& string, newName);
-	praat_cleanUpName (string.string);
-	static MelderString fullName;
-	MelderString_copy (& fullName, Thing_className (OBJECT), U" ", string.string);
-	if (! str32equ (fullName.string, FULL_NAME)) {
-		theCurrentPraatObjects -> list [IOBJECT]. name = Melder_dup_f (fullName.string);
-		autoMelderString listName;
-		MelderString_append (& listName, ID, U". ", fullName.string);
-		praat_list_renameAndSelect (IOBJECT, listName.string);
-		for (int ieditor = 0; ieditor < praat_MAXNUM_EDITORS; ieditor ++)
-			if (EDITOR [ieditor])
-				Thing_setName (EDITOR [ieditor], listName.string);
-		Thing_setName (OBJECT, string.string);
+	if (theCurrentPraatObjects -> totalSelection == 1) {
+		WHERE (SELECTED)
+			break;
+		static MelderString string;
+		MelderString_copy (& string, newName);
+		praat_cleanUpName (string.string);
+		static MelderString fullName;
+		MelderString_copy (& fullName, Thing_className (OBJECT), U" ", string.string);
+		if (! str32equ (fullName.string, FULL_NAME)) {
+			theCurrentPraatObjects -> list [IOBJECT]. name = Melder_dup_f (fullName.string);
+			autoMelderString listName;
+			MelderString_append (& listName, ID, U". ", fullName.string);
+			praat_list_renameAndSelect (IOBJECT, listName.string);
+			for (int ieditor = 0; ieditor < praat_MAXNUM_EDITORS; ieditor ++)
+				if (EDITOR [ieditor])
+					Thing_setName (EDITOR [ieditor], listName.string);
+			Thing_setName (OBJECT, string.string);
+		}
+	} else {
+		autoSTRVEC lines = splitBy_STRVEC (newName, U"\n");
+		if (lines.size < theCurrentPraatObjects -> totalSelection)
+			Melder_throw (U"Not enough names provided! You selected ",
+				theCurrentPraatObjects -> totalSelection,
+				U" objects, but only provided ", lines.size, ( lines.size == 1 ? U" line." : U" lines." ));
+		integer iline = 1;
+		WHERE (SELECTED) {
+			if (iline > lines.size)
+				break;
+			mutablestring32 line = lines [iline].get();
+			if (line) {
+				integer len = Melder_length (line);
+				if (len > 0 && line [len - 1] == U'\r')
+					line [len - 1] = U'\0';
+				static MelderString string;
+				MelderString_copy (& string, line);
+				praat_cleanUpName (string.string);
+				if (string.string [0] != U'\0') {
+					static MelderString fullName;
+					MelderString_copy (& fullName, Thing_className (OBJECT), U" ", string.string);
+					if (! str32equ (fullName.string, FULL_NAME)) {
+						theCurrentPraatObjects -> list [IOBJECT]. name = Melder_dup_f (fullName.string);
+						autoMelderString listName;
+						MelderString_append (& listName, ID, U". ", fullName.string);
+						praat_list_renameAndSelect (IOBJECT, listName.string);
+						for (int ieditor = 0; ieditor < praat_MAXNUM_EDITORS; ieditor ++)
+							if (EDITOR [ieditor])
+								Thing_setName (EDITOR [ieditor], listName.string);
+						Thing_setName (OBJECT, string.string);
+					}
+				}
+			}
+			iline ++;
+		}
 	}
 	END_NO_NEW_DATA
 }
@@ -342,6 +391,37 @@ DIRECT (PRAAT__openNotebook) {
 		autoNotebookEditor notebookEditor = NotebookEditor_createFromText (nullptr);
 		TextEditor_showOpen (notebookEditor.get());
 		notebookEditor.releaseToUser();
+	PRAAT_END
+}
+
+DIRECT (PRAAT__newPythonScript) {
+	PRAAT
+		autoPythonScriptEditor editor = PythonScriptEditor_createFromText (nullptr);
+		editor.releaseToUser();
+	PRAAT_END
+}
+
+DIRECT (PRAAT__openPythonScript) {
+	PRAAT
+		autoPythonScriptEditor editor = PythonScriptEditor_createFromText (nullptr);
+		TextEditor_showOpen (editor.get());
+		editor.releaseToUser();
+	PRAAT_END
+}
+
+FORM (PRAAT__runPythonScript, U"Run Python script", U"Run Python script...") {
+	INFILE (scriptFile, U"Python script file", U"")
+	OK
+	DO
+		praat_runPythonScriptFile (scriptFile);
+	PRAAT_END
+}
+
+FORM (PRAAT__pythonSettings, U"Python settings", U"Python settings...") {
+	TEXTFIELD (pythonPath, U"Python executable path", praat_python_getExecutablePath (), 1)
+	OK
+	DO
+		praat_python_setExecutablePath (pythonPath);
 	PRAAT_END
 }
 
@@ -884,7 +964,7 @@ void praat_show () {
 		(De)sensitivize the fixed buttons as appropriate for the current selection.
 	*/
 	praat_sensitivizeFixedButtonCommand (U"Remove", theCurrentPraatObjects -> totalSelection != 0);
-	praat_sensitivizeFixedButtonCommand (U"Rename...", theCurrentPraatObjects -> totalSelection == 1);
+	praat_sensitivizeFixedButtonCommand (U"Rename...", theCurrentPraatObjects -> totalSelection != 0);
 	praat_sensitivizeFixedButtonCommand (U"Copy...", theCurrentPraatObjects -> totalSelection == 1);
 	praat_sensitivizeFixedButtonCommand (U"Info", theCurrentPraatObjects -> totalSelection == 1);
 	praat_sensitivizeFixedButtonCommand (U"Inspect", theCurrentPraatObjects -> totalSelection != 0);
@@ -1054,6 +1134,15 @@ void praat_addMenus (GuiWindow window) {
 			PRAAT__openScript);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Open Praat notebook...", nullptr, GuiMenu_NO_API,
 			PRAAT__openNotebook);
+	praat_addMenuCommand (U"Objects", U"Praat", U"-- python --", nullptr, 0, nullptr);
+	praat_addMenuCommand (U"Objects", U"Praat", U"New Python script", nullptr, GuiMenu_NO_API,
+			PRAAT__newPythonScript);
+	praat_addMenuCommand (U"Objects", U"Praat", U"Open Python script...", nullptr, GuiMenu_NO_API,
+			PRAAT__openPythonScript);
+	praat_addMenuCommand (U"Objects", U"Praat", U"Run Python script...", nullptr, GuiMenu_NO_API,
+			PRAAT__runPythonScript);
+	praat_addMenuCommand (U"Objects", U"Praat", U"Python settings...", nullptr, GuiMenu_NO_API,
+			PRAAT__pythonSettings);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Open Picture window", nullptr, GuiMenu_NO_API,
 			WINDOW_openPictureWindow);
 	praat_addMenuCommand (U"Objects", U"Praat", U"-- buttons --", nullptr, 0, nullptr);
@@ -1130,6 +1219,9 @@ void praat_addMenus (GuiWindow window) {
 			nullptr, 0, SAVE_Data_writeToShortTextFile);   // alternative GuiMenu_DEPRECATED_2011
 	praat_addAction1 (classDaata, 0, U"Save as binary file... || Write to binary file...",
 			nullptr, 0, SAVE_Data_writeToBinaryFile);   // alternative GuiMenu_DEPRECATED_2011
+
+	praat_addAction1 (classDaata, -2, U"Batch rename... || Rename multiple...",
+			nullptr, 0, MODIFY_Rename);
 
 	praat_addAction1 (classManPages, 1, U"Save to HTML folder... || Save to HTML directory...",
 			nullptr, 0, PRAAT_ManPages_saveToHtmlFolder);   // alternative GuiMenu_DEPRECATED_2020

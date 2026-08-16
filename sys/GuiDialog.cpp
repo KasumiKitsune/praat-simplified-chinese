@@ -204,8 +204,11 @@ integer GuiDialog_run (GuiDialog me) {
 					This is a HACK.
 				*/
 				if (event. message == WM_KEYDOWN && LOWORD (event. wParam) == VK_RETURN && my defaultButton) {
-					my clickedButtonId = my defaultButtonId;
-					break;
+					LONG style = GetWindowLong (event. hwnd, GWL_STYLE);
+					if (! (style & ES_MULTILINE)) {
+						my clickedButtonId = my defaultButtonId;
+						break;
+					}
 				}
 
 				if (IsDialogMessage (my d_xmShell -> window, & event)) {   // not my d_widget -> window, because that would prevent closing

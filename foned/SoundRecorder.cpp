@@ -747,14 +747,14 @@ static LRESULT CALLBACK holdRecordWndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 			my isHoldingRecord = true;
 			startRecording (me);
 			if (my holdRecordButton)
-				GuiButton_setText (my holdRecordButton, U"● 录音中... (松开停止)");
+				GuiButton_setText (my holdRecordButton, praat_translate (U"● Recording... (release to stop)"));
 		} else if (msg == WM_LBUTTONUP || msg == WM_CAPTURECHANGED) {
 			if (my isHoldingRecord) {
 				my isHoldingRecord = false;
 				stopRecording (me);
 				addCurrentRecordingToTakes (me);
 				if (my holdRecordButton)
-					GuiButton_setText (my holdRecordButton, U"按住录音 (松开停止)");
+					GuiButton_setText (my holdRecordButton, praat_translate (U"Hold to Record (release to stop)"));
 				Graphics_updateWs (my graphics.get());
 			}
 		}
@@ -882,7 +882,7 @@ static void gui_button_cb_stop (SoundRecorder me, GuiButtonEvent /* event */) {
 	if (my isHoldingRecord) {
 		my isHoldingRecord = false;
 		if (my holdRecordButton)
-			GuiButton_setText (my holdRecordButton, U"按住录音 (松开停止)");
+			GuiButton_setText (my holdRecordButton, praat_translate (U"Hold to Record (release to stop)"));
 	}
 	addCurrentRecordingToTakes (me);
 	Graphics_updateWs (my graphics.get());
@@ -1187,7 +1187,7 @@ void structSoundRecorder :: v_createChildren ()
 	our recordButton = GuiButton_createShown (our windowForm, 10, 75, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Record", gui_button_cb_record, this, 0);
 	our holdRecordButton = GuiButton_createShown (our windowForm, 80, 260, -y - Gui_PUSHBUTTON_HEIGHT, -y,
-			U"按住录音 (松开停止)", gui_button_cb_holdRecord, this, 0);
+			U"Hold to Record (release to stop)", gui_button_cb_holdRecord, this, 0);
 	#if defined (_WIN32)
 		if (our holdRecordButton && our holdRecordButton -> d_widget) {
 			HWND hwnd = our holdRecordButton -> d_widget -> window;
@@ -1217,11 +1217,11 @@ void structSoundRecorder :: v_createChildren ()
 		Bottom row (y = 20).
 	*/
 	y = 20;
-	our cancelButton = GuiButton_createShown (our windowForm, -370, -300, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	our cancelButton = GuiButton_createShown (our windowForm, -410, -330, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Close", gui_button_cb_cancel, this, 0);
-	our applyButton = GuiButton_createShown (our windowForm, -290, -170, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	our applyButton = GuiButton_createShown (our windowForm, -320, -185, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Save to list", gui_button_cb_apply, this, GuiButton_DEFAULT);
-	our okButton = GuiButton_createShown (our windowForm, -160, -10, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+	our okButton = GuiButton_createShown (our windowForm, -175, -10, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Save to list & Close", gui_button_cb_ok, this, 0);
 }
 

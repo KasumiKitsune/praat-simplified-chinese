@@ -246,6 +246,75 @@ jobs:
               print("Added LPC/CPP.cpp and LPC/CPP.h to praat_mac Xcode target.")
           else:
               print("LPC/CPP.cpp is already present in the Xcode project.")
+
+          if "praat_python.cpp" not in project:
+              file_ref_py = "CDFE00000000000000000021"
+              build_file_py = "CDFE00000000000000000022"
+              header_ref_py = "CDFE00000000000000000023"
+              header_build_py = "CDFE00000000000000000024"
+
+              file_ref_pse = "CDFE00000000000000000031"
+              build_file_pse = "CDFE00000000000000000032"
+              header_ref_pse = "CDFE00000000000000000033"
+              header_build_pse = "CDFE00000000000000000034"
+
+              project = project.replace(
+                  "/* Begin PBXBuildFile section */\n",
+                  "/* Begin PBXBuildFile section */\n"
+                  f"\t\t{build_file_py} /* praat_python.cpp in Sources */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {file_ref_py} /* praat_python.cpp */; }};\n"
+                  f"\t\t{header_build_py} /* praat_python.h in Headers */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {header_ref_py} /* praat_python.h */; }};\n"
+                  f"\t\t{build_file_pse} /* PythonScriptEditor.cpp in Sources */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {file_ref_pse} /* PythonScriptEditor.cpp */; }};\n"
+                  f"\t\t{header_build_pse} /* PythonScriptEditor.h in Headers */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {header_ref_pse} /* PythonScriptEditor.h */; }};\n",
+                  1,
+              )
+              project = project.replace(
+                  "/* Begin PBXFileReference section */\n",
+                  "/* Begin PBXFileReference section */\n"
+                  f"\t\t{file_ref_py} /* praat_python.cpp */ = "
+                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; "
+                  "name = praat_python.cpp; path = sys/praat_python.cpp; sourceTree = \"<group>\"; };\n"
+                  f"\t\t{header_ref_py} /* praat_python.h */ = "
+                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
+                  "name = praat_python.h; path = sys/praat_python.h; sourceTree = \"<group>\"; };\n"
+                  f"\t\t{file_ref_pse} /* PythonScriptEditor.cpp */ = "
+                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; "
+                  "name = PythonScriptEditor.cpp; path = sys/PythonScriptEditor.cpp; sourceTree = \"<group>\"; };\n"
+                  f"\t\t{header_ref_pse} /* PythonScriptEditor.h */ = "
+                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
+                  "name = PythonScriptEditor.h; path = sys/PythonScriptEditor.h; sourceTree = \"<group>\"; };\n",
+                  1,
+              )
+              project = project.replace(
+                  "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n",
+                  "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n"
+                  f"\t\t{file_ref_py} /* praat_python.cpp */,\n"
+                  f"\t\t{header_ref_py} /* praat_python.h */,\n"
+                  f"\t\t{file_ref_pse} /* PythonScriptEditor.cpp */,\n"
+                  f"\t\t{header_ref_pse} /* PythonScriptEditor.h */,\n",
+                  1,
+              )
+              project = project.replace(
+                  "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n",
+                  "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n"
+                  f"\t\t{build_file_py} /* praat_python.cpp in Sources */,\n"
+                  f"\t\t{build_file_pse} /* PythonScriptEditor.cpp in Sources */,\n",
+                  1,
+              )
+              project = project.replace(
+                  "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n",
+                  "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n"
+                  f"\t\t{header_build_py} /* praat_python.h in Headers */,\n"
+                  f"\t\t{header_build_pse} /* PythonScriptEditor.h in Headers */,\n",
+                  1,
+              )
+              project_path.write_text(project, encoding="utf-8")
+              print("Added praat_python and PythonScriptEditor to praat_mac Xcode target.")
+          else:
+              print("praat_python.cpp is already present in the Xcode project.")
           PY
 
       - name: Build Praat.app

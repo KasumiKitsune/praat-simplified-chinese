@@ -2434,7 +2434,10 @@ modifiers & _motif_SHIFT_MASK ? " shift" : "", message -> message == WM_KEYDOWN 
 					//Melder_information (U"RETURN ", acc, U" def ", Melder_pointer (my shell -> defaultButton));
 					if (acc & 1 << GuiMenu_ENTER) { win_processKeyboardEquivalent (my shell, GuiMenu_ENTER, modifiers); return; }
 					else {
-						if (my shell -> defaultButton && _GuiWinButton_tryToHandleShortcutKey (my shell -> defaultButton)) return;
+						const bool isMultilineText = ( me && MEMBER (me, Text) && (GetWindowLong (my window, GWL_STYLE) & ES_MULTILINE) );
+						if (! isMultilineText) {
+							if (my shell -> defaultButton && _GuiWinButton_tryToHandleShortcutKey (my shell -> defaultButton)) return;
+						}
 					}
 				} else if (kar == VK_ESCAPE) {   // shortcut or cancel button (and from 2024-04-06:) or text
 					if (acc & 1 << GuiMenu_ESCAPE) { win_processKeyboardEquivalent (my shell, GuiMenu_ESCAPE, modifiers); return; }

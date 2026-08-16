@@ -580,6 +580,8 @@ static bool allowExecutionHook (void *closure) {
 			sel1 = ( my class1 == classDaata ? theCurrentPraatObjects -> totalSelection : praat_numberOfSelected (my class1) );
 			if (sel1 == 0)
 				continue;
+			if (my n1 < 0 && sel1 < - my n1)
+				continue;
 			if (my class2 && (sel2 = praat_numberOfSelected (my class2)) == 0)
 				continue;
 			if (my class3 && (sel3 = praat_numberOfSelected (my class3)) == 0)
@@ -588,7 +590,7 @@ static bool allowExecutionHook (void *closure) {
 				continue;
 			if (sel1 + sel2 + sel3 + sel4 != theCurrentPraatObjects -> totalSelection)
 				continue;
-			if ((my n1 && sel1 != my n1) || (my n2 && sel2 != my n2) || (my n3 && sel3 != my n3) || (my n4 && sel4 != my n4))
+			if ((my n1 > 0 && sel1 != my n1) || (my n2 > 0 && sel2 != my n2) || (my n3 > 0 && sel3 != my n3) || (my n4 > 0 && sel4 != my n4))
 				continue;
 			return true;   // found a matching action
 		}
@@ -689,6 +691,8 @@ void praat_actions_show () {
 		sel1 = ( action -> class1 == classDaata ? theCurrentPraatObjects -> totalSelection : praat_numberOfSelected (action -> class1) );
 		if (sel1 == 0)
 			continue;
+		if (n1 < 0 && sel1 < - n1)
+			continue;
 		if (action -> class2 && (sel2 = praat_numberOfSelected (action -> class2)) == 0)
 			continue;
 		if (action -> class3 && (sel3 = praat_numberOfSelected (action -> class3)) == 0)
@@ -704,7 +708,7 @@ void praat_actions_show () {
 		*/
 		if (! action -> callback)
 			continue;   // separators are not executable
-		if ((n1 && sel1 != n1) || (n2 && sel2 != n2) || (n3 && sel3 != n3) || (n4 && sel4 != n4))
+		if ((n1 > 0 && sel1 != n1) || (n2 > 0 && sel2 != n2) || (n3 > 0 && sel3 != n3) || (n4 > 0 && sel4 != n4))
 			continue;
 		action -> executable = true;
 	}
