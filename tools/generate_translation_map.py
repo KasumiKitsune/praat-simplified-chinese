@@ -2,12 +2,13 @@ import re
 import os
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent if Path(__file__).resolve().parent.name == "tools" else Path(__file__).resolve().parent
+TOOLS_DIR = Path(__file__).resolve().parent if Path(__file__).resolve().parent.name == "tools" else (Path(__file__).resolve().parent / "tools")
 
-INPUT_FILE = Path(os.environ.get("PRAAT_ZH_UI_STRINGS", ROOT / "ui_strings.txt"))
+INPUT_FILE = Path(os.environ.get("PRAAT_ZH_UI_STRINGS", TOOLS_DIR / "ui_strings.txt"))
 OUTPUT_CPP = ROOT / "sys" / "praat_translate.cpp"
-DEBUG_OUTPUT = ROOT / "debug_translations.txt"
-CANDIDATE_OUTPUT = ROOT / "translation_candidates.txt"
+DEBUG_OUTPUT = TOOLS_DIR / "debug_translations.txt"
+CANDIDATE_OUTPUT = TOOLS_DIR / "translation_candidates.txt"
 
 # Helper to escape non-ASCII characters to standard C++ \uXXXX escapes
 def to_cpp_unicode_literal(s):
@@ -4462,7 +4463,7 @@ def main():
 
     # Load Simplified to Traditional mapping table
     st_map = {}
-    st_file = ROOT / "STCharacters.txt"
+    st_file = TOOLS_DIR / "STCharacters.txt"
     if st_file.exists():
         with open(st_file, "r", encoding="utf-8") as f:
             for line in f:

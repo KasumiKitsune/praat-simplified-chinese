@@ -1,4 +1,12 @@
 import json
+import os
+import sys
+from pathlib import Path
+
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
 import generate_translation_map
 
 def main():
@@ -7,13 +15,13 @@ def main():
     total = len(translations)
 
     # 1. Output as JSON (very easy for AIs to parse directly)
-    json_path = "praat_translations.json"
+    json_path = TOOLS_DIR / "praat_translations.json"
     with open(json_path, "w", encoding="utf-8", newline='\n') as f:
         json.dump(translations, f, ensure_ascii=False, indent=2)
     print(f"Successfully saved JSON format to {json_path} ({total} entries)")
 
     # 2. Output as TXT (structured and clear for human reading or prompt pasting)
-    txt_path = "praat_translations.txt"
+    txt_path = TOOLS_DIR / "praat_translations.txt"
     with open(txt_path, "w", encoding="utf-8", newline='\n') as f:
         f.write(f"=== Praat Chinese Translation Database (Total: {total} entries) ===\n")
         f.write("Format: [English] block followed by [Chinese] block, separated by '===================='.\n")

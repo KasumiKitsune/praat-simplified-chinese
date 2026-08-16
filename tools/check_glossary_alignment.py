@@ -17,11 +17,15 @@ def parse_markdown_table(content):
                     terms[eng] = chi
     return terms
 
+from pathlib import Path
+
+TOOLS_DIR = Path(__file__).resolve().parent
+
 def main():
-    glossary_path = "praat_glossary.md"
-    translations_path = "praat_translations.json"
-    manuals_path = "manuals_bilingual_review.txt"
-    report_path = r"C:\Users\Sager\.gemini\antigravity\brain\fb0ac5ad-e5a8-4058-a5e7-40414a9b5315\translation_check_report.md"
+    glossary_path = TOOLS_DIR / "praat_glossary.md"
+    translations_path = TOOLS_DIR / "praat_translations.json"
+    manuals_path = TOOLS_DIR / "manuals_bilingual_review.txt"
+    report_path = TOOLS_DIR / "translation_check_report.md"
     
     if not os.path.exists(glossary_path):
         print(f"Glossary file {glossary_path} not found.")

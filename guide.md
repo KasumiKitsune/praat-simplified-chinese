@@ -13,7 +13,7 @@
 
 2. 再按任务类型定位源码：
 
-   - UI / 菜单 / 对话框文字：优先看 `generate_translation_map.py` 和 `sys/praat_translate.cpp`。
+   - UI / 菜单 / 对话框文字：优先看 `tools/generate_translation_map.py` 和 `sys/praat_translate.cpp`。
    - 内置帮助手册：看 `fon/manual_*.cpp`，必要时用抽取脚本生成双语审校材料。
    - Windows 文件拖拽：看 `sys/motifEmulator.cpp`、`sys/GuiMenu.cpp`、`sys/praat_objectMenus.cpp`。
    - 启动时图像窗口隐藏：看 `sys/praat_picture.cpp` 和 `sys/praat_objectMenus.cpp`。
@@ -56,36 +56,36 @@ UI 翻译运行时入口是：
 
 ### 2.2 推荐修改方式
 
-`sys/praat_translate.cpp` 是可编译产物，但当前更稳的维护入口是 `generate_translation_map.py` 里的 `EXACT_MAP`。
+`sys/praat_translate.cpp` 是可编译产物，但当前更稳的维护入口是 `tools/generate_translation_map.py` 里的 `EXACT_MAP`。
 
 常规流程：
 
 1. 在源码中找到未翻译英文原文，保持原文逐字符准确。
-2. 在 `generate_translation_map.py` 的 `EXACT_MAP` 里添加或修正映射。
+2. 在 `tools/generate_translation_map.py` 的 `EXACT_MAP` 里添加或修正映射。
 3. 运行生成脚本：
 
    ```powershell
-   python generate_translation_map.py
+   python tools/generate_translation_map.py
    ```
 
 4. 检查生成结果：
 
    ```powershell
-   git diff -- generate_translation_map.py sys/praat_translate.cpp
-   Get-Content -TotalCount 40 debug_translations.txt
-   Get-Content -TotalCount 40 translation_candidates.txt
+   git diff -- tools/generate_translation_map.py sys/praat_translate.cpp
+   Get-Content -TotalCount 40 tools/debug_translations.txt
+   Get-Content -TotalCount 40 tools/translation_candidates.txt
    ```
 
 5. 需要给其他 AI 或人工审校导出翻译库时，再运行：
 
    ```powershell
-   python extract_translations.py
+   python tools/extract_translations.py
    ```
 
 注意：
 
-- `debug_translations.txt` 和 `translation_candidates.txt` 是生成/审校辅助文件，默认被 `.gitignore` 忽略，不要把它们当作需要发布的源码。
-- `praat_translations.json` 和 `praat_translations.txt` 是从 `EXACT_MAP` 导出的参考资料，不是运行时读取的文件。
+- `tools/debug_translations.txt` 和 `tools/translation_candidates.txt` 是生成/审校辅助文件，默认被 `.gitignore` 忽略，不要把它们当作需要发布的源码。
+- `tools/praat_translations.json` 和 `tools/praat_translations.txt` 是从 `EXACT_MAP` 导出的参考资料，不是运行时读取的文件。
 - `recovered_exact_map.py` 和 `scratch/` 更像恢复或实验材料。除非任务明确要求恢复旧翻译，否则不要把它们并回主流程。
 
 ### 2.3 匹配规则和坑
@@ -94,13 +94,13 @@ UI 翻译运行时入口是：
 
 - 保留上游拼写错误。例如当前有 `"- Draw spectogram to picture window:"`，这里的 `spectogram` 少了 `r`，但必须照抄。
 - 保留前后缀、空格、冒号、省略号、换行和别名分隔符。`"Open Picture window"`、`"Open Picture window..."`、`"- Query pitch:"` 是不同键。
-- `generate_translation_map.py` 会按 Python `sorted()` 输出 `g_translation_map`，不要手动维护排序。
+- `tools/generate_translation_map.py` 会按 Python `sorted()` 输出 `g_translation_map`，不要手动维护排序。
 - 中文在生成的 C++ 里会转为 `\uXXXX` 形式，这是脚本行为。不要手写一半 UTF-8、一半转义导致 diff 难审。
 - `praat_translate()` 只额外处理前导空格复用；其他变化不会自动模糊匹配。
 
 ### 2.4 什么时候可以直接改 `sys/praat_translate.cpp`
 
-只有在做非常小的临时验证时才考虑直接改生成后的 C++。如果最终要保留改动，必须同步回 `generate_translation_map.py`，否则下一次运行脚本会把改动覆盖。
+只有在做非常小的临时验证时才考虑直接改生成后的 C++。如果最终要保留改动，必须同步回 `tools/generate_translation_map.py`，否则下一次运行脚本会把改动覆盖。
 
 ### 2.5 截图漏网 UI 的高效处理
 
@@ -125,7 +125,7 @@ UI 翻译运行时入口是：
    ```
 
 3. 每个英文原文优先做精确搜索，搜索预算控制在 2 次左右。找不到就列入“未定位”，不要因为一个短词把全仓库都扫一遍。
-4. 普通 UI / 菜单 / 按钮优先回到 `generate_translation_map.py` 的 `EXACT_MAP`；确认不经过 `praat_translate()` 时，才继续追具体 GUI 创建路径。
+4. 普通 UI / 菜单 / 按钮优先回到 `tools/generate_translation_map.py` 的 `EXACT_MAP`；确认不经过 `praat_translate()` 时，才继续追具体 GUI 创建路径。
 5. 弹窗、报错、警告要单独标记。许多 `Melder_throw` / `Melder_warning` 文案可能不经过普通 UI 翻译表，不要硬塞进 `EXACT_MAP` 后就宣称完成。
 6. 用户只要求修截图里的几条时，不要生成大而全的 `implementation_plan.md`；定位表足够，确认后直接按清单改。
 
@@ -136,7 +136,7 @@ UI 翻译运行时入口是：
 只处理我列出的字符串；每个字符串最多精确搜索 2 次，找不到就报告未定位。
 
 规则：
-1. 普通 UI / 菜单 / 按钮优先修改 generate_translation_map.py，并按项目流程更新 sys/praat_translate.cpp。
+1. 普通 UI / 菜单 / 按钮优先修改 tools/generate_translation_map.py，并按项目流程更新 sys/praat_translate.cpp。
 2. 手册正文只修改 fon/manual_*.cpp，不修改 docs/manual 生成结果。
 3. 弹窗 / 报错单独标记；如果不经过 praat_translate，不要硬塞进 EXACT_MAP。
 4. 修改前先给出“英文原文 | 位置 | 修改入口 | 建议中文”的定位表。
@@ -194,7 +194,7 @@ UI 翻译运行时入口是：
 是否允许调整链接文本：否，链接目标保持英文
 ```
 
-现有 `extract_full_manuals_bilingual.py` 和 `extract_manuals_bilingual.py` 更适合“已有手册改动后的审校”，不是截图漏网任务的第一步。截图漏网任务应先定位源文件和页面，再按需要运行脚本导出审校材料。
+现有 `tools/extract_full_manuals_bilingual.py` 和 `tools/extract_manuals_bilingual.py` 更适合“已有手册改动后的审校”，不是截图漏网任务的第一步。截图漏网任务应先定位源文件和页面，再按需要运行脚本导出审校材料。
 
 ### 3.3 链接和页面标题规则
 
@@ -215,38 +215,38 @@ UI 翻译运行时入口是：
 
 当前有两条脚本路径，但要注意它们的比较基准：
 
-- `extract_full_manuals_bilingual.py`：从当前源码和 `git show HEAD:<file>` 抽取核心页面，输出 `manuals_bilingual_review.txt`。因为当前 `HEAD` 已经包含中文手册翻译，所以它不能稳定代表“官方英文原文”；更适合在你刚做了未提交手册改动时查看当前工作区相对 HEAD 的变化。
-- `extract_manuals_bilingual.py`：基于 `git diff fon/` 提取未提交 diff。只适合当前有手册改动时使用。
+- `tools/extract_full_manuals_bilingual.py`：从当前源码和 `git show HEAD:<file>` 抽取核心页面，输出 `tools/manuals_bilingual_review.txt`。因为当前 `HEAD` 已经包含中文手册翻译，所以它不能稳定代表“官方英文原文”；更适合在你刚做了未提交手册改动时查看当前工作区相对 HEAD 的变化。
+- `tools/extract_manuals_bilingual.py`：基于 `git diff fon/` 提取未提交 diff。只适合当前有手册改动时使用。
 - 如果需要真正的上游英文原文，应改用 `upstream/master` 或匹配发布版本的上游 tag，例如 `git show upstream/master:fon/manual_tutorials.cpp`，然后再和当前中文源码对照。
 
 使用建议：
 
 ```powershell
-python extract_full_manuals_bilingual.py
+python tools/extract_full_manuals_bilingual.py
 ```
 
 或在有手册 diff 后：
 
 ```powershell
-python extract_manuals_bilingual.py
+python tools/extract_manuals_bilingual.py
 ```
 
-`manuals_bilingual_review.txt` 是审校材料，不是手册源码。发现问题后要回到 `fon/manual_*.cpp` 修改。
+`tools/manuals_bilingual_review.txt` 是审校材料，不是手册源码。发现问题后要回到 `fon/manual_*.cpp` 修改。
 
 ### 3.5 术语表维护
 
-术语表文件是 `praat_glossary.md`，生成入口是 `build_glossary.py`。如果发现术语不准，优先改 `build_glossary.py` 里的 `MANUAL_OVERRIDES`，再重新生成：
+术语表文件是 `tools/praat_glossary.md`，生成入口是 `tools/build_glossary.py`。如果发现术语不准，优先改 `tools/build_glossary.py` 里的 `MANUAL_OVERRIDES`，再重新生成：
 
 ```powershell
-python build_glossary.py
+python tools/build_glossary.py
 ```
 
 术语原则：
 
 - Praat 对象类型和编辑器类名优先保留英文专名，再用括号给中文释义，例如 `TextGrid（文本标注）`、`SoundEditor（声音编辑器）`。
-- UI 命令尽量和 `praat_translations.json` / `generate_translation_map.py` 保持一致，例如 `Remove` 对应“删除”，`Inspect` 对应“检查”。
+- UI 命令尽量和 `tools/praat_translations.json` / `tools/generate_translation_map.py` 保持一致，例如 `Remove` 对应“删除”，`Inspect` 对应“检查”。
 - 声学概念避免过度合并。`tier` 译为“层”，`boundary` 译为“边界”，`time domain` 译为“时间域”；只有在上下文需要时再补充说明。
-- 不要把 `praat_glossary.md` 当作手工孤立文件长期维护；否则下一次运行生成脚本会覆盖手改结果。
+- 不要把 `tools/praat_glossary.md` 当作手工孤立文件长期维护；否则下一次运行生成脚本会覆盖手改结果。
 
 ## 4. 本地化功能改动入口
 
@@ -286,7 +286,7 @@ C:\msys64\usr\bin\bash.exe -lc "cd /c/path/to/Praat_ZH && make PRAAT_COMPILER=gc
 
 按改动类型选择验证：
 
-- UI 翻译：运行 `python generate_translation_map.py`，检查 `sys/praat_translate.cpp` 中目标键存在；能构建时再构建。
+- UI 翻译：运行 `python tools/generate_translation_map.py`，检查 `sys/praat_translate.cpp` 中目标键存在；能构建时再构建。
 - 手册翻译：检查 `@@...@` / `@...` 链接目标仍是英文页面；能构建/启动时确认没有 dangling link 警告。
 - Windows 拖拽：构建后把 `.wav`、`.TextGrid`、`.praat` 等文件拖入窗口，确认对象列表或脚本编辑器有响应。
 - Picture window 行为：启动后确认 Picture window 默认不弹出；通过 Objects 窗口 `Praat -> Open Picture window` 可打开。
@@ -340,5 +340,5 @@ git diff -- guide.md
 提交前注意：
 
 - 不要提交 `Praat.exe`、zip 包、`.o`、`debug_translations.txt`、`translation_candidates.txt` 等忽略产物。
-- 如果修改了生成后的 `sys/praat_translate.cpp`，确认 `generate_translation_map.py` 中的源映射也同步了。
+- 如果修改了生成后的 `sys/praat_translate.cpp`，确认 `tools/generate_translation_map.py` 中的源映射也同步了。
 - 如果修改了手册源码，优先审查链接语法和页面标题，不要让中文显示文本变成链接目标。

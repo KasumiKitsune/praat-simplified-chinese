@@ -1,10 +1,15 @@
 import subprocess
 import re
 import os
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent if Path(__file__).resolve().parent.name == "tools" else Path(__file__).resolve().parent
+TOOLS_DIR = Path(__file__).resolve().parent if Path(__file__).resolve().parent.name == "tools" else (Path(__file__).resolve().parent / "tools")
 
 def get_git_diff():
     result = subprocess.run(
         ["git", "diff", "fon/"],
+        cwd=ROOT,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -16,6 +21,7 @@ def get_original_file_content(filepath):
     # Run git show HEAD:path/to/file to get the original content
     result = subprocess.run(
         ["git", "show", f"HEAD:{filepath}"],
+        cwd=ROOT,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -24,7 +30,7 @@ def get_original_file_content(filepath):
     return result.stdout
 
 def get_current_file_content(filepath):
-    with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+    with open(ROOT / filepath, "r", encoding="utf-8", errors="ignore") as f:
         return f.read()
 
 def extract_page_block(content, page_title, page_type):
@@ -70,7 +76,7 @@ def main():
     for title in sorted(list(set(intro_titles))):
         pages_to_extract.append({"title": title, "file": "fon/manual_tutorials.cpp", "type": "macro"})
         
-    output_path = "manuals_bilingual_review.txt"
+    output_path = TOOLS_DIR / "manuals_bilingual_review.txt"
     
     with open(output_path, "w", encoding="utf-8") as out:
         out.write("================================================================================\n")

@@ -147,9 +147,13 @@ MANUAL_OVERRIDES = {
     "filtered autocorrelation": "滤波自相关"
 }
 
+from pathlib import Path
+
+TOOLS_DIR = Path(__file__).resolve().parent
+
 def load_ui_translations():
     try:
-        with open("praat_translations.json", "r", encoding="utf-8") as f:
+        with open(TOOLS_DIR / "praat_translations.json", "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {}
@@ -157,7 +161,7 @@ def load_ui_translations():
 def main():
     ui_map = load_ui_translations()
     
-    output_path = "praat_glossary.md"
+    output_path = TOOLS_DIR / "praat_glossary.md"
     with open(output_path, "w", encoding="utf-8", newline="\n") as out:
         out.write("# Praat ZH 汉化术语对照表 (Terminology & Glossary)\n\n")
         out.write("本术语表由已翻译的界面词条以及核心帮助手册的译文整理而成，用于规范后续手册翻译与界面翻译的术语一致性。\n\n")

@@ -1,10 +1,15 @@
 import subprocess
 import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent if Path(__file__).resolve().parent.name == "tools" else Path(__file__).resolve().parent
+TOOLS_DIR = Path(__file__).resolve().parent if Path(__file__).resolve().parent.name == "tools" else (Path(__file__).resolve().parent / "tools")
 
 def get_git_diff():
     # Run git diff to get the changes in the manual files
     result = subprocess.run(
         ["git", "diff", "fon/"],
+        cwd=ROOT,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -60,7 +65,7 @@ def main():
     diff_text = get_git_diff()
     bilingual_data = parse_diff(diff_text)
     
-    output_path = "manuals_bilingual_review.txt"
+    output_path = TOOLS_DIR / "manuals_bilingual_review.txt"
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("================================================================================\n")
         f.write("Praat ZH Help Manual Bilingual Review Data (4 Core Manuals + 8 Extension Pages)\n")

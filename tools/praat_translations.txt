@@ -1,4 +1,4 @@
-=== Praat Chinese Translation Database (Total: 3810 entries) ===
+=== Praat Chinese Translation Database (Total: 3844 entries) ===
 Format: [English] block followed by [Chinese] block, separated by '===================='.
 This structure prevents ambiguity with newlines or special characters in the text.
 
@@ -86,6 +86,21 @@ This structure prevents ambiguity with newlines or special characters in the tex
  Takes 
 [Chinese]
  暂存录音 
+====================
+[English]
+ line.
+[Chinese]
+ 行。
+====================
+[English]
+ lines.
+[Chinese]
+ 行。
+====================
+[English]
+ objects, but only provided 
+[Chinese]
+ 个对象，但仅提供了 
 ====================
 [English]
  seconds,
@@ -2660,6 +2675,11 @@ Bartlett's test
 Bartlett 检验
 ====================
 [English]
+Batch rename...
+[Chinese]
+批量重命名...
+====================
+[English]
 Begin column
 [Chinese]
 起始列
@@ -2748,6 +2768,16 @@ Browse...
 Buffer size (MB)
 [Chinese]
 缓冲区大小 (MB)
+====================
+[English]
+Buffer usage
+[Chinese]
+缓冲区使用率
+====================
+[English]
+Buffer usage:
+[Chinese]
+缓冲区使用率：
 ====================
 [English]
 Buttons...
@@ -4357,6 +4387,11 @@ Degrees of freedom
 自由度 (df)
 ====================
 [English]
+Delete
+[Chinese]
+删除
+====================
+[English]
 Delete log file 1
 [Chinese]
 删除记录文件 1
@@ -5450,6 +5485,21 @@ Euclidean distance
 Exact test (Fisher)
 [Chinese]
 精确检验 (Fisher)
+====================
+[English]
+Example: Batch Pitch & Formants
+[Chinese]
+示例：批量提取音高与共振峰
+====================
+[English]
+Example: Generate Sound
+[Chinese]
+示例：生成声音文件并导回 Praat
+====================
+[English]
+Example: TextGrid Analysis
+[Chinese]
+示例：TextGrid 标注分析
 ====================
 [English]
 Excitation Formula
@@ -8457,6 +8507,11 @@ Histogram
 直方图 (Histogram)
 ====================
 [English]
+Hold to Record (release to stop)
+[Chinese]
+按住录音 (松开停止)
+====================
+[English]
 Home
 [Chinese]
 主页
@@ -8635,6 +8690,11 @@ Input source:
 Insert
 [Chinese]
 插入
+====================
+[English]
+Insert Praat Python template
+[Chinese]
+插入 Praat Python 模板
 ====================
 [English]
 Insert boundary...
@@ -10027,6 +10087,11 @@ New Praat script
 新建 Praat 脚本
 ====================
 [English]
+New Python script
+[Chinese]
+新建 Python 脚本
+====================
+[English]
 New boundary or point:
 [Chinese]
 新建边界或点：
@@ -10050,6 +10115,21 @@ New label
 New name
 [Chinese]
 新名称
+====================
+[English]
+New name(s)
+[Chinese]
+新名称
+====================
+[English]
+New name:
+[Chinese]
+请输入新名称：
+====================
+[English]
+New names (one per line)
+[Chinese]
+新名称（每行一个）
 ====================
 [English]
 New tier:
@@ -10140,6 +10220,16 @@ Non-metric Multidimensional Scaling
 Non-speech interval label
 [Chinese]
 非言语区间标签
+====================
+[English]
+Not enough names provided! You selected 
+[Chinese]
+提供的名称数量不足！您已选择了 
+====================
+[English]
+Not recording.
+[Chinese]
+未在录音。
 ====================
 [English]
 Note that you can include many special functions in your formula,
@@ -10360,6 +10450,11 @@ Open Praat notebook...
 Open Praat script...
 [Chinese]
 打开 Praat 脚本...
+====================
+[English]
+Open Python script...
+[Chinese]
+打开 Python 脚本...
 ====================
 [English]
 Open editor script...
@@ -11177,6 +11272,16 @@ Play...
 播放...
 ====================
 [English]
+Please change something in the command window “
+[Chinese]
+请在命令窗口“
+====================
+[English]
+Please change the selection in the object list, or click Cancel in the command window “
+[Chinese]
+请在对象列表中更改选择，或点击命令窗口“
+====================
+[English]
 Plot intensity by pitch
 [Chinese]
 按音高绘制音强图
@@ -11505,6 +11610,11 @@ Praat
 Praat Intro
 [Chinese]
 Praat 简介
+====================
+[English]
+Praat Python API reference
+[Chinese]
+Praat Python API 参考手册
 ====================
 [English]
 Praat picture: Arrow size
@@ -11995,6 +12105,31 @@ Pulses settings:
 Purple
 [Chinese]
 紫色
+====================
+[English]
+Python executable path
+[Chinese]
+Python 可执行文件路径
+====================
+[English]
+Python script file
+[Chinese]
+Python 脚本文件
+====================
+[English]
+Python scripting tutorial
+[Chinese]
+Python 脚本使用教程
+====================
+[English]
+Python settings
+[Chinese]
+Python 设置
+====================
+[English]
+Python settings...
+[Chinese]
+Python 设置...
 ====================
 [English]
 Quadratic Discriminant Analysis (QDA)
@@ -12647,9 +12782,29 @@ Rename column... || Set column label (label)...
 重命名列... || 设置列标签 (按标签)...
 ====================
 [English]
+Rename multiple...
+[Chinese]
+批量重命名...
+====================
+[English]
 Rename object
 [Chinese]
 重命名对象
+====================
+[English]
+Rename object(s)
+[Chinese]
+重命名对象
+====================
+[English]
+Rename recorded take
+[Chinese]
+重命名暂存录音
+====================
+[English]
+Rename selected objects
+[Chinese]
+重命名所选对象
 ====================
 [English]
 Rename take
@@ -12982,6 +13137,16 @@ Run
 运行
 ====================
 [English]
+Run Python script
+[Chinese]
+运行 Python 脚本
+====================
+[English]
+Run Python script...
+[Chinese]
+运行 Python 脚本...
+====================
+[English]
 Run chunk
 [Chinese]
 运行代码块
@@ -13299,12 +13464,12 @@ Save as binary file without Sound... || Write to binary file without Sound...
 [English]
 Save as binary file...
 [Chinese]
-保存为二进制文件...
+打包为集合文件...
 ====================
 [English]
 Save as binary file... || Write to binary file...
 [Chinese]
-保存为二进制文件... || 写入二进制文件...
+打包为集合文件... || 写入集合文件...
 ====================
 [English]
 Save as chronological text file...
@@ -18639,11 +18804,6 @@ logHertz
 对数赫兹 (logHertz)
 ====================
 [English]
-matches (regex)
-[Chinese]
-匹配 (正则表达式)
-====================
-[English]
 matrix.
 [Chinese]
 矩阵.
@@ -19062,4 +19222,14 @@ zero
 » in formula.
 [Chinese]
 » in 公式.
+====================
+[English]
+”, or click Cancel in that window.
+[Chinese]
+”中修改内容，或点击该窗口中的“取消”。
+====================
+[English]
+● Recording... (release to stop)
+[Chinese]
+● 录音中... (松开停止)
 ====================
