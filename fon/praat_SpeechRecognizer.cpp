@@ -104,8 +104,7 @@ void praat_SpeechRecognizer_init () {
 		praat_addMenuCommand (U"Objects", U"New", U"SpeechRecognizer help", nullptr, 1, HELP__SpeechRecognizer_help);
 		praat_addMenuCommand (U"Objects", U"New", U"-- new SpeechRecognizer --", nullptr, 1, nullptr);
 		praat_addMenuCommand (U"Objects", U"New", U"Create SpeechRecognizer...", nullptr, 1, CREATE_ONE__SpeechRecognizer_create);
-	praat_addMenuCommand (U"Objects", U"Settings", U"-- AI settings --", nullptr, 0, nullptr);
-	praat_addMenuCommand (U"Objects", U"Settings", U"AI settings...", nullptr, 0, SETTINGS__SpeechRecognizerSettings);
+	praat_addMenuCommand (U"Objects", U"Settings", U"AI settings...", nullptr, GuiMenu_HIDDEN, SETTINGS__SpeechRecognizerSettings);
 
 	praat_addAction1 (classSpeechRecognizer, 0, U"SpeechRecognizer help", nullptr, 0,
 			HELP__SpeechRecognizer_help);

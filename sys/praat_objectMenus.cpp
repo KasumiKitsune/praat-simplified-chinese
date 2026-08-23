@@ -29,6 +29,7 @@
 #include "praat_translate.h"
 #include "praat_python.h"
 #include "PythonScriptEditor.h"
+#include "PreferencesDialog.h"
 
 #define EDITOR  theCurrentPraatObjects -> list [IOBJECT]. editors
 
@@ -313,7 +314,7 @@ DIRECT (PRAAT__BilingualTable) {
 
 static GuiMenu praatMenu, editMenu, windowMenu, newMenu, readMenu, goodiesMenu, preferencesMenu, technicalMenu, applicationHelpMenu, helpMenu;
 
-static void praat_languageChanged () {
+void praat_languageChanged () {
 	if (praatMenu)           GuiMenu_setTitle (praatMenu,           U"Praat");
 	if (editMenu)            GuiMenu_setTitle (editMenu,            U"Edit");
 	if (windowMenu)          GuiMenu_setTitle (windowMenu,          U"Window");
@@ -1170,17 +1171,18 @@ void praat_addMenus (GuiWindow window) {
 
 	menuItem = praat_addMenuCommand (U"Objects", U"Praat", U"Settings", nullptr, GuiMenu_UNHIDABLE, nullptr);
 	preferencesMenu = menuItem ? menuItem -> d_menu : nullptr;
+	praat_addMenuCommand (U"Objects", U"Settings", U"Preferences...",
+			nullptr, GuiMenu_UNHIDABLE, PRAAT_preferences);
 	praat_addMenuCommand (U"Objects", U"Settings", U"Buttons...",
 			nullptr, GuiMenu_UNHIDABLE, PRAAT__editButtons);
-	praat_addMenuCommand (U"Objects", U"Settings", U"-- encoding prefs --", nullptr, 0, nullptr);
 	praat_addMenuCommand (U"Objects", U"Settings", U"Text reading settings... || Text reading preferences...",
-			nullptr, 0, SETTINGS__TextReadingSettings);   // alternative GuiMenu_DEPRECATED_2023
+			nullptr, GuiMenu_HIDDEN, SETTINGS__TextReadingSettings);   // alternative GuiMenu_DEPRECATED_2023
 	praat_addMenuCommand (U"Objects", U"Settings", U"Text writing settings... || Text writing preferences...",
-			nullptr, 0, SETTINGS__TextWritingSettings);   // alternative GuiMenu_DEPRECATED_2023
+			nullptr, GuiMenu_HIDDEN, SETTINGS__TextWritingSettings);   // alternative GuiMenu_DEPRECATED_2023
 	praat_addMenuCommand (U"Objects", U"Settings", U"CJK font style settings... || CJK font style preferences...",
-			nullptr, 0, SETTINGS__CjkFontStyleSettings);   // alternative GuiMenu_DEPRECATED_2023
+			nullptr, GuiMenu_HIDDEN, SETTINGS__CjkFontStyleSettings);   // alternative GuiMenu_DEPRECATED_2023
 	praat_addMenuCommand (U"Objects", U"Settings", U"Language settings... || Language preferences...",
-			nullptr, 0, SETTINGS__LanguageSettings);
+			nullptr, GuiMenu_HIDDEN, SETTINGS__LanguageSettings);
 
 	menuItem = praat_addMenuCommand (U"Objects", U"Praat", U"Technical", nullptr, GuiMenu_UNHIDABLE, nullptr);
 	technicalMenu = menuItem ? menuItem -> d_menu : nullptr;

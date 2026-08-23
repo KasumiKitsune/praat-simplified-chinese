@@ -1804,6 +1804,10 @@ void XtUnmanageChild (GuiObject me) {
 		case xmTextWidgetClass:
 			_GuiText_unmanage (me);
 			break;
+		case xmRowColumnWidgetClass:
+			if (my window)
+				ShowWindow (my window, SW_HIDE);
+			break;
 		default:
 			_Gui_invalidateWidget (me);
 			break;

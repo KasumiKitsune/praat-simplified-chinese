@@ -959,6 +959,8 @@ Thing_define (GuiOptionMenu, GuiControl) {
 
 	void v_show ()
 		override;
+	void v_hide ()
+		override;
 };
 
 void GuiOptionMenu_init (GuiOptionMenu me, GuiForm parent, int left, int right, int top, int bottom, uint32 flags);

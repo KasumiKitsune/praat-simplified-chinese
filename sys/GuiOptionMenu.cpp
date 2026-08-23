@@ -56,9 +56,29 @@ void structGuiOptionMenu :: v_show () {
 	#if gtk
 		GuiOptionMenu_Parent :: v_show ();
 	#elif motif
-		XtManageChild (d_xmMenuBar);
+		if (d_xmMenuBar) {
+			XtManageChild (d_xmMenuBar);
+			if (d_xmCascadeButton) {
+				XtManageChild (d_xmCascadeButton);
+			}
+		}
 	#elif cocoa
-		//NSLog(@"cocoa structGuiOptionMenu :: v_show"); // ?
+		GuiOptionMenu_Parent :: v_show ();
+	#endif
+}
+
+void structGuiOptionMenu :: v_hide () {
+	#if gtk
+		GuiOptionMenu_Parent :: v_hide ();
+	#elif motif
+		if (d_xmMenuBar) {
+			if (d_xmCascadeButton) {
+				XtUnmanageChild (d_xmCascadeButton);
+			}
+			XtUnmanageChild (d_xmMenuBar);
+		}
+	#elif cocoa
+		GuiOptionMenu_Parent :: v_hide ();
 	#endif
 }
 

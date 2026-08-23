@@ -184,6 +184,7 @@ void praat_actions_writeC (bool isInHeaderFile, bool includeSaveAPI,
 
 void praat_cleanUpName (char32 *name);
 void praat_list_renameAndSelect (integer position, conststring32 name);
+void praat_languageChanged ();
 
 inline struct PraatP {
 	int argc;
