@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/pictures/icon.png" width="110" alt="Praat 简体中文版 Logo" />
+  <img src="docs/pictures/icon.png" width="150" alt="Praat 简体中文版 Logo" />
   <h1>Praat 简体中文版</h1>
   <p>语音学分析与语音信号处理软件 · 简体中文本地化版本</p>
 </div>
