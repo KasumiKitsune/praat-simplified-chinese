@@ -1,13 +1,13 @@
 <div align="center">
-  <img src="docs/pictures/icon.png" width="150" alt="Praat 简体中文版 Logo" />
-  <h1>Praat 简体中文版</h1>
-  <p>语音学分析与语音信号处理软件 · 简体中文本地化版本</p>
+  <img src="docs/pictures/icon.png" width="150" alt="Praat 汉化版 Logo" />
+  <h1>Praat 汉化版</h1>
+  <p>语音学分析与语音信号处理软件 · 中文本地化版本（支持简体中文与繁体中文）</p>
 </div>
 
 > [!NOTE]
-> **Praat 简体中文版说明**
+> **Praat 汉化版说明**
 > 
-> 本仓库是语音学分析软件 **Praat** 的中文汉化/本地化版本。
+> 本仓库是语音学分析软件 **Praat** 的中文汉化/本地化版本，原生支持简体中文与繁体中文无缝切换。
 > - **官方主页 (GitHub Pages)**：[https://kasumikitsune.github.io/praat-simplified-chinese/](https://kasumikitsune.github.io/praat-simplified-chinese/)
 > - **源码仓库**：[KasumiKitsune/praat-simplified-chinese](https://github.com/KasumiKitsune/praat-simplified-chinese)
 > - **官方英文主页**：[praat.org](https://praat.org) / [GitHub 官方仓库](https://github.com/praat/praat)
@@ -15,15 +15,15 @@
 > 本文档是 Praat 英文 `README.md` 的中文翻译版本，旨在为中文用户提供更好的阅读和开发参考。
 
 <div align="center">
-  <img src="docs/pictures/praat-zh-main-window.png" width="32%" alt="Praat 简体中文主窗口" />
-  <img src="docs/pictures/praat-zh-manuel.png" width="32%" alt="Praat 简体中文帮助手册" />
+  <img src="docs/pictures/praat-zh-main-window.png" width="32%" alt="Praat 汉化版主窗口" />
+  <img src="docs/pictures/praat-zh-manuel.png" width="32%" alt="Praat 汉化版帮助手册" />
   <img src="docs/pictures/praat-zh-sound-recorder.png" width="32%" alt="Praat 录音窗口增强" />
 </div>
 
 > [!TIP]
 > **本地化版新增特性与调整**
 > 
-> 为了优化日常使用体验，本简体中文本地化版本在此前基础上，进行了一些细节功能的调整与补充：
+> 为了优化日常使用体验，本中文汉化版本在此前基础上，进行了一些细节功能的调整与补充：
 > * **Windows 平台文件拖拽打开支持**
 >   * **特性描述**：增加了在 Windows 系统下将音频（.wav）、标注（.TextGrid）或脚本（.praat）等文件拖进窗口直接打开的功能，并支持一次性打开多个文件。
 > * **启动时默认隐藏图像窗口**
