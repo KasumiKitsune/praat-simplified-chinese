@@ -1,140 +1,1640 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><meta name="robots" content="index,follow"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Praat: doing Phonetics by Computer</title>
-<link rel="icon" href="pictures/praat.png" type="image/png"></head>
-<style type="text/css">
-<!--
-ul { font-size: 0.8em; font-family: Geneva, Arial, Helvetica, sans-serif }
--->
-</style>
-<body bgcolor="#FFCCCC">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  
+  <!-- SEO Meta Tags -->
+  <title>Praat 简体中文版 | 语音学分析与语音信号处理软件</title>
+  <meta name="description" content="Praat 简体中文本地化版官方主页。基于 Praat 官方内核构建，提供完整界面与帮助手册汉化、排版自适应优化、Windows 拖拽打开、中英术语对照表及录音暂存增强。适用于语音学研究、语言学实验与声学分析。">
+  <meta name="keywords" content="Praat, Praat中文版, Praat汉化版, Praat下载, 语音学, 语音分析, 声学分析, 语图, 频谱图, 音高提取, Pitch, 共振峰, Formant, TextGrid, 语音标注, 语音合成, 国际音标, 语音信号处理">
+  <meta name="author" content="KasumiKitsune / Paul Boersma & David Weenink">
+  <link rel="canonical" href="https://kasumikitsune.github.io/praat-simplified-chinese/">
 
-<table border=0 cellpadding=0 cellspacing=0 width="100%"><tr><td bgcolor="#CCCC00"><table border=4 cellpadding=9 width="100%"><tr>
-<td align=center bgcolor="#000000"><img src="pictures/praat.png" width=48 height=48 alt=""></td>
-<td align=center bgcolor="#000000">
-<font face="Palatino,Book Antiqua,Times" size=6 color="#999900"><b>Praat: doing phonetics by computer</b></font>
-</td>
-<td align=center bgcolor="#000000"><img src="pictures/praat.png" width=48 height=48 alt=""></td>
-</table></table>
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Praat 简体中文版 - 语音学分析与语音处理软件">
+  <meta property="og:description" content="面向中文用户的 Praat 本地化版本。完整汉化、排版优化、Windows 拖拽打开、中英术语对照表与录音暂存增强。">
+  <meta property="og:image" content="pictures/praat-zh-main-window.png">
+  <meta property="og:url" content="https://kasumikitsune.github.io/praat-simplified-chinese/">
 
-<table border=4 cellpadding=5 cellspacing=3 width="100%">
-<tr>
-<td bgcolor="#FFFFFF">
-<font size="+2"><b>Download Praat:</b></font><br>
-&nbsp;&nbsp;&nbsp;* <a href="download_mac.html">Macintosh</a>, <a href="download_win.html">Windows</a><br>
-&nbsp;&nbsp;&nbsp;* <a href="download_linux.html">Linux</a>, <a href="download_raspberrypi.html">Raspberry Pi</a>, <a href="download_chrome.html">Chromebook</a><br>
-&nbsp;&nbsp;&nbsp;* ( <a href="download_freebsd.html">FreeBSD</a>, <a href="download_sgi.html">SGI</a>,
-<a href="download_solaris.html">Solaris</a>, <a href="download_hpux.html">HPUX</a> )<br>
-&nbsp;&nbsp;&nbsp;* <a href="manual/License.html">license</a> and <a href=download_sources.html>source code</a><br>
-<td bgcolor="#FFFFFF">
-<font size="+2"><b>Information on Praat:</b></font><br>
-&nbsp;&nbsp;&nbsp;* Introductory tutorial: choose <b>Intro</b> from Praat’s <b>Help</b> menus.<br>
-&nbsp;&nbsp;&nbsp;* Extensive manuals and tutorials: in Praat’s <b>Help</b> menus.<br>
-&nbsp;&nbsp;&nbsp;* <a href="manualsByOthers.html">Beginner’s manuals by others</a>.<br>
-&nbsp;&nbsp;&nbsp;* Paul Boersma’s <a href="https://www.fon.hum.uva.nl/paul/praat.html">publications</a> on algorithms and tutorials.<br>
-<tr>
-<td bgcolor="#FFFFFF" colspan=2>
-<table width="100%" border=0>
-<tr align=center>
-<td>
-<font size="+2"><b>The authors:</b></font><br>
-&nbsp;&nbsp;&nbsp;Paul Boersma, David Weenink, Anastasia Shchupak&nbsp;&nbsp;&nbsp;<br>
-<a href="https://www.fon.hum.uva.nl">Phonetic Sciences</a>, University of Amsterdam<br>visiting: Spuistraat 134<br>mail: P.O. Box 1642, 1000BP Amsterdam<br>The Netherlands
-</td>
-<td><table><tr><td align=center><a href="https://www.fon.hum.uva.nl/paul/"><img src="pictures/paul.jpg" alt="" width=95></a><tr><td align=center><a href="https://www.fon.hum.uva.nl/paul/">Paul</a></table></td>
-<td><table><tr><td align=center><a href="https://www.fon.hum.uva.nl/david/"><img src="pictures/david.jpg" alt="" width=95></a><tr><td align=center><a href="https://www.fon.hum.uva.nl/david/">David</a></table></td>
-<td><table><tr><td align=center><a href="https://www.fon.hum.uva.nl/anastasia/"><img src="pictures/anastasia.jpg" alt="" width=95></a><tr><td align=center>Anastasia</table></td>
-</table>
-<tr>
-<td bgcolor="#FFFFFF" colspan=2>
-<font size="+2"><b>Questions, problems, solutions:</b></font><br>
-&nbsp;&nbsp;&nbsp;1. Many problems can be solved by upgrading to <a href="manual/What_s_new_.html">version 7.0</a> of Praat.<br>
-&nbsp;&nbsp;&nbsp;2. Make sure you have read the <a href="manual/Intro.html">Intro</a> from Praat’s <b>Help</b> menu.<br>
-&nbsp;&nbsp;&nbsp;3. If that does not help, use the <b>Search</b> button in Praat’s manual window.<br>
-&nbsp;&nbsp;&nbsp;4. Or consult the <a href="manual/FAQ__Frequently_Asked_Questions_.html">Frequently Asked Questions</a> directly.<br>
-&nbsp;&nbsp;&nbsp;5. There is a user group on the Internet: the <a href="https://groups.io/g/Praat-Users-List">Praat Users List</a>.<br>
-&nbsp;&nbsp;&nbsp;6. If none of the above helps, you can send email to <a href="mailto:paul.boersma@uva.nl">paul.boersma@uva.nl</a>.<br>
+  <!-- Favicon -->
+  <link rel="icon" href="pictures/praat.png" type="image/png">
 
-</table>
+  <!-- Web Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<hr><h2>Functionality</h2>
-<p>The following gives you an idea of the features of the Praat program.
-The links take you into the web copy of the manual.
-The same manual is also available from Praat's Help menus,
-in which case you can do searches.
-<p>
-<table border=1 cellpadding=5 cellspacing=3 width="100%" bgcolor="#FFFFCC"><tr><td valign=top rowspan=2>
-<p><font face="Geneva,Arial,Helvetica"><b>Speech analysis:</b></font></p>
-<ul>
-<li><a href="manual/Intro_3__Spectral_analysis.html">spectral analysis (spectrograms)</a>
-<li><a href="manual/Intro_4__Pitch_analysis.html">pitch analysis</a>
-<li><a href="manual/Intro_5__Formant_analysis.html">formant analysis</a>
-<li><a href="manual/Intro_6__Intensity_analysis.html">intensity analysis</a>
-<li><a href="manual/Voice.html">jitter, shimmer, voice breaks</a>
-<li><a href="manual/Cochleagram.html">cochleagram</a>
-<li><a href="manual/Excitation.html">excitation pattern</a>
-</ul>
-<td valign=top><p><font face="Geneva,Arial,Helvetica"><b>Speech synthesis:</b></font></p>
-<ul>
-<li><a href="manual/Source-filter_synthesis.html">from pitch, formant, and intensity</a>
-<li><a href="manual/Articulatory_synthesis.html">articulatory synthesis</a>
-<li><a href="manual/KlattGrid.html">Klatt acoustic synthesis</a>
-</ul>
-<tr><td valign=top><p><font face="Geneva,Arial,Helvetica"><b>Listening experiments:</b></font></p>
-<ul>
-<li><a href="manual/ExperimentMFC.html">identification and discrimination tests</a>
-</ul>
-<tr><td valign=top><p><font face="Geneva,Arial,Helvetica"><b>Labelling and segmentation:</b></font></p>
-<ul>
-<li><a href="manual/Intro_7__Annotation.html">label intervals and time points on multiple tiers</a>
-<li><a href="manual/Phonetic_symbols.html">use phonetic alphabet</a>
-<li><a href="manual/LongSound.html">use sound files up to 2 gigabytes (3 hours)</a>
-</ul>
-<td valign=top><p><font face="Geneva,Arial,Helvetica"><b>Speech manipulation:</b></font></p>
-<ul>
-<li><a href="manual/Intro_8__Manipulation.html">change pitch and duration contours</a>
-<li><a href="manual/Filtering.html">filtering</a>
-</ul>
-<tr><td valign=top><p><font face="Geneva,Arial,Helvetica"><b>Learning algorithms:</b></font></p>
-<ul>
-<li><a href="manual/Feedforward_neural_networks.html">feedforward neural networks</a>
-<li><a href="manual/OT_learning.html">discrete and stochastic Optimality Theory</a>
-</ul>
-<td valign=top><p><font face="Geneva,Arial,Helvetica"><b>Statistics:</b></font></p>
-<ul>
-<li><a href="manual/Multidimensional_scaling.html">multidimensional scaling</a>
-<li><a href="manual/Principal_component_analysis.html">principal component analysis</a>
-<li><a href="manual/Discriminant_analysis.html">discriminant analysis</a>
-</ul>
-<tr><td valign=top><font face="Geneva,Arial,Helvetica"><b>Graphics:</b></font>
-<ul>
-<li><a href="manual/Picture_window.html">high quality for your articles and thesis</a>
-<li>produce <a href="manual/Save_as_PDF_file___.html">PDF</a>,
-<a href="manual/Save_as_PNG_file___.html">PNG</a> or <a href="manual/Save_as_EPS_file___.html">EPS</a> files
-<li><a href="manual/Special_symbols.html">integrated mathematical and phonetic symbols</a>
-</ul>
-<td valign=top><font face="Geneva,Arial,Helvetica"><b>Programmability:</b></font>
-<ul>
-<li><a href="manual/Scripting.html">easy programmable scripting language</a>
-<li><a href="manual/Scripting_6_7__Sending_a_message_to_another_program.html">communicate with other programs</a>
-<li><a href="https://www.fon.hum.uva.nl/praat/sendpraat.html">(the <b>sendpraat</b> source code)</a>
-<li><a href="manual/ManPages.html">create hypertext manuals with sound I/O</a>
-</ul>
-<tr><td valign=top><font face="Geneva,Arial,Helvetica"><b>Portability:</b></font>
-<ul>
-<li><a href="manual/Save_as_binary_file___.html">machine-independent binary files</a>
-<li><a href="manual/Read_from_file___.html">read and write many sound and other file types</a>
-</ul>
-<td valign=top><font face="Geneva,Arial,Helvetica"><b>Configurability:</b></font>
-<ul>
-<li><a href="manual/ButtonEditor.html">grow or shrink menus</a>
-<li><a href="manual/preferences_file.html">save prefs for fonts, views, sound devices</a>
-</ul>
-</table>
-<hr>
-This homepage is <a href="https://praat.org">praat.org</a>
-or <a href="https://www.fon.hum.uva.nl/praat">www.fon.hum.uva.nl/praat</a>.
-<font size=-1><br><br>(This page: &copy; Paul Boersma &amp; David Weenink 1992–2026, CC-BY-SA 4.0)</font>
+  <!-- Structured Data / JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Praat 简体中文版",
+    "alternateName": "Praat Simplified Chinese Localization",
+    "operatingSystem": "Windows 10/11, macOS 11+, Linux",
+    "applicationCategory": "Scientific Software",
+    "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+    "description": "语音学分析与语音信号处理软件 Praat 的简体中文本地化版本，提供完整中文化界面、帮助手册汉化与排版优化、中英术语对照表及录音暂存增强。",
+    "author": {
+      "@type": "Person",
+      "name": "Paul Boersma & David Weenink"
+    },
+    "maintainer": {
+      "@type": "Person",
+      "name": "KasumiKitsune"
+    },
+    "url": "https://kasumikitsune.github.io/praat-simplified-chinese/",
+    "downloadUrl": "https://github.com/KasumiKitsune/praat-simplified-chinese/releases"
+  }
+  </script>
+
+  <style>
+    :root {
+      --app-bg: #e5e9ee;
+      --win-bg: #f8fafc;
+      --win-header: #e2e8f0;
+      --win-header-active: #cbd5e1;
+      --win-border: #94a3b8;
+      --panel-border: #cbd5e1;
+      
+      --text-main: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #475569;
+      --text-light: #64748b;
+      
+      --praat-blue: #0284c7;
+      --praat-blue-hover: #0369a1;
+      --praat-selection: #dbeafe;
+      --praat-btn-bg: #ffffff;
+      --praat-btn-border: #94a3b8;
+      --praat-btn-hover: #f1f5f9;
+      --praat-btn-active: #e2e8f0;
+      
+      --font-ui: "Segoe UI", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, Courier, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Custom Stylized Scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f8fafc;
+    }
+
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+      border: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      background: #64748b;
+    }
+
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      font-family: var(--font-ui);
+      background-color: var(--app-bg);
+      color: var(--text-main);
+      font-size: 14.5px;
+      line-height: 1.5;
+    }
+
+    a {
+      color: var(--praat-blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .praat-desktop {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Global Menu Bar */
+    .top-menu-bar {
+      height: 44px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--win-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      z-index: 50;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 14.5px;
+      color: var(--text-main);
+    }
+
+    .app-brand img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .app-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #bae6fd;
+    }
+
+    .menu-items {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 4px;
+    }
+
+    .menu-item {
+      position: relative;
+    }
+
+    .menu-btn {
+      padding: 6px 12px;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 13.5px;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .menu-btn:hover {
+      background: var(--win-header);
+      border-color: var(--panel-border);
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #ffffff;
+      border: 1px solid var(--win-border);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      border-radius: 5px;
+      min-width: 200px;
+      padding: 6px 0;
+      z-index: 100;
+    }
+
+    .menu-item:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 7px 16px;
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .dropdown-item:hover {
+      background: var(--praat-selection);
+      text-decoration: none;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 5px 0;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .quick-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none !important;
+      border: 1px solid transparent;
+    }
+
+    .quick-btn-primary {
+      background: #0284c7;
+      color: #ffffff !important;
+      border-color: #0369a1;
+    }
+
+    .quick-btn-primary:hover {
+      background: #0369a1;
+    }
+
+    .quick-btn-secondary {
+      background: #ffffff;
+      color: var(--text-main) !important;
+      border-color: var(--win-border);
+    }
+
+    .quick-btn-secondary:hover {
+      background: #f1f5f9;
+    }
+
+    /* Main Workspace */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 12px;
+      padding: 12px;
+      height: calc(100vh - 76px);
+      overflow: hidden;
+    }
+
+    /* Praat Window Common Styles */
+    .praat-window {
+      background: var(--win-bg);
+      border: 1px solid var(--win-border);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .window-title-bar {
+      height: 34px;
+      background: var(--win-header-active);
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      flex-shrink: 0;
+    }
+
+    .window-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .win-control-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.15);
+      cursor: pointer;
+    }
+
+    .win-close { background: #ff5f56; }
+    .win-min { background: #ffbd2e; }
+    .win-max { background: #27c93f; }
+
+    .window-menu-strip {
+      height: 28px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 12px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .window-menu-strip span {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .window-menu-strip span:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    /* Left Pane: Praat Objects Window */
+    .objects-container {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      flex: 1;
+      height: calc(100% - 62px);
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .objects-list-column {
+      border-right: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .objects-list-header {
+      padding: 7px 12px;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--panel-border);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .objects-list {
+      flex: 1;
+      overflow-y: auto;
+      list-style: none;
+      padding: 6px;
+    }
+
+    .object-entry {
+      padding: 9px 12px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid transparent;
+      transition: all 0.1s;
+    }
+
+    .object-entry:hover {
+      background: #f1f5f9;
+    }
+
+    .object-entry.selected {
+      background: var(--praat-selection);
+      border-color: #93c5fd;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .object-entry i {
+      font-size: 13.5px;
+      color: var(--praat-blue);
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .objects-bottom-bar {
+      padding: 8px;
+      background: #f8fafc;
+      border-top: 1px solid var(--panel-border);
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .praat-btn {
+      background: var(--praat-btn-bg);
+      border: 1px solid var(--praat-btn-border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 12.5px;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none !important;
+    }
+
+    .praat-btn:hover {
+      background: var(--praat-btn-hover);
+      border-color: #64748b;
+    }
+
+    .praat-btn:active {
+      background: var(--praat-btn-active);
+    }
+
+    .praat-btn.accent {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0369a1;
+      font-weight: 600;
+    }
+
+    /* Actions Column in Objects Window */
+    .objects-actions-column {
+      background: #fdfdfd;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+    }
+
+    .action-category-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 4px;
+      margin-bottom: 2px;
+      padding-left: 2px;
+      text-transform: uppercase;
+    }
+
+    .praat-action-btn {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--praat-btn-border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 12.5px;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .praat-action-btn:hover {
+      background: #f1f5f9;
+      border-color: #475569;
+    }
+
+    .praat-action-btn.primary-action {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #166534;
+      font-weight: 600;
+    }
+
+    /* Right Main Display Window */
+    .display-window {
+      background: #ffffff;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .display-content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px 26px;
+      background: #ffffff;
+    }
+
+    /* Tab Views Content Styling */
+    .tab-view {
+      display: none;
+    }
+
+    .tab-view.active {
+      display: block;
+    }
+
+    .view-hero {
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .view-hero h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .view-hero p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Feature Item Minimal List */
+    .feature-list-compact {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .feature-item-compact {
+      background: #f8fafc;
+      border: 1px solid var(--win-border);
+      border-radius: 5px;
+      padding: 12px 14px;
+    }
+
+    .feature-item-compact h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-item-compact h3 i {
+      color: var(--praat-blue);
+      font-size: 12.5px;
+    }
+
+    .feature-item-compact p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Download Box Cards */
+    .download-grid-compact {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .download-card-compact {
+      background: #ffffff;
+      border: 1px solid var(--win-border);
+      border-radius: 5px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .download-card-compact.featured {
+      border-color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .dl-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .dl-card-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    /* Terminology Table */
+    .term-table-wrapper {
+      border: 1px solid var(--win-border);
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+
+    .term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: #ffffff;
+      min-width: 480px;
+    }
+
+    .term-table th {
+      background: #f1f5f9;
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 1px solid var(--panel-border);
+      color: var(--text-main);
+    }
+
+    .term-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: var(--text-main);
+    }
+
+    .term-table tr:hover {
+      background: #f8fafc;
+    }
+
+    /* Screenshot Embed Block */
+    .screenshot-frame {
+      background: #f8fafc;
+      border: 1px solid var(--win-border);
+      border-radius: 5px;
+      padding: 8px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .screenshot-frame img {
+      max-width: 100%;
+      height: auto;
+      max-height: 380px;
+      border: 1px solid var(--win-border);
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .screenshot-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .citation-banner {
+      background: #fefce8;
+      border: 1px solid #fef08a;
+      border-radius: 5px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #854d0e;
+      margin-top: 14px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    /* Bottom Desktop Status Bar */
+    .bottom-status-bar {
+      height: 32px;
+      background: #ffffff;
+      border-top: 1px solid var(--win-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Modal Dialog */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .praat-dialog {
+      width: 440px;
+      max-width: 90vw;
+      background: #ffffff;
+      border: 1px solid var(--win-border);
+      border-radius: 6px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .dialog-header {
+      background: var(--win-header-active);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 13px;
+      border-bottom: 1px solid var(--panel-border);
+    }
+
+    .dialog-body {
+      padding: 18px;
+      font-size: 13px;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .dialog-footer {
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 860px) {
+      html, body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+
+      .praat-desktop {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: visible;
+      }
+
+      .top-menu-bar {
+        height: auto;
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .menu-items {
+        display: none;
+      }
+
+      .top-bar-right {
+        margin-left: auto;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 8px;
+        gap: 10px;
+      }
+
+      .praat-window {
+        height: auto;
+      }
+
+      .objects-container {
+        height: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .objects-list-column {
+        border-right: none;
+        border-bottom: 1px solid var(--panel-border);
+      }
+
+      .objects-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+        padding: 6px;
+        max-height: none;
+      }
+
+      .object-entry {
+        padding: 8px 10px;
+        font-size: 12.5px;
+        margin-bottom: 0;
+      }
+
+      .objects-actions-column {
+        display: none;
+      }
+
+      .display-content-area {
+        padding: 14px;
+      }
+
+      .feature-list-compact {
+        grid-template-columns: 1fr;
+      }
+
+      .download-grid-compact {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-status-bar {
+        height: auto;
+        padding: 10px 12px;
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+      }
+
+      .status-right {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="praat-desktop">
+    
+    <!-- Top Global Menu Bar -->
+    <header class="top-menu-bar">
+      <div class="top-bar-left">
+        <div class="app-brand">
+          <img src="pictures/praat.png" alt="Praat Logo">
+          <span>Praat 简体中文版</span>
+          <span class="app-badge">v7.0</span>
+        </div>
+
+        <nav>
+          <ul class="menu-items">
+            <li class="menu-item">
+              <button class="menu-btn" onclick="openModal('about-modal')">Praat <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" onclick="openModal('about-modal')">关于 Praat 简体中文版...</div>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank">
+                  <span>GitHub 源码仓库</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i>
+                </a>
+              </div>
+            </li>
+
+            <li class="menu-item">
+              <button class="menu-btn" onclick="switchTab('tab-download')">下载 <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" id="menu-dl-win" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip">Windows x64 便携版 (.zip) 直链</a>
+                <a class="dropdown-item" id="menu-dl-mac" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg">macOS Universal 通用版 (.dmg) 直链</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank">所有历史版本 Releases</a>
+              </div>
+            </li>
+
+            <li class="menu-item">
+              <button class="menu-btn" onclick="switchTab('tab-manual')">帮助 <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" onclick="switchTab('tab-manual')">帮助手册...</div>
+                <div class="dropdown-item" onclick="switchTab('tab-terms')">中英术语对照表...</div>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="manual/Phonetic_symbols.html" target="_blank">国际音标字符表</a>
+                <a class="dropdown-item" href="https://praat.org" target="_blank">Praat 官方英文主页</a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="top-bar-right">
+        <button class="quick-btn quick-btn-secondary" onclick="switchTab('tab-terms')">
+          <i class="fa-solid fa-table-list"></i>
+          <span>对照表</span>
+        </button>
+        <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" class="quick-btn quick-btn-secondary">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub</span>
+        </a>
+        <button class="quick-btn quick-btn-primary" onclick="switchTab('tab-download')">
+          <i class="fa-solid fa-download"></i>
+          <span>下载软件</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="workspace">
+      
+      <!-- Left: Praat Objects Window -->
+      <section class="praat-window">
+        <div class="window-title-bar">
+          <div class="window-title">
+            <i class="fa-solid fa-window-maximize" style="color: var(--praat-blue);"></i>
+            <span>Praat 对象列表</span>
+          </div>
+          <div class="window-controls">
+            <div class="win-control-btn win-min"></div>
+            <div class="win-control-btn win-max"></div>
+            <div class="win-control-btn win-close"></div>
+          </div>
+        </div>
+
+        <div class="window-menu-strip">
+          <span onclick="openModal('about-modal')">Praat</span>
+          <span onclick="switchTab('tab-recorder')">新建</span>
+          <span onclick="switchTab('tab-overview')">打开</span>
+          <span onclick="switchTab('tab-download')">保存</span>
+          <span onclick="switchTab('tab-manual')">帮助</span>
+        </div>
+
+        <div class="objects-container">
+          <!-- Objects List Column -->
+          <div class="objects-list-column">
+            <div class="objects-list-header">对象列表</div>
+            <ul class="objects-list" id="objects-list">
+              <li class="object-entry selected" onclick="switchTab('tab-overview', this)">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>1. Sound 软件特性</span>
+              </li>
+              <li class="object-entry" onclick="switchTab('tab-download', this)">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>2. Package 下载安装</span>
+              </li>
+              <li class="object-entry" onclick="switchTab('tab-manual', this)">
+                <i class="fa-solid fa-book-open"></i>
+                <span>3. Manual 帮助手册</span>
+              </li>
+              <li class="object-entry" onclick="switchTab('tab-terms', this)">
+                <i class="fa-solid fa-table-list"></i>
+                <span>4. Table 术语对照</span>
+              </li>
+              <li class="object-entry" onclick="switchTab('tab-recorder', this)">
+                <i class="fa-solid fa-microphone"></i>
+                <span>5. Recorder 录音窗口</span>
+              </li>
+            </ul>
+
+            <div class="objects-bottom-bar">
+              <button class="praat-btn" onclick="alert('提示：在左侧列表中点击对象可切换右侧视图。')"><i class="fa-solid fa-trash-can"></i> 移除</button>
+              <button class="praat-btn" onclick="alert('提示：支持在主对象窗口中选中多个对象批量重命名。')"><i class="fa-solid fa-pen"></i> 重命名...</button>
+              <button class="praat-btn accent" onclick="switchTab('tab-terms')"><i class="fa-solid fa-language"></i> 对照表</button>
+              <button class="praat-btn" onclick="openModal('about-modal')"><i class="fa-solid fa-circle-info"></i> 信息</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Actions Column -->
+          <div class="objects-actions-column">
+            <div class="action-category-label">常用操作</div>
+            <button class="praat-action-btn primary-action" onclick="switchTab('tab-overview')">
+              <span>查看与编辑</span>
+              <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
+            </button>
+            <button class="praat-action-btn" onclick="switchTab('tab-download')">
+              <span>获取二进制版</span>
+              <i class="fa-solid fa-download" style="font-size: 11px;"></i>
+            </button>
+
+            <div class="action-category-label">功能导航</div>
+            <button class="praat-action-btn" onclick="switchTab('tab-terms')">
+              <span>术语对照表</span>
+              <i class="fa-solid fa-table-list" style="font-size: 11px;"></i>
+            </button>
+            <button class="praat-action-btn" onclick="switchTab('tab-manual')">
+              <span>帮助手册</span>
+              <i class="fa-solid fa-book" style="font-size: 11px;"></i>
+            </button>
+            <button class="praat-action-btn" onclick="switchTab('tab-recorder')">
+              <span>录音窗口</span>
+              <i class="fa-solid fa-microphone" style="font-size: 11px;"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Main Display & View Window -->
+      <section class="praat-window display-window">
+        <div class="window-title-bar">
+          <div class="window-title" id="display-window-title">
+            <i class="fa-solid fa-wave-square" style="color: var(--praat-blue);"></i>
+            <span>Praat 7.0 简体中文版 · 软件特性与功能总览</span>
+          </div>
+          <div class="window-controls">
+            <div class="win-control-btn win-min"></div>
+            <div class="win-control-btn win-max"></div>
+            <div class="win-control-btn win-close"></div>
+          </div>
+        </div>
+
+        <div class="window-menu-strip">
+          <span>文件</span>
+          <span>编辑</span>
+          <span>查询</span>
+          <span>视图</span>
+          <span>设置</span>
+          <span>帮助</span>
+        </div>
+
+        <div class="display-content-area">
+
+          <!-- TAB 1: Overview & Highlights -->
+          <div id="tab-overview" class="tab-view active">
+            <div class="view-hero">
+              <h1>
+                <i class="fa-solid fa-circle-info" style="color: #0284c7;"></i>
+                Praat 简体中文本地化版本
+              </h1>
+              <p>
+                基于 Praat 官方内核构建，提供完整中文界面与帮助手册。针对中文排版、拖拽打开、录音暂存与多对象批量操作深度优化。
+              </p>
+            </div>
+
+            <!-- 6 Core Localization Enhancements -->
+            <div class="feature-list-compact">
+              <div class="feature-item-compact">
+                <h3><i class="fa-solid fa-language"></i> 完整界面汉化</h3>
+                <p>菜单栏、参数对话框及设置面板全量中文，支持一键切换中英文。</p>
+              </div>
+
+              <div class="feature-item-compact">
+                <h3><i class="fa-solid fa-book"></i> 帮助手册汉化</h3>
+                <p>内置帮助手册主要页面全量翻译为中文，排版与滚动自适应优化。</p>
+              </div>
+
+              <div class="feature-item-compact">
+                <h3><i class="fa-solid fa-table-list"></i> 术语对照表</h3>
+                <p>主窗口常驻对照表按钮，随时核对语音学专业名词中英原词。</p>
+              </div>
+
+              <div class="feature-item-compact">
+                <h3><i class="fa-solid fa-file-import"></i> 文件拖拽打开</h3>
+                <p>Windows 下支持音频（.wav）、标注（.TextGrid）直接拖入载入。</p>
+              </div>
+
+              <div class="feature-item-compact">
+                <h3><i class="fa-solid fa-microphone"></i> 录音窗口增强</h3>
+                <p>按住录音模式、暂存列表自动递增编号与分层波形预览。</p>
+              </div>
+
+              <div class="feature-item-compact">
+                <h3><i class="fa-solid fa-i-cursor"></i> 多对象批量重命名</h3>
+                <p>选中多个对象时自动显示批量重命名工具，支持统一前后缀与序号递增。</p>
+              </div>
+            </div>
+
+            <div class="screenshot-frame">
+              <img src="pictures/praat-zh-main-window.png" alt="Praat 简体中文主窗口预览">
+              <div class="screenshot-caption">Praat 简体中文主窗口与常用固定操作区</div>
+            </div>
+          </div>
+
+          <!-- TAB 2: Download & Releases -->
+          <div id="tab-download" class="tab-view">
+            <div class="view-hero">
+              <h1><i class="fa-solid fa-download" style="color: #0284c7;"></i> 下载 Praat 简体中文版</h1>
+              <p>绿色免安装，解压即用。</p>
+            </div>
+
+            <div class="download-grid-compact">
+              <!-- Windows Card -->
+              <div class="download-card-compact featured">
+                <div class="dl-card-header">
+                  <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
+                  <span>Windows (x64)</span>
+                </div>
+                <div class="dl-card-desc">
+                  适用于 64 位 Windows 10 及 11。解压后双击即用。
+                </div>
+                <a id="dl-win-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip" class="praat-btn accent" style="padding: 8px;">
+                  <i class="fa-solid fa-download"></i>
+                  <span>下载 Windows x64 便携包 (.zip)</span>
+                </a>
+              </div>
+
+              <!-- macOS Card -->
+              <div class="download-card-compact">
+                <div class="dl-card-header">
+                  <i class="fa-brands fa-apple" style="color: #000000;"></i>
+                  <span>macOS (Universal)</span>
+                </div>
+                <div class="dl-card-desc">
+                  通用二进制包，适用于 Apple Silicon 与 Intel Mac (macOS 11+)。
+                </div>
+                <a id="dl-mac-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg" class="praat-btn" style="padding: 8px;">
+                  <i class="fa-solid fa-download"></i>
+                  <span>下载 macOS Universal (.dmg)</span>
+                </a>
+              </div>
+
+              <!-- Linux / Source Card -->
+              <div class="download-card-compact">
+                <div class="dl-card-header">
+                  <i class="fa-brands fa-linux" style="color: #334155;"></i>
+                  <span>Linux / 源码</span>
+                </div>
+                <div class="dl-card-desc">
+                  适用于 Ubuntu、Debian 等 Linux 发行版，或自行编译。
+                </div>
+                <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" class="praat-btn" style="padding: 8px;">
+                  <i class="fa-brands fa-github"></i>
+                  <span>查看 GitHub 源码仓库</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Citation -->
+            <div class="citation-banner">
+              <i class="fa-solid fa-quote-left"></i>
+              <div>
+                <strong>学术引用</strong>：Boersma, P., & Weenink, D. (2026). Praat: doing phonetics by computer [Computer program]. https://praat.org/
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: Help Manual -->
+          <div id="tab-manual" class="tab-view">
+            <div class="view-hero">
+              <h1><i class="fa-solid fa-book" style="color: #0284c7;"></i> 帮助手册汉化与排版优化</h1>
+              <p>内置帮助手册主要页面已全量翻译为中文，图文教程在不同窗口尺寸下均能自适应流式呈现，方便查阅与学习。</p>
+            </div>
+
+            <div class="screenshot-frame">
+              <img src="pictures/praat-zh-manuel.png" alt="Praat 简体中文帮助手册界面">
+              <div class="screenshot-caption">内置帮助手册实际运行效果</div>
+            </div>
+          </div>
+
+          <!-- TAB 4: Bilingual Terminology Table -->
+          <div id="tab-terms" class="tab-view">
+            <div class="view-hero">
+              <h1><i class="fa-solid fa-table-list" style="color: #0284c7;"></i> 常用语音学与 Praat 术语中英对照表</h1>
+              <p>收录核心语音学、数据结构、信号处理与合成算法的标准中英文对照，方便文献阅读与脚本编写。</p>
+            </div>
+
+            <!-- Search Input Bar -->
+            <div style="margin-bottom: 12px; display: flex; gap: 10px; align-items: center;">
+              <div style="position: relative; flex: 1;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 9px; color: #94a3b8; font-size: 12px;"></i>
+                <input type="text" id="term-search" placeholder="搜索中文或英文术语（如 Pitch, 共振峰, 标注, LPC）..." oninput="filterTerms(this.value)" style="width: 100%; padding: 6px 10px 6px 30px; font-family: inherit; font-size: 13px; border: 1px solid var(--win-border); border-radius: 4px; outline: none; background: #ffffff;">
+              </div>
+              <span id="term-count" style="font-size: 12px; color: var(--text-muted); white-space: nowrap;">共 34 条术语</span>
+            </div>
+
+            <div class="term-table-wrapper">
+              <table class="term-table" id="glossary-table">
+                <thead>
+                  <tr>
+                    <th>中文术语</th>
+                    <th>英文原词</th>
+                    <th>分类</th>
+                    <th>说明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- 核心声学与语音特征 -->
+                  <tr>
+                    <td><strong>基频 / 音高</strong></td>
+                    <td>Pitch / F0</td>
+                    <td>核心声学</td>
+                    <td>声带振动的基频频率，单位为赫兹 (Hz)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>音高上限 / 下限</strong></td>
+                    <td>Pitch ceiling / floor</td>
+                    <td>参数设置</td>
+                    <td>音高分析算法搜索的最高与最低频率限制范围</td>
+                  </tr>
+                  <tr>
+                    <td><strong>共振峰</strong></td>
+                    <td>Formant (F1, F2...)</td>
+                    <td>核心声学</td>
+                    <td>声道共鸣腔产生的特定共振频率峰值与带宽</td>
+                  </tr>
+                  <tr>
+                    <td><strong>音强 / 振幅</strong></td>
+                    <td>Intensity / Amplitude</td>
+                    <td>核心声学</td>
+                    <td>声音的能量强度 (dB) 与振幅波形包络</td>
+                  </tr>
+                  <tr>
+                    <td><strong>语图 / 声谱图</strong></td>
+                    <td>Spectrogram</td>
+                    <td>信号显示</td>
+                    <td>呈现时间、频率和能量三维关系的经典分析谱图</td>
+                  </tr>
+                  <tr>
+                    <td><strong>频谱 / 频谱切片</strong></td>
+                    <td>Spectrum / Spectral slice</td>
+                    <td>频域分析</td>
+                    <td>特定时间点上的瞬时频域能量分布切片</td>
+                  </tr>
+                  <tr>
+                    <td><strong>脉冲 / 声门脉冲</strong></td>
+                    <td>Pulses / Glottal pulses</td>
+                    <td>声门活动</td>
+                    <td>对应声带振动周期的离散脉冲时间点序列</td>
+                  </tr>
+                  <tr>
+                    <td><strong>谐噪比</strong></td>
+                    <td>Harmonicity / HNR</td>
+                    <td>音质分析</td>
+                    <td>声音信号中周期谐波成分与非周期噪声成分的比值 (dB)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>音高微扰 / 振幅微扰</strong></td>
+                    <td>Jitter / Shimmer</td>
+                    <td>音质分析</td>
+                    <td>周期与振幅的微小随机波动，用于嗓音病理评估</td>
+                  </tr>
+                  <tr>
+                    <td><strong>浊音 / 清音</strong></td>
+                    <td>Voiced / Voiceless</td>
+                    <td>发音学</td>
+                    <td>发音时声带参与振动的状态 / 声带不振动</td>
+                  </tr>
+                  <tr>
+                    <td><strong>摩擦 / 送气 / 气声</strong></td>
+                    <td>Frication / Aspiration / Breathiness</td>
+                    <td>发音与音质</td>
+                    <td>声道狭窄湍流噪音 / 释放后呼出气流 / 声带微开产生的气化音</td>
+                  </tr>
+                  <tr>
+                    <td><strong>声道</strong></td>
+                    <td>Vocal Tract</td>
+                    <td>生理声学</td>
+                    <td>从声带至唇齿的发音共鸣通道（咽腔、口腔、鼻腔）</td>
+                  </tr>
+
+                  <!-- 数据结构与标注体系 -->
+                  <tr>
+                    <td><strong>声音对象 / 长声音</strong></td>
+                    <td>Sound / LongSound</td>
+                    <td>核心数据</td>
+                    <td>普通内存音频对象 / 超长流式读取音频对象</td>
+                  </tr>
+                  <tr>
+                    <td><strong>文本标注格</strong></td>
+                    <td>TextGrid</td>
+                    <td>标注结构</td>
+                    <td>Praat 用于分层标注语音时间段与点事件的标准格式</td>
+                  </tr>
+                  <tr>
+                    <td><strong>层 / 标注轨</strong></td>
+                    <td>Tier</td>
+                    <td>标注层级</td>
+                    <td>在时间轴上相互独立平行的分层标注轨道</td>
+                  </tr>
+                  <tr>
+                    <td><strong>区间层 / 点层</strong></td>
+                    <td>Interval Tier / Point Tier</td>
+                    <td>标注层级</td>
+                    <td>包含起止时间的区间标注轨 / 单个离散时间点的标记轨</td>
+                  </tr>
+                  <tr>
+                    <td><strong>区间 / 边界</strong></td>
+                    <td>Interval / Boundary</td>
+                    <td>标注元素</td>
+                    <td>区间层中的单个时间段 / 切分音段的起止时间标记点</td>
+                  </tr>
+                  <tr>
+                    <td><strong>点过程</strong></td>
+                    <td>PointProcess</td>
+                    <td>数据结构</td>
+                    <td>记录离散时间点序列（如基频脉冲）的底层对象</td>
+                  </tr>
+                  <tr>
+                    <td><strong>操控对象</strong></td>
+                    <td>Manipulation</td>
+                    <td>操纵结构</td>
+                    <td>结合基频层与时长层、用于重合成与变形修改的对象</td>
+                  </tr>
+                  <tr>
+                    <td><strong>音高层 / 音强层</strong></td>
+                    <td>PitchTier / IntensityTier</td>
+                    <td>层级对象</td>
+                    <td>独立的音高变化曲线层 / 独立的音强包络层</td>
+                  </tr>
+                  <tr>
+                    <td><strong>时长层 / 振幅层</strong></td>
+                    <td>DurationTier / AmplitudeTier</td>
+                    <td>层级对象</td>
+                    <td>用于局部变速的时长因子层 / 振幅缩放控制层</td>
+                  </tr>
+                  <tr>
+                    <td><strong>字符串列表 / 实数表</strong></td>
+                    <td>Strings / TableOfReal</td>
+                    <td>统计数据</td>
+                    <td>文本与文件名列表对象 / 多维数值统计矩阵对象</td>
+                  </tr>
+
+                  <!-- 信号处理与分析算法 -->
+                  <tr>
+                    <td><strong>自相关 / 互相关</strong></td>
+                    <td>Autocorrelation / Cross-correlation</td>
+                    <td>周期算法</td>
+                    <td>音高提取经典算法，计算信号自身的周期重复性</td>
+                  </tr>
+                  <tr>
+                    <td><strong>线性预测编码</strong></td>
+                    <td>LPC (Burg / Autocorrelation)</td>
+                    <td>谱估计算法</td>
+                    <td>用于分离声道共鸣与提取共振峰频率/带宽的核心算法</td>
+                  </tr>
+                  <tr>
+                    <td><strong>预加重 / 去加重</strong></td>
+                    <td>Pre-emphasis / De-emphasis</td>
+                    <td>滤波预处理</td>
+                    <td>提升高频能量以补偿声门辐射滚降 / 还原原始频响</td>
+                  </tr>
+                  <tr>
+                    <td><strong>谱重心 / 频谱倾斜</strong></td>
+                    <td>Centre of gravity / Spectral tilt</td>
+                    <td>频域特征</td>
+                    <td>频谱能量分布的加权中心频率 / 频谱高低频滚降斜率</td>
+                  </tr>
+                  <tr>
+                    <td><strong>长期平均谱</strong></td>
+                    <td>LTAS (Long-term average spectrum)</td>
+                    <td>频域统计</td>
+                    <td>较长语音段平均频域能量分布，反映发音特质</td>
+                  </tr>
+                  <tr>
+                    <td><strong>梅尔倒谱系数</strong></td>
+                    <td>MFCC</td>
+                    <td>特征工程</td>
+                    <td>模拟人耳听觉梅尔尺度的倒谱特征系数</td>
+                  </tr>
+                  <tr>
+                    <td><strong>动态时间规整</strong></td>
+                    <td>DTW</td>
+                    <td>模式匹配</td>
+                    <td>用于非线性对齐不同语速语音发音的动态时间算法</td>
+                  </tr>
+
+                  <!-- 语音合成与高级分析 -->
+                  <tr>
+                    <td><strong>PSOLA 语音操纵</strong></td>
+                    <td>PSOLA (Pitch-Synchronous Overlap-Add)</td>
+                    <td>语音变换</td>
+                    <td>基频同步重叠相加，改变语速与音调而不改变音色</td>
+                  </tr>
+                  <tr>
+                    <td><strong>声源-滤波器合成</strong></td>
+                    <td>Source-filter synthesis</td>
+                    <td>语音合成</td>
+                    <td>结合声门波源与声道滤波器模型生成人工语音</td>
+                  </tr>
+                  <tr>
+                    <td><strong>发音合成</strong></td>
+                    <td>Articulatory synthesis</td>
+                    <td>语音合成</td>
+                    <td>模拟发音器官生理结构与肌肉运动生成发音</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Klatt 声学合成网格</strong></td>
+                    <td>KlattGrid</td>
+                    <td>语音合成</td>
+                    <td>经典级联/并联多共振峰声学参数合成模型</td>
+                  </tr>
+                  <tr>
+                    <td><strong>耳蜗图 / 倒谱图</strong></td>
+                    <td>Cochleagram / PowerCepstrogram</td>
+                    <td>高级谱图</td>
+                    <td>内耳基底膜响应听觉图 / 倒频域声门声道分离图</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 5: SoundRecorder Preview -->
+          <div id="tab-recorder" class="tab-view">
+            <div class="view-hero">
+              <h1><i class="fa-solid fa-microphone" style="color: #0284c7;"></i> 录音窗口增强</h1>
+              <p>新增按住录音模式（松开即存）、暂存列表自动递增编号，音频超过 10 秒自适应分层显示。</p>
+            </div>
+
+            <div class="screenshot-frame">
+              <img src="pictures/praat-zh-sound-recorder.png" alt="Praat 录音窗口增强界面">
+              <div class="screenshot-caption">录音窗口实际界面</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Desktop Status Bar -->
+    <footer class="bottom-status-bar">
+      <div class="status-left">
+      </div>
+
+      <div class="status-right">
+        <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" style="color: var(--text-muted);">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub 源码仓库</span>
+        </a>
+        <a href="https://praat.org" target="_blank" style="color: var(--text-muted);">
+          <i class="fa-solid fa-globe"></i>
+          <span>praat.org 官方主页</span>
+        </a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- About Praat Modal Dialog -->
+  <div id="about-modal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'about-modal')">
+    <div class="praat-dialog">
+      <div class="dialog-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <img src="pictures/praat.png" width="18" height="18" alt="Praat Logo">
+          <span>关于 Praat 简体中文版</span>
+        </div>
+        <div class="win-control-btn win-close" onclick="closeModal('about-modal')"></div>
+      </div>
+      <div class="dialog-body">
+        <div style="text-align: center; margin-bottom: 12px;">
+          <img src="pictures/praat.png" width="44" height="44" alt="Praat">
+          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 6px;">Praat 简体中文本地化版</h3>
+          <div style="font-size: 12px; color: var(--text-muted);">版本 7.0 · 基于官方内核</div>
+        </div>
+        <p style="margin-bottom: 8px;">
+          Praat 官方原版由荷兰阿姆斯特丹大学语音科学研究所的 <strong>Paul Boersma</strong> 与 <strong>David Weenink</strong> 教授开发。
+        </p>
+        <p style="margin-bottom: 8px;">
+          本简体中文版本由 <strong>KasumiKitsune</strong> 维护，旨在为中文语音学与声学研究者提供更流畅的本土化体验。
+        </p>
+        <div style="font-size: 12px; color: var(--text-muted); background: #f1f5f9; padding: 8px; border-radius: 4px;">
+          开源许可证：GNU General Public License v3 (GPL v3)
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="praat-btn accent" onclick="closeModal('about-modal')">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript for Interactive Simulator -->
+  <script>
+    function switchTab(tabId, element) {
+      const views = document.querySelectorAll('.tab-view');
+      views.forEach(v => v.classList.remove('active'));
+
+      const targetView = document.getElementById(tabId);
+      if (targetView) {
+        targetView.classList.add('active');
+      }
+
+      const titleMap = {
+        'tab-overview': 'Praat 7.0 简体中文版 · 软件特性与功能总览',
+        'tab-download': 'Praat 7.0 简体中文版 · 跨平台版本下载与安装',
+        'tab-manual': 'Praat 7.0 简体中文版 · 帮助手册汉化与排版优化',
+        'tab-terms': 'Praat 7.0 简体中文版 · 常用语音学术语中英对照表',
+        'tab-recorder': 'Praat 7.0 简体中文版 · 录音窗口增强'
+      };
+
+      const titleElem = document.getElementById('display-window-title');
+      if (titleElem && titleMap[tabId]) {
+        titleElem.innerHTML = `<i class="fa-solid fa-wave-square" style="color: var(--praat-blue);"></i> <span>${titleMap[tabId]}</span>`;
+      }
+
+      if (element) {
+        const items = document.querySelectorAll('.object-entry');
+        items.forEach(item => item.classList.remove('selected'));
+        element.classList.add('selected');
+      } else {
+        const items = document.querySelectorAll('.object-entry');
+        items.forEach(item => {
+          if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)) {
+            items.forEach(i => i.classList.remove('selected'));
+            item.classList.add('selected');
+          }
+        });
+      }
+    }
+
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.add('open');
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.remove('open');
+    }
+
+    function closeModalOnOverlay(event, modalId) {
+      if (event.target.id === modalId) {
+        closeModal(modalId);
+      }
+    }
+
+    function filterTerms(query) {
+      const q = (query || '').trim().toLowerCase();
+      const rows = document.querySelectorAll('#glossary-table tbody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (!q || text.includes(q)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      const countElem = document.getElementById('term-count');
+      if (countElem) {
+        countElem.textContent = q ? `找到 ${visibleCount} 条结果` : `共 ${rows.length} 条术语`;
+      }
+    }
+
+    // Auto-resolve direct download links to the latest GitHub release if online
+    (function fetchLatestReleaseLinks() {
+      fetch('https://api.github.com/repos/KasumiKitsune/praat-simplified-chinese/releases/latest')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.assets && data.assets.length > 0) {
+            const winAsset = data.assets.find(a => a.name.endsWith('.zip') && a.name.includes('Windows'));
+            const macAsset = data.assets.find(a => a.name.endsWith('.dmg') && a.name.includes('macOS'));
+            if (winAsset && winAsset.browser_download_url) {
+              const winBtn = document.getElementById('dl-win-btn');
+              const menuWin = document.getElementById('menu-dl-win');
+              if (winBtn) winBtn.href = winAsset.browser_download_url;
+              if (menuWin) menuWin.href = winAsset.browser_download_url;
+            }
+            if (macAsset && macAsset.browser_download_url) {
+              const macBtn = document.getElementById('dl-mac-btn');
+              const menuMac = document.getElementById('menu-dl-mac');
+              if (macBtn) macBtn.href = macAsset.browser_download_url;
+              if (menuMac) menuMac.href = macAsset.browser_download_url;
+            }
+          }
+        })
+        .catch(() => {});
+    })();
+  </script>
 
 </body>
 </html>
