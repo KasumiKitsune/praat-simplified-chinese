@@ -1,13 +1,13 @@
 <div align="center">
   <img src="docs/pictures/icon.png" width="150" alt="Praat 汉化版 Logo" />
   <h1>Praat 汉化版</h1>
-  <p>语音学分析与语音信号处理软件 · 中文本地化版本（支持简体中文与繁体中文）</p>
+  <p>语音学分析与语音信号处理软件 · 中文本地化版本</p>
 </div>
 
 > [!NOTE]
 > **Praat 汉化版说明**
 > 
-> 本仓库是语音学分析软件 **Praat** 的中文汉化/本地化版本，原生支持简体中文与繁体中文无缝切换。
+> 本仓库是语音学分析软件 **Praat** 的中文汉化/本地化版本。
 > - **官方主页 (GitHub Pages)**：[https://kasumikitsune.github.io/praat-simplified-chinese/](https://kasumikitsune.github.io/praat-simplified-chinese/)
 > - **源码仓库**：[KasumiKitsune/praat-simplified-chinese](https://github.com/KasumiKitsune/praat-simplified-chinese)
 > - **官方英文主页**：[praat.org](https://praat.org) / [GitHub 官方仓库](https://github.com/praat/praat)
