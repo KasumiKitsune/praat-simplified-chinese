@@ -208,18 +208,16 @@ autoSound Sound_record_fixedTime (int inputSource, double gain, double balance, 
 			Set the input source; the default is the microphone.
 		*/
 		if (inputUsesPortAudio) {
-			if (inputSource < 1 || inputSource > Pa_GetDeviceCount ())
-				Melder_throw (U"Unknown device #", inputSource, U".");
-			/*
-				Saying
-					streamParameters. device = inputSource - 1;
-				would presuppose that the input devices are listed before the output devices.
-				TODO: cycle through all devices, and determine which of them are input devices
-			*/
-			streamParameters. device = Pa_GetDefaultInputDevice ();
+			integer preferredDevIndex = MelderAudio_getInputDeviceIndex ();
+			if (preferredDevIndex >= 0 && preferredDevIndex < Pa_GetDeviceCount ()) {
+				streamParameters. device = (PaDeviceIndex) preferredDevIndex;
+			} else {
+				streamParameters. device = Pa_GetDefaultInputDevice ();
+			}
 			Melder_casual (U"streamParameters. device: ", (integer) streamParameters. device);
 			const PaDeviceInfo *paDeviceInfo = Pa_GetDeviceInfo (streamParameters. device);
-			Melder_casual (U"Name: ", Melder_peek8to32_u (paDeviceInfo -> name));
+			if (paDeviceInfo)
+				Melder_casual (U"Name: ", Melder_peek8to32_u (paDeviceInfo -> name));
 		} else {
 			#if defined (macintosh)
 			#elif defined (linux) && ! defined (NO_AUDIO)

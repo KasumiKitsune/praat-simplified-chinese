@@ -75,6 +75,7 @@ static struct {
 	enum kMelder_inputSoundSystem inputSoundSystem;
 	enum kMelder_outputSoundSystem outputSoundSystem;
 	double silenceBefore, silenceAfter;
+	PrefsString inputDeviceName;
 } preferences;
 
 void Melder_audio_prefs () {
@@ -83,6 +84,69 @@ void Melder_audio_prefs () {
 	Preferences_addEnum (U"Audio.outputSoundSystem", & preferences. outputSoundSystem, kMelder_outputSoundSystem, kMelder_outputSoundSystem::DEFAULT);
 	Preferences_addDouble (U"Audio.silenceBefore2", & preferences. silenceBefore, kMelderAudio_outputSilenceBefore_DEFAULT);
 	Preferences_addDouble (U"Audio.silenceAfter2", & preferences. silenceAfter, kMelderAudio_outputSilenceAfter_DEFAULT);
+	Preferences_addString (U"Audio.inputDeviceName", & preferences. inputDeviceName [0], U"");
+}
+
+void MelderAudio_setInputDeviceName (conststring32 inputDeviceName) {
+	if (inputDeviceName)
+		str32ncpy (preferences. inputDeviceName, inputDeviceName, Preferences_STRING_BUFFER_SIZE - 1);
+	else
+		preferences. inputDeviceName [0] = U'\0';
+	preferences. inputDeviceName [Preferences_STRING_BUFFER_SIZE - 1] = U'\0';
+}
+conststring32 MelderAudio_getInputDeviceName () {
+	return preferences. inputDeviceName;
+}
+
+integer MelderAudio_getInputDeviceIndex () {
+	if (! MelderAudio_hasBeenInitialized) {
+		Pa_Initialize ();
+		MelderAudio_hasBeenInitialized = true;
+	}
+	conststring32 configuredName = MelderAudio_getInputDeviceName ();
+	PaDeviceIndex deviceCount = Pa_GetDeviceCount ();
+	if (configuredName && configuredName [0] != U'\0' && ! Melder_equ (configuredName, U"DEFAULT") && ! Melder_equ (configuredName, U"default")) {
+		for (PaDeviceIndex i = 0; i < deviceCount; i ++) {
+			const PaDeviceInfo *info = Pa_GetDeviceInfo (i);
+			if (info && info -> maxInputChannels > 0) {
+				conststring32 devName = Melder_peek8to32_u (info -> name);
+				if (Melder_equ (configuredName, devName))
+					return i;
+			}
+		}
+	}
+	// Fallback to default input device
+	PaDeviceIndex defDev = Pa_GetDefaultInputDevice ();
+	if (defDev != paNoDevice && defDev >= 0 && defDev < deviceCount) {
+		const PaDeviceInfo *info = Pa_GetDeviceInfo (defDev);
+		if (info && info -> maxInputChannels > 0)
+			return defDev;
+	}
+	// Fallback to first available input device
+	for (PaDeviceIndex i = 0; i < deviceCount; i ++) {
+		const PaDeviceInfo *info = Pa_GetDeviceInfo (i);
+		if (info && info -> maxInputChannels > 0)
+			return i;
+	}
+	return paNoDevice;
+}
+
+void MelderAudio_getInputDeviceList (MelderAudio_DeviceList *outList) {
+	if (! outList) return;
+	outList -> count = 0;
+	if (! MelderAudio_hasBeenInitialized) {
+		Pa_Initialize ();
+		MelderAudio_hasBeenInitialized = true;
+	}
+	PaDeviceIndex deviceCount = Pa_GetDeviceCount ();
+	for (PaDeviceIndex i = 0; i < deviceCount && outList -> count < 32; i ++) {
+		const PaDeviceInfo *info = Pa_GetDeviceInfo (i);
+		if (info && info -> maxInputChannels > 0) {
+			outList -> names [outList -> count] = Melder_dup (Melder_peek8to32_u (info -> name));
+			outList -> paIndices [outList -> count] = i;
+			outList -> count ++;
+		}
+	}
 }
 
 void MelderAudio_setOutputMaximumAsynchronicity (enum kMelder_asynchronicityLevel maximumAsynchronicity) {

@@ -631,10 +631,25 @@ static void startRecording (SoundRecorder me) {
 		if (! my synchronous) {
 			if (my inputUsesPortAudio) {
 				PaStreamParameters streamParameters = { };
-				streamParameters. device = my deviceIndices [theControlPanel. inputSource];
+				integer preferredDevIndex = MelderAudio_getInputDeviceIndex ();
+				if (preferredDevIndex >= 0 && preferredDevIndex < Pa_GetDeviceCount ()) {
+					streamParameters. device = (PaDeviceIndex) preferredDevIndex;
+					const PaDeviceInfo *devInfo = Pa_GetDeviceInfo (streamParameters. device);
+					if (devInfo)
+						streamParameters. suggestedLatency = devInfo -> defaultLowInputLatency;
+				} else if (theControlPanel. inputSource >= 1 && theControlPanel. inputSource <= my numberOfInputDevices) {
+					streamParameters. device = my deviceIndices [theControlPanel. inputSource];
+					streamParameters. suggestedLatency = my deviceInfos [theControlPanel. inputSource] -> defaultLowInputLatency;
+				} else {
+					streamParameters. device = Pa_GetDefaultInputDevice ();
+					if (streamParameters. device != paNoDevice) {
+						const PaDeviceInfo *devInfo = Pa_GetDeviceInfo (streamParameters. device);
+						if (devInfo)
+							streamParameters. suggestedLatency = devInfo -> defaultLowInputLatency;
+					}
+				}
 				streamParameters. channelCount = my numberOfChannels;
 				streamParameters. sampleFormat = paInt16;
-				streamParameters. suggestedLatency = my deviceInfos [theControlPanel. inputSource] -> defaultLowInputLatency;
 				#if defined (macintosh)
 					PaMacCoreStreamInfo macCoreStreamInfo = { };
 					macCoreStreamInfo. size = sizeof (PaMacCoreStreamInfo);
@@ -1443,6 +1458,15 @@ autoSoundRecorder SoundRecorder_create (int numberOfChannels) {
 			}
 			if (my numberOfInputDevices == 0)
 				Melder_throw (U"No input devices available.");
+			PaDeviceIndex prefDevice = (PaDeviceIndex) MelderAudio_getInputDeviceIndex ();
+			if (prefDevice != paNoDevice) {
+				for (integer i = 1; i <= my numberOfInputDevices; i ++) {
+					if (my deviceIndices [i] == prefDevice) {
+						theControlPanel. inputSource = i;
+						break;
+					}
+				}
+			}
 		} else {
 			#if defined (macintosh)
 			#elif defined (_WIN32)

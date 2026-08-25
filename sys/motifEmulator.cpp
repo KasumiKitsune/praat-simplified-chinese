@@ -545,7 +545,7 @@ static void _GuiNativizeWidget (GuiObject me) {
 		} break;
 		case xmDrawingAreaWidgetClass: Melder_crash (U"Should be implemented in GuiDrawingArea."); break;
 		case xmFormWidgetClass: {
-			my window = CreateWindowEx (0, Melder_peek32toW (theWindowClassName), L"form", WS_CHILD | WS_CLIPSIBLINGS,
+			my window = CreateWindowEx (0, Melder_peek32toW (theWindowClassName), L"form", WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 				my x, my y, my width, my height, my parent -> window, NULL, theGui.instance, NULL);
 			SetWindowLongPtr (my window, GWLP_USERDATA, (LONG_PTR) me);
 		} break;
@@ -2769,24 +2769,28 @@ static void on_vscroll (HWND window, HWND controlWindow, UINT code, int pos) {
 static void on_mouseWheel (HWND window, int xPos, int yPos, int zDelta, int fwKeys) {
 	GuiObject me = (GuiObject) GetWindowLongPtr (window, GWLP_USERDATA);
 	if (me) {
-		if (my widgetClass == xmDrawingAreaWidgetClass) {
-			const bool isHorizontal = ( fwKeys & MK_SHIFT );
-			const int direction = ( isHorizontal ? ( zDelta < 0 ? SB_LINELEFT : SB_LINERIGHT ) : ( zDelta < 0 ? SB_LINEDOWN : SB_LINEUP ) );
-			const bool controlKeyPressed = ( fwKeys & MK_CONTROL );
-			if (controlKeyPressed) {
-				_GuiWinDrawingArea_handleZoom (me, double (zDelta) / 10.0);
-			} else if (my parent -> widgetClass == xmScrolledWindowWidgetClass) {
-				on_scroll (isHorizontal ? my parent -> motiff.scrolledWindow.horizontalBar : my parent -> motiff.scrolledWindow.verticalBar, direction, 0);
-			} else if (isHorizontal) {
-				for (GuiObject child = my parent -> firstChild; child; child = child -> nextSibling)
-					if (child -> widgetClass == xmScrollBarWidgetClass && child -> orientation == XmHORIZONTAL)
-						on_scroll (child, direction, 0);
-			} else {
-				for (GuiObject child = my parent -> firstChild; child; child = child -> nextSibling)
-					if (child -> widgetClass == xmScrollBarWidgetClass && child -> orientation == XmVERTICAL)
-						on_scroll (child, direction, 0);
+		const bool isHorizontal = ( fwKeys & MK_SHIFT );
+		const int direction = ( isHorizontal ? ( zDelta < 0 ? SB_LINELEFT : SB_LINERIGHT ) : ( zDelta < 0 ? SB_LINEDOWN : SB_LINEUP ) );
+		const bool controlKeyPressed = ( fwKeys & MK_CONTROL );
+		if (my widgetClass == xmDrawingAreaWidgetClass && controlKeyPressed) {
+			_GuiWinDrawingArea_handleZoom (me, double (zDelta) / 10.0);
+			return;
+		}
+		if (my widgetClass == xmDrawingAreaWidgetClass && my parent -> widgetClass == xmScrolledWindowWidgetClass) {
+			on_scroll (isHorizontal ? my parent -> motiff.scrolledWindow.horizontalBar : my parent -> motiff.scrolledWindow.verticalBar, direction, 0);
+			return;
+		}
+		GuiObject searchIn = (MEMBER (me, Shell) ? me : my parent);
+		while (searchIn) {
+			for (GuiObject child = searchIn -> firstChild; child; child = child -> nextSibling) {
+				if (child -> widgetClass == xmScrollBarWidgetClass && child -> orientation == (isHorizontal ? XmHORIZONTAL : XmVERTICAL)) {
+					on_scroll (child, direction, 0);
+					return;
+				}
 			}
-		} else FORWARD_WM_MOUSEWHEEL (window, xPos, yPos, zDelta, fwKeys, DefWindowProc);
+			searchIn = searchIn -> parent;
+		}
+		FORWARD_WM_MOUSEWHEEL (window, xPos, yPos, zDelta, fwKeys, DefWindowProc);
 	} else FORWARD_WM_MOUSEWHEEL (window, xPos, yPos, zDelta, fwKeys, DefWindowProc);
 }
 static void on_size (HWND window, UINT state, int cx, int cy) {

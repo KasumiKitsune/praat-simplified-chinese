@@ -36,6 +36,35 @@ Thing_implement (GuiForm, GuiControl, 0);
 #elif cocoa
 #endif
 
+GuiForm GuiForm_create (GuiForm parent, int left, int right, int top, int bottom, uint32 flags)
+{
+	(void) flags;
+	autoGuiForm me = Thing_new (GuiForm);
+	my d_shell = parent -> d_shell;
+	my d_parent = parent;
+	#if gtk
+		my d_widget = gtk_fixed_new ();
+		my v_positionInForm (my d_widget, left, right, top, bottom, parent);
+		g_signal_connect (G_OBJECT (my d_widget), "destroy", G_CALLBACK (_guiGtkForm_destroyCallback), me.get());
+	#elif motif
+		my d_widget = XmCreateForm (parent -> d_widget, "form", nullptr, 0);
+		my v_positionInForm (my d_widget, left, right, top, bottom, parent);
+		XtAddCallback (my d_widget, XmNdestroyCallback, _guiMotifForm_destroyCallback, me.get());
+	#elif cocoa
+		NSView *view = [[NSView alloc] init];
+		my d_widget = (GuiObject) view;
+		my v_positionInForm (my d_widget, left, right, top, bottom, parent);
+	#endif
+	return me.releaseToAmbiguousOwner();
+}
+
+GuiForm GuiForm_createShown (GuiForm parent, int left, int right, int top, int bottom, uint32 flags)
+{
+	GuiForm me = GuiForm_create (parent, left, right, top, bottom, flags);
+	GuiThing_show (me);
+	return me;
+}
+
 GuiForm GuiForm_createInScrolledWindow (GuiScrolledWindow parent)
 {
 	autoGuiForm me = Thing_new (GuiForm);

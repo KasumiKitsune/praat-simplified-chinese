@@ -53,6 +53,7 @@ Thing_define (PreferencesDialog, Thing) {
 	// Panel 2: Sound & Audio
 	GuiText recordingBufferSizeText;
 	GuiOptionMenu inputSoundSystemMenu;
+	GuiOptionMenu inputSoundDeviceMenu;
 	GuiOptionMenu outputSoundSystemMenu;
 	GuiOptionMenu maximumAsynchronicityMenu;
 	GuiText silenceBeforeText;
@@ -177,6 +178,21 @@ static void PreferencesDialog_loadValues (PreferencesDialog me) {
 	// Panel 2: Sound & Audio
 	GuiText_setString (my recordingBufferSizeText, Melder_integer (SoundRecorder_getBufferSizePref_MB ()));
 	GuiOptionMenu_setValue (my inputSoundSystemMenu, (int) MelderAudio_getInputSoundSystem () - (int) kMelder_inputSoundSystem::MIN + 1);
+	{
+		conststring32 curDevName = MelderAudio_getInputDeviceName ();
+		int selectedOption = 1; // 1 = "System default"
+		if (curDevName && curDevName [0] != U'\0') {
+			MelderAudio_DeviceList devList = { 0 };
+			MelderAudio_getInputDeviceList (& devList);
+			for (integer i = 0; i < devList. count; i ++) {
+				if (Melder_equ (curDevName, devList. names [i]. get())) {
+					selectedOption = (int) i + 2;
+					break;
+				}
+			}
+		}
+		GuiOptionMenu_setValue (my inputSoundDeviceMenu, selectedOption);
+	}
 	GuiOptionMenu_setValue (my outputSoundSystemMenu, (int) MelderAudio_getOutputSoundSystem () - (int) kMelder_outputSoundSystem::MIN + 1);
 	GuiOptionMenu_setValue (my maximumAsynchronicityMenu, (int) MelderAudio_getOutputMaximumAsynchronicity () - (int) kMelder_asynchronicityLevel::MIN + 1);
 	GuiText_setString (my silenceBeforeText, Melder_double (MelderAudio_getOutputSilenceBefore ()));
@@ -208,6 +224,7 @@ static void PreferencesDialog_restoreDefaults (PreferencesDialog me) {
 	// Panel 2: Sound & Audio
 	GuiText_setString (my recordingBufferSizeText, U"60");
 	GuiOptionMenu_setValue (my inputSoundSystemMenu, (int) kMelder_inputSoundSystem::DEFAULT - (int) kMelder_inputSoundSystem::MIN + 1);
+	GuiOptionMenu_setValue (my inputSoundDeviceMenu, 1);
 	GuiOptionMenu_setValue (my outputSoundSystemMenu, (int) kMelder_outputSoundSystem::DEFAULT - (int) kMelder_outputSoundSystem::MIN + 1);
 	GuiOptionMenu_setValue (my maximumAsynchronicityMenu, (int) kMelder_asynchronicityLevel::DEFAULT - (int) kMelder_asynchronicityLevel::MIN + 1);
 	GuiText_setString (my silenceBeforeText, Melder_double (kMelderAudio_outputSilenceBefore_DEFAULT));
@@ -253,6 +270,20 @@ static bool PreferencesDialog_apply (PreferencesDialog me) {
 
 		int inSysVal = GuiOptionMenu_getValue (my inputSoundSystemMenu);
 		MelderAudio_setInputSoundSystem ((kMelder_inputSoundSystem) (inSysVal - 1 + (int) kMelder_inputSoundSystem::MIN));
+
+		int inDevChoice = GuiOptionMenu_getValue (my inputSoundDeviceMenu);
+		if (inDevChoice <= 1) {
+			MelderAudio_setInputDeviceName (U"");
+		} else {
+			MelderAudio_DeviceList devList = { 0 };
+			MelderAudio_getInputDeviceList (& devList);
+			int devIndex = inDevChoice - 2;
+			if (devIndex >= 0 && devIndex < devList. count) {
+				MelderAudio_setInputDeviceName (devList. names [devIndex]. get());
+			} else {
+				MelderAudio_setInputDeviceName (U"");
+			}
+		}
 
 		int outSysVal = GuiOptionMenu_getValue (my outputSoundSystemMenu);
 		MelderAudio_setOutputSoundSystem ((kMelder_outputSoundSystem) (outSysVal - 1 + (int) kMelder_outputSoundSystem::MIN));
@@ -419,6 +450,18 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 		for (int i = (int) kMelder_inputSoundSystem::MIN; i <= (int) kMelder_inputSoundSystem::MAX; i ++)
 			GuiOptionMenu_addOption (my inputSoundSystemMenu, praat_translate (kMelder_inputSoundSystem_getText ((kMelder_inputSoundSystem) i)));
 		ADD_PANEL_CONTROL (2, my inputSoundSystemMenu);
+		y += 30;
+
+		GuiLabel l2b = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Input sound device:"), GuiLabel_RIGHT);
+		ADD_PANEL_CONTROL (2, l2b);
+		my inputSoundDeviceMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		GuiOptionMenu_addOption (my inputSoundDeviceMenu, praat_translate (U"System default"));
+		MelderAudio_DeviceList devList = { 0 };
+		MelderAudio_getInputDeviceList (& devList);
+		for (integer i = 0; i < devList. count; i ++) {
+			GuiOptionMenu_addOption (my inputSoundDeviceMenu, devList. names [i]. get());
+		}
+		ADD_PANEL_CONTROL (2, my inputSoundDeviceMenu);
 		y += 38;
 
 		GuiLabel h2 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Sound Playback"), GuiLabel_BOLD);

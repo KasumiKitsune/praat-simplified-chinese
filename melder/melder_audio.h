@@ -21,6 +21,16 @@
 void MelderAudio_setInputSoundSystem (enum kMelder_inputSoundSystem inputSoundSystem);
 enum kMelder_inputSoundSystem MelderAudio_getInputSoundSystem ();
 
+struct MelderAudio_DeviceList {
+	integer count;
+	autostring32 names [32];
+	integer paIndices [32];
+};
+void MelderAudio_setInputDeviceName (conststring32 inputDeviceName);
+conststring32 MelderAudio_getInputDeviceName ();
+integer MelderAudio_getInputDeviceIndex ();
+void MelderAudio_getInputDeviceList (MelderAudio_DeviceList *outList);
+
 void MelderAudio_setOutputSoundSystem (enum kMelder_outputSoundSystem outputSoundSystem);
 enum kMelder_outputSoundSystem MelderAudio_getOutputSoundSystem ();
 

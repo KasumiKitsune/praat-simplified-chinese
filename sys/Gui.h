@@ -664,6 +664,8 @@ autostring32 GuiFileSelect_getFolderName (GuiWindow optionalParent, conststring3
 
 /********** GuiForm **********/
 
+GuiForm GuiForm_create (GuiForm parent, int left, int right, int top, int bottom, uint32 flags);
+GuiForm GuiForm_createShown (GuiForm parent, int left, int right, int top, int bottom, uint32 flags);
 GuiForm GuiForm_createInScrolledWindow (GuiScrolledWindow parent);
 
 /********** GuiLabel **********/
