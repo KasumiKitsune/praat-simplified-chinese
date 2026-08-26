@@ -196,25 +196,27 @@ static void win_waveInClose (SoundRecorder me) {
 }
 #endif
 
+static void closePortAudioStream (SoundRecorder me) {
+	if (my portaudioStream) {
+		try {
+			Pa_StopStream (my portaudioStream);
+		} catch (...) { }
+		try {
+			Pa_CloseStream (my portaudioStream);
+		} catch (...) { }
+		my portaudioStream = nullptr;
+	}
+}
+
 static void stopRecording (SoundRecorder me) {	
 	if (! my recording) return;
 	try {
 		my recording = false;
 		if (! my synchronous) {
 			if (my inputUsesPortAudio) {
-				Pa_StopStream (my portaudioStream);
-				Pa_CloseStream (my portaudioStream);
-				my portaudioStream = nullptr;
+				// Keep portaudioStream in hot standby mode for zero-latency restart
 			} else {
 				#if defined (_WIN32)
-					/*
-					 * On newer systems, waveInStop waits until the buffer is full.
-					 * Wrong behaviour!
-					 * Therefore, we call waveInReset instead.
-					 * But on these same newer systems, waveInReset causes the dwBytesRecorded
-					 * attribute to go to zero, so we cannot do
-					 * my nsamp = my waveHeader [0]. dwBytesRecorded / (sizeof (short) * my numberOfChannels);
-					 */
 					MMTIME mmtime;
 					mmtime. wType = TIME_BYTES;
 					my nsamp = 0;
@@ -236,7 +238,7 @@ static void stopRecording (SoundRecorder me) {
 }
 
 void structSoundRecorder :: v9_destroy () noexcept {
-	stopRecording (this);   // must occur before freeing our buffer
+	our recording = false;
 	MelderAudio_stopPlaying (MelderAudio_IMPLICIT);   // must also occur before freeing our buffer
 	#if cocoa
 		if (our d_cocoaTimer)
@@ -249,10 +251,7 @@ void structSoundRecorder :: v9_destroy () noexcept {
 	#endif
 
 	if (our inputUsesPortAudio) {
-		if (our portaudioStream)
-			Pa_StopStream (our portaudioStream);
-		if (our portaudioStream)
-			Pa_CloseStream (our portaudioStream);
+		closePortAudioStream (this);
 	} else {
 		#if defined (_WIN32)
 			if (our hWaveIn != 0) {
@@ -601,6 +600,9 @@ static int portaudioStreamCallback (
 		the workProc will therefore have to take some care in accessing my nsamp (see there).
 	*/
 	SoundRecorder me = static_cast <SoundRecorder> (void_SoundRecorder);
+	if (! my recording)
+		return paContinue;
+
 	if (Melder_debug == 20)
 		Melder_casual (U"The PortAudio stream callback receives ", frameCount, U" frames.");
 	Melder_assert (my nsamp <= my nmax);
@@ -611,13 +613,71 @@ static int portaudioStreamCallback (
 			Melder_casual (U"play ", dsamples, U" ", Pa_GetStreamCpuLoad (my portaudioStream));
 		memcpy (& my recordBuffer [1 + my nsamp * my numberOfChannels], input, 2 * dsamples * my numberOfChannels);
 		my nsamp += dsamples;
-		if (my nsamp >= my nmax)
-			return paComplete;
-	} else /*if (my nsamp >= my nmax)*/ {
+		if (my nsamp >= my nmax) {
+			my recording = false;
+			return paContinue;
+		}
+	} else {
 		my nsamp = my nmax;
-		return paComplete;
+		my recording = false;
+		return paContinue;
 	}
 	return paContinue;
+}
+
+static void ensurePortAudioStream (SoundRecorder me) {
+	if (my portaudioStream)
+		return;
+	PaStreamParameters streamParameters = { };
+	integer preferredDevIndex = MelderAudio_getInputDeviceIndex ();
+	if (preferredDevIndex >= 0 && preferredDevIndex < Pa_GetDeviceCount ()) {
+		streamParameters. device = (PaDeviceIndex) preferredDevIndex;
+		const PaDeviceInfo *devInfo = Pa_GetDeviceInfo (streamParameters. device);
+		if (devInfo)
+			streamParameters. suggestedLatency = devInfo -> defaultLowInputLatency;
+	} else if (theControlPanel. inputSource >= 1 && theControlPanel. inputSource <= my numberOfInputDevices) {
+		streamParameters. device = my deviceIndices [theControlPanel. inputSource];
+		streamParameters. suggestedLatency = my deviceInfos [theControlPanel. inputSource] -> defaultLowInputLatency;
+	} else {
+		streamParameters. device = Pa_GetDefaultInputDevice ();
+		if (streamParameters. device != paNoDevice) {
+			const PaDeviceInfo *devInfo = Pa_GetDeviceInfo (streamParameters. device);
+			if (devInfo)
+				streamParameters. suggestedLatency = devInfo -> defaultLowInputLatency;
+		}
+	}
+	streamParameters. channelCount = my numberOfChannels;
+	streamParameters. sampleFormat = paInt16;
+	#if defined (macintosh)
+		PaMacCoreStreamInfo macCoreStreamInfo = { };
+		macCoreStreamInfo. size = sizeof (PaMacCoreStreamInfo);
+		macCoreStreamInfo. hostApiType = paCoreAudio;
+		macCoreStreamInfo. version = 0x01;
+		macCoreStreamInfo. flags = paMacCoreChangeDeviceParameters | paMacCoreFailIfConversionRequired;
+		streamParameters. hostApiSpecificStreamInfo = & macCoreStreamInfo;
+	#endif
+	if (Melder_debug == 20)
+		Melder_casual (U"Before Pa_OpenStream");
+	PaError err = Pa_OpenStream (& my portaudioStream, & streamParameters, nullptr,
+		theControlPanel. sampleRate, 0, paNoFlag, portaudioStreamCallback, (void *) me);
+	if (Melder_debug == 20)
+		Melder_casual (U"Pa_OpenStream returns ", (int) err);
+	if (err) {
+		conststring32 errorText = Melder_peek8to32_u (Pa_GetErrorText (err));
+		if (Melder_equ (errorText, U"Invalid number of channels")) {
+			if (my numberOfChannels == 1)
+				Melder_throw (U"You are trying to record in mono, but your microphone does not seem to support that.\nPerhaps you could try to record in stereo instead.");
+			else
+				Melder_throw (U"You are trying to record in stereo, but you do not seem to have a stereo microphone.\nPerhaps you could try to record in mono instead.");
+		} else {
+			Melder_throw (U"Error opening audio input stream: ", errorText, U".");
+		}
+	}
+	err = Pa_StartStream (my portaudioStream);
+	if (Melder_debug == 20)
+		Melder_casual (U"Pa_StartStream returns ", (int) err);
+	if (err)
+		Melder_throw (U"Error starting audio input stream: ", Melder_peek8to32_u (Pa_GetErrorText (err)), U".");
 }
 
 static void startRecording (SoundRecorder me) {
@@ -625,60 +685,12 @@ static void startRecording (SoundRecorder me) {
 		if (my recording)
 			return;
 		my nsamp = 0;
-		my recording = true;
 		my lastLeftMaximum = 0;
 		my lastRightMaximum = 0;
 		if (! my synchronous) {
 			if (my inputUsesPortAudio) {
-				PaStreamParameters streamParameters = { };
-				integer preferredDevIndex = MelderAudio_getInputDeviceIndex ();
-				if (preferredDevIndex >= 0 && preferredDevIndex < Pa_GetDeviceCount ()) {
-					streamParameters. device = (PaDeviceIndex) preferredDevIndex;
-					const PaDeviceInfo *devInfo = Pa_GetDeviceInfo (streamParameters. device);
-					if (devInfo)
-						streamParameters. suggestedLatency = devInfo -> defaultLowInputLatency;
-				} else if (theControlPanel. inputSource >= 1 && theControlPanel. inputSource <= my numberOfInputDevices) {
-					streamParameters. device = my deviceIndices [theControlPanel. inputSource];
-					streamParameters. suggestedLatency = my deviceInfos [theControlPanel. inputSource] -> defaultLowInputLatency;
-				} else {
-					streamParameters. device = Pa_GetDefaultInputDevice ();
-					if (streamParameters. device != paNoDevice) {
-						const PaDeviceInfo *devInfo = Pa_GetDeviceInfo (streamParameters. device);
-						if (devInfo)
-							streamParameters. suggestedLatency = devInfo -> defaultLowInputLatency;
-					}
-				}
-				streamParameters. channelCount = my numberOfChannels;
-				streamParameters. sampleFormat = paInt16;
-				#if defined (macintosh)
-					PaMacCoreStreamInfo macCoreStreamInfo = { };
-					macCoreStreamInfo. size = sizeof (PaMacCoreStreamInfo);
-					macCoreStreamInfo. hostApiType = paCoreAudio;
-					macCoreStreamInfo. version = 0x01;
-					macCoreStreamInfo. flags = paMacCoreChangeDeviceParameters | paMacCoreFailIfConversionRequired;
-					streamParameters. hostApiSpecificStreamInfo = & macCoreStreamInfo;
-				#endif
-				if (Melder_debug == 20)
-					Melder_casual (U"Before Pa_OpenStream");
-				PaError err = Pa_OpenStream (& my portaudioStream, & streamParameters, nullptr,
-					theControlPanel. sampleRate, 0, paNoFlag, portaudioStreamCallback, (void *) me);
-				if (Melder_debug == 20)
-					Melder_casual (U"Pa_OpenStream returns ", (int) err);
-				if (err) {
-					conststring32 errorText = Melder_peek8to32_u (Pa_GetErrorText (err));
-					if (Melder_equ (errorText, U"Invalid number of channels"))
-						if (my numberOfChannels == 1)
-							Melder_throw (U"You are trying to record in mono, but your microphone does not seem to support that.\nPerhaps you could try to record in stereo instead.");
-						else
-							Melder_throw (U"You are trying to record in stereo, but you do not seem to have a stereo microphone.\nPerhaps you could try to record in mono instead.");
-					else
-						Melder_throw (U"Error opening audio input stream: ", errorText, U".");
-				}
-				Pa_StartStream (my portaudioStream);
-				if (Melder_debug == 20)
-					Melder_casual (U"Pa_StartStream returns ", (int) err);
-				if (err)
-					Melder_throw (U"Error starting audio input stream: ", Melder_peek8to32_u (Pa_GetErrorText (err)), U".");
+				ensurePortAudioStream (me);
+				my recording = true;
 			} else {
 				#if defined (_WIN32)
 					win_fillFormat (me);
@@ -689,6 +701,7 @@ static void startRecording (SoundRecorder me) {
 					win_waveInStart (me);
 				#elif defined (macintosh)
 				#endif
+				my recording = true;
 			}
 		}
 		Graphics_updateWs (my graphics.get());
@@ -1052,7 +1065,7 @@ static void gui_radiobutton_cb_input (SoundRecorder me, GuiRadioButtonEvent even
 
 	/* Set system's input source. */
 	if (my inputUsesPortAudio) {
-		// deferred to the start of recording
+		closePortAudioStream (me);
 	} else {
 		#if defined (_WIN32)
 			// deferred to the start of recording
@@ -1106,7 +1119,7 @@ static void gui_radiobutton_cb_fsamp (SoundRecorder me, GuiRadioButtonEvent even
 			and reopening it with a new sampling frequency.
 		*/
 		if (my inputUsesPortAudio) {
-			// deferred to the start of recording
+			closePortAudioStream (me);
 		} else {
 			#if defined (_WIN32)
 				// deferred to the start of recording
@@ -1537,6 +1550,13 @@ gui_drawingarea_cb_resize (me.get(), & event);
 			my workProcId = XtAddWorkProc (workProc, me.get());
 		#endif
 		updateMenus (me.get());
+		if (my inputUsesPortAudio) {
+			try {
+				ensurePortAudioStream (me.get());
+			} catch (MelderError) {
+				Melder_clearError ();
+			}
+		}
 		return me;
 	} catch (MelderError) {
 		Melder_throw (U"SoundRecorder not created.");
