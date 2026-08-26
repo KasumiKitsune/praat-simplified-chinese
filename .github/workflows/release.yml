@@ -11,7 +11,7 @@ on:
       release_name:
         description: "Release title"
         required: false
-        default: "Praat 7.0 简体中文版 (v7.0-zh.1)"
+        default: "Praat 7.0 中文版 (v7.0-zh.3)"
         type: string
       release_notes:
         description: "Release notes / description"
@@ -293,7 +293,7 @@ jobs:
 
           NOTES="$RELEASE_NOTES"
           if [ -z "$NOTES" ]; then
-            NOTES="基于 Praat 7.0 的非官方简体中文本地化版本。包含 Windows x64 与 macOS universal 构建产物。"
+            NOTES="基于 Praat 7.0 的非官方中文本地化版本。包含 Windows x64 与 macOS universal 构建产物。"
           fi
 
           if gh release view "$TAG_NAME" --repo "$GH_REPO" >/dev/null 2>&1; then
