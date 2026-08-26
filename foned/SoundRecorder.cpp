@@ -273,7 +273,7 @@ static void showMaximum (SoundRecorder me, int channel, double maximum) {
 	Graphics_setWindow (my graphics.get(),
 		my numberOfChannels == 1 || channel == 1 ? 0.0 : -1.0,
 		my numberOfChannels == 1 || channel == 2 ? 1.0 : 2.0,
-		-0.1, 1.1);
+		0.0, 1.0);
 	Graphics_setGrey (my graphics.get(), 0.9);
 	Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, maximum, 1.0);
 	Graphics_setColour (my graphics.get(), Melder_GREEN);
@@ -364,6 +364,9 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 		return;
 	}
 	if (my instancePref_meter_which() == kSoundRecorder_meter::INTENSITY) {
+		double x1w, x2w, y1w, y2w;
+		Graphics_inqWsWindow (my graphics.get(), & x1w, & x2w, & y1w, & y2w);
+		Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
 		int leftMaximum = 0, rightMaximum = 0;
 		if (my numberOfChannels == 1) {
 			for (integer i = 0; i < nsamp; i ++) {
