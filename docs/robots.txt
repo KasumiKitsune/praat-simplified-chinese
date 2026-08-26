@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kasumikitsune.github.io/praat-simplified-chinese/sitemap.xml
