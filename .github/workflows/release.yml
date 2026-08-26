@@ -19,14 +19,14 @@ on:
         default: ""
         type: string
       praat_upstream_tag:
-        description: "Upstream Praat tag used for the Xcode project, e.g. v7.0"
+        description: "Upstream Praat tag used for the Xcode project, e.g. v7.0.01"
         required: false
-        default: "v7.0"
+        default: "v7.0.01"
         type: string
       praat_version_digits:
-        description: "Praat version digits used in upstream asset names, e.g. 7000"
+        description: "Praat version digits used in upstream asset names, e.g. 7001"
         required: false
-        default: "7000"
+        default: "7001"
         type: string
       xcodeproj_url:
         description: "Optional direct URL to praatXXXX_xcodeproj.zip; leave blank to use upstream tag/version"
