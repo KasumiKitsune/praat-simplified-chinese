@@ -966,7 +966,15 @@ autoUiForm UiForm_createE (EditorCommand cmd, conststring32 title, conststring32
 static UiField UiForm_addField (UiForm me, _kUiField_type type, conststring32 labelText) {
 	if (my numberOfFields == MAXIMUM_NUMBER_OF_FIELDS)
 		Melder_throw (U"Cannot have more than ", MAXIMUM_NUMBER_OF_FIELDS, U"fields in a form.");
-	my field [++ my numberOfFields] = UiField_create (type, praat_translate (labelText));
+	autostring32 translatedLabel;
+	if (str32nequ (labelText, U"left ", 5)) {
+		translatedLabel = Melder_dup (Melder_cat (U"left ", praat_translate (labelText + 5)));
+	} else if (str32nequ (labelText, U"right ", 6)) {
+		translatedLabel = Melder_dup (Melder_cat (U"right ", praat_translate (labelText + 6)));
+	} else {
+		translatedLabel = Melder_dup (praat_translate (labelText));
+	}
+	my field [++ my numberOfFields] = UiField_create (type, translatedLabel.get());
 	return my field [my numberOfFields].get();
 }
 
