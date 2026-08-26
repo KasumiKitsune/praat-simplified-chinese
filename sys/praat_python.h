@@ -13,7 +13,7 @@ conststring32 praat_python_getExecutablePath ();
 void praat_python_setExecutablePath (conststring32 path);
 
 // Run a Python script file (.py)
-void praat_runPythonScriptFile (conststring32 filePath);
+void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWorkingDir = nullptr);
 
 // Run Python code text directly
 void praat_runPythonScriptText (conststring32 scriptText, conststring32 optionalScriptDirectory = nullptr);

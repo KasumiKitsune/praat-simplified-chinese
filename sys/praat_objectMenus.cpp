@@ -410,14 +410,6 @@ DIRECT (PRAAT__openPythonScript) {
 	PRAAT_END
 }
 
-FORM (PRAAT__runPythonScript, U"Run Python script", U"Run Python script...") {
-	INFILE (scriptFile, U"Python script file", U"")
-	OK
-	DO
-		praat_runPythonScriptFile (scriptFile);
-	PRAAT_END
-}
-
 FORM (PRAAT__pythonSettings, U"Python settings", U"Python settings...") {
 	TEXTFIELD (pythonPath, U"Python executable path", praat_python_getExecutablePath (), 1)
 	OK
@@ -1140,8 +1132,6 @@ void praat_addMenus (GuiWindow window) {
 			PRAAT__newPythonScript);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Open Python script...", nullptr, GuiMenu_NO_API,
 			PRAAT__openPythonScript);
-	praat_addMenuCommand (U"Objects", U"Praat", U"Run Python script...", nullptr, GuiMenu_NO_API,
-			PRAAT__runPythonScript);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Python settings...", nullptr, GuiMenu_NO_API,
 			PRAAT__pythonSettings);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Open Picture window", nullptr, GuiMenu_NO_API,

@@ -16,11 +16,12 @@ static void menu_cb_run (PythonScriptEditor me, EDITOR_ARGS) {
 		autostring32 text = GuiText_getString (my textWidget);
 		if (! text || text [0] == U'\0')
 			Melder_throw (U"No Python script text to run.");
-		if (! MelderFile_isNull (& my file)) {
-			praat_runPythonScriptFile (MelderFile_peekPath (& my file));
-		} else {
-			praat_runPythonScriptText (text.get());
-		}
+
+		const char32 *scriptDir = nullptr;
+		if (! MelderFile_isNull (& my file))
+			scriptDir = MelderFile_peekPath (& my file);
+
+		praat_runPythonScriptText (text.get(), scriptDir);
 	} catch (MelderError) {
 		Melder_flushError (U"Python script execution failed.");
 	}
@@ -31,7 +32,12 @@ static void menu_cb_runSelection (PythonScriptEditor me, EDITOR_ARGS) {
 		autostring32 selectedText = GuiText_getSelection (my textWidget);
 		if (! selectedText || selectedText [0] == U'\0')
 			Melder_throw (U"No Python script text selected.");
-		praat_runPythonScriptText (selectedText.get());
+
+		const char32 *scriptDir = nullptr;
+		if (! MelderFile_isNull (& my file))
+			scriptDir = MelderFile_peekPath (& my file);
+
+		praat_runPythonScriptText (selectedText.get(), scriptDir);
 	} catch (MelderError) {
 		Melder_flushError (U"Python script selection execution failed.");
 	}

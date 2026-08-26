@@ -14,13 +14,61 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <cstdlib>
+#include <sstream>
+#include <iomanip>
 
 #if defined (_WIN32)
 	#include <windows.h>
+	#include <process.h>
 #else
 	#include <unistd.h>
 	#include <sys/wait.h>
+	#include <sys/types.h>
+#endif
+
+static std::filesystem::path get_process_workspace () {
+#if defined (_WIN32)
+	unsigned long pid = GetCurrentProcessId ();
+#else
+	pid_t pid = getpid ();
+#endif
+	return std::filesystem::temp_directory_path () / ("praat_py_workspace_" + std::to_string (pid));
+}
+
+static std::string escape_json_string (const std::string &str) {
+	std::ostringstream oss;
+	for (unsigned char c : str) {
+		switch (c) {
+			case '"':  oss << "\\\""; break;
+			case '\\': oss << "\\\\"; break;
+			case '\b': oss << "\\b"; break;
+			case '\f': oss << "\\f"; break;
+			case '\n': oss << "\\n"; break;
+			case '\r': oss << "\\r"; break;
+			case '\t': oss << "\\t"; break;
+			default:
+				if (c < 0x20) {
+					oss << "\\u" << std::hex << std::setw (4) << std::setfill ('0') << (int) c;
+				} else {
+					oss << (char) c;
+				}
+				break;
+		}
+	}
+	return oss.str ();
+}
+
+#if defined (_WIN32)
+static std::wstring utf8_to_wstring (const std::string &u8) {
+	if (u8.empty ()) return std::wstring ();
+	int len = MultiByteToWideChar (CP_UTF8, 0, u8.c_str (), (int) u8.size (), nullptr, 0);
+	if (len <= 0) return std::wstring ();
+	std::wstring w (len, 0);
+	MultiByteToWideChar (CP_UTF8, 0, u8.c_str (), (int) u8.size (), & w [0], len);
+	return w;
+}
 #endif
 
 static char32 thePythonExecutablePath [Preferences_STRING_BUFFER_SIZE];
@@ -88,14 +136,14 @@ autostring32 praat_python_getTutorialDoc () {
 		U"1. 运行与调试\n"
 		U"   • 运行整个脚本：按下快捷键 【Ctrl + R】 或点击菜单 【运行 -> 运行】\n"
 		U"   • 运行选区代码：按下快捷键 【Ctrl + T】 或点击菜单 【运行 -> 运行选区】\n"
-		U"   • 控制台输出：所有的 print(...) 输出会自动呈现在 Praat 的 Info 窗口中。\n\n"
+		U"   • 控制台输出：所有的 print(...) 与异常报错会自动呈现在 Praat 的 Info 窗口中。\n\n"
 		U"2. 桥接模块 praat\n"
 		U"   在脚本开头输入 import praat 即可使用内置桥接功能：\n"
-		U"   • praat.get_selected()：获取当前在 Praat 对象列表选中的所有对象信息\n"
-		U"   • praat.call(command, *args)：直接调用任意 Praat 菜单命令或声学算法\n"
-		U"   • praat.select(id) / praat.plus_select(id)：选中或增选指定对象\n"
-		U"   • praat.rename(name)：为当前选中对象重命名\n"
-		U"   • praat.remove()：移除当前选中对象\n"
+		U"   • praat.get_selected()：获取 Praat 当前选中的对象信息。选中的 Sound 对象已自动导出为标准 .wav 音频（可直接用 scipy/librosa/parselmouth 读取）。\n"
+		U"   • praat.call(command, *args)：调度调用 Praat 菜单命令或声学算法（在 Python 结束后由 Praat 顺序执行）。\n"
+		U"   • praat.select(id) / praat.plus_select(id)：调度选中指定对象\n"
+		U"   • praat.rename(name)：调度重命名当前选中对象\n"
+		U"   • praat.remove()：调度删除当前选中对象\n"
 		U"   • praat.get_output_dir()：获取输出目录，保存在该目录的文件会在脚本结束后自动载入 Praat\n\n"
 		U"3. Python 运行环境设置\n"
 		U"   • 点击 【Praat -> Python 设置...】 可以配置 Python 解释器路径。\n"
@@ -118,9 +166,10 @@ autostring32 praat_python_getApiDoc () {
 		U"=================================================================\n\n"
 		U"• praat.get_selected()\n"
 		U"  返回当前在 Praat 对象列表中选中的所有对象列表。\n"
-		U"  返回值格式：[ {'id': 1, 'name': 'Sound_1', 'class': 'Sound', 'file': 'path/to/file'}, ... ]\n\n"
+		U"  返回值格式：[ {'id': 1, 'name': 'Sound_1', 'class': 'Sound', 'file': 'path/to/file.wav'}, ... ]\n"
+		U"  提示：Sound 对象文件为标准 16-bit PCM .wav，TextGrid 为标准 .TextGrid 格式。\n\n"
 		U"• praat.call(command_name, *args)\n"
-		U"  在 Praat 中执行任意原生命令（算法）。\n"
+		U"  调度执行 Praat 原生菜单命令或算法（在 Python 执行完毕后统一批处理执行）。\n"
 		U"  示例：\n"
 		U"    praat.call(\"To Pitch (ac)...\", 0.0, 75, 15, \"yes\", 0.03, 0.45, 0.01, 0.35, 0.14, 600)\n"
 		U"    praat.call(\"To Formant (burg)...\", 0.0, 5, 5500, 0.025, 50)\n"
@@ -299,11 +348,11 @@ static void ensure_helper_module (const std::filesystem::path& tempDir) {
 	}
 }
 
-void praat_runPythonScriptFile (conststring32 filePath) {
+void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWorkingDir) {
 	if (! filePath || filePath [0] == U'\0')
 		Melder_throw (U"No Python script file specified.");
 
-	std::filesystem::path tempDir = std::filesystem::temp_directory_path() / "praat_py_workspace";
+	std::filesystem::path tempDir = get_process_workspace ();
 	std::filesystem::create_directories (tempDir);
 	std::filesystem::path outputDir = tempDir / "output";
 	try {
@@ -320,87 +369,137 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 			std::filesystem::remove (commandsPath);
 	} catch (...) {}
 
+	// Record currently selected objects
+	std::vector<integer> selectedIds;
+	if (theCurrentPraatObjects && theCurrentPraatObjects -> totalSelection > 0) {
+		for (integer iobj = 1; iobj <= theCurrentPraatObjects -> n; iobj ++) {
+			if (theCurrentPraatObjects -> list [iobj]. isSelected)
+				selectedIds.push_back (iobj);
+		}
+	}
+
 	// Export selected objects to workspace
 	std::filesystem::path contextJsonPath = tempDir / "praat_context.json";
 	std::ofstream jsonOfs (contextJsonPath, std::ios::out | std::ios::trunc);
 	if (jsonOfs.is_open()) {
 		jsonOfs << "{\n  \"selected_objects\": [\n";
 		bool first = true;
-		if (theCurrentPraatObjects && theCurrentPraatObjects -> totalSelection > 0) {
-			for (integer iobj = 1; iobj <= theCurrentPraatObjects -> n; iobj ++) {
-				if (theCurrentPraatObjects -> list [iobj]. isSelected) {
-					Daata object = theCurrentPraatObjects -> list [iobj]. object;
-					if (! object) continue;
+		for (integer iobj : selectedIds) {
+			Daata object = theCurrentPraatObjects -> list [iobj]. object;
+			if (! object) continue;
 
-					if (! first) jsonOfs << ",\n";
-					first = false;
+			if (! first) jsonOfs << ",\n";
+			first = false;
 
-					char32 sanitizedBaseName [128];
-					str32cpy (sanitizedBaseName, theCurrentPraatObjects -> list [iobj]. name.get());
-					for (char32 *p = sanitizedBaseName; *p != U'\0'; p ++) {
-						if (*p == U' ' || *p == U'\\' || *p == U'/' || *p == U':' || *p == U'*' || *p == U'?' || *p == U'"' || *p == U'<' || *p == U'>' || *p == U'|')
-							*p = U'_';
-					}
-
-					autoMelderString objFileName;
-					MelderString_append (& objFileName, iobj, U"_", sanitizedBaseName, U".ooTextFile");
-					autostring8 objFileName8 = Melder_32to8 (objFileName.string);
-					std::filesystem::path objPath = tempDir / (objFileName8 ? objFileName8.get() : "obj.ooTextFile");
-
-					structMelderFile objMelderFile { };
-					autostring32 objPath32 = Melder_8to32_e (objPath.u8string().c_str());
-					Melder_pathToFile (objPath32.get(), & objMelderFile);
-					try {
-						Data_writeToTextFile (object, & objMelderFile);
-					} catch (...) {}
-
-					autostring8 utf8Name = Melder_32to8 (theCurrentPraatObjects -> list [iobj]. name.get());
-					autostring8 utf8Class = Melder_32to8 (Thing_className (object));
-					std::string objPathStr = objPath.u8string();
-
-					jsonOfs << "    {\n"
-					        << "      \"id\": " << iobj << ",\n"
-					        << "      \"name\": \"" << (utf8Name ? utf8Name.get() : "") << "\",\n"
-					        << "      \"class\": \"" << (utf8Class ? utf8Class.get() : "") << "\",\n"
-					        << "      \"file\": \"";
-					for (char c : objPathStr) {
-						if (c == '\\') jsonOfs << "\\\\";
-						else jsonOfs << c;
-					}
-					jsonOfs << "\"\n    }";
-				}
+			char32 sanitizedBaseName [128];
+			str32cpy (sanitizedBaseName, theCurrentPraatObjects -> list [iobj]. name.get());
+			for (char32 *p = sanitizedBaseName; *p != U'\0'; p ++) {
+				if (*p == U' ' || *p == U'\\' || *p == U'/' || *p == U':' || *p == U'*' || *p == U'?' || *p == U'"' || *p == U'<' || *p == U'>' || *p == U'|')
+					*p = U'_';
 			}
+
+			conststring32 className = Thing_className (object);
+			bool isSound = str32equ (className, U"Sound");
+			bool isTextGrid = str32equ (className, U"TextGrid");
+
+			const char32 *ext = isSound ? U".wav" : (isTextGrid ? U".TextGrid" : U".ooTextFile");
+
+			autoMelderString objFileName;
+			MelderString_append (& objFileName, iobj, U"_", sanitizedBaseName, ext);
+			autostring8 objFileName8 = Melder_32to8 (objFileName.string);
+			std::filesystem::path objPath = tempDir / (objFileName8 ? objFileName8.get() : "obj");
+
+			if (isSound) {
+				// Export Sound as standard PCM WAV file
+				autoMelderString saveCmd;
+				autostring32 objPath32 = Melder_8to32_e (objPath.u8string().c_str());
+				autoMelderString escapedObjPath;
+				if (objPath32) {
+					for (const char32 *p = objPath32.get(); *p != U'\0'; p++) {
+						if (*p == U'"')
+							MelderString_append (& escapedObjPath, U"\"\"");
+						else
+							MelderString_appendCharacter (& escapedObjPath, *p);
+					}
+				}
+				MelderString_append (& saveCmd, U"selectObject: ", iobj, U"\nSave as WAV file: \"", escapedObjPath.string, U"\"\n");
+				try {
+					praat_executeScriptFromText (saveCmd.string);
+				} catch (...) {
+					structMelderFile objMelderFile { };
+					Melder_pathToFile (objPath32.get(), & objMelderFile);
+					try { Data_writeToTextFile (object, & objMelderFile); } catch (...) {}
+				}
+			} else {
+				structMelderFile objMelderFile { };
+				autostring32 objPath32 = Melder_8to32_e (objPath.u8string().c_str());
+				Melder_pathToFile (objPath32.get(), & objMelderFile);
+				try {
+					Data_writeToTextFile (object, & objMelderFile);
+				} catch (...) {}
+			}
+
+			autostring8 utf8Name = Melder_32to8 (theCurrentPraatObjects -> list [iobj]. name.get());
+			autostring8 utf8Class = Melder_32to8 (className);
+			std::string objPathStr = objPath.u8string();
+
+			jsonOfs << "    {\n"
+			        << "      \"id\": " << iobj << ",\n"
+			        << "      \"name\": \"" << escape_json_string (utf8Name ? utf8Name.get() : "") << "\",\n"
+			        << "      \"class\": \"" << escape_json_string (utf8Class ? utf8Class.get() : "") << "\",\n"
+			        << "      \"file\": \"" << escape_json_string (objPathStr) << "\"\n"
+			        << "    }";
 		}
 		jsonOfs << "\n  ]\n}\n";
 		jsonOfs.close();
 	}
 
+	// Restore original selection
+	if (! selectedIds.empty ()) {
+		autoMelderString restoreSelectionCmd;
+		MelderString_append (& restoreSelectionCmd, U"selectObject: ", selectedIds [0], U"\n");
+		for (size_t i = 1; i < selectedIds.size (); i ++) {
+			MelderString_append (& restoreSelectionCmd, U"plusObject: ", selectedIds [i], U"\n");
+		}
+		try {
+			praat_executeScriptFromText (restoreSelectionCmd.string);
+		} catch (...) {}
+	}
+
 	conststring32 pyExec = praat_python_getExecutablePath ();
 
 	#if defined (_WIN32)
-		HANDLE hStdoutRead = NULL, hStdoutWrite = NULL;
-		HANDLE hStderrRead = NULL, hStderrWrite = NULL;
+		HANDLE hPipeRead = NULL, hPipeWrite = NULL;
 		SECURITY_ATTRIBUTES saAttr;
 		saAttr.nLength = sizeof (SECURITY_ATTRIBUTES);
 		saAttr.bInheritHandle = TRUE;
 		saAttr.lpSecurityDescriptor = NULL;
 
-		CreatePipe (& hStdoutRead, & hStdoutWrite, & saAttr, 0);
-		SetHandleInformation (hStdoutRead, HANDLE_FLAG_INHERIT, 0);
-
-		CreatePipe (& hStderrRead, & hStderrWrite, & saAttr, 0);
-		SetHandleInformation (hStderrRead, HANDLE_FLAG_INHERIT, 0);
+		CreatePipe (& hPipeRead, & hPipeWrite, & saAttr, 0);
+		SetHandleInformation (hPipeRead, HANDLE_FLAG_INHERIT, 0);
 
 		STARTUPINFOW si;
 		ZeroMemory (& si, sizeof (STARTUPINFOW));
 		si.cb = sizeof (STARTUPINFOW);
-		si.hStdOutput = hStdoutWrite;
-		si.hStdError = hStderrWrite;
+		si.hStdOutput = hPipeWrite;
+		si.hStdError = hPipeWrite; // Merge stderr to single pipe to prevent deadlocks and maintain ordering
 		si.hStdInput = GetStdHandle (STD_INPUT_HANDLE);
 		si.dwFlags |= STARTF_USESTDHANDLES;
 
 		PROCESS_INFORMATION pi;
 		ZeroMemory (& pi, sizeof (PROCESS_INFORMATION));
+
+		// Backup parent process environment variables
+		wchar_t oldPythonPath [4096] = {0};
+		DWORD oldPythonPathLen = GetEnvironmentVariableW (L"PYTHONPATH", oldPythonPath, 4096);
+		wchar_t oldContext [4096] = {0};
+		DWORD oldContextLen = GetEnvironmentVariableW (L"PRAAT_CONTEXT", oldContext, 4096);
+		wchar_t oldTempDir [4096] = {0};
+		DWORD oldTempDirLen = GetEnvironmentVariableW (L"PRAAT_TEMP_DIR", oldTempDir, 4096);
+		wchar_t oldIOEnc [4096] = {0};
+		DWORD oldIOEncLen = GetEnvironmentVariableW (L"PYTHONIOENCODING", oldIOEnc, 4096);
+		wchar_t oldUnbuf [4096] = {0};
+		DWORD oldUnbufLen = GetEnvironmentVariableW (L"PYTHONUNBUFFERED", oldUnbuf, 4096);
 
 		// Set Environment variables for python
 		SetEnvironmentVariableW (L"PRAAT_CONTEXT", contextJsonPath.wstring().c_str());
@@ -409,9 +508,8 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 		SetEnvironmentVariableW (L"PYTHONUNBUFFERED", L"1");
 
 		std::wstring existingPythonPath;
-		wchar_t envBuf [4096];
-		if (GetEnvironmentVariableW (L"PYTHONPATH", envBuf, 4096) > 0)
-			existingPythonPath = tempDir.wstring() + L";" + envBuf;
+		if (oldPythonPathLen > 0)
+			existingPythonPath = tempDir.wstring() + L";" + oldPythonPath;
 		else
 			existingPythonPath = tempDir.wstring();
 		SetEnvironmentVariableW (L"PYTHONPATH", existingPythonPath.c_str());
@@ -419,17 +517,24 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 		autostring8 pyExec8 = Melder_32to8 (pyExec);
 		autostring8 filePath8 = Melder_32to8 (filePath);
 		std::string cmdLineA = "\"" + std::string (pyExec8 ? pyExec8.get() : "python") + "\" \"" + std::string (filePath8 ? filePath8.get() : "") + "\"";
-		autostring32 cmdLine32 = Melder_8to32_e (cmdLineA.c_str());
-		std::wstring cmdLineW;
-		if (cmdLine32) {
-			for (const char32 *p = cmdLine32.get(); *p != U'\0'; p ++)
-				cmdLineW.push_back ((wchar_t) *p);
-		}
+		std::wstring cmdLineW = utf8_to_wstring (cmdLineA);
 
 		// Determine script working directory
-		autostring8 scriptPath8 = Melder_32to8 (filePath);
-		std::filesystem::path scriptDirPath = std::filesystem::u8path (scriptPath8 ? scriptPath8.get() : "").parent_path();
-		std::wstring cwdW = scriptDirPath.wstring();
+		std::wstring cwdW;
+		if (optionalWorkingDir && optionalWorkingDir [0] != U'\0') {
+			autostring8 optCwd8 = Melder_32to8 (optionalWorkingDir);
+			if (optCwd8) {
+				std::filesystem::path p = std::filesystem::u8path (optCwd8.get());
+				if (std::filesystem::is_directory (p))
+					cwdW = p.wstring();
+				else if (p.has_parent_path())
+					cwdW = p.parent_path().wstring();
+			}
+		}
+		if (cwdW.empty()) {
+			std::filesystem::path scriptDirPath = std::filesystem::u8path (filePath8 ? filePath8.get() : "").parent_path();
+			cwdW = scriptDirPath.wstring();
+		}
 		const wchar_t *cwd = cwdW.empty() ? nullptr : cwdW.c_str();
 
 		std::vector<wchar_t> cmdLineMutable (cmdLineW.begin(), cmdLineW.end());
@@ -448,27 +553,38 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 			& pi
 		);
 
-		CloseHandle (hStdoutWrite);
-		CloseHandle (hStderrWrite);
+		// Close parent's write handle so ReadFile gets EOF when child exits
+		CloseHandle (hPipeWrite);
+
+		// Restore parent process environment variables
+		if (oldPythonPathLen > 0) SetEnvironmentVariableW (L"PYTHONPATH", oldPythonPath);
+		else SetEnvironmentVariableW (L"PYTHONPATH", NULL);
+
+		if (oldContextLen > 0) SetEnvironmentVariableW (L"PRAAT_CONTEXT", oldContext);
+		else SetEnvironmentVariableW (L"PRAAT_CONTEXT", NULL);
+
+		if (oldTempDirLen > 0) SetEnvironmentVariableW (L"PRAAT_TEMP_DIR", oldTempDir);
+		else SetEnvironmentVariableW (L"PRAAT_TEMP_DIR", NULL);
+
+		if (oldIOEncLen > 0) SetEnvironmentVariableW (L"PYTHONIOENCODING", oldIOEnc);
+		else SetEnvironmentVariableW (L"PYTHONIOENCODING", NULL);
+
+		if (oldUnbufLen > 0) SetEnvironmentVariableW (L"PYTHONUNBUFFERED", oldUnbuf);
+		else SetEnvironmentVariableW (L"PYTHONUNBUFFERED", NULL);
 
 		if (! success) {
-			CloseHandle (hStdoutRead);
-			CloseHandle (hStderrRead);
+			CloseHandle (hPipeRead);
 			Melder_throw (U"Cannot start Python subprocess: <<", pyExec, U">>.\nPlease check your Python executable path in Praat -> Python settings.");
 		}
 
-		// Read stdout and stderr
-		std::string stdoutAccum, stderrAccum;
+		// Read output continuously
+		std::string outputAccum;
 		char buffer [4096];
-		DWORD bytesRead;
+		DWORD bytesRead = 0;
 
-		while (ReadFile (hStdoutRead, buffer, sizeof (buffer) - 1, & bytesRead, NULL) && bytesRead > 0) {
+		while (ReadFile (hPipeRead, buffer, sizeof (buffer) - 1, & bytesRead, NULL) && bytesRead > 0) {
 			buffer [bytesRead] = '\0';
-			stdoutAccum.append (buffer, bytesRead);
-		}
-		while (ReadFile (hStderrRead, buffer, sizeof (buffer) - 1, & bytesRead, NULL) && bytesRead > 0) {
-			buffer [bytesRead] = '\0';
-			stderrAccum.append (buffer, bytesRead);
+			outputAccum.append (buffer, bytesRead);
 		}
 
 		WaitForSingleObject (pi.hProcess, INFINITE);
@@ -477,11 +593,9 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 
 		CloseHandle (pi.hProcess);
 		CloseHandle (pi.hThread);
-		CloseHandle (hStdoutRead);
-		CloseHandle (hStderrRead);
+		CloseHandle (hPipeRead);
 
-		autostring32 out32 = Melder_8to32_e (stdoutAccum.c_str());
-		autostring32 err32 = Melder_8to32_e (stderrAccum.c_str());
+		autostring32 out32 = Melder_8to32_e (outputAccum.c_str());
 
 		if (out32 && out32 [0] != U'\0') {
 			MelderInfo_open ();
@@ -490,37 +604,55 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 		}
 
 		if (exitCode != 0) {
-			if (err32 && err32 [0] != U'\0') {
-				MelderInfo_open ();
-				if (out32 && out32 [0] != U'\0') {
-					MelderInfo_write (out32.get());
-					MelderInfo_write (U"\n--- Traceback / Errors ---\n");
-				}
-				MelderInfo_write (err32.get());
-				MelderInfo_close ();
-			}
 			Melder_throw (U"Python script exited with error (exit code ", (int) exitCode, U"). See Info window for details.");
 		}
 	#else
 		// POSIX implementation (macOS and Linux)
+		const char *oldPythonPath = getenv ("PYTHONPATH");
+		std::string oldPythonPathStr = oldPythonPath ? oldPythonPath : "";
+
 		setenv ("PRAAT_CONTEXT", contextJsonPath.string().c_str(), 1);
 		setenv ("PRAAT_TEMP_DIR", tempDir.string().c_str(), 1);
 		setenv ("PYTHONIOENCODING", "utf-8", 1);
 		setenv ("PYTHONUNBUFFERED", "1", 1);
 
-		const char *existingPythonPath = getenv ("PYTHONPATH");
 		std::string newPythonPath = tempDir.string();
-		if (existingPythonPath && existingPythonPath [0] != '\0')
-			newPythonPath += ":" + std::string (existingPythonPath);
+		if (! oldPythonPathStr.empty ())
+			newPythonPath += ":" + oldPythonPathStr;
 		setenv ("PYTHONPATH", newPythonPath.c_str(), 1);
 
 		autostring8 pyExec8 = Melder_32to8 (pyExec);
 		autostring8 filePath8 = Melder_32to8 (filePath);
 
-		std::string cmd = "\"" + std::string (pyExec8 ? pyExec8.get() : "python3") + "\" \"" + std::string (filePath8 ? filePath8.get() : "") + "\" 2>&1";
+		std::string safePyExec = pyExec8 ? pyExec8.get() : "python3";
+		std::string safeFilePath = filePath8 ? filePath8.get() : "";
+
+		std::string escapedPyExec;
+		for (char c : safePyExec) {
+			if (c == '\'') escapedPyExec += "'\\''";
+			else escapedPyExec += c;
+		}
+		std::string escapedFilePath;
+		for (char c : safeFilePath) {
+			if (c == '\'') escapedFilePath += "'\\''";
+			else escapedFilePath += c;
+		}
+
+		std::string cmd = "'" + escapedPyExec + "' '" + escapedFilePath + "' 2>&1";
 
 		std::string outputAccum;
 		FILE *pipe = popen (cmd.c_str(), "r");
+
+		// Restore environment variables
+		if (! oldPythonPathStr.empty ())
+			setenv ("PYTHONPATH", oldPythonPathStr.c_str(), 1);
+		else
+			unsetenv ("PYTHONPATH");
+		unsetenv ("PRAAT_CONTEXT");
+		unsetenv ("PRAAT_TEMP_DIR");
+		unsetenv ("PYTHONIOENCODING");
+		unsetenv ("PYTHONUNBUFFERED");
+
 		if (! pipe) {
 			Melder_throw (U"Cannot execute Python command: <<", pyExec, U">>.");
 		}
@@ -563,21 +695,40 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 		try { std::filesystem::remove (commandsPath); } catch (...) {}
 	}
 
-	// Auto-import any files generated in output/ during this run
+	// Auto-import any files generated in output/ during this run (sorted & protected)
 	try {
 		if (std::filesystem::exists (outputDir)) {
 			std::vector<std::filesystem::path> filesToImport;
 			for (const auto& entry : std::filesystem::directory_iterator (outputDir)) {
 				if (entry.is_regular_file()) {
-					filesToImport.push_back (entry.path());
+					std::string fname = entry.path().filename().string();
+					if (! fname.empty() && fname[0] != '.') {
+						filesToImport.push_back (entry.path());
+					}
 				}
 			}
+			std::sort (filesToImport.begin(), filesToImport.end());
+
 			for (const auto& fpath : filesToImport) {
 				std::string fullPath = fpath.u8string();
 				autostring32 path32 = Melder_8to32_e (fullPath.c_str());
+				if (! path32) continue;
+
+				autoMelderString escapedPath;
+				for (const char32 *p = path32.get(); *p != U'\0'; p++) {
+					if (*p == U'"')
+						MelderString_append (& escapedPath, U"\"\"");
+					else
+						MelderString_appendCharacter (& escapedPath, *p);
+				}
+
 				autoMelderString cmd;
-				MelderString_append (& cmd, U"Read from file: ~", path32.get(), U"\n");
-				praat_executeScriptFromText (cmd.string);
+				MelderString_append (& cmd, U"Read from file: \"", escapedPath.string, U"\"\n");
+				try {
+					praat_executeScriptFromText (cmd.string);
+				} catch (MelderError) {
+					Melder_clearError ();
+				}
 			}
 			// Clean up output dir after loading into memory
 			std::filesystem::remove_all (outputDir);
@@ -586,11 +737,11 @@ void praat_runPythonScriptFile (conststring32 filePath) {
 	} catch (...) {}
 }
 
-void praat_runPythonScriptText (conststring32 scriptText, conststring32 /* optionalScriptDirectory */) {
+void praat_runPythonScriptText (conststring32 scriptText, conststring32 optionalScriptDirectory) {
 	if (! scriptText || scriptText [0] == U'\0')
 		Melder_throw (U"Python script text is empty.");
 
-	std::filesystem::path tempDir = std::filesystem::temp_directory_path() / "praat_py_workspace";
+	std::filesystem::path tempDir = get_process_workspace ();
 	std::filesystem::create_directories (tempDir);
 	std::filesystem::path scriptPath = tempDir / "temp_exec_script.py";
 
@@ -606,5 +757,5 @@ void praat_runPythonScriptText (conststring32 scriptText, conststring32 /* optio
 
 	std::string scriptPathStr = scriptPath.u8string();
 	autostring32 scriptPath32 = Melder_8to32_e (scriptPathStr.c_str());
-	praat_runPythonScriptFile (scriptPath32.get());
+	praat_runPythonScriptFile (scriptPath32.get(), optionalScriptDirectory);
 }
