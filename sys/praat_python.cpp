@@ -62,8 +62,13 @@ static std::string escape_json_string (const std::string &str) {
 
 static std::string path_to_utf8 (const std::filesystem::path &p) {
 #if defined (_WIN32)
-	auto u8 = p.u8string ();
-	return std::string (reinterpret_cast<const char *> (u8.data ()), u8.size ());
+	std::wstring w = p.wstring ();
+	if (w.empty ()) return std::string ();
+	int len = WideCharToMultiByte (CP_UTF8, 0, w.c_str (), (int) w.size (), nullptr, 0, nullptr, nullptr);
+	if (len <= 0) return std::string ();
+	std::string s (len, 0);
+	WideCharToMultiByte (CP_UTF8, 0, w.c_str (), (int) w.size (), & s [0], len, nullptr, nullptr);
+	return s;
 #else
 	return p.string ();
 #endif
@@ -71,7 +76,12 @@ static std::string path_to_utf8 (const std::filesystem::path &p) {
 
 static std::filesystem::path utf8_to_path (const std::string &u8) {
 #if defined (_WIN32)
-	return std::filesystem::path (reinterpret_cast<const char8_t *> (u8.data ()), reinterpret_cast<const char8_t *> (u8.data () + u8.size ()));
+	if (u8.empty ()) return std::filesystem::path ();
+	int len = MultiByteToWideChar (CP_UTF8, 0, u8.c_str (), (int) u8.size (), nullptr, 0);
+	if (len <= 0) return std::filesystem::path ();
+	std::wstring w (len, 0);
+	MultiByteToWideChar (CP_UTF8, 0, u8.c_str (), (int) u8.size (), & w [0], len);
+	return std::filesystem::path (w);
 #else
 	return std::filesystem::path (u8);
 #endif
@@ -120,9 +130,34 @@ void praat_python_setExecutablePath (conststring32 path) {
 }
 
 autostring32 praat_python_getScriptTemplate () {
+	if (g_language_choice == 0) {
+		return Melder_dup (
+			U"# Praat Python Script\n"
+			U"# Directly execute Python & call Praat built-in algorithms (Ctrl+R to run)\n"
+			U"import sys\n"
+			U"import os\n"
+			U"import praat\n\n"
+			U"print(\"=== Praat Python Integration ===\")\n"
+			U"print(f\"Python Version: {sys.version.split()[0]}\")\n\n"
+			U"# 1. Get objects currently selected in Praat\n"
+			U"selected = praat.get_selected()\n"
+			U"print(f\"Number of selected objects: {len(selected)}\")\n"
+			U"for obj in selected:\n"
+			U"    print(f\"  • [ID {obj['id']}] {obj['class']}: {obj['name']}\")\n\n"
+			U"# 2. Directly call Praat native algorithms & commands\n"
+			U"# For example, iterate selected Sounds, extract Pitch using To Pitch (ac), and rename:\n"
+			U"for obj in selected:\n"
+			U"    if obj['class'] == 'Sound':\n"
+			U"        praat.select(obj['id'])\n"
+			U"        praat.call('To Pitch (ac)...', 0.0, 75, 15, 'yes', 0.03, 0.45, 0.01, 0.35, 0.14, 600)\n"
+			U"        praat.rename(f\"Pitch_{obj['name']}\")\n"
+			U"        print(f\"  ⚡ Generated Pitch for Sound [{obj['name']}]\")\n\n"
+			U"# 3. To import generated audio or data back to Praat, save into praat.get_output_dir()\n"
+		);
+	}
 	return Melder_dup (
-		U"# Praat Python Script\n"
-		U"# Directly execute Python & call Praat built-in algorithms (Ctrl+R to run)\n"
+		U"# Praat Python 脚本\n"
+		U"# 直接运行 Python 并调用 Praat 原生算法与指令（快捷键 Ctrl+R 运行）\n"
 		U"import sys\n"
 		U"import os\n"
 		U"import praat\n\n"
@@ -146,6 +181,40 @@ autostring32 praat_python_getScriptTemplate () {
 }
 
 autostring32 praat_python_getTutorialDoc () {
+	if (g_language_choice == 0) {
+		return Melder_dup (
+			U"=================================================================\n"
+			U"  Praat Python Scripting Tutorial\n"
+			U"=================================================================\n\n"
+			U"1. Run and Debug\n"
+			U"   • Run entire script: Press [Ctrl + R] or click menu [Run -> Run]\n"
+			U"   • Run selected code: Press [Ctrl + T] or click menu [Run -> Run selection]\n"
+			U"   • Console output: All print(...) and exceptions are displayed in Praat's Info window.\n\n"
+			U"2. Bridge Module `praat`\n"
+			U"   Import the built-in bridge at the top of your script with `import praat`:\n"
+			U"   • praat.get_selected(): Get list of currently selected objects in Praat.\n"
+			U"     Selected Sound objects are automatically exported as standard .wav audio files\n"
+			U"     (readable directly with scipy/librosa/parselmouth).\n"
+			U"   • praat.call(command, *args): Dispatch Praat menu commands or acoustic algorithms\n"
+			U"     (executed by Praat in batch after the Python process finishes).\n"
+			U"   • praat.select(id) / praat.plus_select(id): Select object(s) by ID.\n"
+			U"   • praat.rename(name): Rename currently selected object.\n"
+			U"   • praat.remove(): Delete currently selected object(s).\n"
+			U"   • praat.get_output_dir(): Get temp directory; any .wav or .TextGrid files saved\n"
+			U"     here will be automatically imported into Praat when the script finishes.\n\n"
+			U"3. Python Environment Settings\n"
+			U"   • Click [Praat -> Python settings...] to configure the Python path.\n"
+			U"   • Supports system Python, Anaconda environments, and virtual environments (venv).\n\n"
+			U"4. Third-Party Libraries\n"
+			U"   Any library installed in your Python environment can be imported directly, such as:\n"
+			U"   • parselmouth (Praat C core algorithm bindings for Python)\n"
+			U"   • praatio (Fast manipulation of TextGrid annotations)\n"
+			U"   • numpy, scipy, pandas (Scientific computing & statistics)\n"
+			U"   • matplotlib, seaborn (Publication-quality figures)\n"
+			U"   • whisper, funasr (AI speech recognition & alignment)\n"
+			U"=================================================================\n"
+		);
+	}
 	return Melder_dup (
 		U"=================================================================\n"
 		U"  Praat Python 脚本使用教程 (Python Scripting Tutorial)\n"
@@ -177,6 +246,41 @@ autostring32 praat_python_getTutorialDoc () {
 }
 
 autostring32 praat_python_getApiDoc () {
+	if (g_language_choice == 0) {
+		return Melder_dup (
+			U"=================================================================\n"
+			U"  Praat Python Bridge API Reference\n"
+			U"=================================================================\n\n"
+			U"• praat.get_selected()\n"
+			U"  Returns a list of all objects currently selected in Praat's object window.\n"
+			U"  Format: [ {'id': 1, 'name': 'Sound_1', 'class': 'Sound', 'file': 'path/to/file.wav'}, ... ]\n"
+			U"  Note: Sound objects are exported as 16-bit PCM .wav; TextGrid as standard .TextGrid files.\n\n"
+			U"• praat.call(command_name, *args)\n"
+			U"  Dispatches a native Praat menu command or action (executed in batch when Python exits).\n"
+			U"  Examples:\n"
+			U"    praat.call(\"To Pitch (ac)...\", 0.0, 75, 15, \"yes\", 0.03, 0.45, 0.01, 0.35, 0.14, 600)\n"
+			U"    praat.call(\"To Formant (burg)...\", 0.0, 5, 5500, 0.025, 50)\n"
+			U"    praat.call(\"Filter (pass Hann band)...\", 500, 1500, 100)\n\n"
+			U"• praat.select(object_id)\n"
+			U"  Selects a single object by its ID in Praat.\n"
+			U"  Example: praat.select(1)\n\n"
+			U"• praat.plus_select(object_id)\n"
+			U"  Adds an object to current selection by its ID.\n"
+			U"  Example: praat.plus_select(2)\n\n"
+			U"• praat.rename(new_name)\n"
+			U"  Renames the currently selected object.\n"
+			U"  Example: praat.rename(\"Vowel_A\")\n\n"
+			U"• praat.remove()\n"
+			U"  Removes the currently selected object(s) from Praat.\n\n"
+			U"• praat.run_praat_script(script_text)\n"
+			U"  Executes raw Praat script text.\n\n"
+			U"• praat.get_output_dir()\n"
+			U"  Returns the temporary output directory monitored by Praat.\n"
+			U"  Any audio (.wav) or annotation (.TextGrid) saved in this directory\n"
+			U"  will be automatically loaded into Praat upon script completion.\n"
+			U"=================================================================\n"
+		);
+	}
 	return Melder_dup (
 		U"=================================================================\n"
 		U"  Praat Python 桥接模块 API 参考手册 (API Reference)\n"
@@ -212,6 +316,29 @@ autostring32 praat_python_getApiDoc () {
 }
 
 autostring32 praat_python_getExampleBatch () {
+	if (g_language_choice == 0) {
+		return Melder_dup (
+			U"# Example: Batch extract Pitch and Formants for selected Sound objects\n"
+			U"import praat\n\n"
+			U"print(\"🚀 Starting batch analysis on selected sounds...\")\n"
+			U"selected = praat.get_selected()\n"
+			U"sound_count = 0\n\n"
+			U"for obj in selected:\n"
+			U"    if obj['class'] == 'Sound':\n"
+			U"        sound_count += 1\n"
+			U"        # 1. Select the sound\n"
+			U"        praat.select(obj['id'])\n"
+			U"        # 2. Extract Pitch (autocorrelation method)\n"
+			U"        praat.call('To Pitch (ac)...', 0.0, 75, 15, 'yes', 0.03, 0.45, 0.01, 0.35, 0.14, 600)\n"
+			U"        praat.rename(f\"Pitch_{obj['name']}\")\n\n"
+			U"        # 3. Extract Formants (Burg method)\n"
+			U"        praat.select(obj['id'])\n"
+			U"        praat.call('To Formant (burg)...', 0.0, 5, 5500, 0.025, 50)\n"
+			U"        praat.rename(f\"Formant_{obj['name']}\")\n\n"
+			U"        print(f\"  • Generated Pitch & Formants for [{obj['name']}]\")\n\n"
+			U"print(f\"🎉 Done! Processed {sound_count} sound object(s).\")\n"
+		);
+	}
 	return Melder_dup (
 		U"# 示例：批量为选中的 Sound 对象提取音高与共振峰\n"
 		U"import praat\n\n"
@@ -236,6 +363,23 @@ autostring32 praat_python_getExampleBatch () {
 }
 
 autostring32 praat_python_getExampleTextGrid () {
+	if (g_language_choice == 0) {
+		return Melder_dup (
+			U"# Example: Read and analyze selected TextGrid annotation intervals\n"
+			U"import os\n"
+			U"import praat\n\n"
+			U"print(\"📝 Analyzing selected TextGrid objects...\")\n"
+			U"for obj in praat.get_selected():\n"
+			U"    if obj['class'] == 'TextGrid':\n"
+			U"        print(f\"\\n--- TextGrid: {obj['name']} ---\")\n"
+			U"        if os.path.exists(obj['file']):\n"
+			U"            with open(obj['file'], 'r', encoding='utf-8', errors='ignore') as f:\n"
+			U"                lines = f.readlines()\n"
+			U"            labels = [line.strip().split('=')[1].strip(' \"') for line in lines if 'text =' in line and 'text = \"\"' not in line]\n"
+			U"            print(f\"  Total valid intervals: {len(labels)}\")\n"
+			U"            print(f\"  First 10 intervals: {labels[:10]}\")\n"
+		);
+	}
 	return Melder_dup (
 		U"# 示例：读取并分析选中的 TextGrid 标注层内容\n"
 		U"import os\n"
@@ -254,6 +398,35 @@ autostring32 praat_python_getExampleTextGrid () {
 }
 
 autostring32 praat_python_getExampleSound () {
+	if (g_language_choice == 0) {
+		return Melder_dup (
+			U"# Example: Generate a dual-tone sound (440Hz + 880Hz) in Python and load into Praat\n"
+			U"import os\n"
+			U"import math\n"
+			U"import wave\n"
+			U"import struct\n"
+			U"import praat\n\n"
+			U"out_dir = praat.get_output_dir()\n"
+			U"wav_path = os.path.join(out_dir, \"Python_DualTone_440_880.wav\")\n"
+			U"sr = 44100\n"
+			U"duration = 2.0\n"
+			U"num_samples = int(sr * duration)\n\n"
+			U"with wave.open(wav_path, 'w') as f:\n"
+			U"    f.setnchannels(1)\n"
+			U"    f.setsampwidth(2)\n"
+			U"    f.setframerate(sr)\n"
+			U"    frames = bytearray()\n"
+			U"    for i in range(num_samples):\n"
+			U"        t = float(i) / sr\n"
+			U"        s1 = math.sin(2.0 * math.pi * 440.0 * t)\n"
+			U"        s2 = math.sin(2.0 * math.pi * 880.0 * t)\n"
+			U"        val = int(32767.0 * 0.4 * (s1 + s2))\n"
+			U"        frames.extend(struct.pack('<h', val))\n"
+			U"    f.writeframes(frames)\n\n"
+			U"print(f\"✅ Generated sound file: {wav_path}\")\n"
+			U"print(\"🚀 Praat is automatically importing the sound into Objects list!\")\n"
+		);
+	}
 	return Melder_dup (
 		U"# 示例：使用 Python 生成双音（440Hz + 880Hz）并自动载入 Praat\n"
 		U"import os\n"
