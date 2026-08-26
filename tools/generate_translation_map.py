@@ -86,6 +86,12 @@ EXACT_MAP = {
     "Selection changed!\nNo object selected. Cannot rename.": "选择已更改！\n未选择任何对象。无法重命名。",
     "Selection changed!\nCannot rename more than one object at a time.": "选择已更改！\n一次无法重命名多个对象。",
 
+    # Manual Window
+    "Copy text": "复制全文",
+    "Copy page text": "复制当前页全文",
+    "Open official English manual (Web)...": "在浏览器打开官方英文手册...",
+    "Page text copied to clipboard.": "已将当前手册页面全文复制到剪贴板。",
+
     # Unified Preferences Dialog
     "General & Language": "常规与语言",
     "Sound Recording & Playback": "音频录制与播放",

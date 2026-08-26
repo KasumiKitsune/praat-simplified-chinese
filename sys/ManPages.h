@@ -61,6 +61,9 @@ void ManPages_writeAllToHtmlDir (ManPages me, Interpreter optionalInterpreterRef
 integer ManPages_uniqueLinksHither (ManPages me, integer ipage);
 constSTRVEC ManPages_getTitles (ManPages me);
 
+autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pageNumber);
+autostring32 ManPage_getOfficialUrl (ManPage me);
+
 #define ManPages_FILENAME_BUFFER_SIZE  256
 
 inline static bool isAllowedFileNameCharacter (char32 c) {

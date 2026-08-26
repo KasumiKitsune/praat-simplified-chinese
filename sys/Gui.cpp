@@ -148,4 +148,71 @@ void Gui_getWindowPositioningBounds (double *x, double *y, double *width, double
 	}
 #endif
 
+void Gui_copyTextToClipboard (conststring32 text) {
+	if (! text || text [0] == U'\0') return;
+	autostring8 text8 = Melder_32to8 (text);
+	if (! text8) return;
+
+	#if defined (_WIN32)
+		int lenW = MultiByteToWideChar (CP_UTF8, 0, text8.get(), -1, nullptr, 0);
+		if (lenW <= 0) return;
+		if (! OpenClipboard (nullptr)) return;
+		EmptyClipboard ();
+		HGLOBAL hMem = GlobalAlloc (GMEM_MOVEABLE, lenW * sizeof (wchar_t));
+		if (hMem) {
+			wchar_t *pMem = (wchar_t *) GlobalLock (hMem);
+			if (pMem) {
+				MultiByteToWideChar (CP_UTF8, 0, text8.get(), -1, pMem, lenW);
+				GlobalUnlock (hMem);
+				SetClipboardData (CF_UNICODETEXT, hMem);
+			}
+		}
+		CloseClipboard ();
+	#elif defined (macintosh)
+		NSString *nsStr = [NSString stringWithUTF8String: text8.get()];
+		if (nsStr) {
+			NSPasteboard *pb = [NSPasteboard generalPasteboard];
+			[pb clearContents];
+			[pb setString: nsStr forType: NSPasteboardTypeString];
+		}
+	#elif gtk
+		GtkClipboard *cb = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
+		if (cb) {
+			gtk_clipboard_set_text (cb, text8.get(), -1);
+		}
+	#endif
+}
+
+void Gui_openUrl (conststring32 url) {
+	if (! url || url [0] == U'\0') return;
+	autostring8 url8 = Melder_32to8 (url);
+	if (! url8) return;
+
+	#if defined (_WIN32)
+		int lenW = MultiByteToWideChar (CP_UTF8, 0, url8.get(), -1, nullptr, 0);
+		if (lenW > 0) {
+			std::wstring w (lenW, 0);
+			MultiByteToWideChar (CP_UTF8, 0, url8.get(), -1, & w [0], lenW);
+			ShellExecuteW (nullptr, L"open", w.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+		}
+	#elif defined (macintosh)
+		NSString *nsUrl = [NSString stringWithUTF8String: url8.get()];
+		if (nsUrl) {
+			NSURL *u = [NSURL URLWithString: nsUrl];
+			if (u) {
+				[[NSWorkspace sharedWorkspace] openURL: u];
+			}
+		}
+	#else
+		std::string safeUrl = url8.get();
+		std::string escaped;
+		for (char c : safeUrl) {
+			if (c == '\'') escaped += "'\\''";
+			else escaped += c;
+		}
+		std::string cmd = "xdg-open '" + escaped + "' 2>/dev/null &";
+		system (cmd.c_str());
+	#endif
+}
+
 /* End of file Gui.cpp */

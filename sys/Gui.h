@@ -1204,6 +1204,9 @@ void Gui_setOpenDocumentCallback (void (*openDocumentCallback) (MelderFile file)
 void Gui_setQuitApplicationCallback (void (*quitApplicationCallback) ());
 void Gui_runQuitApplicationCallback ();
 
+void Gui_copyTextToClipboard (conststring32 text);
+void Gui_openUrl (conststring32 url);
+
 extern uinteger theGuiTopLowAccelerators [8];
 
 /*

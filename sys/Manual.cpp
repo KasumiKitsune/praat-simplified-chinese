@@ -377,6 +377,35 @@ static void gui_button_cb_search (Manual me, GuiButtonEvent /* event */) {
 	do_search (me);
 }
 
+static void do_copyPageText (Manual me) {
+	if (my visiblePageNumber > 0 && my visiblePageNumber <= my manPages() -> pages.size) {
+		ManPage page = my manPages() -> pages.at [my visiblePageNumber];
+		autostring32 plainText = ManPage_toCleanPlainText (page, my manPages(), my visiblePageNumber);
+		if (plainText && plainText [0] != U'\0') {
+			Gui_copyTextToClipboard (plainText.get());
+			Melder_information (praat_translate (U"Page text copied to clipboard."));
+		}
+	}
+}
+
+static void gui_button_cb_copy (Manual me, GuiButtonEvent /* event */) {
+	do_copyPageText (me);
+}
+
+static void menu_cb_copyPageText (Manual me, EDITOR_ARGS) {
+	do_copyPageText (me);
+}
+
+static void menu_cb_openOfficialEnglish (Manual me, EDITOR_ARGS) {
+	if (my visiblePageNumber > 0 && my visiblePageNumber <= my manPages() -> pages.size) {
+		ManPage page = my manPages() -> pages.at [my visiblePageNumber];
+		autostring32 url = ManPage_getOfficialUrl (page);
+		if (url && url [0] != U'\0') {
+			Gui_openUrl (url.get());
+		}
+	}
+}
+
 void structManual :: v_createChildren () {
 	const bool hasRecordingButtons = ( our manPages() -> dynamic && our manPages() -> pages.at [1] -> recordingTime > 0.0 );
 	our d_hasExtraRowOfTools = hasRecordingButtons;
@@ -400,6 +429,9 @@ void structManual :: v_createChildren () {
 	GuiButton_createShown (our windowForm, 274, 274 + 69, y, y + height,
 			U"Search:", gui_button_cb_search, this, GuiButton_DEFAULT);
 	our searchText = GuiText_createShown (our windowForm, 274+69 + STRING_SPACING, 452 + STRING_SPACING - 2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+
+	our copyButton = GuiButton_createShown (our windowForm, 465, 465 + 85, y, y + height,
+			U"Copy text", gui_button_cb_copy, this, 0);
 }
 
 static void menu_cb_help (Manual me, EDITOR_ARGS) { HyperPage_goToPage (me, U"Manual"); }
@@ -407,6 +439,10 @@ static void menu_cb_help (Manual me, EDITOR_ARGS) { HyperPage_goToPage (me, U"Ma
 void structManual :: v_createMenus () {
 	Manual_Parent :: v_createMenus ();
 
+	Editor_addCommand (this, U"File", U"Copy page text", 'C', menu_cb_copyPageText);
+	Editor_addCommand (this, U"File", U"-- copy --", 0, nullptr);
+	Editor_addCommand (this, U"File", U"Open official English manual (Web)...", 0, menu_cb_openOfficialEnglish);
+	Editor_addCommand (this, U"File", U"-- web --", 0, nullptr);
 	Editor_addCommand (this, U"File", U"Print manual...", 0, menu_cb_printRange);
 	Editor_addCommand (this, U"File", U"Save page as HTML file...", 'S', menu_cb_writeOneToHtmlFile);
 	Editor_addCommand (this, U"File", U"Save manual to HTML folder...", 0, menu_cb_writeAllToHtmlFolder);
@@ -418,6 +454,8 @@ void structManual :: v_createMenus () {
 
 void structManual :: v_createMenuItems_help (EditorMenu menu) {
 	Manual_Parent :: v_createMenuItems_help (menu);
+	EditorMenu_addCommand (menu, U"Open official English manual (Web)...", 0, menu_cb_openOfficialEnglish);
+	EditorMenu_addCommand (menu, U"-- help --", 0, nullptr);
 	EditorMenu_addCommand (menu, U"Manual help", '?', menu_cb_help);
 }
 

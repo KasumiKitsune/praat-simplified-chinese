@@ -28,7 +28,7 @@ Thing_define (Manual, HyperPage) {
 	bool ownManPages;
 	integer visiblePageNumber;
 	GuiText searchText;
-	GuiButton homeButton, recordButton, playButton, publishButton;
+	GuiButton homeButton, recordButton, playButton, publishButton, copyButton;
 	int numberOfMatches;
 	integer matches [1 + 20], fromPage, toPage;
 	bool suppressLinksHither;
