@@ -16,6 +16,7 @@
  * along with this work. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CorpusEditor.h"
 #include "Pitch_AnyTier_to_PitchTier.h"
 #include "SpectrumEditor.h"
 #include "SpeechSynthesizer.h"
@@ -739,6 +740,24 @@ DIRECT (MODIFY_SpellingChecker_replaceUserDictionary) {
 }
 
 // MARK: - TEXTGRID
+
+// MARK: New
+
+FORM (NEW1_TextGrid_create, U"Create TextGrid", U"Create TextGrid...") {
+	COMMENT (U"Hint: to label or segment an existing Sound,")
+	COMMENT (U"select that Sound and choose \"To TextGrid...\".")
+	REAL (startTime, U"Start time (s)", U"0.0")
+	REAL (endTime, U"End time (s)", U"1.0")
+	SENTENCE (allTierNames, U"All tier names", U"Mary John bell")
+	SENTENCE (whichOfTheseArePointTiers, U"Which of these are point tiers?", U"bell")
+	OK
+DO
+	if (endTime <= startTime)
+		Melder_throw (U"The end time should be greater than the start time");
+	CREATE_ONE
+		autoTextGrid result = TextGrid_create (startTime, endTime, allTierNames, whichOfTheseArePointTiers);
+	CREATE_ONE_END (allTierNames)
+}
 
 // MARK: Save
 
@@ -1640,14 +1659,338 @@ DIRECT (NEW_WordList_upto_SpellingChecker) {
 	CONVERT_EACH_TO_ONE_END (my name.get())
 }
 
+// MARK: - CORPUS
+
+// MARK: New
+
+FORM (NEW1_Corpus_create, U"Create Corpus", U"Create Corpus...") {
+	WORD (name, U"Name", U"myCorpus")
+	FOLDER (folderWithSoundFiles, U"Folder with sound files", U"")
+	WORD (soundFileExtension, U"Sound file extension", U"wav")
+	FOLDER (folderWithAnnotationFiles, U"Folder with annotation files", U"")
+	WORD (annotationFileExtension, U"Annotation file extension", U"TextGrid")
+	OK
+DO
+	CREATE_ONE
+		autoCorpus result = Corpus_create (folderWithSoundFiles, soundFileExtension, folderWithAnnotationFiles, annotationFileExtension);
+	CREATE_ONE_END (name)
+}
+
+// MARK: Open
+
+FORM (READ_ONE__TextGrid_readFromEspsLabelFile, U"Read TextGrid from ESPS label file", U"Read TextGrid from ESPS label file...") {
+	INFILE (soundFilePath, U"Sound file path", U"")
+	BOOLEAN (tiersArePointTiers, U"Tiers are point tiers", false)
+	INTEGER (overrideNumberOfTiers, U"Override number of tiers", U"0 (= don't override)")
+	OK
+DO
+	CREATE_ONE
+		structMelderFile file { };
+		Melder_relativePathToFile (soundFilePath, & file);
+		autoTextGrid result = TextGrid_readFromEspsLabelFile (& file, tiersArePointTiers, overrideNumberOfTiers);
+	CREATE_ONE_END (U"")
+}
+
+FORM (NEW_Sound_readWithAdjacentAnnotationFiles_buckeye, U"Read with adjacent annotations (Buckeye)", U"Read with adjacent annotation files (Buckeye)...") {
+	INFILE (soundFileName, U"Sound file name", U"/Volumes/Buckeye/s01/s0101a/s0101a.wav")
+	OK
+DO
+	CREATE_MULTIPLE
+		autoTextGrid textgrid;
+		autoSound sound = Sound_readWithAdjacentAnnotationFiles_buckeye (soundFileName, & textgrid);
+		praat_new (sound.move());
+		praat_new (textgrid.move());
+	CREATE_MULTIPLE_END
+}
+
+FORM (NEW_Sound_readWithAdjacentAnnotationFiles_timit, U"Read with adjacent annotations (TIMIT)", U"Read with adjacent annotation files (TIMIT)...") {
+	INFILE (soundFileName, U"Sound file name", U"/Volumes/TIMIT/train/dr1/fcjf0/sa1.wav")
+	OK
+DO
+	CREATE_MULTIPLE
+		autoTextGrid textgrid;
+		autoSound sound = Sound_readWithAdjacentAnnotationFiles_timit (soundFileName, & textgrid);
+		praat_newWithFile (sound.move(), nullptr, soundFileName);
+		praat_newWithFile (textgrid.move(), nullptr, soundFileName);
+	CREATE_MULTIPLE_END
+}
+
+FORM (NEW_Sound_readWithAdjacentAnnotationFiles_cgn, U"Read with adjacent annotations (CGN)", U"Read with adjacent annotation files (CGN)...") {
+	INFILE (soundFileName, U"Sound file name", U"/Volumes/CGN_2.0.3/comp-a/vl/fv400061.wav")
+	OK
+DO
+	CREATE_MULTIPLE
+		autoSound sound;
+		autoTextGrid textgrid = TextGrid_Sound_readFromCorpusGesprokenNederlands (soundFileName, & sound);
+		praat_newWithFile (sound.move(), nullptr, soundFileName);
+		praat_newWithFile (textgrid.move(), nullptr, soundFileName);
+	CREATE_MULTIPLE_END
+}
+
+FORM (NEW_Corpus_importFromCGN, U"Import Corpus from CGN", U"Import Corpus from CGN...") {
+	FOLDER (folderName, U"CGN folder name", U"/Volumes/CGN_2.0.3")
+	OK
+DO
+	CREATE_ONE
+		autoCorpus result = Corpus_importFromCGN (folderName);
+	CREATE_ONE_END (U"CGN")
+}
+
+// MARK: View & Edit
+
+DIRECT (EDITOR_ONE_Corpus_edit) {
+	EDITOR_ONE (a,Corpus)
+		autoCorpusEditor editor = CorpusEditor_create (Melder_cat (ID_AND_FULL_NAME, U"  –  overview"), me);
+	EDITOR_ONE_END
+}
+
+DIRECT (EDITOR_ONE_Corpus_editSpeakers) {
+	EDITOR_ONE (a,Corpus)
+		autoTableEditor editor = TableEditor_create (Melder_cat (ID_AND_FULL_NAME, U"  –  speakers"), my speakers.get());
+	EDITOR_ONE_END
+}
+
+// MARK: Query
+
+DIRECT (QUERY_ONE_FOR_INTEGER__Corpus_getNumberOfRecordings) {
+	QUERY_ONE_FOR_INTEGER (Corpus)
+		const integer result = ( my recordings ? my recordings -> rows.size : 0 );
+	QUERY_ONE_FOR_INTEGER_END (U" recordings")
+}
+
+DIRECT (QUERY_ONE_FOR_INTEGER__Corpus_getNumberOfSpeakers) {
+	QUERY_ONE_FOR_INTEGER (Corpus)
+		const integer result = ( my speakers ? my speakers -> rows.size : 0 );
+	QUERY_ONE_FOR_INTEGER_END (U" speakers")
+}
+
+// MARK: Extract
+
+FORM (NEW_Corpus_extractTextGrid_number, U"Corpus: Extract TextGrid (number)", U"Corpus: Extract TextGrid (number)") {
+	NATURAL (recordingNumber, U"Recording number", U"1")
+	OK
+DO
+	CONVERT_EACH_TO_ONE (Corpus)
+		autoTextGrid result = Corpus_extractTextGrid_number (me, recordingNumber);
+		autostring32 textgridName = Melder_dup (result -> name.get());
+	CONVERT_EACH_TO_ONE_END (my name.get(), U"_", textgridName.get())
+}
+
+FORM (NEW_Corpus_extractSound_number, U"Corpus: Extract Sound (number)", U"Corpus: Extract Sound (number)") {
+	NATURAL (recordingNumber, U"Recording number", U"1")
+	OK
+DO
+	CONVERT_EACH_TO_ONE (Corpus)
+		autoSound result = Corpus_extractSound_number (me, recordingNumber);
+		autostring32 textgridName = Melder_dup (result -> name.get());
+	CONVERT_EACH_TO_ONE_END (my name.get(), U"_", textgridName.get())
+}
+
+DIRECT (NEW_Corpus_extractSpeakersTable) {
+	CONVERT_EACH_TO_ONE (Corpus)
+		autoTable result = Data_copy (my speakers.get());
+	CONVERT_EACH_TO_ONE_END (my name.get(), U"_speakers")
+}
+
+FORM (NEW_Corpus_extractComponents, U"Corpus: Extract components", U"Corpus: Extract components") {
+	BOOLEAN (comp_a, U"comp-a", true)
+	BOOLEAN (comp_b, U"comp-b", true)
+	BOOLEAN (comp_c, U"comp-c", false)
+	BOOLEAN (comp_d, U"comp-d", false)
+	BOOLEAN (comp_e, U"comp-e", false)
+	BOOLEAN (comp_f, U"comp-f", false)
+	BOOLEAN (comp_g, U"comp-g", false)
+	BOOLEAN (comp_h, U"comp-h", false)
+	BOOLEAN (comp_i, U"comp-i", false)
+	BOOLEAN (comp_j, U"comp-j", false)
+	BOOLEAN (comp_k, U"comp-k", false)
+	BOOLEAN (comp_l, U"comp-l", false)
+	BOOLEAN (comp_m, U"comp-m", false)
+	BOOLEAN (comp_n, U"comp-n", false)
+	BOOLEAN (comp_o, U"comp-o", false)
+	OK
+DO
+	CONVERT_EACH_TO_ONE (Corpus)
+		autoCorpus result = Corpus_extractComponents (me, comp_a, comp_b, comp_c, comp_d, comp_e, comp_f, comp_g,
+				comp_h, comp_i, comp_j, comp_k, comp_l, comp_m, comp_n, comp_o);
+		autoMelderString componentList;
+		if (comp_a)
+			MelderString_appendCharacter (& componentList, U'a');
+		if (comp_b)
+			MelderString_appendCharacter (& componentList, U'b');
+		if (comp_c)
+			MelderString_appendCharacter (& componentList, U'c');
+		if (comp_d)
+			MelderString_appendCharacter (& componentList, U'd');
+		if (comp_e)
+			MelderString_appendCharacter (& componentList, U'e');
+		if (comp_f)
+			MelderString_appendCharacter (& componentList, U'f');
+		if (comp_g)
+			MelderString_appendCharacter (& componentList, U'g');
+		if (comp_h)
+			MelderString_appendCharacter (& componentList, U'h');
+		if (comp_i)
+			MelderString_appendCharacter (& componentList, U'i');
+		if (comp_j)
+			MelderString_appendCharacter (& componentList, U'j');
+		if (comp_k)
+			MelderString_appendCharacter (& componentList, U'k');
+		if (comp_l)
+			MelderString_appendCharacter (& componentList, U'l');
+		if (comp_m)
+			MelderString_appendCharacter (& componentList, U'm');
+		if (comp_n)
+			MelderString_appendCharacter (& componentList, U'n');
+		if (comp_o)
+			MelderString_appendCharacter (& componentList, U'o');
+	CONVERT_EACH_TO_ONE_END (my name.get(), U"_", componentList.string)
+}
+
+FORM (NEW_Corpus_extractEducationRegions, U"Corpus: Extract education regions", U"Corpus: Extract education regions") {
+	BOOLEAN (sHolland, Corpus_CGN_regions_short [0], false)
+	BOOLEAN (nHolland, Corpus_CGN_regions_short [1], false)
+	BOOLEAN (wUtrecht, Corpus_CGN_regions_short [2], false)
+	BOOLEAN (zeeland, Corpus_CGN_regions_short [3], false)
+	BOOLEAN (eUtrecht, Corpus_CGN_regions_short [4], false)
+	BOOLEAN (guelders, Corpus_CGN_regions_short [5], true)
+	BOOLEAN (veluwe, Corpus_CGN_regions_short [6], false)
+	BOOLEAN (wFriesland, Corpus_CGN_regions_short [7], false)
+	BOOLEAN (polders, Corpus_CGN_regions_short [8], false)
+	BOOLEAN (achterhoek, Corpus_CGN_regions_short [9], false)
+	BOOLEAN (overijssel, Corpus_CGN_regions_short [10], false)
+	BOOLEAN (drenthe, Corpus_CGN_regions_short [11], false)
+	BOOLEAN (groningen, Corpus_CGN_regions_short [12], false)
+	BOOLEAN (frisia, Corpus_CGN_regions_short [13], true)
+	BOOLEAN (nBrabant, Corpus_CGN_regions_short [14], false)
+	BOOLEAN (eLimburg, Corpus_CGN_regions_short [15], true)
+	BOOLEAN (netherlands, Corpus_CGN_regions_short [16], false)
+	BOOLEAN (sBrabant, Corpus_CGN_regions_short [17], false)
+	BOOLEAN (eFlanders, Corpus_CGN_regions_short [18], false)
+	BOOLEAN (wFlanders, Corpus_CGN_regions_short [19], true)
+	BOOLEAN (wLimburg, Corpus_CGN_regions_short [20], true)
+	BOOLEAN (nBelgium, Corpus_CGN_regions_short [21], false)
+	BOOLEAN (sBelgium, Corpus_CGN_regions_short [22], false)
+	BOOLEAN (reg_other, Corpus_CGN_regions_short [23], false)
+	BOOLEAN (reg_unknown, Corpus_CGN_regions_short [24], false)
+	OK
+DO
+	CONVERT_EACH_TO_ONE (Corpus)
+		autoCorpus result = Corpus_extractEducationRegions (me,
+			sHolland, nHolland, wUtrecht, zeeland, eUtrecht,
+			guelders, veluwe, wFriesland, polders, achterhoek,
+			overijssel, drenthe, groningen, frisia, nBrabant,
+			eLimburg, netherlands, sBrabant, eFlanders, wFlanders,
+			wLimburg, nBelgium, sBelgium, reg_other, reg_unknown
+		);
+		autoMelderString regionList;
+		if (sHolland)
+			MelderString_append (& regionList, U"_SH");
+		if (nHolland)
+			MelderString_append (& regionList, U"_NH");
+		if (wUtrecht)
+			MelderString_append (& regionList, U"_WU");
+		if (zeeland)
+			MelderString_append (& regionList, U"_Ze");
+		if (eUtrecht)
+			MelderString_append (& regionList, U"_EU");
+		if (guelders)
+			MelderString_append (& regionList, U"_Ge");
+		if (veluwe)
+			MelderString_append (& regionList, U"_Ve");
+		if (wFriesland)
+			MelderString_append (& regionList, U"_WF");
+		if (polders)
+			MelderString_append (& regionList, U"_Po");
+		if (achterhoek)
+			MelderString_append (& regionList, U"_Ac");
+		if (overijssel)
+			MelderString_append (& regionList, U"_Ov");
+		if (drenthe)
+			MelderString_append (& regionList, U"_Dr");
+		if (groningen)
+			MelderString_append (& regionList, U"_Gr");
+		if (frisia)
+			MelderString_append (& regionList, U"_Fr");
+		if (nBrabant)
+			MelderString_append (& regionList, U"_NB");
+		if (eLimburg)
+			MelderString_append (& regionList, U"_EL");
+		if (netherlands)
+			MelderString_append (& regionList, U"_Nl");
+		if (sBrabant)
+			MelderString_append (& regionList, U"_SB");
+		if (eFlanders)
+			MelderString_append (& regionList, U"_EV");
+		if (wFlanders)
+			MelderString_append (& regionList, U"_WV");
+		if (wLimburg)
+			MelderString_append (& regionList, U"_WL");
+		if (nBelgium)
+			MelderString_append (& regionList, U"_No");
+		if (sBelgium)
+			MelderString_append (& regionList, U"_So");
+		if (reg_other)
+			MelderString_append (& regionList, U"_ot");
+		if (reg_unknown)
+			MelderString_append (& regionList, U"_un");
+	CONVERT_EACH_TO_ONE_END (my name.get(), regionList.string)
+}
+
+
 /***** buttons *****/
 
 void praat_uvafon_TextGrid_init () {
+	Thing_recognizeClassesByName (classTextPoint, classTextInterval, classTextTier,
+		classIntervalTier, classTextGrid, classWordList, classSpellingChecker,
+		classCorpus);
 	Thing_recognizeClassByOtherName (classTextTier, U"MarkTier");
 
 	structTextGridArea :: f_preferences ();
 
 	structTextGridEditor :: f_preferences ();
+
+	praat_addMenuCommand (U"Objects", U"New", U"-- new textgrid --",
+			nullptr, 0, nullptr);
+	praat_addMenuCommand (U"Objects", U"New", U"Create TextGrid...",
+			nullptr, 0, NEW1_TextGrid_create);
+	praat_addMenuCommand (U"Objects", U"New", U"Create Corpus...",
+			nullptr, 0, NEW1_Corpus_create);
+
+	praat_addMenuCommand (U"Objects", U"Open", U"-- open textgrid --", nullptr, 0, nullptr);
+	praat_addMenuCommand (U"Objects", U"Open", U"Read from special annotation file...", nullptr, 0, nullptr);
+		praat_addMenuCommand (U"Objects", U"Open", U"Read TextGrid from Xwaves... || Read TextGrid from ESPS label file...",
+				nullptr, 1, READ_ONE__TextGrid_readFromEspsLabelFile);
+	praat_addMenuCommand (U"Objects", U"Open", U"Read Sound with adjacent annotation files...", nullptr, 0, nullptr);
+		praat_addMenuCommand (U"Objects", U"Open", U"Read Sound with adjacent annotation files (Buckeye)...",
+				nullptr, 1, NEW_Sound_readWithAdjacentAnnotationFiles_buckeye);
+		praat_addMenuCommand (U"Objects", U"Open", U"Read Sound with adjacent annotation files (TIMIT)...",
+				nullptr, 1, NEW_Sound_readWithAdjacentAnnotationFiles_timit);
+		praat_addMenuCommand (U"Objects", U"Open", U"Read Sound with adjacent annotation files (Corpus Gesproken Nederlands)...",
+				nullptr, 1, NEW_Sound_readWithAdjacentAnnotationFiles_cgn);
+	praat_addMenuCommand (U"Objects", U"Open", U"Import Corpus...", nullptr, 0, nullptr);
+		praat_addMenuCommand (U"Objects", U"Open", U"Import Corpus from CGN...",
+				nullptr, 1, NEW_Corpus_importFromCGN);
+
+	praat_addAction1 (classCorpus, 1, U"View & Edit", nullptr, GuiMenu_ATTRACTIVE, EDITOR_ONE_Corpus_edit);
+	praat_addAction1 (classCorpus, 1, U"View & Edit speakers", nullptr, 0, EDITOR_ONE_Corpus_editSpeakers);
+	praat_addAction1 (classCorpus, 0, U"Query -", nullptr, 0, nullptr);
+		praat_addAction1 (classCorpus, 1, U"Get number of recordings",
+				nullptr, 1, QUERY_ONE_FOR_INTEGER__Corpus_getNumberOfRecordings);
+		praat_addAction1 (classCorpus, 1, U"Get number of speakers",
+				nullptr, 1, QUERY_ONE_FOR_INTEGER__Corpus_getNumberOfSpeakers);
+	praat_addAction1 (classCorpus, 0, U"Extract -", nullptr, 0, nullptr);
+		praat_addAction1 (classCorpus, 1, U"Extract TextGrid (number)...",
+				nullptr, 1, NEW_Corpus_extractTextGrid_number);
+		praat_addAction1 (classCorpus, 1, U"Extract Sound (number)...",
+				nullptr, 1, NEW_Corpus_extractSound_number);
+		praat_addAction1 (classCorpus, 1, U"Extract speakers Table",
+				nullptr, 1, NEW_Corpus_extractSpeakersTable);
+		praat_addAction1 (classCorpus, 1, U"-- create subcorpus --", nullptr, 1, nullptr);
+		praat_addAction1 (classCorpus, 1, U"Extract components...",
+				nullptr, 1, NEW_Corpus_extractComponents);
+		praat_addAction1 (classCorpus, 1, U"Extract education regions...",
+				nullptr, 1, NEW_Corpus_extractEducationRegions);
 
 	praat_addAction1 (classIntervalTier, 1, U"Save as Xwaves label file... || Write to Xwaves label file...", nullptr, 0, SAVE_IntervalTier_writeToXwaves);
 			// alternative COMPATIBILITY <= 2011
