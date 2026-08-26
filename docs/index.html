@@ -2,9 +2,9 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="index, follow">
-  
+
   <!-- SEO Meta Tags -->
   <title>Praat 汉化版 | 语音学分析与语音信号处理软件</title>
   <meta name="description" content="Praat 汉化版官方主页。基于 Praat 官方内核构建，提供完整界面与帮助手册汉化、排版自适应优化、Windows 拖拽打开、中英术语对照表及录音暂存增强。适用于语音学研究、语言学实验与声学分析。">
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;700;900&family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
 
   <!-- Structured Data / JSON-LD -->
   <script type="application/ld+json">
@@ -55,92 +55,82 @@
 
   <style>
     :root {
-      --app-bg: #e5e9ee;
-      --win-bg: #f8fafc;
-      --win-header: #e2e8f0;
-      --win-header-active: #cbd5e1;
-      --win-border: #94a3b8;
-      --panel-border: #cbd5e1;
-      
-      --text-main: #0f172a;
-      --text-secondary: #334155;
-      --text-muted: #475569;
-      --text-light: #64748b;
-      
-      --praat-blue: #0284c7;
-      --praat-blue-hover: #0369a1;
-      --praat-selection: #dbeafe;
-      --praat-btn-bg: #ffffff;
-      --praat-btn-border: #94a3b8;
-      --praat-btn-hover: #f1f5f9;
-      --praat-btn-active: #e2e8f0;
-      
-      --font-ui: "Segoe UI", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      --font-mono: 'JetBrains Mono', Consolas, Courier, monospace;
+      /* Paper & Desktop - Pure Flat Solid Colors (No Gradients) */
+      --desktop: #e7e2d2;
+      --paper: #fffdf6;
+      --paper-2: #faf7ec;
+      --panel: #f5f1e2;
+
+      /* Ink (derived from dark forest) */
+      --ink: #0c310a;
+      --ink-2: #3b4732;
+      --ink-3: #6d7560;
+
+      /* Olive accent system */
+      --olive: #57772e;
+      --olive-deep: #3d4d20;
+      --sage: #d5e798;
+      --sage-soft: #eef3d6;
+      --line: #d2d5c3;
+      --line-strong: #b9bda6;
+
+      /* Window chrome (traffic lights) */
+      --tl-close: #ff5f57;
+      --tl-min: #febc2e;
+      --tl-max: #28c840;
+
+      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-display: "Spectral", "Noto Serif SC", "Songti SC", serif;
+      --font-mono: "IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
+
+      --shadow-window: 0 1px 0 rgba(12, 49, 10, 0.03), 0 16px 40px -16px rgba(61, 77, 32, 0.28);
+      --shadow-pop: 0 12px 32px -10px rgba(61, 77, 32, 0.3);
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Custom Stylized Scrollbar */
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 #f8fafc;
-    }
+    ::selection { background: var(--sage); color: var(--ink); }
 
-    ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-      border: 1px solid #f1f5f9;
-      transition: background 0.15s ease;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-
-    ::-webkit-scrollbar-thumb:active {
-      background: #64748b;
-    }
-
-    ::-webkit-scrollbar-corner {
-      background: transparent;
-    }
+    /* Custom Scrollbar */
+    * { scrollbar-width: thin; scrollbar-color: #c4c9b1 transparent; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c4c9b1; border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-thumb:hover { background: #a6ad89; border: 2px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-corner { background: transparent; }
 
     html, body {
       width: 100%;
       height: 100vh;
       overflow: hidden;
       font-family: var(--font-ui);
-      background-color: var(--app-bg);
-      color: var(--text-main);
+      background-color: var(--desktop);
+      color: var(--ink);
       font-size: 14.5px;
-      line-height: 1.5;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
     }
 
-    a {
-      color: var(--praat-blue);
-      text-decoration: none;
+    /* Subtle paper texture overlay without gradients */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+      z-index: 1;
     }
 
-    a:hover {
-      text-decoration: underline;
-    }
+    a { color: var(--olive); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    button { font-family: inherit; }
+    :focus-visible { outline: 2px solid var(--olive); outline-offset: 2px; border-radius: 4px; }
 
     .praat-desktop {
+      position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       width: 100vw;
@@ -148,171 +138,142 @@
       overflow: hidden;
     }
 
-    /* Top Global Menu Bar */
+    /* ============ Top Global Menu Bar ============ */
     .top-menu-bar {
-      height: 44px;
-      background: #ffffff;
-      border-bottom: 1px solid var(--win-border);
+      height: 54px;
+      background: var(--paper-2);
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 18px;
       flex-shrink: 0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       z-index: 50;
     }
 
-    .top-bar-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    .top-bar-left { display: flex; align-items: center; gap: 18px; }
 
     .app-brand {
       display: flex;
       align-items: center;
       gap: 10px;
+      font-family: var(--font-display);
       font-weight: 700;
-      font-size: 14.5px;
-      color: var(--text-main);
+      font-size: 16px;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+      user-select: none;
     }
 
-    .app-badge {
-      font-size: 11.5px;
-      font-weight: 600;
-      background: #e0f2fe;
-      color: #0369a1;
-      padding: 2px 8px;
-      border-radius: 4px;
-      border: 1px solid #bae6fd;
-    }
+    .app-brand img { width: 30px; height: 30px; object-fit: contain; }
 
-    .menu-items {
-      display: flex;
-      align-items: center;
-      list-style: none;
-      gap: 4px;
-    }
-
-    .menu-item {
-      position: relative;
-    }
+    .menu-items { display: flex; align-items: center; list-style: none; gap: 2px; }
+    .menu-item { position: relative; }
 
     .menu-btn {
       padding: 6px 12px;
-      background: none;
+      background: transparent;
       border: 1px solid transparent;
-      border-radius: 4px;
-      font-family: inherit;
+      border-radius: 7px;
       font-size: 13.5px;
-      color: var(--text-main);
+      color: var(--ink-2);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
       font-weight: 500;
+      transition: background 0.15s ease, color 0.15s ease;
     }
 
-    .menu-btn:hover {
-      background: var(--win-header);
-      border-color: var(--panel-border);
-    }
+    .menu-btn:hover { background: rgba(213, 231, 152, 0.45); color: var(--ink); text-decoration: none; }
 
     .dropdown-menu {
       display: none;
       position: absolute;
-      top: 100%;
+      top: calc(100% + 6px);
       left: 0;
-      background: #ffffff;
-      border: 1px solid var(--win-border);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      border-radius: 5px;
-      min-width: 200px;
-      padding: 6px 0;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-pop);
+      border-radius: 10px;
+      min-width: 216px;
+      padding: 6px;
       z-index: 100;
+      animation: popIn 0.16s ease;
     }
 
-    .menu-item:hover .dropdown-menu {
-      display: block;
+    .menu-item:hover .dropdown-menu { display: block; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .dropdown-item {
-      padding: 7px 16px;
+      padding: 7px 12px;
       font-size: 13px;
-      color: var(--text-main);
+      color: var(--ink-2);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.12s ease, color 0.12s ease;
     }
 
-    .dropdown-item:hover {
-      background: var(--praat-selection);
-      text-decoration: none;
-    }
+    .dropdown-item:hover { background: var(--sage-soft); color: var(--ink); text-decoration: none; }
+    .dropdown-divider { height: 1px; background: var(--line); margin: 5px 8px; }
 
-    .dropdown-divider {
-      height: 1px;
-      background: #e2e8f0;
-      margin: 5px 0;
-    }
-
-    .top-bar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .top-bar-right { display: flex; align-items: center; gap: 8px; }
 
     .quick-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
+      gap: 7px;
+      padding: 7px 16px;
       font-size: 13px;
       font-weight: 600;
-      border-radius: 4px;
+      border-radius: 999px;
       cursor: pointer;
       text-decoration: none !important;
       border: 1px solid transparent;
+      transition: all 0.18s ease;
     }
 
     .quick-btn-primary {
-      background: #0284c7;
-      color: #ffffff !important;
-      border-color: #0369a1;
+      background: var(--olive);
+      color: #fffdf6 !important;
+      border-color: var(--olive-deep);
+      box-shadow: 0 2px 8px rgba(87, 119, 46, 0.3);
     }
 
-    .quick-btn-primary:hover {
-      background: #0369a1;
-    }
+    .quick-btn-primary:hover { background: var(--olive-deep); transform: translateY(-1px); box-shadow: 0 5px 14px rgba(87, 119, 46, 0.35); }
+    .quick-btn-primary:active { transform: translateY(0) scale(0.97); }
 
-    .quick-btn-secondary {
-      background: #ffffff;
-      color: var(--text-main) !important;
-      border-color: var(--win-border);
-    }
+    .quick-btn-secondary { background: var(--paper); color: var(--ink-2) !important; border-color: var(--line-strong); }
+    .quick-btn-secondary:hover { background: var(--sage-soft); border-color: var(--olive); color: var(--ink) !important; transform: translateY(-1px); }
+    .quick-btn-secondary:active { transform: translateY(0) scale(0.97); }
 
-    .quick-btn-secondary:hover {
-      background: #f1f5f9;
-    }
+    .mobile-about-btn { display: none; }
 
-    /* Main Workspace */
+    /* ============ Main Workspace ============ */
     .workspace {
       flex: 1;
       display: grid;
-      grid-template-columns: 360px 1fr;
-      gap: 12px;
-      padding: 12px;
-      height: calc(100vh - 76px);
+      grid-template-columns: 372px 1fr;
+      gap: 14px;
+      padding: 14px;
+      height: calc(100vh - 54px - 40px);
       overflow: hidden;
     }
 
-    /* Praat Window Common Styles */
+    /* ============ Praat Window Chrome ============ */
     .praat-window {
-      background: var(--win-bg);
-      border: 1px solid var(--win-border);
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow-window);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -320,502 +281,803 @@
     }
 
     .window-title-bar {
-      height: 34px;
-      background: var(--win-header-active);
-      border-bottom: 1px solid var(--panel-border);
+      height: 40px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 12px;
+      padding: 0 12px 0 14px;
       flex-shrink: 0;
+      user-select: none;
+      transition: background 0.3s ease;
+    }
+
+    @keyframes titleFlash {
+      0% { background: var(--sage); }
+      100% { background: var(--panel); }
+    }
+
+    .window-title-bar.title-highlight {
+      animation: titleFlash 0.65s ease-out;
     }
 
     .window-title {
-      font-weight: 700;
-      font-size: 13.5px;
-      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: var(--ink-2);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
+      min-width: 0;
     }
 
-    .window-controls {
-      display: flex;
-      gap: 6px;
-    }
+    .window-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .window-title i { color: var(--olive); font-size: 12px; flex-shrink: 0; }
+
+    .window-controls { display: flex; gap: 7px; flex-shrink: 0; }
 
     .win-control-btn {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.15);
+      border: 1px solid rgba(12, 49, 10, 0.18);
+      box-shadow: inset 0 -1px 2px rgba(12, 49, 10, 0.15);
       cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
     }
 
-    .win-close { background: #ff5f56; }
-    .win-min { background: #ffbd2e; }
-    .win-max { background: #27c93f; }
+    .win-control-btn:hover { filter: brightness(1.08); transform: scale(1.15); }
+    .win-control-btn:active { filter: brightness(0.88); transform: scale(0.9); }
+    .win-close { background: var(--tl-close); }
+    .win-min { background: var(--tl-min); }
+    .win-max { background: var(--tl-max); }
 
     .window-menu-strip {
-      height: 28px;
-      background: #ffffff;
-      border-bottom: 1px solid var(--panel-border);
+      height: 30px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      gap: 12px;
-      font-size: 12.5px;
-      color: var(--text-muted);
+      padding: 0 12px;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      letter-spacing: 0.05em;
+      color: var(--ink-3);
       flex-shrink: 0;
+      user-select: none;
     }
 
     .window-menu-strip span {
       cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 3px 9px;
+      border-radius: 5px;
+      transition: background 0.12s ease, color 0.12s ease;
     }
 
-    .window-menu-strip span:hover {
-      background: #e2e8f0;
-      color: var(--text-main);
-    }
+    .window-menu-strip span:hover { background: var(--sage-soft); color: var(--ink); }
 
-    /* Left Pane: Praat Objects Window */
+    /* ============ Left Pane: Praat Objects Window ============ */
     .objects-container {
       display: grid;
       grid-template-columns: 1.35fr 1fr;
       flex: 1;
-      height: calc(100% - 62px);
-      background: #ffffff;
+      height: calc(100% - 70px);
+      background: var(--paper);
       overflow: hidden;
     }
 
     .objects-list-column {
-      border-right: 1px solid var(--panel-border);
+      border-right: 1px solid var(--line);
       display: flex;
       flex-direction: column;
-      background: #ffffff;
+      background: var(--paper);
       overflow: hidden;
     }
 
     .objects-list-header {
-      padding: 7px 12px;
-      background: #f1f5f9;
-      border-bottom: 1px solid var(--panel-border);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      padding: 8px 14px;
+      background: var(--paper-2);
+      border-bottom: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      color: var(--ink-3);
+      user-select: none;
     }
 
-    .objects-list {
-      flex: 1;
-      overflow-y: auto;
-      list-style: none;
-      padding: 6px;
-    }
+    .objects-list { flex: 1; overflow-y: auto; list-style: none; padding: 8px; }
 
     .object-entry {
       padding: 9px 12px;
-      margin-bottom: 4px;
-      border-radius: 4px;
+      margin-bottom: 3px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 13.5px;
       display: flex;
       align-items: center;
       gap: 10px;
       border: 1px solid transparent;
-      transition: all 0.1s;
+      color: var(--ink-2);
+      transition: background 0.14s ease, border-color 0.14s ease, transform 0.14s ease;
+      user-select: none;
     }
 
-    .object-entry:hover {
-      background: #f1f5f9;
-    }
+    .object-entry:hover { background: var(--paper-2); border-color: var(--line); transform: translateX(2px); }
+    .object-entry:active { transform: scale(0.99); }
 
     .object-entry.selected {
-      background: var(--praat-selection);
-      border-color: #93c5fd;
-      color: var(--text-main);
+      background: var(--sage);
+      border-color: #c3d47e;
+      color: var(--ink);
       font-weight: 600;
     }
 
-    .object-entry i {
-      font-size: 13.5px;
-      color: var(--praat-blue);
-      width: 16px;
-      text-align: center;
-      flex-shrink: 0;
-    }
+    .object-entry i { font-size: 13px; color: var(--olive); width: 17px; text-align: center; flex-shrink: 0; }
+    .object-entry.selected i { color: var(--olive-deep); }
+
+    .obj-num { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); font-weight: 500; }
+    .obj-cls { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; letter-spacing: 0.01em; }
+    .object-entry.selected .obj-num { color: var(--olive-deep); }
 
     .objects-bottom-bar {
-      padding: 8px;
-      background: #f8fafc;
-      border-top: 1px solid var(--panel-border);
+      padding: 10px;
+      background: var(--paper-2);
+      border-top: 1px solid var(--line);
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
+      gap: 7px;
       flex-shrink: 0;
     }
 
     .praat-btn {
-      background: var(--praat-btn-bg);
-      border: 1px solid var(--praat-btn-border);
-      border-radius: 4px;
-      padding: 6px 8px;
-      font-family: inherit;
+      background: var(--paper);
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      padding: 7px 8px;
       font-size: 12.5px;
-      color: var(--text-main);
+      font-weight: 500;
+      color: var(--ink-2);
       cursor: pointer;
       text-align: center;
-      box-shadow: 0 1px 1px rgba(0,0,0,0.03);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       text-decoration: none !important;
+      transition: all 0.15s ease;
     }
 
-    .praat-btn:hover {
-      background: var(--praat-btn-hover);
-      border-color: #64748b;
-    }
-
-    .praat-btn:active {
-      background: var(--praat-btn-active);
-    }
+    .praat-btn:hover { background: var(--sage-soft); border-color: var(--olive); color: var(--ink); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(61, 77, 32, 0.12); }
+    .praat-btn:active { transform: translateY(0) scale(0.97); box-shadow: none; }
 
     .praat-btn.accent {
-      background: #e0f2fe;
-      border-color: #7dd3fc;
-      color: #0369a1;
+      background: var(--olive);
+      border-color: var(--olive-deep);
+      color: #fffdf6;
       font-weight: 600;
     }
 
+    .praat-btn.accent:hover { background: var(--olive-deep); border-color: var(--olive-deep); color: #fffdf6; box-shadow: 0 3px 8px rgba(87, 119, 46, 0.3); }
+    .praat-btn.accent:active { background: var(--olive-deep); }
+
     /* Actions Column in Objects Window */
     .objects-actions-column {
-      background: #fdfdfd;
+      background: #f8f5e9;
       padding: 8px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 3px;
       overflow-y: auto;
     }
 
     .action-category-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-top: 4px;
-      margin-bottom: 2px;
-      padding-left: 2px;
-      text-transform: uppercase;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--ink-3);
+      margin-top: 8px;
+      margin-bottom: 3px;
+      padding-left: 4px;
+      user-select: none;
     }
+
+    .action-category-label:first-child { margin-top: 2px; }
 
     .praat-action-btn {
       width: 100%;
-      background: #ffffff;
-      border: 1px solid var(--praat-btn-border);
-      border-radius: 4px;
-      padding: 6px 8px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
       font-size: 12.5px;
-      color: var(--text-main);
+      color: var(--ink-2);
       cursor: pointer;
       text-align: left;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
+      transition: background 0.14s ease, color 0.14s ease, transform 0.14s ease;
     }
 
-    .praat-action-btn:hover {
-      background: #f1f5f9;
-      border-color: #475569;
-    }
+    .praat-action-btn:hover { background: var(--sage-soft); color: var(--ink); transform: translateX(3px); }
+    .praat-action-btn:active { transform: translateX(1px) scale(0.98); }
+    .praat-action-btn i { color: var(--ink-3); }
+    .praat-action-btn:hover i { color: var(--olive); }
 
-    .praat-action-btn.primary-action {
-      background: #f0fdf4;
-      border-color: #86efac;
-      color: #166534;
-      font-weight: 600;
-    }
+    .praat-action-btn.primary-action { color: var(--olive-deep); font-weight: 600; }
+    .praat-action-btn.primary-action:hover { background: var(--sage); }
 
-    /* Right Main Display Window */
-    .display-window {
-      background: #ffffff;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
+    /* ============ Right Main Display Window ============ */
+    .display-window { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    
     .display-content-area {
       flex: 1;
       overflow-y: auto;
-      padding: 22px 26px;
-      background: #ffffff;
+      padding: 28px 36px 40px;
+      background: var(--paper);
     }
 
-    /* Tab Views Content Styling */
-    .tab-view {
-      display: none;
+    .view-content-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    .tab-view.active {
-      display: block;
+    .tab-view { display: none; }
+    .tab-view.active { display: block; animation: viewIn 0.25s ease; }
+
+    @keyframes viewIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Hero Section */
     .view-hero {
-      border-bottom: 1px solid var(--panel-border);
-      padding-bottom: 12px;
-      margin-bottom: 16px;
+      position: relative;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+      margin-bottom: 28px;
     }
 
     .view-hero h1 {
-      font-size: 18px;
+      font-family: var(--font-display);
+      font-size: 26px;
       font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      line-height: 1.3;
     }
 
-    .view-hero p {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      line-height: 1.6;
+    .view-hero h1 i { color: var(--olive); font-size: 20px; }
+
+    .view-hero p { font-size: 13.5px; color: var(--ink-3); line-height: 1.7; max-width: 680px; }
+
+    /* Decorative waveform */
+    .wave-divider {
+      position: absolute;
+      right: 2px;
+      bottom: 16px;
+      width: 128px;
+      height: 20px;
+      color: var(--olive);
+      opacity: 0.5;
+      pointer-events: none;
     }
 
-    /* Feature Item Minimal List */
+    /* Feature List with Mono Counters */
     .feature-list-compact {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 18px;
+      column-gap: 36px;
+      margin-bottom: 32px;
+      counter-reset: feat;
     }
 
     .feature-item-compact {
-      background: #f8fafc;
-      border: 1px solid var(--win-border);
-      border-radius: 5px;
-      padding: 12px 14px;
+      padding: 15px 2px;
+      border-top: 1px solid var(--line);
+      counter-increment: feat;
     }
 
     .feature-item-compact h3 {
-      font-size: 13.5px;
+      font-size: 14.5px;
       font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 4px;
+      color: var(--ink);
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
     }
 
-    .feature-item-compact h3 i {
-      color: var(--praat-blue);
-      font-size: 12.5px;
+    .feature-item-compact h3::before {
+      content: counter(feat, decimal-leading-zero);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--olive);
+      letter-spacing: 0.08em;
+      margin-right: 2px;
     }
 
-    .feature-item-compact p {
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
+    .feature-item-compact h3 i { color: var(--olive); font-size: 13px; width: 16px; text-align: center; }
+    .feature-item-compact p { font-size: 12.8px; color: var(--ink-2); line-height: 1.65; }
 
-    /* Download Box Cards */
+    /* Download Cards & Meta */
     .download-grid-compact {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
     .download-card-compact {
-      background: #ffffff;
-      border: 1px solid var(--win-border);
-      border-radius: 5px;
-      padding: 14px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
+      transition: all 0.18s ease;
     }
 
-    .download-card-compact.featured {
-      border-color: #0284c7;
-      background: #f0f9ff;
-    }
+    .download-card-compact:hover { border-color: var(--olive); box-shadow: 0 8px 20px -8px rgba(61, 77, 32, 0.25); transform: translateY(-3px); }
+
+    .download-card-compact.featured { background: #f1f5dc; border-color: var(--olive); }
+    .download-card-compact.featured:hover { border-color: var(--olive-deep); box-shadow: 0 10px 24px -8px rgba(87, 119, 46, 0.35); }
 
     .dl-card-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       margin-bottom: 6px;
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--ink);
     }
 
-    .dl-card-desc {
-      font-size: 12.5px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      flex: 1;
-      line-height: 1.5;
+    .dl-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-bottom: 10px;
     }
 
-    /* Terminology Table */
-    .term-table-wrapper {
-      border: 1px solid var(--win-border);
-      border-radius: 5px;
-      overflow-x: auto;
-      margin-bottom: 16px;
-    }
-
-    .term-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      background: #ffffff;
-      min-width: 480px;
-    }
-
-    .term-table th {
-      background: #f1f5f9;
-      padding: 8px 12px;
-      text-align: left;
-      font-weight: 700;
-      border-bottom: 1px solid var(--panel-border);
-      color: var(--text-main);
-    }
-
-    .term-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e2e8f0;
-      color: var(--text-main);
-    }
-
-    .term-table tr:hover {
-      background: #f8fafc;
-    }
-
-    /* Screenshot Embed Block */
-    .screenshot-frame {
-      background: #f8fafc;
-      border: 1px solid var(--win-border);
-      border-radius: 5px;
-      padding: 8px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .screenshot-frame img {
-      max-width: 100%;
-      height: auto;
-      max-height: 380px;
-      border: 1px solid var(--win-border);
-      border-radius: 4px;
+    .dl-meta i {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--line-strong);
       display: inline-block;
     }
 
-    .screenshot-caption {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 6px;
+    .dl-card-desc { font-size: 12.8px; color: var(--ink-3); margin-bottom: 16px; flex: 1; line-height: 1.6; }
+
+    /* Terminology Table with Groups */
+    .term-table-wrapper {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: auto;
+      margin-bottom: 20px;
+      max-height: calc(100vh - 320px);
+      box-shadow: 0 2px 8px rgba(12, 49, 10, 0.04);
     }
 
-    .citation-banner {
-      background: #fefce8;
-      border: 1px solid #fef08a;
-      border-radius: 5px;
-      padding: 10px 14px;
+    .term-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--paper); min-width: 520px; }
+
+    .term-table th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: var(--paper-2);
+      padding: 9px 14px;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--line-strong);
+      color: var(--ink-2);
+      white-space: nowrap;
+    }
+
+    .term-group td {
+      position: sticky;
+      top: 34px;
+      z-index: 2;
+      background: var(--panel);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--olive-deep);
+      border-bottom: 1px solid var(--line-strong);
+      border-top: 1px solid var(--line);
+      padding: 7px 14px;
+      user-select: none;
+    }
+
+    .term-table td { padding: 9px 14px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+    .term-table td strong { color: var(--ink); }
+    .term-table td:nth-child(2) { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); font-weight: 500; }
+    
+    .term-cat-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--sage-soft);
+      border: 1px solid var(--line);
+      color: var(--olive-deep);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .term-table tr:hover td { background: var(--sage-soft); }
+    .term-table tr.term-group:hover td { background: var(--panel); }
+    .term-table tr:last-child td { border-bottom: none; }
+
+    /* Term Search */
+    .term-search-bar { margin-bottom: 14px; display: flex; gap: 12px; align-items: center; }
+    .term-search-wrap { position: relative; flex: 1; }
+    .term-search-wrap i { position: absolute; left: 12px; top: 10px; color: var(--ink-3); font-size: 12px; }
+
+    .term-search-input {
+      width: 100%;
+      padding: 8px 12px 8px 32px;
+      font-family: inherit;
+      font-size: 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      outline: none;
+      background: var(--paper);
+      color: var(--ink);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .term-search-input:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(213, 231, 152, 0.6); }
+    .term-search-input::placeholder { color: var(--ink-3); }
+
+    #term-count { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
+
+    /* Screenshot Embed Window Chrome (shot-window) */
+    .shot-window {
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow-window);
+      background: var(--paper);
+      margin-bottom: 24px;
+    }
+
+    .shot-titlebar {
+      height: 32px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      user-select: none;
+    }
+
+    .shot-dots { display: flex; gap: 5px; }
+    .shot-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); display: inline-block; }
+    .shot-dots i:first-child { background: var(--tl-close); }
+    .shot-dots i:nth-child(2) { background: var(--tl-min); }
+    .shot-dots i:nth-child(3) { background: var(--tl-max); }
+    .shot-filename { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+
+    .screenshot-wrapper {
+      position: relative;
+      display: block;
+      width: 100%;
+      cursor: zoom-in;
+      background: var(--paper-2);
+      text-align: center;
+      padding: 10px;
+    }
+
+    .screenshot-wrapper img {
+      max-width: 100%;
+      height: auto;
+      max-height: 420px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      display: inline-block;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .screenshot-wrapper:hover img { transform: scale(1.012); box-shadow: 0 10px 28px rgba(61, 77, 32, 0.22); }
+
+    .screenshot-zoom-badge {
+      position: absolute;
+      bottom: 18px;
+      right: 18px;
+      background: rgba(12, 49, 10, 0.75);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      color: #fffdf6;
+      font-size: 11.5px;
+      font-weight: 500;
+      padding: 4px 11px;
+      border-radius: 999px;
+      pointer-events: none;
+      opacity: 0.85;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .screenshot-wrapper:hover .screenshot-zoom-badge { opacity: 1; transform: scale(1.05); background: rgba(87, 119, 46, 0.92); }
+
+    /* Split View (Tab 3 & Tab 5) */
+    .split-view {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+      align-items: start;
+      margin-bottom: 24px;
+    }
+
+    .split-sidebar .lead {
+      font-family: var(--font-display);
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--ink-2);
+      margin-bottom: 18px;
+    }
+
+    .doc-outline {
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+
+    .doc-outline-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--olive-deep);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .doc-outline ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .doc-outline li {
       font-size: 12.5px;
-      color: #854d0e;
-      margin-top: 14px;
+      color: var(--ink-2);
       display: flex;
       align-items: baseline;
       gap: 8px;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
-    /* Bottom Desktop Status Bar */
-    .bottom-status-bar {
-      height: 32px;
-      background: #ffffff;
-      border-top: 1px solid var(--win-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 14px;
-      font-size: 12px;
-      color: var(--text-muted);
+    .doc-outline li i {
+      color: var(--olive);
+      font-size: 10px;
       flex-shrink: 0;
     }
 
-    .status-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .wave-recorder-deco {
+      width: 100%;
+      height: 28px;
+      margin-top: 8px;
     }
 
-    .status-right {
-      display: flex;
+    /* Fullscreen Lightbox */
+    .lightbox-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 30, 12, 0.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 2000;
       align-items: center;
-      gap: 16px;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      transition: opacity 0.22s ease;
+      cursor: zoom-out;
     }
 
-    /* Modal Dialog */
+    .lightbox-overlay.open { display: flex; opacity: 1; }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 95vw;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+      animation: lightboxZoom 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes lightboxZoom {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .lightbox-content img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 253, 246, 0.25);
+      background: var(--paper);
+    }
+
+    .lightbox-caption {
+      color: #f5f1e2;
+      font-size: 13.5px;
+      margin-top: 12px;
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      font-weight: 500;
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--olive-deep);
+      border: 2px solid var(--paper);
+      color: #fffdf6;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      transition: all 0.15s ease;
+      z-index: 10;
+    }
+
+    .lightbox-close-btn:hover { background: var(--tl-close); transform: scale(1.1); }
+    .lightbox-close-btn:active { transform: scale(0.95); }
+
+    /* Citation Footnote Style */
+    .citation-banner {
+      background: none;
+      border: none;
+      border-left: 3px solid var(--sage);
+      border-radius: 0;
+      padding: 6px 0 6px 14px;
+      font-size: 12.5px;
+      color: var(--ink-2);
+      margin-top: 24px;
+      line-height: 1.6;
+    }
+
+    .citation-banner strong { color: var(--ink); }
+
+    /* ============ Bottom Status Bar ============ */
+    .bottom-status-bar {
+      height: 40px;
+      background: var(--paper-2);
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      letter-spacing: 0.02em;
+      color: var(--ink-3);
+      flex-shrink: 0;
+      z-index: 50;
+    }
+
+    .status-left { display: flex; align-items: center; gap: 16px; }
+    .status-right { display: flex; align-items: center; gap: 18px; }
+
+    .status-right a {
+      color: var(--ink-3);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: color 0.14s ease;
+    }
+
+    .status-right a:hover { color: var(--olive-deep); text-decoration: none; }
+
+    /* ============ Mobile Bottom Navigation Bar ============ */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    /* ============ Modal Dialog ============ */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.35);
-      backdrop-filter: blur(2px);
+      background: rgba(18, 30, 12, 0.35);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
       z-index: 1000;
       align-items: center;
       justify-content: center;
     }
 
-    .modal-overlay.open {
-      display: flex;
-    }
+    .modal-overlay.open { display: flex; }
 
     .praat-dialog {
-      width: 440px;
-      max-width: 90vw;
-      background: #ffffff;
-      border: 1px solid var(--win-border);
-      border-radius: 6px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      width: 460px;
+      max-width: 92vw;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 24px 60px -16px rgba(18, 30, 12, 0.45);
       overflow: hidden;
+      animation: lightboxZoom 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .dialog-header {
-      background: var(--win-header-active);
-      padding: 8px 12px;
+      background: var(--panel);
+      padding: 9px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-weight: 700;
       font-size: 13px;
-      border-bottom: 1px solid var(--panel-border);
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
     }
 
-    .dialog-body {
-      padding: 18px;
-      font-size: 13px;
-      color: var(--text-main);
-      line-height: 1.6;
-    }
+    .dialog-body { padding: 20px; font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+    .dialog-body strong { color: var(--ink); }
 
     .dialog-footer {
-      padding: 10px 14px;
-      background: #f8fafc;
-      border-top: 1px solid var(--panel-border);
+      padding: 11px 14px;
+      background: var(--paper-2);
+      border-top: 1px solid var(--line);
       display: flex;
       justify-content: flex-end;
     }
 
-    /* Mobile Responsive Optimizations */
-    @media (max-width: 860px) {
+    .license-chip {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      border-radius: 7px;
+    }
+
+    /* ============ Mobile Responsive Styles (< 880px) ============ */
+    @media (max-width: 880px) {
       html, body {
         height: auto;
         min-height: 100vh;
@@ -826,85 +1088,332 @@
         height: auto;
         min-height: 100vh;
         overflow-y: visible;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
       }
 
+      /* 1. Slim Top Bar */
       .top-menu-bar {
+        height: 50px;
+        padding: 0 14px;
+        flex-wrap: nowrap;
+      }
+
+      .menu-items { display: none; }
+      .top-bar-right .quick-btn-secondary { display: none; }
+      
+      .mobile-about-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 1px solid var(--line-strong);
+        color: var(--ink-2);
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.15s ease;
+      }
+      .mobile-about-btn:hover { background: var(--sage-soft); color: var(--ink); }
+      .mobile-about-btn:active { transform: scale(0.94); }
+
+      .top-bar-right {
+        margin-left: auto;
+        gap: 8px;
+      }
+
+      /* 2. Workspace: Single Unified Display Window */
+      .workspace {
+        display: block;
         height: auto;
-        padding: 8px 12px;
+        padding: 10px;
+        gap: 0;
+      }
+
+      .workspace > .praat-window:first-child {
+        display: none !important;
+      }
+
+      .praat-window.display-window {
+        border-radius: 12px;
+        box-shadow: 0 4px 20px -8px rgba(61, 77, 32, 0.2);
+      }
+
+      .window-controls { display: none !important; }
+      .window-menu-strip { display: none !important; }
+
+      .window-title-bar {
+        height: 42px;
+        padding: 0 14px;
+      }
+
+      .window-title {
+        font-size: 12.5px;
+      }
+
+      .display-content-area {
+        padding: 18px 14px 28px;
+      }
+
+      .view-hero {
+        padding-bottom: 14px;
+        margin-bottom: 20px;
+      }
+
+      .view-hero h1 {
+        font-size: 20px;
+        gap: 8px;
+      }
+
+      .view-hero p {
+        font-size: 13px;
+      }
+
+      .wave-divider { display: none; }
+
+      /* Feature Cards */
+      .feature-list-compact {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+        margin-bottom: 20px;
+      }
+
+      .feature-item-compact {
+        padding: 12px 2px;
+      }
+
+      /* Download Cards */
+      .download-grid-compact {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .download-card-compact {
+        padding: 16px;
+      }
+
+      .download-card-compact .praat-btn {
+        width: 100%;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13.5px;
+      }
+
+      /* Split View on Mobile */
+      .split-view {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .split-sidebar .lead {
+        font-size: 15px;
+        margin-bottom: 14px;
+      }
+
+      /* Terminology Card Stream */
+      .term-search-bar {
+        position: sticky;
+        top: -18px;
+        z-index: 10;
+        background: var(--paper);
+        padding: 8px 0;
+        margin-bottom: 14px;
+        border-bottom: 1px solid var(--line);
         flex-wrap: wrap;
         gap: 8px;
       }
 
-      .menu-items {
+      .term-search-input {
+        min-height: 42px;
+        font-size: 13.5px;
+      }
+
+      #term-count {
+        width: 100%;
+        text-align: right;
+        font-size: 11.5px;
+      }
+
+      .term-table-wrapper {
+        border: none;
+        border-radius: 0;
+        overflow: visible;
+        max-height: none;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .term-table {
+        display: block;
+        min-width: 0;
+        background: transparent;
+      }
+
+      .term-table thead {
         display: none;
       }
 
-      .top-bar-right {
-        margin-left: auto;
-      }
-
-      .workspace {
-        grid-template-columns: 1fr;
-        height: auto;
-        padding: 8px;
+      .term-table tbody {
+        display: flex;
+        flex-direction: column;
         gap: 10px;
       }
 
-      .praat-window {
-        height: auto;
-      }
-
-      .objects-container {
-        height: auto;
+      .term-table tr {
         display: flex;
         flex-direction: column;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        box-shadow: 0 2px 6px rgba(12, 49, 10, 0.04);
+        transition: border-color 0.15s ease;
       }
 
-      .objects-list-column {
-        border-right: none;
-        border-bottom: 1px solid var(--panel-border);
+      .term-table tr.term-group {
+        background: var(--panel);
+        border-color: var(--line-strong);
+        padding: 6px 12px;
+        border-radius: 6px;
+        margin-top: 8px;
       }
 
-      .objects-list {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 4px;
-        padding: 6px;
-        max-height: none;
+      .term-group td {
+        position: static;
+        padding: 0;
+        background: transparent;
+        border: none;
+        font-size: 11px;
       }
 
-      .object-entry {
-        padding: 8px 10px;
-        font-size: 12.5px;
-        margin-bottom: 0;
+      .term-table tr:hover {
+        border-color: var(--olive);
       }
 
-      .objects-actions-column {
-        display: none;
+      .term-table td {
+        display: block;
+        padding: 2px 0;
+        border-bottom: none;
       }
 
-      .display-content-area {
-        padding: 14px;
+      .term-table td:nth-child(1) {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.4;
       }
 
-      .feature-list-compact {
-        grid-template-columns: 1fr;
+      .term-table td:nth-child(2) {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--olive-deep);
+        font-weight: 600;
+        margin-bottom: 6px;
       }
 
-      .download-grid-compact {
-        grid-template-columns: 1fr;
+      .term-table td:nth-child(3) {
+        margin-bottom: 6px;
       }
 
+      .term-table td:nth-child(4) {
+        font-size: 12.8px;
+        color: var(--ink-2);
+        line-height: 1.55;
+        margin-top: 4px;
+        border-top: 1px dashed var(--line);
+        padding-top: 6px;
+      }
+
+      /* Bottom Status Bar */
       .bottom-status-bar {
         height: auto;
-        padding: 10px 12px;
-        flex-direction: column;
-        gap: 6px;
-        text-align: center;
+        padding: 10px 14px;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 12px;
       }
 
+      .status-left { display: none; }
       .status-right {
+        width: 100%;
+        justify-content: space-around;
+        gap: 12px;
+      }
+      .status-right a {
+        font-size: 12px;
+        min-height: 36px;
+      }
+
+      /* Mobile Fixed Bottom Nav */
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: calc(56px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: var(--paper-2);
+        border-top: 1px solid var(--line);
+        box-shadow: 0 -4px 18px rgba(12, 49, 10, 0.08);
+        z-index: 1000;
+        align-items: center;
+        justify-content: space-around;
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+
+      .mobile-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
+        gap: 3px;
+        height: 48px;
+        min-height: 48px;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        color: var(--ink-3);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        padding: 4px 2px;
+        user-select: none;
+      }
+
+      .mobile-nav-item i {
+        font-size: 17px;
+        color: var(--ink-3);
+        transition: color 0.15s ease;
+      }
+
+      .mobile-nav-item span.mobile-nav-label {
+        font-size: 11.5px;
+        font-weight: 500;
+        line-height: 1;
+      }
+
+      .mobile-nav-item:hover {
+        background: var(--sage-soft);
+        color: var(--ink);
+      }
+
+      .mobile-nav-item:active {
+        transform: scale(0.94);
+      }
+
+      .mobile-nav-item.active {
+        background: var(--sage);
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .mobile-nav-item.active i {
+        color: var(--olive-deep);
       }
     }
   </style>
@@ -912,14 +1421,13 @@
 <body>
 
   <div class="praat-desktop">
-    
+
     <!-- Top Global Menu Bar -->
     <header class="top-menu-bar">
       <div class="top-bar-left">
         <div class="app-brand">
-          <img src="pictures/icon.png" alt="Praat 汉化版 Logo" style="width: 30px; height: 30px; object-fit: contain;">
+          <img src="pictures/icon.png" alt="Praat 汉化版 Logo">
           <span>Praat 汉化版</span>
-          <span class="app-badge">v7.0</span>
         </div>
 
         <nav>
@@ -939,8 +1447,8 @@
             <li class="menu-item">
               <button class="menu-btn" onclick="switchTab('tab-download')">下载 <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" id="menu-dl-win" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip">Windows x64 便携版 (.zip) 直链</a>
-                <a class="dropdown-item" id="menu-dl-mac" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg">macOS Universal 通用版 (.dmg) 直链</a>
+                <a class="dropdown-item" id="menu-dl-win" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip">Windows x64 便携版 (.zip)</a>
+                <a class="dropdown-item" id="menu-dl-mac" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg">macOS Universal 通用版 (.dmg)</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank">所有历史版本 Releases</a>
               </div>
@@ -969,6 +1477,9 @@
           <i class="fa-brands fa-github"></i>
           <span>GitHub</span>
         </a>
+        <button class="mobile-about-btn" onclick="openModal('about-modal')" title="关于">
+          <i class="fa-solid fa-circle-info"></i>
+        </button>
         <button class="quick-btn quick-btn-primary" onclick="switchTab('tab-download')">
           <i class="fa-solid fa-download"></i>
           <span>下载软件</span>
@@ -978,12 +1489,12 @@
 
     <!-- Main Workspace Area -->
     <main class="workspace">
-      
-      <!-- Left: Praat Objects Window -->
+
+      <!-- Left: Praat Objects Window (Desktop Only) -->
       <section class="praat-window">
         <div class="window-title-bar">
           <div class="window-title">
-            <i class="fa-solid fa-window-maximize" style="color: var(--praat-blue);"></i>
+            <i class="fa-solid fa-window-maximize"></i>
             <span>Praat 对象列表</span>
           </div>
           <div class="window-controls">
@@ -1008,23 +1519,23 @@
             <ul class="objects-list" id="objects-list">
               <li class="object-entry selected" onclick="switchTab('tab-overview', this)">
                 <i class="fa-solid fa-volume-high"></i>
-                <span>1. Sound 软件特性</span>
+                <span><span class="obj-num">1.&nbsp;</span><span class="obj-cls">Sound</span>&nbsp;软件特性</span>
               </li>
               <li class="object-entry" onclick="switchTab('tab-download', this)">
                 <i class="fa-solid fa-box-archive"></i>
-                <span>2. Package 下载安装</span>
+                <span><span class="obj-num">2.&nbsp;</span><span class="obj-cls">Package</span>&nbsp;下载安装</span>
               </li>
               <li class="object-entry" onclick="switchTab('tab-manual', this)">
                 <i class="fa-solid fa-book-open"></i>
-                <span>3. Manual 帮助手册</span>
+                <span><span class="obj-num">3.&nbsp;</span><span class="obj-cls">Manual</span>&nbsp;帮助手册</span>
               </li>
               <li class="object-entry" onclick="switchTab('tab-terms', this)">
                 <i class="fa-solid fa-table-list"></i>
-                <span>4. Table 术语对照</span>
+                <span><span class="obj-num">4.&nbsp;</span><span class="obj-cls">Table</span>&nbsp;术语对照</span>
               </li>
               <li class="object-entry" onclick="switchTab('tab-recorder', this)">
                 <i class="fa-solid fa-microphone"></i>
-                <span>5. Recorder 录音窗口</span>
+                <span><span class="obj-num">5.&nbsp;</span><span class="obj-cls">Recorder</span>&nbsp;录音窗口</span>
               </li>
             </ul>
 
@@ -1044,7 +1555,7 @@
               <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i>
             </button>
             <button class="praat-action-btn" onclick="switchTab('tab-download')">
-              <span>获取二进制版</span>
+              <span>获取软件</span>
               <i class="fa-solid fa-download" style="font-size: 11px;"></i>
             </button>
 
@@ -1069,7 +1580,7 @@
       <section class="praat-window display-window">
         <div class="window-title-bar">
           <div class="window-title" id="display-window-title">
-            <i class="fa-solid fa-wave-square" style="color: var(--praat-blue);"></i>
+            <i class="fa-solid fa-wave-square"></i>
             <span>Praat 7.0 汉化版 · 软件特性与功能总览</span>
           </div>
           <div class="window-controls">
@@ -1089,390 +1600,468 @@
         </div>
 
         <div class="display-content-area">
+          <div class="view-content-wrapper">
 
-          <!-- TAB 1: Overview & Highlights -->
-          <div id="tab-overview" class="tab-view active">
-            <div class="view-hero" style="display: flex; gap: 20px; align-items: center;">
-              <img src="pictures/icon.png" alt="Praat 汉化版 Logo" style="width: 92px; height: 92px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.08));">
-              <div>
-                <h1>Praat 汉化版</h1>
-                <p>
-                  基于 Praat 官方内核构建，提供完整中文界面与帮助手册。针对中文排版、拖拽打开、录音暂存与多对象批量操作深度优化。
-                </p>
+            <!-- TAB 1: Overview & Highlights -->
+            <div id="tab-overview" class="tab-view active">
+              <div class="view-hero" style="display: flex; gap: 24px; align-items: center;">
+                <img src="pictures/icon.png" alt="Praat 汉化版 Logo" style="width: 96px; height: 96px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 10px rgba(61,77,32,0.18));">
+                <div>
+                  <h1>Praat 汉化版</h1>
+                  <p>
+                    基于 Praat 官方内核构建，提供完整中文界面与帮助手册。针对中文排版、拖拽打开、录音暂存与多对象批量操作深度优化。
+                  </p>
+                </div>
+                <svg class="wave-divider" viewBox="0 0 132 20" fill="none" aria-hidden="true"><path d="M2 10v0 M8 7v6 M14 4v12 M20 8v4 M26 2v16 M32 6v8 M38 9v2 M44 5v10 M50 3v14 M56 8v4 M62 6v8 M68 2v16 M74 7v6 M80 9v2 M86 4v12 M92 8v4 M98 6v8 M104 3v14 M110 8v4 M116 7v6 M122 9v2 M128 10v0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+
+              <!-- 6 Core Localization Enhancements -->
+              <div class="feature-list-compact">
+                <div class="feature-item-compact">
+                  <h3><i class="fa-solid fa-language"></i> 完整界面汉化</h3>
+                  <p>菜单栏、参数对话框及设置面板全量汉化，支持中英文自由切换，偏好自动保存。</p>
+                </div>
+
+                <div class="feature-item-compact">
+                  <h3><i class="fa-solid fa-book"></i> 帮助手册汉化</h3>
+                  <p>内置帮助手册主要页面全量翻译为中文，排版与滚动自适应优化。</p>
+                </div>
+
+                <div class="feature-item-compact">
+                  <h3><i class="fa-solid fa-table-list"></i> 术语对照表</h3>
+                  <p>主窗口常驻对照表按钮，随时核对语音学专业名词中英原词。</p>
+                </div>
+
+                <div class="feature-item-compact">
+                  <h3><i class="fa-solid fa-file-import"></i> 文件拖拽打开</h3>
+                  <p>Windows 下支持音频（.wav）、标注（.TextGrid）直接拖入载入。</p>
+                </div>
+
+                <div class="feature-item-compact">
+                  <h3><i class="fa-solid fa-microphone"></i> 录音窗口增强</h3>
+                  <p>按住录音模式、暂存列表自动递增编号与分层波形预览。</p>
+                </div>
+
+                <div class="feature-item-compact">
+                  <h3><i class="fa-solid fa-i-cursor"></i> 多对象批量重命名</h3>
+                  <p>选中多个对象时自动显示批量重命名工具，支持统一前后缀与序号递增。</p>
+                </div>
+              </div>
+
+              <!-- Screenshot Window Frame -->
+              <div class="shot-window">
+                <div class="shot-titlebar">
+                  <span class="shot-dots"><i></i><i></i><i></i></span>
+                  <span class="shot-filename">praat-zh-main-window.png · 主窗口与常用操作</span>
+                </div>
+                <div class="screenshot-wrapper" onclick="openLightbox('pictures/praat-zh-main-window.png', 'Praat 汉化版主窗口与常用固定操作区')">
+                  <img src="pictures/praat-zh-main-window.png" alt="Praat 汉化版主窗口预览">
+                  <div class="screenshot-zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
+                </div>
               </div>
             </div>
 
-            <!-- 6 Core Localization Enhancements -->
-            <div class="feature-list-compact">
-              <div class="feature-item-compact">
-                <h3><i class="fa-solid fa-language"></i> 完整界面汉化</h3>
-                <p>菜单栏、参数对话框及设置面板全量汉化，支持中英文自由切换，偏好自动保存。</p>
+            <!-- TAB 2: Download & Releases -->
+            <div id="tab-download" class="tab-view">
+              <div class="view-hero">
+                <h1><i class="fa-solid fa-download"></i> 下载 Praat 汉化版</h1>
+                <p>绿色免安装，解压即用。基于官方稳定内核构建。</p>
+                <svg class="wave-divider" viewBox="0 0 132 20" fill="none" aria-hidden="true"><path d="M2 10v0 M8 7v6 M14 4v12 M20 8v4 M26 2v16 M32 6v8 M38 9v2 M44 5v10 M50 3v14 M56 8v4 M62 6v8 M68 2v16 M74 7v6 M80 9v2 M86 4v12 M92 8v4 M98 6v8 M104 3v14 M110 8v4 M116 7v6 M122 9v2 M128 10v0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </div>
 
-              <div class="feature-item-compact">
-                <h3><i class="fa-solid fa-book"></i> 帮助手册汉化</h3>
-                <p>内置帮助手册主要页面全量翻译为中文，排版与滚动自适应优化。</p>
+              <div class="download-grid-compact">
+                <!-- Windows Card -->
+                <div class="download-card-compact featured">
+                  <div class="dl-card-header">
+                    <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
+                    <span>Windows (x64)</span>
+                  </div>
+                  <div class="dl-meta">
+                    <span>v7.0-zh.2</span><i></i><span>.zip · 便携免安装</span>
+                  </div>
+                  <div class="dl-card-desc">
+                    适用于 64 位 Windows 10 及 11。解压后双击即可运行。
+                  </div>
+                  <a id="dl-win-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip" class="praat-btn accent" style="padding: 10px;">
+                    <i class="fa-solid fa-download"></i>
+                    <span>下载 Windows x64 便携包 (.zip)</span>
+                  </a>
+                </div>
+
+                <!-- macOS Card -->
+                <div class="download-card-compact">
+                  <div class="dl-card-header">
+                    <i class="fa-brands fa-apple" style="color: #1a1a1a;"></i>
+                    <span>macOS (Universal)</span>
+                  </div>
+                  <div class="dl-meta">
+                    <span>v7.0-zh.2</span><i></i><span>.dmg · 通用二进制</span>
+                  </div>
+                  <div class="dl-card-desc">
+                    支持 Apple Silicon (M系列) 与 Intel 处理器的 Mac (macOS 11+)。
+                  </div>
+                  <a id="dl-mac-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg" class="praat-btn" style="padding: 10px;">
+                    <i class="fa-solid fa-download"></i>
+                    <span>下载 macOS Universal (.dmg)</span>
+                  </a>
+                </div>
+
+                <!-- Linux / Source Card -->
+                <div class="download-card-compact">
+                  <div class="dl-card-header">
+                    <i class="fa-brands fa-linux" style="color: #3b4732;"></i>
+                    <span>Linux / 源码</span>
+                  </div>
+                  <div class="dl-meta">
+                    <span>源码构建</span><i></i><span>GPL v3 开源</span>
+                  </div>
+                  <div class="dl-card-desc">
+                    适用于 Ubuntu、Debian 等 Linux 发行版，或直接获取完整源码。
+                  </div>
+                  <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" class="praat-btn" style="padding: 10px;">
+                    <i class="fa-brands fa-github"></i>
+                    <span>查看 GitHub 源码仓库</span>
+                  </a>
+                </div>
               </div>
 
-              <div class="feature-item-compact">
-                <h3><i class="fa-solid fa-table-list"></i> 术语对照表</h3>
-                <p>主窗口常驻对照表按钮，随时核对语音学专业名词中英原词。</p>
-              </div>
-
-              <div class="feature-item-compact">
-                <h3><i class="fa-solid fa-file-import"></i> 文件拖拽打开</h3>
-                <p>Windows 下支持音频（.wav）、标注（.TextGrid）直接拖入载入。</p>
-              </div>
-
-              <div class="feature-item-compact">
-                <h3><i class="fa-solid fa-microphone"></i> 录音窗口增强</h3>
-                <p>按住录音模式、暂存列表自动递增编号与分层波形预览。</p>
-              </div>
-
-              <div class="feature-item-compact">
-                <h3><i class="fa-solid fa-i-cursor"></i> 多对象批量重命名</h3>
-                <p>选中多个对象时自动显示批量重命名工具，支持统一前后缀与序号递增。</p>
+              <!-- Academic Citation Footnote -->
+              <div class="citation-banner">
+                <div>
+                  <strong>学术引用格式</strong>：Boersma, P., & Weenink, D. (2026). Praat: doing phonetics by computer [Computer program]. Version 7.0. https://praat.org/
+                </div>
               </div>
             </div>
 
-            <div class="screenshot-frame">
-              <img src="pictures/praat-zh-main-window.png" alt="Praat 汉化版主窗口预览">
-              <div class="screenshot-caption">Praat 汉化版主窗口与常用固定操作区</div>
+            <!-- TAB 3: Help Manual -->
+            <div id="tab-manual" class="tab-view">
+              <div class="view-hero">
+                <h1><i class="fa-solid fa-book"></i> 帮助手册汉化与排版优化</h1>
+                <p>内置帮助手册主要页面已全量翻译为中文，图文教程在不同窗口尺寸下均能自适应流式呈现，方便查阅与学习。</p>
+                <svg class="wave-divider" viewBox="0 0 132 20" fill="none" aria-hidden="true"><path d="M2 10v0 M8 7v6 M14 4v12 M20 8v4 M26 2v16 M32 6v8 M38 9v2 M44 5v10 M50 3v14 M56 8v4 M62 6v8 M68 2v16 M74 7v6 M80 9v2 M86 4v12 M92 8v4 M98 6v8 M104 3v14 M110 8v4 M116 7v6 M122 9v2 M128 10v0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+
+              <div class="split-view">
+                <div class="split-sidebar">
+                  <p class="lead">
+                    全面翻译常用核心章节，支持中英双向检索与跳转，助你快速掌握语音分析流程。
+                  </p>
+                  <div class="doc-outline">
+                    <div class="doc-outline-title">核心查阅章节</div>
+                    <ul>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>初学者语音学快速上手指南</span></li>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>语图（Spectrogram）参数与分析</span></li>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>音高提取（Pitch）与共振峰跟踪</span></li>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>TextGrid 分层切分与标注规范</span></li>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>Praat 自动化批处理脚本编写</span></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="split-content">
+                  <div class="shot-window">
+                    <div class="shot-titlebar">
+                      <span class="shot-dots"><i></i><i></i><i></i></span>
+                      <span class="shot-filename">praat-zh-manuel.png · 帮助手册界面</span>
+                    </div>
+                    <div class="screenshot-wrapper" onclick="openLightbox('pictures/praat-zh-manuel.png', '内置帮助手册实际运行效果')">
+                      <img src="pictures/praat-zh-manuel.png" alt="Praat 汉化版帮助手册界面">
+                      <div class="screenshot-zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <!-- TAB 4: Bilingual Terminology Table -->
+            <div id="tab-terms" class="tab-view">
+              <div class="view-hero">
+                <h1><i class="fa-solid fa-table-list"></i> 常用语音学与 Praat 术语中英对照表</h1>
+                <p>按模块分组收录核心语音学、数据结构、信号处理与合成算法的标准中英文对照，方便文献阅读与脚本编写。</p>
+                <svg class="wave-divider" viewBox="0 0 132 20" fill="none" aria-hidden="true"><path d="M2 10v0 M8 7v6 M14 4v12 M20 8v4 M26 2v16 M32 6v8 M38 9v2 M44 5v10 M50 3v14 M56 8v4 M62 6v8 M68 2v16 M74 7v6 M80 9v2 M86 4v12 M92 8v4 M98 6v8 M104 3v14 M110 8v4 M116 7v6 M122 9v2 M128 10v0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+
+              <!-- Search Input Bar -->
+              <div class="term-search-bar">
+                <div class="term-search-wrap">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" id="term-search" class="term-search-input" placeholder="搜索中文或英文术语（如 Pitch, 共振峰, 标注, LPC）..." oninput="filterTerms(this.value)">
+                </div>
+                <span id="term-count">共 34 条术语</span>
+              </div>
+
+              <div class="term-table-wrapper">
+                <table class="term-table" id="glossary-table">
+                  <thead>
+                    <tr>
+                      <th>中文术语</th>
+                      <th>英文原词</th>
+                      <th>分类</th>
+                      <th>说明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Group 1: 核心声学与语音特征 -->
+                    <tr class="term-group"><td colspan="4">01 · 核心声学与语音特征</td></tr>
+                    <tr>
+                      <td><strong>基频 / 音高</strong></td>
+                      <td>Pitch / F0</td>
+                      <td><span class="term-cat-tag">核心声学</span></td>
+                      <td>声带振动的基频频率，单位为赫兹 (Hz)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>音高上限 / 下限</strong></td>
+                      <td>Pitch ceiling / floor</td>
+                      <td><span class="term-cat-tag">参数设置</span></td>
+                      <td>音高分析算法搜索的最高与最低频率限制范围</td>
+                    </tr>
+                    <tr>
+                      <td><strong>共振峰</strong></td>
+                      <td>Formant (F1, F2...)</td>
+                      <td><span class="term-cat-tag">核心声学</span></td>
+                      <td>声道共鸣腔产生的特定共振频率峰值与带宽</td>
+                    </tr>
+                    <tr>
+                      <td><strong>音强 / 振幅</strong></td>
+                      <td>Intensity / Amplitude</td>
+                      <td><span class="term-cat-tag">核心声学</span></td>
+                      <td>声音的能量强度 (dB) 与振幅波形包络</td>
+                    </tr>
+                    <tr>
+                      <td><strong>语图 / 声谱图</strong></td>
+                      <td>Spectrogram</td>
+                      <td><span class="term-cat-tag">信号显示</span></td>
+                      <td>呈现时间、频率和能量三维关系的经典分析谱图</td>
+                    </tr>
+                    <tr>
+                      <td><strong>频谱 / 频谱切片</strong></td>
+                      <td>Spectrum / Spectral slice</td>
+                      <td><span class="term-cat-tag">频域分析</span></td>
+                      <td>特定时间点上的瞬时频域能量分布切片</td>
+                    </tr>
+                    <tr>
+                      <td><strong>脉冲 / 声门脉冲</strong></td>
+                      <td>Pulses / Glottal pulses</td>
+                      <td><span class="term-cat-tag">声门活动</span></td>
+                      <td>对应声带振动周期的离散脉冲时间点序列</td>
+                    </tr>
+                    <tr>
+                      <td><strong>谐噪比</strong></td>
+                      <td>Harmonicity / HNR</td>
+                      <td><span class="term-cat-tag">音质分析</span></td>
+                      <td>声音信号中周期谐波成分与非周期噪声成分的比值 (dB)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>音高微扰 / 振幅微扰</strong></td>
+                      <td>Jitter / Shimmer</td>
+                      <td><span class="term-cat-tag">音质分析</span></td>
+                      <td>周期与振幅的微小随机波动，用于嗓音病理评估</td>
+                    </tr>
+                    <tr>
+                      <td><strong>浊音 / 清音</strong></td>
+                      <td>Voiced / Voiceless</td>
+                      <td><span class="term-cat-tag">发音学</span></td>
+                      <td>发音时声带参与振动的状态 / 声带不振动</td>
+                    </tr>
+                    <tr>
+                      <td><strong>摩擦 / 送气 / 气声</strong></td>
+                      <td>Frication / Aspiration / Breathiness</td>
+                      <td><span class="term-cat-tag">发音与音质</span></td>
+                      <td>声道狭窄湍流噪音 / 释放后呼出气流 / 声带微开产生的气化音</td>
+                    </tr>
+                    <tr>
+                      <td><strong>声道</strong></td>
+                      <td>Vocal Tract</td>
+                      <td><span class="term-cat-tag">生理声学</span></td>
+                      <td>从声带至唇齿的发音共鸣通道（咽腔、口腔、鼻腔）</td>
+                    </tr>
+
+                    <!-- Group 2: 数据结构与标注体系 -->
+                    <tr class="term-group"><td colspan="4">02 · 数据结构与标注体系</td></tr>
+                    <tr>
+                      <td><strong>声音对象 / 长声音</strong></td>
+                      <td>Sound / LongSound</td>
+                      <td><span class="term-cat-tag">核心数据</span></td>
+                      <td>普通内存音频对象 / 超长流式读取音频对象</td>
+                    </tr>
+                    <tr>
+                      <td><strong>文本标注格</strong></td>
+                      <td>TextGrid</td>
+                      <td><span class="term-cat-tag">标注结构</span></td>
+                      <td>Praat 用于分层标注语音时间段与点事件的标准格式</td>
+                    </tr>
+                    <tr>
+                      <td><strong>层 / 标注轨</strong></td>
+                      <td>Tier</td>
+                      <td><span class="term-cat-tag">标注层级</span></td>
+                      <td>在时间轴上相互独立平行的分层标注轨道</td>
+                    </tr>
+                    <tr>
+                      <td><strong>区间层 / 点层</strong></td>
+                      <td>Interval Tier / Point Tier</td>
+                      <td><span class="term-cat-tag">标注层级</span></td>
+                      <td>包含起止时间的区间标注轨 / 单个离散时间点的标记轨</td>
+                    </tr>
+                    <tr>
+                      <td><strong>区间 / 边界</strong></td>
+                      <td>Interval / Boundary</td>
+                      <td><span class="term-cat-tag">标注元素</span></td>
+                      <td>区间层中的单个时间段 / 切分音段的起止时间标记点</td>
+                    </tr>
+                    <tr>
+                      <td><strong>点过程</strong></td>
+                      <td>PointProcess</td>
+                      <td><span class="term-cat-tag">数据结构</span></td>
+                      <td>记录离散时间点序列（如基频脉冲）的底层对象</td>
+                    </tr>
+                    <tr>
+                      <td><strong>操控对象</strong></td>
+                      <td>Manipulation</td>
+                      <td><span class="term-cat-tag">操纵结构</span></td>
+                      <td>结合基频层与时长层、用于重合成与变形修改的对象</td>
+                    </tr>
+                    <tr>
+                      <td><strong>音高层 / 音强层</strong></td>
+                      <td>PitchTier / IntensityTier</td>
+                      <td><span class="term-cat-tag">层级对象</span></td>
+                      <td>独立的音高变化曲线层 / 独立的音强包络层</td>
+                    </tr>
+                    <tr>
+                      <td><strong>时长层 / 振幅层</strong></td>
+                      <td>DurationTier / AmplitudeTier</td>
+                      <td><span class="term-cat-tag">层级对象</span></td>
+                      <td>用于局部变速的时长因子层 / 振幅缩放控制层</td>
+                    </tr>
+                    <tr>
+                      <td><strong>字符串列表 / 实数表</strong></td>
+                      <td>Strings / TableOfReal</td>
+                      <td><span class="term-cat-tag">统计数据</span></td>
+                      <td>文本与文件名列表对象 / 多维数值统计矩阵对象</td>
+                    </tr>
+
+                    <!-- Group 3: 信号处理与分析算法 -->
+                    <tr class="term-group"><td colspan="4">03 · 信号处理与分析算法</td></tr>
+                    <tr>
+                      <td><strong>自相关 / 互相关</strong></td>
+                      <td>Autocorrelation / Cross-correlation</td>
+                      <td><span class="term-cat-tag">周期算法</span></td>
+                      <td>音高提取经典算法，计算信号自身的周期重复性</td>
+                    </tr>
+                    <tr>
+                      <td><strong>线性预测编码</strong></td>
+                      <td>LPC (Burg / Autocorrelation)</td>
+                      <td><span class="term-cat-tag">谱估计算法</span></td>
+                      <td>用于分离声道共鸣与提取共振峰频率/带宽的核心算法</td>
+                    </tr>
+                    <tr>
+                      <td><strong>预加重 / 去加重</strong></td>
+                      <td>Pre-emphasis / De-emphasis</td>
+                      <td><span class="term-cat-tag">滤波预处理</span></td>
+                      <td>提升高频能量以补偿声门辐射滚降 / 还原原始频响</td>
+                    </tr>
+                    <tr>
+                      <td><strong>谱重心 / 频谱倾斜</strong></td>
+                      <td>Centre of gravity / Spectral tilt</td>
+                      <td><span class="term-cat-tag">频域特征</span></td>
+                      <td>频谱能量分布的加权中心频率 / 频谱高低频滚降斜率</td>
+                    </tr>
+                    <tr>
+                      <td><strong>长期平均谱</strong></td>
+                      <td>LTAS (Long-term average spectrum)</td>
+                      <td><span class="term-cat-tag">频域统计</span></td>
+                      <td>较长语音段平均频域能量分布，反映发音特质</td>
+                    </tr>
+                    <tr>
+                      <td><strong>梅尔倒谱系数</strong></td>
+                      <td>MFCC</td>
+                      <td><span class="term-cat-tag">特征工程</span></td>
+                      <td>模拟人耳听觉梅尔尺度的倒谱特征系数</td>
+                    </tr>
+                    <tr>
+                      <td><strong>动态时间规整</strong></td>
+                      <td>DTW</td>
+                      <td><span class="term-cat-tag">模式匹配</span></td>
+                      <td>用于非线性对齐不同语速语音发音的动态时间算法</td>
+                    </tr>
+
+                    <!-- Group 4: 语音合成与高级分析 -->
+                    <tr class="term-group"><td colspan="4">04 · 语音合成与高级分析</td></tr>
+                    <tr>
+                      <td><strong>PSOLA 语音操纵</strong></td>
+                      <td>PSOLA (Pitch-Synchronous Overlap-Add)</td>
+                      <td><span class="term-cat-tag">语音变换</span></td>
+                      <td>基频同步重叠相加，改变语速与音调而不改变音色</td>
+                    </tr>
+                    <tr>
+                      <td><strong>声源-滤波器合成</strong></td>
+                      <td>Source-filter synthesis</td>
+                      <td><span class="term-cat-tag">语音合成</span></td>
+                      <td>结合声门波源与声道滤波器模型生成人工语音</td>
+                    </tr>
+                    <tr>
+                      <td><strong>发音合成</strong></td>
+                      <td>Articulatory synthesis</td>
+                      <td><span class="term-cat-tag">语音合成</span></td>
+                      <td>模拟发音器官生理结构与肌肉运动生成发音</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Klatt 声学合成网格</strong></td>
+                      <td>KlattGrid</td>
+                      <td><span class="term-cat-tag">语音合成</span></td>
+                      <td>经典级联/并联多共振峰声学参数合成模型</td>
+                    </tr>
+                    <tr>
+                      <td><strong>耳蜗图 / 倒谱图</strong></td>
+                      <td>Cochleagram / PowerCepstrogram</td>
+                      <td><span class="term-cat-tag">高级谱图</span></td>
+                      <td>内耳基底膜响应听觉图 / 倒频域声门声道分离图</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- TAB 5: SoundRecorder Preview -->
+            <div id="tab-recorder" class="tab-view">
+              <div class="view-hero">
+                <h1><i class="fa-solid fa-microphone"></i> 录音窗口增强</h1>
+                <p>新增按住录音模式（松开即存）、暂存列表自动递增编号，音频超过 10 秒自适应分层显示。</p>
+                <svg class="wave-divider" viewBox="0 0 132 20" fill="none" aria-hidden="true"><path d="M2 10v0 M8 7v6 M14 4v12 M20 8v4 M26 2v16 M32 6v8 M38 9v2 M44 5v10 M50 3v14 M56 8v4 M62 6v8 M68 2v16 M74 7v6 M80 9v2 M86 4v12 M92 8v4 M98 6v8 M104 3v14 M110 8v4 M116 7v6 M122 9v2 M128 10v0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+
+              <div class="split-view">
+                <div class="split-sidebar">
+                  <p class="lead">
+                    专为语音实验录音与语料采集设计，优化交互响应与长音频波形渲染。
+                  </p>
+                  <div class="doc-outline">
+                    <div class="doc-outline-title">录音增强特性</div>
+                    <ul>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>按住录音模式 · 松开即自动存入列表</span></li>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>临时列表自动递增编号保存</span></li>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>超过 10 秒长音频自适应双层显示</span></li>
+                      <li><i class="fa-solid fa-angle-right"></i> <span>支持立体声 / 单声道采样率快捷设定</span></li>
+                    </ul>
+                  </div>
+                  <svg class="wave-recorder-deco" viewBox="0 0 240 32" fill="none" aria-hidden="true">
+                    <path d="M2 16v0 M10 12v8 M18 8v16 M26 4v24 M34 10v12 M42 14v4 M50 6v20 M58 2v28 M66 8v16 M74 12v8 M82 15v2 M90 7v18 M98 3v26 M106 10v12 M114 13v6 M122 5v22 M130 1v30 M138 8v16 M146 12v8 M154 4v24 M162 9v14 M170 14v4 M178 6v20 M186 2v28 M194 8v16 M202 11v10 M210 5v22 M218 13v6 M226 9v14 M234 16v0" stroke="var(--olive)" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+                  </svg>
+                </div>
+                <div class="split-content">
+                  <div class="shot-window">
+                    <div class="shot-titlebar">
+                      <span class="shot-dots"><i></i><i></i><i></i></span>
+                      <span class="shot-filename">praat-zh-sound-recorder.png · 录音窗口界面</span>
+                    </div>
+                    <div class="screenshot-wrapper" onclick="openLightbox('pictures/praat-zh-sound-recorder.png', 'Praat 录音窗口增强界面')">
+                      <img src="pictures/praat-zh-sound-recorder.png" alt="Praat 录音窗口增强界面">
+                      <div class="screenshot-zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
-
-          <!-- TAB 2: Download & Releases -->
-          <div id="tab-download" class="tab-view">
-            <div class="view-hero">
-              <h1><i class="fa-solid fa-download" style="color: #0284c7;"></i> 下载 Praat 汉化版</h1>
-              <p>绿色免安装，解压即用。</p>
-            </div>
-
-            <div class="download-grid-compact">
-              <!-- Windows Card -->
-              <div class="download-card-compact featured">
-                <div class="dl-card-header">
-                  <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
-                  <span>Windows (x64)</span>
-                </div>
-                <div class="dl-card-desc">
-                  适用于 64 位 Windows 10 及 11。解压后双击即用。
-                </div>
-                <a id="dl-win-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip" class="praat-btn accent" style="padding: 8px;">
-                  <i class="fa-solid fa-download"></i>
-                  <span>下载 Windows x64 便携包 (.zip)</span>
-                </a>
-              </div>
-
-              <!-- macOS Card -->
-              <div class="download-card-compact">
-                <div class="dl-card-header">
-                  <i class="fa-brands fa-apple" style="color: #000000;"></i>
-                  <span>macOS (Universal)</span>
-                </div>
-                <div class="dl-card-desc">
-                  通用二进制包，适用于 Apple Silicon 与 Intel Mac (macOS 11+)。
-                </div>
-                <a id="dl-mac-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg" class="praat-btn" style="padding: 8px;">
-                  <i class="fa-solid fa-download"></i>
-                  <span>下载 macOS Universal (.dmg)</span>
-                </a>
-              </div>
-
-              <!-- Linux / Source Card -->
-              <div class="download-card-compact">
-                <div class="dl-card-header">
-                  <i class="fa-brands fa-linux" style="color: #334155;"></i>
-                  <span>Linux / 源码</span>
-                </div>
-                <div class="dl-card-desc">
-                  适用于 Ubuntu、Debian 等 Linux 发行版，或自行编译。
-                </div>
-                <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" class="praat-btn" style="padding: 8px;">
-                  <i class="fa-brands fa-github"></i>
-                  <span>查看 GitHub 源码仓库</span>
-                </a>
-              </div>
-            </div>
-
-            <!-- Citation -->
-            <div class="citation-banner">
-              <i class="fa-solid fa-quote-left"></i>
-              <div>
-                <strong>学术引用</strong>：Boersma, P., & Weenink, D. (2026). Praat: doing phonetics by computer [Computer program]. https://praat.org/
-              </div>
-            </div>
-          </div>
-
-          <!-- TAB 3: Help Manual -->
-          <div id="tab-manual" class="tab-view">
-            <div class="view-hero">
-              <h1><i class="fa-solid fa-book" style="color: #0284c7;"></i> 帮助手册汉化与排版优化</h1>
-              <p>内置帮助手册主要页面已全量翻译为中文，图文教程在不同窗口尺寸下均能自适应流式呈现，方便查阅与学习。</p>
-            </div>
-
-            <div class="screenshot-frame">
-              <img src="pictures/praat-zh-manuel.png" alt="Praat 汉化版帮助手册界面">
-              <div class="screenshot-caption">内置帮助手册实际运行效果</div>
-            </div>
-          </div>
-
-          <!-- TAB 4: Bilingual Terminology Table -->
-          <div id="tab-terms" class="tab-view">
-            <div class="view-hero">
-              <h1><i class="fa-solid fa-table-list" style="color: #0284c7;"></i> 常用语音学与 Praat 术语中英对照表</h1>
-              <p>收录核心语音学、数据结构、信号处理与合成算法的标准中英文对照，方便文献阅读与脚本编写。</p>
-            </div>
-
-            <!-- Search Input Bar -->
-            <div style="margin-bottom: 12px; display: flex; gap: 10px; align-items: center;">
-              <div style="position: relative; flex: 1;">
-                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 9px; color: #94a3b8; font-size: 12px;"></i>
-                <input type="text" id="term-search" placeholder="搜索中文或英文术语（如 Pitch, 共振峰, 标注, LPC）..." oninput="filterTerms(this.value)" style="width: 100%; padding: 6px 10px 6px 30px; font-family: inherit; font-size: 13px; border: 1px solid var(--win-border); border-radius: 4px; outline: none; background: #ffffff;">
-              </div>
-              <span id="term-count" style="font-size: 12px; color: var(--text-muted); white-space: nowrap;">共 34 条术语</span>
-            </div>
-
-            <div class="term-table-wrapper">
-              <table class="term-table" id="glossary-table">
-                <thead>
-                  <tr>
-                    <th>中文术语</th>
-                    <th>英文原词</th>
-                    <th>分类</th>
-                    <th>说明</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- 核心声学与语音特征 -->
-                  <tr>
-                    <td><strong>基频 / 音高</strong></td>
-                    <td>Pitch / F0</td>
-                    <td>核心声学</td>
-                    <td>声带振动的基频频率，单位为赫兹 (Hz)</td>
-                  </tr>
-                  <tr>
-                    <td><strong>音高上限 / 下限</strong></td>
-                    <td>Pitch ceiling / floor</td>
-                    <td>参数设置</td>
-                    <td>音高分析算法搜索的最高与最低频率限制范围</td>
-                  </tr>
-                  <tr>
-                    <td><strong>共振峰</strong></td>
-                    <td>Formant (F1, F2...)</td>
-                    <td>核心声学</td>
-                    <td>声道共鸣腔产生的特定共振频率峰值与带宽</td>
-                  </tr>
-                  <tr>
-                    <td><strong>音强 / 振幅</strong></td>
-                    <td>Intensity / Amplitude</td>
-                    <td>核心声学</td>
-                    <td>声音的能量强度 (dB) 与振幅波形包络</td>
-                  </tr>
-                  <tr>
-                    <td><strong>语图 / 声谱图</strong></td>
-                    <td>Spectrogram</td>
-                    <td>信号显示</td>
-                    <td>呈现时间、频率和能量三维关系的经典分析谱图</td>
-                  </tr>
-                  <tr>
-                    <td><strong>频谱 / 频谱切片</strong></td>
-                    <td>Spectrum / Spectral slice</td>
-                    <td>频域分析</td>
-                    <td>特定时间点上的瞬时频域能量分布切片</td>
-                  </tr>
-                  <tr>
-                    <td><strong>脉冲 / 声门脉冲</strong></td>
-                    <td>Pulses / Glottal pulses</td>
-                    <td>声门活动</td>
-                    <td>对应声带振动周期的离散脉冲时间点序列</td>
-                  </tr>
-                  <tr>
-                    <td><strong>谐噪比</strong></td>
-                    <td>Harmonicity / HNR</td>
-                    <td>音质分析</td>
-                    <td>声音信号中周期谐波成分与非周期噪声成分的比值 (dB)</td>
-                  </tr>
-                  <tr>
-                    <td><strong>音高微扰 / 振幅微扰</strong></td>
-                    <td>Jitter / Shimmer</td>
-                    <td>音质分析</td>
-                    <td>周期与振幅的微小随机波动，用于嗓音病理评估</td>
-                  </tr>
-                  <tr>
-                    <td><strong>浊音 / 清音</strong></td>
-                    <td>Voiced / Voiceless</td>
-                    <td>发音学</td>
-                    <td>发音时声带参与振动的状态 / 声带不振动</td>
-                  </tr>
-                  <tr>
-                    <td><strong>摩擦 / 送气 / 气声</strong></td>
-                    <td>Frication / Aspiration / Breathiness</td>
-                    <td>发音与音质</td>
-                    <td>声道狭窄湍流噪音 / 释放后呼出气流 / 声带微开产生的气化音</td>
-                  </tr>
-                  <tr>
-                    <td><strong>声道</strong></td>
-                    <td>Vocal Tract</td>
-                    <td>生理声学</td>
-                    <td>从声带至唇齿的发音共鸣通道（咽腔、口腔、鼻腔）</td>
-                  </tr>
-
-                  <!-- 数据结构与标注体系 -->
-                  <tr>
-                    <td><strong>声音对象 / 长声音</strong></td>
-                    <td>Sound / LongSound</td>
-                    <td>核心数据</td>
-                    <td>普通内存音频对象 / 超长流式读取音频对象</td>
-                  </tr>
-                  <tr>
-                    <td><strong>文本标注格</strong></td>
-                    <td>TextGrid</td>
-                    <td>标注结构</td>
-                    <td>Praat 用于分层标注语音时间段与点事件的标准格式</td>
-                  </tr>
-                  <tr>
-                    <td><strong>层 / 标注轨</strong></td>
-                    <td>Tier</td>
-                    <td>标注层级</td>
-                    <td>在时间轴上相互独立平行的分层标注轨道</td>
-                  </tr>
-                  <tr>
-                    <td><strong>区间层 / 点层</strong></td>
-                    <td>Interval Tier / Point Tier</td>
-                    <td>标注层级</td>
-                    <td>包含起止时间的区间标注轨 / 单个离散时间点的标记轨</td>
-                  </tr>
-                  <tr>
-                    <td><strong>区间 / 边界</strong></td>
-                    <td>Interval / Boundary</td>
-                    <td>标注元素</td>
-                    <td>区间层中的单个时间段 / 切分音段的起止时间标记点</td>
-                  </tr>
-                  <tr>
-                    <td><strong>点过程</strong></td>
-                    <td>PointProcess</td>
-                    <td>数据结构</td>
-                    <td>记录离散时间点序列（如基频脉冲）的底层对象</td>
-                  </tr>
-                  <tr>
-                    <td><strong>操控对象</strong></td>
-                    <td>Manipulation</td>
-                    <td>操纵结构</td>
-                    <td>结合基频层与时长层、用于重合成与变形修改的对象</td>
-                  </tr>
-                  <tr>
-                    <td><strong>音高层 / 音强层</strong></td>
-                    <td>PitchTier / IntensityTier</td>
-                    <td>层级对象</td>
-                    <td>独立的音高变化曲线层 / 独立的音强包络层</td>
-                  </tr>
-                  <tr>
-                    <td><strong>时长层 / 振幅层</strong></td>
-                    <td>DurationTier / AmplitudeTier</td>
-                    <td>层级对象</td>
-                    <td>用于局部变速的时长因子层 / 振幅缩放控制层</td>
-                  </tr>
-                  <tr>
-                    <td><strong>字符串列表 / 实数表</strong></td>
-                    <td>Strings / TableOfReal</td>
-                    <td>统计数据</td>
-                    <td>文本与文件名列表对象 / 多维数值统计矩阵对象</td>
-                  </tr>
-
-                  <!-- 信号处理与分析算法 -->
-                  <tr>
-                    <td><strong>自相关 / 互相关</strong></td>
-                    <td>Autocorrelation / Cross-correlation</td>
-                    <td>周期算法</td>
-                    <td>音高提取经典算法，计算信号自身的周期重复性</td>
-                  </tr>
-                  <tr>
-                    <td><strong>线性预测编码</strong></td>
-                    <td>LPC (Burg / Autocorrelation)</td>
-                    <td>谱估计算法</td>
-                    <td>用于分离声道共鸣与提取共振峰频率/带宽的核心算法</td>
-                  </tr>
-                  <tr>
-                    <td><strong>预加重 / 去加重</strong></td>
-                    <td>Pre-emphasis / De-emphasis</td>
-                    <td>滤波预处理</td>
-                    <td>提升高频能量以补偿声门辐射滚降 / 还原原始频响</td>
-                  </tr>
-                  <tr>
-                    <td><strong>谱重心 / 频谱倾斜</strong></td>
-                    <td>Centre of gravity / Spectral tilt</td>
-                    <td>频域特征</td>
-                    <td>频谱能量分布的加权中心频率 / 频谱高低频滚降斜率</td>
-                  </tr>
-                  <tr>
-                    <td><strong>长期平均谱</strong></td>
-                    <td>LTAS (Long-term average spectrum)</td>
-                    <td>频域统计</td>
-                    <td>较长语音段平均频域能量分布，反映发音特质</td>
-                  </tr>
-                  <tr>
-                    <td><strong>梅尔倒谱系数</strong></td>
-                    <td>MFCC</td>
-                    <td>特征工程</td>
-                    <td>模拟人耳听觉梅尔尺度的倒谱特征系数</td>
-                  </tr>
-                  <tr>
-                    <td><strong>动态时间规整</strong></td>
-                    <td>DTW</td>
-                    <td>模式匹配</td>
-                    <td>用于非线性对齐不同语速语音发音的动态时间算法</td>
-                  </tr>
-
-                  <!-- 语音合成与高级分析 -->
-                  <tr>
-                    <td><strong>PSOLA 语音操纵</strong></td>
-                    <td>PSOLA (Pitch-Synchronous Overlap-Add)</td>
-                    <td>语音变换</td>
-                    <td>基频同步重叠相加，改变语速与音调而不改变音色</td>
-                  </tr>
-                  <tr>
-                    <td><strong>声源-滤波器合成</strong></td>
-                    <td>Source-filter synthesis</td>
-                    <td>语音合成</td>
-                    <td>结合声门波源与声道滤波器模型生成人工语音</td>
-                  </tr>
-                  <tr>
-                    <td><strong>发音合成</strong></td>
-                    <td>Articulatory synthesis</td>
-                    <td>语音合成</td>
-                    <td>模拟发音器官生理结构与肌肉运动生成发音</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Klatt 声学合成网格</strong></td>
-                    <td>KlattGrid</td>
-                    <td>语音合成</td>
-                    <td>经典级联/并联多共振峰声学参数合成模型</td>
-                  </tr>
-                  <tr>
-                    <td><strong>耳蜗图 / 倒谱图</strong></td>
-                    <td>Cochleagram / PowerCepstrogram</td>
-                    <td>高级谱图</td>
-                    <td>内耳基底膜响应听觉图 / 倒频域声门声道分离图</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- TAB 5: SoundRecorder Preview -->
-          <div id="tab-recorder" class="tab-view">
-            <div class="view-hero">
-              <h1><i class="fa-solid fa-microphone" style="color: #0284c7;"></i> 录音窗口增强</h1>
-              <p>新增按住录音模式（松开即存）、暂存列表自动递增编号，音频超过 10 秒自适应分层显示。</p>
-            </div>
-
-            <div class="screenshot-frame">
-              <img src="pictures/praat-zh-sound-recorder.png" alt="Praat 录音窗口增强界面">
-              <div class="screenshot-caption">录音窗口实际界面</div>
-            </div>
-          </div>
-
         </div>
       </section>
 
@@ -1484,16 +2073,40 @@
       </div>
 
       <div class="status-right">
-        <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" style="color: var(--text-muted);">
+        <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank">
           <i class="fa-brands fa-github"></i>
           <span>GitHub 源码仓库</span>
         </a>
-        <a href="https://praat.org" target="_blank" style="color: var(--text-muted);">
+        <a href="https://praat.org" target="_blank">
           <i class="fa-solid fa-globe"></i>
           <span>praat.org 官方主页</span>
         </a>
       </div>
     </footer>
+
+    <!-- Mobile Fixed Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+      <button class="mobile-nav-item active" onclick="switchTab('tab-overview', this)">
+        <i class="fa-solid fa-volume-high"></i>
+        <span class="mobile-nav-label">特性</span>
+      </button>
+      <button class="mobile-nav-item" onclick="switchTab('tab-download', this)">
+        <i class="fa-solid fa-box-archive"></i>
+        <span class="mobile-nav-label">下载</span>
+      </button>
+      <button class="mobile-nav-item" onclick="switchTab('tab-manual', this)">
+        <i class="fa-solid fa-book-open"></i>
+        <span class="mobile-nav-label">手册</span>
+      </button>
+      <button class="mobile-nav-item" onclick="switchTab('tab-terms', this)">
+        <i class="fa-solid fa-table-list"></i>
+        <span class="mobile-nav-label">术语</span>
+      </button>
+      <button class="mobile-nav-item" onclick="switchTab('tab-recorder', this)">
+        <i class="fa-solid fa-microphone"></i>
+        <span class="mobile-nav-label">录音</span>
+      </button>
+    </nav>
 
   </div>
 
@@ -1508,24 +2121,35 @@
         <div class="win-control-btn win-close" onclick="closeModal('about-modal')"></div>
       </div>
       <div class="dialog-body">
-        <div style="text-align: center; margin-bottom: 12px;">
+        <div style="text-align: center; margin-bottom: 14px;">
           <img src="pictures/icon.png" width="76" height="76" alt="Praat 汉化版" style="object-fit: contain;">
-          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 8px;">Praat 汉化版</h3>
-          <div style="font-size: 12px; color: var(--text-muted);">版本 7.0 · 基于官方内核</div>
+          <h3 style="font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 8px;">Praat 汉化版</h3>
+          <div style="font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-3); margin-top: 2px;">基于官方内核构建 · 语音学分析与处理软件</div>
         </div>
         <p style="margin-bottom: 8px;">
           Praat 官方原版由荷兰阿姆斯特丹大学语音科学研究所的 <strong>Paul Boersma</strong> 与 <strong>David Weenink</strong> 教授开发。
         </p>
-        <p style="margin-bottom: 8px;">
+        <p style="margin-bottom: 10px;">
           本汉化版本由 <strong>KasumiKitsune</strong> 维护，旨在为中文语音学与声学研究者提供更流畅的本土化体验。
         </p>
-        <div style="font-size: 12px; color: var(--text-muted); background: #f1f5f9; padding: 8px; border-radius: 4px;">
+        <div class="license-chip">
           开源许可证：GNU General Public License v3 (GPL v3)
         </div>
       </div>
       <div class="dialog-footer">
-        <button class="praat-btn accent" onclick="closeModal('about-modal')">确定</button>
+        <button class="praat-btn accent" onclick="closeModal('about-modal')" style="padding: 7px 22px;">确定</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div id="image-lightbox-modal" class="lightbox-overlay" onclick="closeLightbox(event)">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="lightbox-close-btn" onclick="closeLightbox()" title="关闭 (Esc)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="lightbox-img" src="" alt="放大预览">
+      <div id="lightbox-caption" class="lightbox-caption"></div>
     </div>
   </div>
 
@@ -1550,21 +2174,42 @@
 
       const titleElem = document.getElementById('display-window-title');
       if (titleElem && titleMap[tabId]) {
-        titleElem.innerHTML = `<i class="fa-solid fa-wave-square" style="color: var(--praat-blue);"></i> <span>${titleMap[tabId]}</span>`;
+        titleElem.innerHTML = `<i class="fa-solid fa-wave-square"></i> <span>${titleMap[tabId]}</span>`;
       }
 
-      if (element) {
-        const items = document.querySelectorAll('.object-entry');
-        items.forEach(item => item.classList.remove('selected'));
-        element.classList.add('selected');
-      } else {
-        const items = document.querySelectorAll('.object-entry');
-        items.forEach(item => {
-          if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)) {
-            items.forEach(i => i.classList.remove('selected'));
-            item.classList.add('selected');
-          }
-        });
+      // Sync Desktop Object list items
+      const items = document.querySelectorAll('.object-entry');
+      items.forEach(item => {
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+
+      // Sync Mobile Bottom Nav items
+      const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+      mobileNavItems.forEach(item => {
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      // Scroll content area back to top on tab switch
+      const contentArea = document.querySelector('.display-content-area');
+      if (contentArea) {
+        contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Title bar moss-green pulse animation feedback
+      const titleBar = document.querySelector('.display-window .window-title-bar');
+      if (titleBar) {
+        titleBar.classList.remove('title-highlight');
+        void titleBar.offsetWidth; // Force reflow
+        titleBar.classList.add('title-highlight');
       }
     }
 
@@ -1586,24 +2231,51 @@
 
     function filterTerms(query) {
       const q = (query || '').trim().toLowerCase();
-      const rows = document.querySelectorAll('#glossary-table tbody tr');
+      const tbody = document.querySelector('#glossary-table tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
       let visibleCount = 0;
 
+      let currentGroupRow = null;
+      let groupHasVisibleChild = false;
+
       rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        if (!q || text.includes(q)) {
+        if (row.classList.contains('term-group')) {
+          if (currentGroupRow) {
+            currentGroupRow.style.display = (!q || groupHasVisibleChild) ? '' : 'none';
+          }
+          currentGroupRow = row;
+          groupHasVisibleChild = false;
           row.style.display = '';
-          visibleCount++;
         } else {
-          row.style.display = 'none';
+          const text = row.textContent.toLowerCase();
+          if (!q || text.includes(q)) {
+            row.style.display = '';
+            visibleCount++;
+            groupHasVisibleChild = true;
+          } else {
+            row.style.display = 'none';
+          }
         }
       });
 
+      if (currentGroupRow) {
+        currentGroupRow.style.display = (!q || groupHasVisibleChild) ? '' : 'none';
+      }
+
       const countElem = document.getElementById('term-count');
       if (countElem) {
-        countElem.textContent = q ? `找到 ${visibleCount} 条结果` : `共 ${rows.length} 条术语`;
+        countElem.textContent = q ? `找到 ${visibleCount} 条结果` : `共 34 条术语`;
       }
     }
+
+    // Auto-detect OS and feature the matching download card
+    (function detectOS() {
+      const isMac = /Mac OS X|Macintosh/.test(navigator.userAgent);
+      if (isMac) {
+        document.querySelector('.download-card-compact.featured')?.classList.remove('featured');
+        document.getElementById('dl-mac-btn')?.closest('.download-card-compact')?.classList.add('featured');
+      }
+    })();
 
     // Auto-resolve direct download links to the latest GitHub release if online
     (function fetchLatestReleaseLinks() {
@@ -1629,6 +2301,33 @@
         })
         .catch(() => {});
     })();
+
+    // Lightbox Modal for Image Zoom
+    function openLightbox(imgSrc, captionText) {
+      const modal = document.getElementById('image-lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+      if (modal && img) {
+        img.src = imgSrc;
+        if (caption) caption.textContent = captionText || '';
+        modal.classList.add('open');
+      }
+    }
+
+    function closeLightbox(event) {
+      const modal = document.getElementById('image-lightbox-modal');
+      if (modal) {
+        modal.classList.remove('open');
+      }
+    }
+
+    // Keyboard ESC listener
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeModal('about-modal');
+      }
+    });
   </script>
 
 </body>
