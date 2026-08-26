@@ -504,6 +504,28 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 		Graphics_setGrey (my graphics, 0.9);
 		Graphics_fillRectangle (my graphics, 0.0, 1.0, 0.0, 32768.0);*/
 
+		if (my durationLabel) {
+			if (my recording) {
+				double curSeconds = (double) my nsamp / ( theControlPanel. sampleRate > 0.0 ? theControlPanel. sampleRate : 44100.0 );
+				char32 timeBuf [64];
+				Melder_sprint (timeBuf, 64, U"🔴 ", Melder_fixed (curSeconds, 1), U" s");
+				GuiLabel_setText (my durationLabel, timeBuf);
+			} else {
+				integer sel = getSelectedTakeIndex (me);
+				if (sel >= 1 && sel <= my recordedSounds.size) {
+					Sound s = my recordedSounds.at [sel];
+					if (s) {
+						double dur = s -> xmax - s -> xmin;
+						char32 timeBuf [64];
+						Melder_sprint (timeBuf, 64, praat_translate (U"Duration: "), Melder_fixed (dur, 2), U" s");
+						GuiLabel_setText (my durationLabel, timeBuf);
+					}
+				} else {
+					GuiLabel_setText (my durationLabel, U"");
+				}
+			}
+		}
+
 		if (my synchronous) {
 			/*
 				Read some samples into 'buffertje'.
@@ -571,6 +593,11 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 						Pa_Sleep (10);
 					}
 				#endif
+				integer sel = getSelectedTakeIndex (me);
+				if (sel == 0 && my monitorSamples > 0 && my graphics) {
+					showMeter (me, my monitorBuffer, my monitorSamples);
+					Graphics_updateWs (my graphics.get());
+				}
 			}
 		}
 	} catch (MelderError) {
@@ -600,6 +627,13 @@ static int portaudioStreamCallback (
 		the workProc will therefore have to take some care in accessing my nsamp (see there).
 	*/
 	SoundRecorder me = static_cast <SoundRecorder> (void_SoundRecorder);
+	const short *inSamples = static_cast <const short *> (input);
+	if (inSamples && frameCount > 0) {
+		uinteger copyCount = frameCount > 2048 ? 2048 : frameCount;
+		memcpy (my monitorBuffer, inSamples, copyCount * my numberOfChannels * sizeof (short));
+		my monitorSamples = copyCount;
+	}
+
 	if (! my recording)
 		return paContinue;
 
@@ -758,10 +792,14 @@ static void addCurrentRecordingToTakes (SoundRecorder me) {
 	Melder_sprint (takeName, 300, baseName.get(), U"_", my takeIndex ++);
 	Thing_setName (sound.get(), takeName);
 
+	const double dur = sound -> xmax - sound -> xmin;
+	char32 takeTitle [350];
+	Melder_sprint (takeTitle, 350, takeName, U"  (", Melder_fixed (dur, 1), U"s)");
+
 	my recordedSounds.addItem_move (sound.move());
 
 	if (my takeList) {
-		GuiList_insertItem (my takeList, takeName, my recordedSounds.size);
+		GuiList_insertItem (my takeList, takeTitle, my recordedSounds.size);
 		GuiList_selectItem (my takeList, my recordedSounds.size);
 	}
 }
@@ -849,7 +887,10 @@ static void gui_button_cb_takeRename (SoundRecorder me, GuiButtonEvent /* event 
 		autostring32 newName = GuiText_getString (text);
 		if (newName && Melder_length (newName.get()) > 0) {
 			Thing_setName (sound, newName.get());
-			GuiList_replaceItem (my takeList, newName.get(), index);
+			const double dur = sound -> xmax - sound -> xmin;
+			char32 takeTitle [350];
+			Melder_sprint (takeTitle, 350, newName.get(), U"  (", Melder_fixed (dur, 1), U"s)");
+			GuiList_replaceItem (my takeList, takeTitle, index);
 			GuiList_selectItem (my takeList, index);
 			if (my soundName)
 				GuiText_setString (my soundName, newName.get());
@@ -1136,13 +1177,20 @@ static void gui_radiobutton_cb_fsamp (SoundRecorder me, GuiRadioButtonEvent even
 	}
 }
 
-static void gui_drawingarea_cb_expose (SoundRecorder me, GuiDrawingArea_ExposeEvent event) {
+static void gui_drawingarea_cb_expose (SoundRecorder me, GuiDrawingArea_ExposeEvent /* event */) {
 	if (! my graphics)
 		return;   // could be the case in the very beginning
-	if (my recording)
+	if (my recording) {
 		showMeter (me, & my recordBuffer [1 + my firstSample * my numberOfChannels], my lastSample - my firstSample);
-	else
-		showMeter (me, nullptr, 0);
+	} else {
+		integer sel = getSelectedTakeIndex (me);
+		if (sel >= 1 && sel <= my recordedSounds.size)
+			showMeter (me, nullptr, 0);
+		else if (my monitorSamples > 0)
+			showMeter (me, my monitorBuffer, my monitorSamples);
+		else
+			showMeter (me, nullptr, 0);
+	}
 }
 
 static void gui_drawingarea_cb_resize (SoundRecorder me, GuiDrawingArea_ResizeEvent event) {
@@ -1161,7 +1209,8 @@ void structSoundRecorder :: v_createChildren ()
 	/*
 		Takes list (Left region: x: 10 ~ 280).
 	*/
-	GuiLabel_createShown (our windowForm, 10, 280, y, y + Gui_LABEL_HEIGHT, U"Recorded takes:", 0);
+	GuiLabel_createShown (our windowForm, 10, 160, y, y + Gui_LABEL_HEIGHT, U"Recorded takes:", 0);
+	our durationLabel = GuiLabel_createShown (our windowForm, 160, 280, y, y + Gui_LABEL_HEIGHT, U"", GuiLabel_RIGHT);
 	our takeList = GuiList_createShown (our windowForm, 10, 280, y + Gui_LABEL_HEIGHT + 2, -215, false, U" Takes ");
 	GuiList_setSelectionChangedCallback (our takeList, gui_list_cb_takeSelectionChanged, this);
 	GuiList_setDoubleClickCallback (our takeList, gui_list_cb_takeDoubleClick, this);

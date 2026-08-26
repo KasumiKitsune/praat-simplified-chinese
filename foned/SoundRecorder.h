@@ -92,6 +92,7 @@ Thing_define (SoundRecorder, Editor) {
 	OrderedOf <structSound> recordedSounds;
 	integer takeIndex;
 	GuiList takeList;
+	GuiLabel durationLabel;
 	GuiButton playTakeButton, renameTakeButton, deleteTakeButton, publishAllButton;
 	GuiText soundName;
 	GuiButton cancelButton, applyButton, okButton;
@@ -102,6 +103,8 @@ Thing_define (SoundRecorder, Editor) {
 	const PaDeviceInfo *deviceInfos [1+SoundRecorder_IDEVICE_MAX];
 	PaDeviceIndex deviceIndices [1+SoundRecorder_IDEVICE_MAX];
 	PaStream *portaudioStream;
+	short monitorBuffer [2048 * 2];
+	integer monitorSamples;
 
 	#if cocoa
 		CFRunLoopTimerRef d_cocoaTimer;

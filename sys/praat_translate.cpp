@@ -1083,6 +1083,7 @@ static const std::unordered_map<std::u32string, std::u32string> g_translation_ma
 	{ U"Duplicate tier...", U"\u590d\u5236\u5c42..." },
 	{ U"Dur", U"\u65f6\u957f (Dur)" },
 	{ U"Duration (s):", U"\u65f6\u957f (s)\uff1a" },
+	{ U"Duration: ", U"\u65f6\u957f: " },
 	{ U"DurationTier help", U"\u65f6\u957f\u5c42\u5e2e\u52a9" },
 	{ U"DurationTier: Formula", U"\u65f6\u957f\u5c42\uff1a\u516c\u5f0f" },
 	{ U"DurationTier: Formula...", U"\u65f6\u957f\u5c42\uff1a\u516c\u5f0f..." },

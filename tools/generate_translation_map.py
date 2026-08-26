@@ -77,6 +77,7 @@ EXACT_MAP = {
     "● Recording...": "● 录音中...",
     "Hold to Record (release to stop)": "按住录音",
     "● Recording... (release to stop)": "● 录音中...",
+    "Duration: ": "时长: ",
     "Not enough names provided! You selected ": "提供的名称数量不足！您已选择了 ",
     " objects, but only provided ": " 个对象，但仅提供了 ",
     " line.": " 行。",
