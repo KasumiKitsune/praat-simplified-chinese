@@ -303,7 +303,6 @@ static integer getSelectedTakeIndex (SoundRecorder me) {
 
 static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) {
 	Melder_assert (my graphics);
-	Graphics_clearWs (my graphics.get());
 	if (nsamp < 1) {
 		integer sel = getSelectedTakeIndex (me);
 		Sound sound = nullptr;
@@ -311,6 +310,7 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 			sound = my recordedSounds.at [sel];
 
 		if (sound) {
+			Graphics_clearWs (my graphics.get());
 			double x1w, x2w, y1w, y2w;
 			Graphics_inqWsWindow (my graphics.get(), & x1w, & x2w, & y1w, & y2w);
 			Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
@@ -352,6 +352,7 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 			return;
 		}
 
+		Graphics_clearWs (my graphics.get());
 		Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
 		#if defined (macintosh)
 			Graphics_setColour (my graphics.get(), Melder_WHITE);
@@ -460,27 +461,42 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 		}
 
 		/*
-			Set the buttons according to the audio parameters.
+			Set the buttons according to the audio parameters (only on state change).
 		*/
 		bool hasTakes = (my recordedSounds.size > 0);
-		if (my recordButton)
-			GuiThing_setSensitive (my recordButton, ! my recording);
-		if (my stopButton)
-			GuiThing_setSensitive (my stopButton, my recording);
-		if (my playButton)
-			GuiThing_setSensitive (my playButton, ! my recording && my nsamp > 0);
-		if (my playTakeButton)
-			GuiThing_setSensitive (my playTakeButton, ! my recording && hasTakes);
-		if (my renameTakeButton)
-			GuiThing_setSensitive (my renameTakeButton, ! my recording && hasTakes);
-		if (my deleteTakeButton)
-			GuiThing_setSensitive (my deleteTakeButton, ! my recording && hasTakes);
-		if (my publishAllButton)
-			GuiThing_setSensitive (my publishAllButton, ! my recording && (hasTakes || my nsamp > 0));
-		if (my applyButton)
-			GuiThing_setSensitive (my applyButton, ! my recording && (hasTakes || my nsamp > 0));
-		if (my okButton)
-			GuiThing_setSensitive (my okButton, ! my recording && (hasTakes || my nsamp > 0));
+		bool hasNsamp = (my nsamp > 0);
+		if (my lastSensRecording != my recording || my lastSensHasTakes != hasTakes || my lastSensHasNsamp != hasNsamp) {
+			my lastSensRecording = my recording;
+			my lastSensHasTakes = hasTakes;
+			my lastSensHasNsamp = hasNsamp;
+			if (my recordButton)
+				GuiThing_setSensitive (my recordButton, ! my recording);
+			if (my stopButton)
+				GuiThing_setSensitive (my stopButton, my recording);
+			if (my playButton)
+				GuiThing_setSensitive (my playButton, ! my recording && hasNsamp);
+			if (my playTakeButton)
+				GuiThing_setSensitive (my playTakeButton, ! my recording && hasTakes);
+			if (my renameTakeButton)
+				GuiThing_setSensitive (my renameTakeButton, ! my recording && hasTakes);
+			if (my deleteTakeButton)
+				GuiThing_setSensitive (my deleteTakeButton, ! my recording && hasTakes);
+			if (my publishAllButton)
+				GuiThing_setSensitive (my publishAllButton, ! my recording && (hasTakes || hasNsamp));
+			if (my applyButton)
+				GuiThing_setSensitive (my applyButton, ! my recording && (hasTakes || hasNsamp));
+			if (my okButton)
+				GuiThing_setSensitive (my okButton, ! my recording && (hasTakes || hasNsamp));
+			if (my monoButton)   GuiThing_setSensitive (my monoButton,   ! my recording);
+			if (my stereoButton) GuiThing_setSensitive (my stereoButton, ! my recording);
+			for (integer i = 1; i <= SoundRecorder_IFSAMP_MAX; i ++)
+				if (my fsamps [i]. button)
+					GuiThing_setSensitive (my fsamps [i]. button, ! my recording);
+			for (integer i = 1; i <= SoundRecorder_IDEVICE_MAX; i ++)
+				if (my devices [i]. button)
+					GuiThing_setSensitive (my devices [i]. button, ! my recording);
+		}
+
 		if (my monoButton && my numberOfChannels == 1)
 			GuiRadioButton_set (my monoButton);
 		if (my stereoButton && my numberOfChannels == 2)
@@ -490,39 +506,25 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 				GuiRadioButton_set (my fsamps [i]. button);
 		if (my devices [theControlPanel. inputSource]. button)
 			GuiRadioButton_set (my devices [theControlPanel. inputSource]. button);
-		if (my monoButton)   GuiThing_setSensitive (my monoButton,   ! my recording);
-		if (my stereoButton) GuiThing_setSensitive (my stereoButton, ! my recording);
-		for (integer i = 1; i <= SoundRecorder_IFSAMP_MAX; i ++)
-			if (my fsamps [i]. button)
-				GuiThing_setSensitive (my fsamps [i]. button, ! my recording);
-		for (integer i = 1; i <= SoundRecorder_IDEVICE_MAX; i ++)
-			if (my devices [i]. button)
-				GuiThing_setSensitive (my devices [i]. button, ! my recording);
-
-		/*Graphics_setGrey (my graphics, 0.9);
-		Graphics_fillRectangle (my graphics, 0.0, 1.0, 0.0, 32768.0);
-		Graphics_setGrey (my graphics, 0.9);
-		Graphics_fillRectangle (my graphics, 0.0, 1.0, 0.0, 32768.0);*/
 
 		if (my durationLabel) {
+			char32 timeBuf [64] = { 0 };
 			if (my recording) {
 				double curSeconds = (double) my nsamp / ( theControlPanel. sampleRate > 0.0 ? theControlPanel. sampleRate : 44100.0 );
-				char32 timeBuf [64];
 				Melder_sprint (timeBuf, 64, U"🔴 ", Melder_fixed (curSeconds, 1), U" s");
-				GuiLabel_setText (my durationLabel, timeBuf);
 			} else {
 				integer sel = getSelectedTakeIndex (me);
 				if (sel >= 1 && sel <= my recordedSounds.size) {
 					Sound s = my recordedSounds.at [sel];
 					if (s) {
 						double dur = s -> xmax - s -> xmin;
-						char32 timeBuf [64];
 						Melder_sprint (timeBuf, 64, praat_translate (U"Duration: "), Melder_fixed (dur, 2), U" s");
-						GuiLabel_setText (my durationLabel, timeBuf);
 					}
-				} else {
-					GuiLabel_setText (my durationLabel, U"");
 				}
+			}
+			if (! Melder_equ (my lastDurationText, timeBuf)) {
+				str32ncpy (my lastDurationText, timeBuf, 63);
+				GuiLabel_setText (my durationLabel, timeBuf);
 			}
 		}
 
@@ -593,10 +595,13 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 						Pa_Sleep (10);
 					}
 				#endif
-				integer sel = getSelectedTakeIndex (me);
-				if (sel == 0 && my monitorSamples > 0 && my graphics) {
-					showMeter (me, my monitorBuffer, my monitorSamples);
-					Graphics_updateWs (my graphics.get());
+				my monitorTick ++;
+				if ((my monitorTick % 2 == 0) && my inputUsesPortAudio) {
+					integer sel = getSelectedTakeIndex (me);
+					if (sel == 0 && my monitorSamples > 0 && my graphics) {
+						showMeter (me, my monitorBuffer, my monitorSamples);
+						Graphics_updateWs (my graphics.get());
+					}
 				}
 			}
 		}

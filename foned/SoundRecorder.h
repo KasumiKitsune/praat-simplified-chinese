@@ -105,6 +105,11 @@ Thing_define (SoundRecorder, Editor) {
 	PaStream *portaudioStream;
 	short monitorBuffer [2048 * 2];
 	integer monitorSamples;
+	char32 lastDurationText [64];
+	bool lastSensRecording;
+	bool lastSensHasTakes;
+	bool lastSensHasNsamp;
+	integer monitorTick;
 
 	#if cocoa
 		CFRunLoopTimerRef d_cocoaTimer;
