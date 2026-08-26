@@ -13,6 +13,11 @@ on:
         required: false
         default: "Praat 7.0 简体中文版 (v7.0-zh.1)"
         type: string
+      release_notes:
+        description: "Release notes / description"
+        required: false
+        default: ""
+        type: string
       praat_upstream_tag:
         description: "Upstream Praat tag used for the Xcode project, e.g. v7.0"
         required: false
@@ -383,15 +388,21 @@ jobs:
           GH_REPO: ${{ github.repository }}
           TAG_NAME: ${{ inputs.tag_name }}
           RELEASE_NAME: ${{ inputs.release_name }}
+          RELEASE_NOTES: ${{ inputs.release_notes }}
           DRAFT: ${{ inputs.draft }}
           PRERELEASE: ${{ inputs.prerelease }}
         run: |
           set -euo pipefail
 
+          NOTES="$RELEASE_NOTES"
+          if [ -z "$NOTES" ]; then
+            NOTES="基于 Praat 7.0 的非官方简体中文本地化版本。包含 Windows x64 与 macOS universal 构建产物。"
+          fi
+
           if gh release view "$TAG_NAME" --repo "$GH_REPO" >/dev/null 2>&1; then
             echo "Release $TAG_NAME exists, uploading artifacts..."
             gh release upload "$TAG_NAME" dist/* --repo "$GH_REPO" --clobber
-            gh release edit "$TAG_NAME" --repo "$GH_REPO" --title "$RELEASE_NAME"
+            gh release edit "$TAG_NAME" --repo "$GH_REPO" --title "$RELEASE_NAME" --notes "$NOTES"
           else
             args=(
               release create "$TAG_NAME"
@@ -399,7 +410,7 @@ jobs:
               --repo "$GH_REPO"
               --target "${{ github.sha }}"
               --title "$RELEASE_NAME"
-              --notes "基于 Praat 7.0 的非官方简体中文本地化版本。包含 Windows x64 与 macOS universal 构建产物。"
+              --notes "$NOTES"
             )
 
             if [ "$DRAFT" = "true" ]; then
