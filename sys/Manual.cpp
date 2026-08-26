@@ -383,7 +383,6 @@ static void do_copyPageText (Manual me) {
 		autostring32 plainText = ManPage_toCleanPlainText (page, my manPages(), my visiblePageNumber);
 		if (plainText && plainText [0] != U'\0') {
 			Gui_copyTextToClipboard (plainText.get());
-			Melder_information (praat_translate (U"Page text copied to clipboard."));
 		}
 	}
 }
