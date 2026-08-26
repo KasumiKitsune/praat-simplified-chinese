@@ -60,6 +60,23 @@ static std::string escape_json_string (const std::string &str) {
 	return oss.str ();
 }
 
+static std::string path_to_utf8 (const std::filesystem::path &p) {
+#if defined (_WIN32)
+	auto u8 = p.u8string ();
+	return std::string (reinterpret_cast<const char *> (u8.data ()), u8.size ());
+#else
+	return p.string ();
+#endif
+}
+
+static std::filesystem::path utf8_to_path (const std::string &u8) {
+#if defined (_WIN32)
+	return std::filesystem::path (reinterpret_cast<const char8_t *> (u8.data ()), reinterpret_cast<const char8_t *> (u8.data () + u8.size ()));
+#else
+	return std::filesystem::path (u8);
+#endif
+}
+
 #if defined (_WIN32)
 static std::wstring utf8_to_wstring (const std::string &u8) {
 	if (u8.empty ()) return std::wstring ();
@@ -408,11 +425,12 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			MelderString_append (& objFileName, iobj, U"_", sanitizedBaseName, ext);
 			autostring8 objFileName8 = Melder_32to8 (objFileName.string);
 			std::filesystem::path objPath = tempDir / (objFileName8 ? objFileName8.get() : "obj");
+			std::string objPathStr = path_to_utf8 (objPath);
 
 			if (isSound) {
 				// Export Sound as standard PCM WAV file
 				autoMelderString saveCmd;
-				autostring32 objPath32 = Melder_8to32_e (objPath.u8string().c_str());
+				autostring32 objPath32 = Melder_8to32_e (objPathStr.c_str());
 				autoMelderString escapedObjPath;
 				if (objPath32) {
 					for (const char32 *p = objPath32.get(); *p != U'\0'; p++) {
@@ -432,7 +450,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 				}
 			} else {
 				structMelderFile objMelderFile { };
-				autostring32 objPath32 = Melder_8to32_e (objPath.u8string().c_str());
+				autostring32 objPath32 = Melder_8to32_e (objPathStr.c_str());
 				Melder_pathToFile (objPath32.get(), & objMelderFile);
 				try {
 					Data_writeToTextFile (object, & objMelderFile);
@@ -441,7 +459,6 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 
 			autostring8 utf8Name = Melder_32to8 (theCurrentPraatObjects -> list [iobj]. name.get());
 			autostring8 utf8Class = Melder_32to8 (className);
-			std::string objPathStr = objPath.u8string();
 
 			jsonOfs << "    {\n"
 			        << "      \"id\": " << iobj << ",\n"
@@ -523,8 +540,8 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 		std::wstring cwdW;
 		if (optionalWorkingDir && optionalWorkingDir [0] != U'\0') {
 			autostring8 optCwd8 = Melder_32to8 (optionalWorkingDir);
-			if (optCwd8) {
-				std::filesystem::path p = std::filesystem::u8path (optCwd8.get());
+			if (optCwd8 && optCwd8.get() [0] != '\0') {
+				std::filesystem::path p = utf8_to_path (optCwd8.get());
 				if (std::filesystem::is_directory (p))
 					cwdW = p.wstring();
 				else if (p.has_parent_path())
@@ -532,7 +549,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			}
 		}
 		if (cwdW.empty()) {
-			std::filesystem::path scriptDirPath = std::filesystem::u8path (filePath8 ? filePath8.get() : "").parent_path();
+			std::filesystem::path scriptDirPath = utf8_to_path (filePath8 ? filePath8.get() : "").parent_path();
 			cwdW = scriptDirPath.wstring();
 		}
 		const wchar_t *cwd = cwdW.empty() ? nullptr : cwdW.c_str();
@@ -710,7 +727,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			std::sort (filesToImport.begin(), filesToImport.end());
 
 			for (const auto& fpath : filesToImport) {
-				std::string fullPath = fpath.u8string();
+				std::string fullPath = path_to_utf8 (fpath);
 				autostring32 path32 = Melder_8to32_e (fullPath.c_str());
 				if (! path32) continue;
 
@@ -755,7 +772,7 @@ void praat_runPythonScriptText (conststring32 scriptText, conststring32 optional
 	}
 	ofs.close();
 
-	std::string scriptPathStr = scriptPath.u8string();
+	std::string scriptPathStr = path_to_utf8 (scriptPath);
 	autostring32 scriptPath32 = Melder_8to32_e (scriptPathStr.c_str());
 	praat_runPythonScriptFile (scriptPath32.get(), optionalScriptDirectory);
 }

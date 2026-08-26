@@ -44,6 +44,7 @@ __pycache__/
 
 # Local zip packages/releases
 *.zip
+dist/
 
 # Translation temporary/intermediate log and candidate files
 debug_translations.txt
