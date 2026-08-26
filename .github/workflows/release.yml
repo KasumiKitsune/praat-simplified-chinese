@@ -149,177 +149,74 @@ jobs:
           project = project.replace('CODE_SIGN_ENTITLEMENTS = main/Praat.entitlements;', 'CODE_SIGN_ENTITLEMENTS = "";')
           project = project.replace('INFOPLIST_PREFIX_HEADER = /Users/pboersma/Dropbox/Praats/src/sys/praat_version.h;', 'INFOPLIST_PREFIX_HEADER = main/main_Praat.h;')
 
-          if "praat_translate.cpp" not in project:
-              file_ref = "CDFE00000000000000000001"
-              build_file = "CDFE00000000000000000002"
-              header_ref = "CDFE00000000000000000003"
-              header_build = "CDFE00000000000000000004"
+          files_to_add = [
+              ("sys/praat_translate.cpp", "sys/praat_translate.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "01"),
+              ("LPC/CPP.cpp", "LPC/CPP.h", "23D1643C243D165800A2A049", "23D1643D243D165800A2A049", "23D16441243D165F00A2A049", "11"),
+              ("LPC/Sound_to_CPP.cpp", "LPC/Sound_to_CPP.h", "23D1643C243D165800A2A049", "23D1643D243D165800A2A049", "23D16441243D165F00A2A049", "15"),
+              ("sys/praat_python.cpp", "sys/praat_python.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "21"),
+              ("sys/PythonScriptEditor.cpp", "sys/PythonScriptEditor.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "31"),
+              ("sys/PreferencesDialog.cpp", "sys/PreferencesDialog.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "41"),
+          ]
+
+          for cpp_path, h_path, anchor_grp, anchor_src, anchor_hdr, pfx in files_to_add:
+              import os
+              cpp_name = os.path.basename(cpp_path)
+              h_name = os.path.basename(h_path)
+              if cpp_name in project:
+                  print(f"{cpp_name} is already present in the Xcode project.")
+                  continue
+
+              file_ref_cpp = f"CDFE000000000000000000{pfx}1"
+              build_file_cpp = f"CDFE000000000000000000{pfx}2"
+              header_ref = f"CDFE000000000000000000{pfx}3"
+              header_build = f"CDFE000000000000000000{pfx}4"
 
               project = project.replace(
                   "/* Begin PBXBuildFile section */\n",
                   "/* Begin PBXBuildFile section */\n"
-                  f"\t\t{build_file} /* praat_translate.cpp in Sources */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {file_ref} /* praat_translate.cpp */; }};\n"
-                  f"\t\t{header_build} /* praat_translate.h in Headers */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {header_ref} /* praat_translate.h */; }};\n",
+                  f"\t\t{build_file_cpp} /* {cpp_name} in Sources */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {file_ref_cpp} /* {cpp_name} */; }};\n"
+                  f"\t\t{header_build} /* {h_name} in Headers */ = "
+                  f"{{isa = PBXBuildFile; fileRef = {header_ref} /* {h_name} */; }};\n",
                   1,
               )
               project = project.replace(
                   "/* Begin PBXFileReference section */\n",
                   "/* Begin PBXFileReference section */\n"
-                  f"\t\t{file_ref} /* praat_translate.cpp */ = "
-                  "{isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; "
-                  "fileEncoding = 4; name = praat_translate.cpp; path = sys/praat_translate.cpp; "
-                  "sourceTree = \"<group>\"; };\n"
-                  f"\t\t{header_ref} /* praat_translate.h */ = "
-                  "{isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; "
-                  "fileEncoding = 4; name = praat_translate.h; path = sys/praat_translate.h; "
-                  "sourceTree = \"<group>\"; };\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n",
-                  "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n"
-                  f"\t\t{file_ref} /* praat_translate.cpp */,\n"
-                  f"\t\t{header_ref} /* praat_translate.h */,\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n",
-                  "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n"
-                  f"\t\t{build_file} /* praat_translate.cpp in Sources */,\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n",
-                  "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n"
-                  f"\t\t{header_build} /* praat_translate.h in Headers */,\n",
+                  f"\t\t{file_ref_cpp} /* {cpp_name} */ = "
+                  f"{{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; "
+                  f"name = {cpp_name}; path = {cpp_path}; sourceTree = \"<group>\"; }};\n"
+                  f"\t\t{header_ref} /* {h_name} */ = "
+                  f"{{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
+                  f"name = {h_name}; path = {h_path}; sourceTree = \"<group>\"; }};\n",
                   1,
               )
 
-              project_path.write_text(project, encoding="utf-8")
-              print("Added sys/praat_translate.cpp and sys/praat_translate.h to praat_mac Xcode target.")
-          else:
-              print("sys/praat_translate.cpp is already present in the Xcode project.")
+              # Group anchor
+              grp_anchor = f"\t\t\t\t{anchor_grp} /*"
+              idx = project.find(grp_anchor)
+              if idx != -1:
+                  end_line = project.find("\n", idx) + 1
+                  project = project[:end_line] + f"\t\t\t\t{file_ref_cpp} /* {cpp_name} */,\n\t\t\t\t{header_ref} /* {h_name} */,\n" + project[end_line:]
 
-          if "CPP.cpp" not in project:
-              file_ref_cpp = "CDFE00000000000000000011"
-              build_file_cpp = "CDFE00000000000000000012"
-              header_ref_cpp = "CDFE00000000000000000013"
-              header_build_cpp = "CDFE00000000000000000014"
+              # Sources anchor
+              src_anchor = f"\t\t\t\t{anchor_src} /*"
+              idx = project.find(src_anchor)
+              if idx != -1:
+                  end_line = project.find("\n", idx) + 1
+                  project = project[:end_line] + f"\t\t\t\t{build_file_cpp} /* {cpp_name} in Sources */,\n" + project[end_line:]
 
-              project = project.replace(
-                  "/* Begin PBXBuildFile section */\n",
-                  "/* Begin PBXBuildFile section */\n"
-                  f"\t\t{build_file_cpp} /* CPP.cpp in Sources */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {file_ref_cpp} /* CPP.cpp */; }};\n"
-                  f"\t\t{header_build_cpp} /* CPP.h in Headers */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {header_ref_cpp} /* CPP.h */; }};\n",
-                  1,
-              )
-              project = project.replace(
-                  "/* Begin PBXFileReference section */\n",
-                  "/* Begin PBXFileReference section */\n"
-                  f"\t\t{file_ref_cpp} /* CPP.cpp */ = "
-                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; "
-                  "name = CPP.cpp; path = LPC/CPP.cpp; sourceTree = \"<group>\"; };\n"
-                  f"\t\t{header_ref_cpp} /* CPP.h */ = "
-                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
-                  "name = CPP.h; path = LPC/CPP.h; sourceTree = \"<group>\"; };\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23D1643C243D165800A2A049 /* PowerCepstrogram.cpp */,\n",
-                  "\t\t\t\t23D1643C243D165800A2A049 /* PowerCepstrogram.cpp */,\n"
-                  f"\t\t{file_ref_cpp} /* CPP.cpp */,\n"
-                  f"\t\t{header_ref_cpp} /* CPP.h */,\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23D1643D243D165800A2A049 /* PowerCepstrogram.cpp in Sources */,\n",
-                  "\t\t\t\t23D1643D243D165800A2A049 /* PowerCepstrogram.cpp in Sources */,\n"
-                  f"\t\t{build_file_cpp} /* CPP.cpp in Sources */,\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23D16441243D165F00A2A049 /* PowerCepstrogram.h in Headers */,\n",
-                  "\t\t\t\t23D16441243D165F00A2A049 /* PowerCepstrogram.h in Headers */,\n"
-                  f"\t\t{header_build_cpp} /* CPP.h in Headers */,\n",
-                  1,
-              )
-              project_path.write_text(project, encoding="utf-8")
-              print("Added LPC/CPP.cpp and LPC/CPP.h to praat_mac Xcode target.")
-          else:
-              print("LPC/CPP.cpp is already present in the Xcode project.")
+              # Headers anchor
+              hdr_anchor = f"\t\t\t\t{anchor_hdr} /*"
+              idx = project.find(hdr_anchor)
+              if idx != -1:
+                  end_line = project.find("\n", idx) + 1
+                  project = project[:end_line] + f"\t\t\t\t{header_build} /* {h_name} in Headers */,\n" + project[end_line:]
 
-          if "praat_python.cpp" not in project:
-              file_ref_py = "CDFE00000000000000000021"
-              build_file_py = "CDFE00000000000000000022"
-              header_ref_py = "CDFE00000000000000000023"
-              header_build_py = "CDFE00000000000000000024"
+              print(f"Added {cpp_path} and {h_path} to praat_mac Xcode target.")
 
-              file_ref_pse = "CDFE00000000000000000031"
-              build_file_pse = "CDFE00000000000000000032"
-              header_ref_pse = "CDFE00000000000000000033"
-              header_build_pse = "CDFE00000000000000000034"
-
-              project = project.replace(
-                  "/* Begin PBXBuildFile section */\n",
-                  "/* Begin PBXBuildFile section */\n"
-                  f"\t\t{build_file_py} /* praat_python.cpp in Sources */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {file_ref_py} /* praat_python.cpp */; }};\n"
-                  f"\t\t{header_build_py} /* praat_python.h in Headers */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {header_ref_py} /* praat_python.h */; }};\n"
-                  f"\t\t{build_file_pse} /* PythonScriptEditor.cpp in Sources */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {file_ref_pse} /* PythonScriptEditor.cpp */; }};\n"
-                  f"\t\t{header_build_pse} /* PythonScriptEditor.h in Headers */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {header_ref_pse} /* PythonScriptEditor.h */; }};\n",
-                  1,
-              )
-              project = project.replace(
-                  "/* Begin PBXFileReference section */\n",
-                  "/* Begin PBXFileReference section */\n"
-                  f"\t\t{file_ref_py} /* praat_python.cpp */ = "
-                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; "
-                  "name = praat_python.cpp; path = sys/praat_python.cpp; sourceTree = \"<group>\"; };\n"
-                  f"\t\t{header_ref_py} /* praat_python.h */ = "
-                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
-                  "name = praat_python.h; path = sys/praat_python.h; sourceTree = \"<group>\"; };\n"
-                  f"\t\t{file_ref_pse} /* PythonScriptEditor.cpp */ = "
-                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; "
-                  "name = PythonScriptEditor.cpp; path = sys/PythonScriptEditor.cpp; sourceTree = \"<group>\"; };\n"
-                  f"\t\t{header_ref_pse} /* PythonScriptEditor.h */ = "
-                  "{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
-                  "name = PythonScriptEditor.h; path = sys/PythonScriptEditor.h; sourceTree = \"<group>\"; };\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n",
-                  "\t\t\t\t23E5CB0809A22901004E41D5 /* praat_statistics.cpp */,\n"
-                  f"\t\t{file_ref_py} /* praat_python.cpp */,\n"
-                  f"\t\t{header_ref_py} /* praat_python.h */,\n"
-                  f"\t\t{file_ref_pse} /* PythonScriptEditor.cpp */,\n"
-                  f"\t\t{header_ref_pse} /* PythonScriptEditor.h */,\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n",
-                  "\t\t\t\t23E5D0BD09A22A57004E41D5 /* praat_statistics.cpp in Sources */,\n"
-                  f"\t\t{build_file_py} /* praat_python.cpp in Sources */,\n"
-                  f"\t\t{build_file_pse} /* PythonScriptEditor.cpp in Sources */,\n",
-                  1,
-              )
-              project = project.replace(
-                  "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n",
-                  "\t\t\t\t23E5D0BC09A22A57004E41D5 /* praat_script.h in Headers */,\n"
-                  f"\t\t{header_build_py} /* praat_python.h in Headers */,\n"
-                  f"\t\t{header_build_pse} /* PythonScriptEditor.h in Headers */,\n",
-                  1,
-              )
-              project_path.write_text(project, encoding="utf-8")
-              print("Added praat_python and PythonScriptEditor to praat_mac Xcode target.")
-          else:
-              print("praat_python.cpp is already present in the Xcode project.")
+          project_path.write_text(project, encoding="utf-8")
+          print("All missing files patched into Xcode project successfully.")
           PY
 
       - name: Build Praat.app
