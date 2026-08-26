@@ -55,24 +55,24 @@
 
   <style>
     :root {
-      /* Paper & Desktop - Pure Flat Solid Colors (No Gradients) */
-      --desktop: #e7e2d2;
-      --paper: #fffdf6;
-      --paper-2: #faf7ec;
-      --panel: #f5f1e2;
+      /* Clean Modern Grey-White Theme */
+      --desktop: #eceef2;
+      --paper: #ffffff;
+      --paper-2: #f8fafc;
+      --panel: #f1f4f8;
 
-      /* Ink (derived from dark forest) */
-      --ink: #0c310a;
-      --ink-2: #3b4732;
-      --ink-3: #6d7560;
+      /* Ink (rich charcoal / slate) */
+      --ink: #0f172a;
+      --ink-2: #334155;
+      --ink-3: #64748b;
 
-      /* Olive accent system */
-      --olive: #57772e;
-      --olive-deep: #3d4d20;
-      --sage: #d5e798;
-      --sage-soft: #eef3d6;
-      --line: #d2d5c3;
-      --line-strong: #b9bda6;
+      /* Slate & Steel Accent System */
+      --olive: #3b4252;
+      --olive-deep: #1e293b;
+      --sage: #e2e8f0;
+      --sage-soft: #f1f5f9;
+      --line: #e2e8f0;
+      --line-strong: #cbd5e1;
 
       /* Window chrome (traffic lights) */
       --tl-close: #ff5f57;
@@ -83,8 +83,8 @@
       --font-display: "Spectral", "Noto Serif SC", "Songti SC", serif;
       --font-mono: "IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
 
-      --shadow-window: 0 1px 0 rgba(12, 49, 10, 0.03), 0 16px 40px -16px rgba(61, 77, 32, 0.28);
-      --shadow-pop: 0 12px 32px -10px rgba(61, 77, 32, 0.3);
+      --shadow-window: 0 1px 0 rgba(15, 23, 42, 0.04), 0 12px 32px -12px rgba(15, 23, 42, 0.12);
+      --shadow-pop: 0 8px 24px -6px rgba(15, 23, 42, 0.12);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -92,11 +92,11 @@
     ::selection { background: var(--sage); color: var(--ink); }
 
     /* Custom Scrollbar */
-    * { scrollbar-width: thin; scrollbar-color: #c4c9b1 transparent; }
+    * { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #c4c9b1; border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
-    ::-webkit-scrollbar-thumb:hover { background: #a6ad89; border: 2px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; border: 2px solid transparent; background-clip: content-box; }
     ::-webkit-scrollbar-corner { background: transparent; }
 
     html, body {
@@ -190,16 +190,27 @@
     .dropdown-menu {
       display: none;
       position: absolute;
-      top: calc(100% + 6px);
+      top: calc(100% + 4px);
       left: 0;
       background: var(--paper);
       border: 1px solid var(--line);
       box-shadow: var(--shadow-pop);
       border-radius: 10px;
-      min-width: 216px;
+      min-width: 184px;
       padding: 6px;
       z-index: 100;
       animation: popIn 0.16s ease;
+    }
+
+    /* Invisible hover bridge to prevent losing hover when moving mouse downwards */
+    .dropdown-menu::before {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: transparent;
     }
 
     .menu-item:hover .dropdown-menu { display: block; }
@@ -210,16 +221,23 @@
     }
 
     .dropdown-item {
-      padding: 7px 12px;
+      padding: 8px 12px;
       font-size: 13px;
       color: var(--ink-2);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       cursor: pointer;
       border-radius: 6px;
+      text-decoration: none !important;
       transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .dropdown-item i {
+      font-size: 14px;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
     }
 
     .dropdown-item:hover { background: var(--sage-soft); color: var(--ink); text-decoration: none; }
@@ -452,22 +470,22 @@
       transition: all 0.15s ease;
     }
 
-    .praat-btn:hover { background: var(--sage-soft); border-color: var(--olive); color: var(--ink); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(61, 77, 32, 0.12); }
+    .praat-btn:hover { background: var(--sage-soft); border-color: var(--olive); color: var(--ink); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08); }
     .praat-btn:active { transform: translateY(0) scale(0.97); box-shadow: none; }
 
     .praat-btn.accent {
       background: var(--olive);
       border-color: var(--olive-deep);
-      color: #fffdf6;
+      color: #ffffff;
       font-weight: 600;
     }
 
-    .praat-btn.accent:hover { background: var(--olive-deep); border-color: var(--olive-deep); color: #fffdf6; box-shadow: 0 3px 8px rgba(87, 119, 46, 0.3); }
+    .praat-btn.accent:hover { background: var(--olive-deep); border-color: var(--olive-deep); color: #ffffff; box-shadow: 0 3px 8px rgba(15, 23, 42, 0.2); }
     .praat-btn.accent:active { background: var(--olive-deep); }
 
     /* Actions Column in Objects Window */
     .objects-actions-column {
-      background: #f8f5e9;
+      background: var(--paper-2);
       padding: 8px;
       display: flex;
       flex-direction: column;
@@ -631,10 +649,10 @@
       transition: all 0.18s ease;
     }
 
-    .download-card-compact:hover { border-color: var(--olive); box-shadow: 0 8px 20px -8px rgba(61, 77, 32, 0.25); transform: translateY(-3px); }
+    .download-card-compact:hover { border-color: var(--olive); box-shadow: 0 8px 20px -8px rgba(15, 23, 42, 0.12); transform: translateY(-3px); }
 
-    .download-card-compact.featured { background: #f1f5dc; border-color: var(--olive); }
-    .download-card-compact.featured:hover { border-color: var(--olive-deep); box-shadow: 0 10px 24px -8px rgba(87, 119, 46, 0.35); }
+    .download-card-compact.featured { background: var(--paper-2); border-color: var(--olive-deep); box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.08); }
+    .download-card-compact.featured:hover { border-color: var(--ink); box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.16); }
 
     .dl-card-header {
       display: flex;
@@ -967,20 +985,67 @@
     .lightbox-close-btn:hover { background: var(--tl-close); transform: scale(1.1); }
     .lightbox-close-btn:active { transform: scale(0.95); }
 
-    /* Citation Footnote Style */
-    .citation-banner {
-      background: none;
-      border: none;
-      border-left: 3px solid var(--sage);
-      border-radius: 0;
-      padding: 6px 0 6px 14px;
-      font-size: 12.5px;
-      color: var(--ink-2);
+    /* Version Selection Guide Card */
+    .version-tips-card {
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px 22px;
       margin-top: 24px;
-      line-height: 1.6;
     }
 
-    .citation-banner strong { color: var(--ink); }
+    .version-tips-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px;
+    }
+
+    .version-tips-header i { color: var(--ink-2); font-size: 15px; }
+
+    .version-tips-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+    }
+
+    .version-tip-item {
+      font-size: 12.8px;
+      color: var(--ink-2);
+      line-height: 1.65;
+    }
+
+    .version-tip-item.full-width {
+      grid-column: 1 / -1;
+      padding-top: 12px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .version-tip-item strong {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13.5px;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .version-tip-item code {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--ink);
+    }
+
+    @media (max-width: 880px) {
+      .version-tips-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
 
     /* ============ Bottom Status Bar ============ */
     .bottom-status-bar {
@@ -1354,16 +1419,14 @@
         bottom: 0;
         left: 0;
         right: 0;
-        height: calc(56px + env(safe-area-inset-bottom, 0px));
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) 6px;
         background: var(--paper-2);
         border-top: 1px solid var(--line);
         box-shadow: 0 -4px 18px rgba(12, 49, 10, 0.08);
         z-index: 1000;
         align-items: center;
-        justify-content: space-around;
-        padding-left: 6px;
-        padding-right: 6px;
+        justify-content: space-between;
+        gap: 6px;
       }
 
       .mobile-nav-item {
@@ -1373,20 +1436,19 @@
         align-items: center;
         justify-content: center;
         gap: 3px;
-        height: 48px;
-        min-height: 48px;
+        height: 44px;
         background: transparent;
         border: none;
         border-radius: 8px;
         color: var(--ink-3);
         cursor: pointer;
         transition: all 0.15s ease;
-        padding: 4px 2px;
+        padding: 0;
         user-select: none;
       }
 
       .mobile-nav-item i {
-        font-size: 17px;
+        font-size: 16px;
         color: var(--ink-3);
         transition: color 0.15s ease;
       }
@@ -1435,11 +1497,15 @@
             <li class="menu-item">
               <button class="menu-btn" onclick="openModal('about-modal')">Praat <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
               <div class="dropdown-menu">
-                <div class="dropdown-item" onclick="openModal('about-modal')">关于 Praat 汉化版...</div>
+                <div class="dropdown-item" onclick="openModal('about-modal')">
+                  <i class="fa-solid fa-circle-info" style="color: var(--olive);"></i>
+                  <span>关于 Praat 汉化版...</span>
+                </div>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank">
-                  <span>GitHub 源码仓库</span>
-                  <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i>
+                  <i class="fa-brands fa-github" style="color: var(--ink);"></i>
+                  <span style="flex: 1;">GitHub 源码仓库</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; color: var(--ink-3); width: auto;"></i>
                 </a>
               </div>
             </li>
@@ -1447,21 +1513,44 @@
             <li class="menu-item">
               <button class="menu-btn" onclick="switchTab('tab-download')">下载 <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" id="menu-dl-win" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip">Windows x64 便携版 (.zip)</a>
-                <a class="dropdown-item" id="menu-dl-mac" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg">macOS Universal 通用版 (.dmg)</a>
+                <a class="dropdown-item" id="menu-dl-win" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-Windows-x64.zip">
+                  <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
+                  <span>Windows (.zip)</span>
+                </a>
+                <a class="dropdown-item" id="menu-dl-mac" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.2/Praat-v7.0-zh.2-macOS-universal.dmg">
+                  <i class="fa-brands fa-apple" style="color: #1a1a1a;"></i>
+                  <span>macOS (.dmg)</span>
+                </a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank">所有历史版本 Releases</a>
+                <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank">
+                  <i class="fa-solid fa-clock-rotate-left" style="color: var(--ink-3);"></i>
+                  <span>所有历史版本</span>
+                </a>
               </div>
             </li>
 
             <li class="menu-item">
               <button class="menu-btn" onclick="switchTab('tab-manual')">帮助 <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
               <div class="dropdown-menu">
-                <div class="dropdown-item" onclick="switchTab('tab-manual')">帮助手册...</div>
-                <div class="dropdown-item" onclick="switchTab('tab-terms')">中英术语对照表...</div>
+                <div class="dropdown-item" onclick="switchTab('tab-manual')">
+                  <i class="fa-solid fa-book-open" style="color: var(--olive);"></i>
+                  <span>帮助手册...</span>
+                </div>
+                <div class="dropdown-item" onclick="switchTab('tab-terms')">
+                  <i class="fa-solid fa-table-list" style="color: var(--olive);"></i>
+                  <span>中英术语对照表...</span>
+                </div>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="manual/Phonetic_symbols.html" target="_blank">国际音标字符表</a>
-                <a class="dropdown-item" href="https://praat.org" target="_blank">Praat 官方英文主页</a>
+                <a class="dropdown-item" href="manual/Phonetic_symbols.html" target="_blank">
+                  <i class="fa-solid fa-font" style="color: var(--ink-3);"></i>
+                  <span style="flex: 1;">国际音标字符表</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; color: var(--ink-3); width: auto;"></i>
+                </a>
+                <a class="dropdown-item" href="https://praat.org" target="_blank">
+                  <i class="fa-solid fa-globe" style="color: var(--ink-3);"></i>
+                  <span style="flex: 1;">Praat 官方英文主页</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; color: var(--ink-3); width: auto;"></i>
+                </a>
               </div>
             </li>
           </ul>
@@ -1725,10 +1814,25 @@
                 </div>
               </div>
 
-              <!-- Academic Citation Footnote -->
-              <div class="citation-banner">
-                <div>
-                  <strong>学术引用格式</strong>：Boersma, P., & Weenink, D. (2026). Praat: doing phonetics by computer [Computer program]. Version 7.0. https://praat.org/
+              <!-- Version Selection & Setup Tips -->
+              <div class="version-tips-card">
+                <div class="version-tips-header">
+                  <i class="fa-solid fa-circle-question"></i>
+                  <span>如何选择与运行适合你的版本？</span>
+                </div>
+                <div class="version-tips-grid">
+                  <div class="version-tip-item">
+                    <strong><i class="fa-brands fa-windows" style="color: #0078d4;"></i> Windows 用户</strong>
+                    <p>推荐直接下载 <code>.zip</code> 压缩包。解压到任意文件夹后，双击 <code>Praat.exe</code> 即可直接运行，完全绿色免安装，也可以放在 U 盘里随身携带。</p>
+                  </div>
+                  <div class="version-tip-item">
+                    <strong><i class="fa-brands fa-apple" style="color: #1a1a1a;"></i> Mac 用户</strong>
+                    <p>下载 <code>.dmg</code> 镜像文件，双击打开后把 Praat 图标拖入「应用程序」即可（通用版已同时支持 M 系列芯片与 Intel 芯片机型）。</p>
+                  </div>
+                  <div class="version-tip-item full-width">
+                    <strong><i class="fa-solid fa-shield-halved" style="color: var(--ink-3);"></i> 首次打开提示安全拦截？</strong>
+                    <p>若 macOS 提示“无法打开，因为无法验证开发者”，前往系统「设置」→「隐私与安全性」，在页面下方找到 Praat 并点击「仍要打开」即可正常启动。</p>
+                  </div>
                 </div>
               </div>
             </div>
