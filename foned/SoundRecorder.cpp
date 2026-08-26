@@ -775,14 +775,14 @@ static LRESULT CALLBACK holdRecordWndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 			my isHoldingRecord = true;
 			startRecording (me);
 			if (my holdRecordButton)
-				GuiButton_setText (my holdRecordButton, praat_translate (U"● Recording... (release to stop)"));
+				GuiButton_setText (my holdRecordButton, praat_translate (U"● Recording..."));
 		} else if (msg == WM_LBUTTONUP || msg == WM_CAPTURECHANGED) {
 			if (my isHoldingRecord) {
 				my isHoldingRecord = false;
 				stopRecording (me);
 				addCurrentRecordingToTakes (me);
 				if (my holdRecordButton)
-					GuiButton_setText (my holdRecordButton, praat_translate (U"Hold to Record (release to stop)"));
+					GuiButton_setText (my holdRecordButton, praat_translate (U"Hold to Record"));
 				Graphics_updateWs (my graphics.get());
 			}
 		}
@@ -910,7 +910,7 @@ static void gui_button_cb_stop (SoundRecorder me, GuiButtonEvent /* event */) {
 	if (my isHoldingRecord) {
 		my isHoldingRecord = false;
 		if (my holdRecordButton)
-			GuiButton_setText (my holdRecordButton, praat_translate (U"Hold to Record (release to stop)"));
+			GuiButton_setText (my holdRecordButton, praat_translate (U"Hold to Record"));
 	}
 	addCurrentRecordingToTakes (me);
 	Graphics_updateWs (my graphics.get());
@@ -1214,8 +1214,10 @@ void structSoundRecorder :: v_createChildren ()
 	y = 65;
 	our recordButton = GuiButton_createShown (our windowForm, 10, 75, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			U"Record", gui_button_cb_record, this, 0);
-	our holdRecordButton = GuiButton_createShown (our windowForm, 80, 260, -y - Gui_PUSHBUTTON_HEIGHT, -y,
-			U"Hold to Record (release to stop)", gui_button_cb_holdRecord, this, 0);
+	our stopButton = GuiButton_createShown (our windowForm, 80, 145, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+			U"Stop", gui_button_cb_stop, this, 0);
+	our holdRecordButton = GuiButton_createShown (our windowForm, 150, 260, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+			U"Hold to Record", gui_button_cb_holdRecord, this, 0);
 	#if defined (_WIN32)
 		if (our holdRecordButton && our holdRecordButton -> d_widget) {
 			HWND hwnd = our holdRecordButton -> d_widget -> window;
@@ -1225,14 +1227,12 @@ void structSoundRecorder :: v_createChildren ()
 			}
 		}
 	#endif
-	our stopButton = GuiButton_createShown (our windowForm, 265, 330, -y - Gui_PUSHBUTTON_HEIGHT, -y,
-			U"Stop", gui_button_cb_stop, this, 0);
 	if (inputUsesPortAudio) {
-		our playButton = GuiButton_createShown (our windowForm, 335, 400, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+		our playButton = GuiButton_createShown (our windowForm, 265, 330, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 				U"Play", gui_button_cb_play, this, 0);
 	} else {
 		#if defined (_WIN32) || defined (macintosh)
-			our playButton = GuiButton_createShown (our windowForm, 335, 400, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+			our playButton = GuiButton_createShown (our windowForm, 265, 330, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 					U"Play", gui_button_cb_play, this, 0);
 		#endif
 	}

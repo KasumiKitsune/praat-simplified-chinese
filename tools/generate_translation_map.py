@@ -73,8 +73,10 @@ EXACT_MAP = {
     "contains ink ending with": "包含可见字符结尾是",
     "does not contain ink ending with": "不包含可见字符结尾不是",
     # Batch rename and error hints
-    "Hold to Record (release to stop)": "按住录音 (松开停止)",
-    "● Recording... (release to stop)": "● 录音中... (松开停止)",
+    "Hold to Record": "按住录音",
+    "● Recording...": "● 录音中...",
+    "Hold to Record (release to stop)": "按住录音",
+    "● Recording... (release to stop)": "● 录音中...",
     "Not enough names provided! You selected ": "提供的名称数量不足！您已选择了 ",
     " objects, but only provided ": " 个对象，但仅提供了 ",
     " line.": " 行。",

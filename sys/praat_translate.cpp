@@ -1791,7 +1791,8 @@ static const std::unordered_map<std::u32string, std::u32string> g_translation_ma
 	{ U"Hierarchical clustering", U"\u5c42\u6b21\u805a\u7c7b (Hierarchical Clustering)" },
 	{ U"Hint: to label or segment an existing Sound,", U"\u63d0\u793a\uff1a\u82e5\u8981\u5bf9\u73b0\u6709\u58f0\u97f3\u8fdb\u884c\u6807\u6ce8\u6216\u5207\u5206\uff0c" },
 	{ U"Histogram", U"\u76f4\u65b9\u56fe (Histogram)" },
-	{ U"Hold to Record (release to stop)", U"\u6309\u4f4f\u5f55\u97f3 (\u677e\u5f00\u505c\u6b62)" },
+	{ U"Hold to Record", U"\u6309\u4f4f\u5f55\u97f3" },
+	{ U"Hold to Record (release to stop)", U"\u6309\u4f4f\u5f55\u97f3" },
 	{ U"Home", U"\u4e3b\u9875" },
 	{ U"Horizontal column", U"\u6c34\u5e73\u8f74\u5bf9\u5e94\u5217" },
 	{ U"Horizontal factor", U"\u6c34\u5e73\u56e0\u5b50" },
@@ -4149,7 +4150,8 @@ static const std::unordered_map<std::u32string, std::u32string> g_translation_ma
 	{ U"\u00bb in formula", U"\u00bb in \u516c\u5f0f" },
 	{ U"\u00bb in formula.", U"\u00bb in \u516c\u5f0f." },
 	{ U"\u201d, or click Cancel in that window.", U"\u201d\u4e2d\u4fee\u6539\u5185\u5bb9\uff0c\u6216\u70b9\u51fb\u8be5\u7a97\u53e3\u4e2d\u7684\u201c\u53d6\u6d88\u201d\u3002" },
-	{ U"\u25cf Recording... (release to stop)", U"\u25cf \u5f55\u97f3\u4e2d... (\u677e\u5f00\u505c\u6b62)" }
+	{ U"\u25cf Recording...", U"\u25cf \u5f55\u97f3\u4e2d..." },
+	{ U"\u25cf Recording... (release to stop)", U"\u25cf \u5f55\u97f3\u4e2d..." }
 };
 
 // Simplified to Traditional Chinese character-level mapping
