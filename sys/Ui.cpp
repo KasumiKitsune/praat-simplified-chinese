@@ -1397,9 +1397,23 @@ static void UiForm_moveControl (GuiControl ctrl, int left, int right, int top, i
 	int h = bottom - top;
 	int w = right - left;
 	#if defined (_WIN32)
-		if (! ctrl -> d_widget || ! ctrl -> d_widget -> window)
+		HWND hwnd = NULL;
+		if (Thing_isa (ctrl, classGuiOptionMenu)) {
+			GuiOptionMenu om = (GuiOptionMenu) ctrl;
+			#if motif
+				if (om -> d_xmMenuBar && om -> d_xmMenuBar -> window) {
+					hwnd = om -> d_xmMenuBar -> window;
+					left -= 4;
+					top -= 4;
+					w += 8;
+					h += 8;
+				}
+			#endif
+		}
+		if (! hwnd && ctrl -> d_widget && ctrl -> d_widget -> window)
+			hwnd = ctrl -> d_widget -> window;
+		if (! hwnd)
 			return;
-		HWND hwnd = ctrl -> d_widget -> window;
 		if (top < 0 || top + h > visH) {
 			ShowWindow (hwnd, SW_HIDE);
 		} else {
@@ -1573,7 +1587,9 @@ static void gui_form_cb_scroll (Thing void_me, GuiScrollBarEvent /* event */) {
 			SendMessage (hwnd, WM_SETREDRAW, FALSE, 0);
 			UiForm_updateFieldPositions (me);
 			SendMessage (hwnd, WM_SETREDRAW, TRUE, 0);
-			RECT r = { 0, 0, 520, my contentVisibleHeight + 5 };
+			RECT r;
+			GetClientRect (hwnd, & r);
+			r.bottom = my contentVisibleHeight + 5;
 			InvalidateRect (hwnd, & r, TRUE);
 			RedrawWindow (hwnd, & r, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
 		} else {
