@@ -185,7 +185,7 @@
       transition: background 0.15s ease, color 0.15s ease;
     }
 
-    .menu-btn:hover { background: rgba(213, 231, 152, 0.45); color: var(--ink); text-decoration: none; }
+    .menu-btn:hover { background: var(--sage-soft); color: var(--ink); text-decoration: none; }
 
     .dropdown-menu {
       display: none;
@@ -261,12 +261,12 @@
 
     .quick-btn-primary {
       background: var(--olive);
-      color: #fffdf6 !important;
+      color: #ffffff !important;
       border-color: var(--olive-deep);
-      box-shadow: 0 2px 8px rgba(87, 119, 46, 0.3);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.16);
     }
 
-    .quick-btn-primary:hover { background: var(--olive-deep); transform: translateY(-1px); box-shadow: 0 5px 14px rgba(87, 119, 46, 0.35); }
+    .quick-btn-primary:hover { background: var(--olive-deep); transform: translateY(-1px); box-shadow: 0 5px 14px rgba(15, 23, 42, 0.22); }
     .quick-btn-primary:active { transform: translateY(0) scale(0.97); }
 
     .quick-btn-secondary { background: var(--paper); color: var(--ink-2) !important; border-color: var(--line-strong); }
@@ -341,8 +341,8 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      border: 1px solid rgba(12, 49, 10, 0.18);
-      box-shadow: inset 0 -1px 2px rgba(12, 49, 10, 0.15);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.12);
       cursor: pointer;
       transition: transform 0.15s ease, filter 0.15s ease;
     }
@@ -430,7 +430,7 @@
 
     .object-entry.selected {
       background: var(--sage);
-      border-color: #c3d47e;
+      border-color: var(--line-strong);
       color: var(--ink);
       font-weight: 600;
     }
@@ -691,7 +691,7 @@
       overflow: auto;
       margin-bottom: 20px;
       max-height: calc(100vh - 320px);
-      box-shadow: 0 2px 8px rgba(12, 49, 10, 0.04);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     }
 
     .term-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--paper); min-width: 520px; }
@@ -767,7 +767,7 @@
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .term-search-input:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(213, 231, 152, 0.6); }
+    .term-search-input:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(59, 66, 82, 0.16); }
     .term-search-input::placeholder { color: var(--ink-3); }
 
     #term-count { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
@@ -820,16 +820,16 @@
       transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
 
-    .screenshot-wrapper:hover img { transform: scale(1.012); box-shadow: 0 10px 28px rgba(61, 77, 32, 0.22); }
+    .screenshot-wrapper:hover img { transform: scale(1.012); box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14); }
 
     .screenshot-zoom-badge {
       position: absolute;
       bottom: 18px;
       right: 18px;
-      background: rgba(12, 49, 10, 0.75);
+      background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
-      color: #fffdf6;
+      color: #ffffff;
       font-size: 11.5px;
       font-weight: 500;
       padding: 4px 11px;
@@ -842,7 +842,7 @@
       gap: 6px;
     }
 
-    .screenshot-wrapper:hover .screenshot-zoom-badge { opacity: 1; transform: scale(1.05); background: rgba(87, 119, 46, 0.92); }
+    .screenshot-wrapper:hover .screenshot-zoom-badge { opacity: 1; transform: scale(1.05); background: rgba(30, 41, 59, 0.92); }
 
     /* Split View (Tab 3 & Tab 5) */
     .split-view {
@@ -912,7 +912,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(18, 30, 12, 0.62);
+      background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       z-index: 2000;
@@ -949,12 +949,12 @@
       object-fit: contain;
       border-radius: 10px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 253, 246, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       background: var(--paper);
     }
 
     .lightbox-caption {
-      color: #f5f1e2;
+      color: #f8fafc;
       font-size: 13.5px;
       margin-top: 12px;
       text-align: center;
@@ -971,7 +971,7 @@
       border-radius: 50%;
       background: var(--olive-deep);
       border: 2px solid var(--paper);
-      color: #fffdf6;
+      color: #ffffff;
       font-size: 15px;
       display: flex;
       align-items: center;
@@ -1087,7 +1087,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(18, 30, 12, 0.35);
+      background: rgba(15, 23, 42, 0.45);
       backdrop-filter: blur(3px);
       -webkit-backdrop-filter: blur(3px);
       z-index: 1000;
@@ -1103,7 +1103,7 @@
       background: var(--paper);
       border: 1px solid var(--line);
       border-radius: 14px;
-      box-shadow: 0 24px 60px -16px rgba(18, 30, 12, 0.45);
+      box-shadow: 0 24px 60px -16px rgba(15, 23, 42, 0.35);
       overflow: hidden;
       animation: lightboxZoom 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -1202,7 +1202,7 @@
 
       .praat-window.display-window {
         border-radius: 12px;
-        box-shadow: 0 4px 20px -8px rgba(61, 77, 32, 0.2);
+        box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.12);
       }
 
       .window-controls { display: none !important; }
@@ -1334,7 +1334,7 @@
         border: 1px solid var(--line);
         border-radius: 10px;
         padding: 12px 14px;
-        box-shadow: 0 2px 6px rgba(12, 49, 10, 0.04);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
         transition: border-color 0.15s ease;
       }
 
@@ -1422,7 +1422,7 @@
         padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) 6px;
         background: var(--paper-2);
         border-top: 1px solid var(--line);
-        box-shadow: 0 -4px 18px rgba(12, 49, 10, 0.08);
+        box-shadow: 0 -4px 18px rgba(15, 23, 42, 0.08);
         z-index: 1000;
         align-items: center;
         justify-content: space-between;
@@ -1694,7 +1694,7 @@
             <!-- TAB 1: Overview & Highlights -->
             <div id="tab-overview" class="tab-view active">
               <div class="view-hero" style="display: flex; gap: 24px; align-items: center;">
-                <img src="pictures/icon.png" alt="Praat 汉化版 Logo" style="width: 96px; height: 96px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 10px rgba(61,77,32,0.18));">
+                <img src="pictures/icon.png" alt="Praat 汉化版 Logo" style="width: 96px; height: 96px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 10px rgba(15, 23, 42, 0.12));">
                 <div>
                   <h1>Praat 汉化版</h1>
                   <p>
@@ -1798,7 +1798,7 @@
                 <!-- Linux / Source Card -->
                 <div class="download-card-compact">
                   <div class="dl-card-header">
-                    <i class="fa-brands fa-linux" style="color: #3b4732;"></i>
+                    <i class="fa-brands fa-linux" style="color: var(--ink);"></i>
                     <span>Linux / 源码</span>
                   </div>
                   <div class="dl-meta">
@@ -2308,7 +2308,7 @@
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Title bar moss-green pulse animation feedback
+      // Title bar pulse animation feedback
       const titleBar = document.querySelector('.display-window .window-title-bar');
       if (titleBar) {
         titleBar.classList.remove('title-highlight');
