@@ -10,6 +10,8 @@
 #include "Preferences.h"
 #include "melder_sysenv.h"
 #include "praat_translate.h"
+#include "Sound.h"
+#include "TextGrid.h"
 #include <filesystem>
 #include <fstream>
 #include <vector>
@@ -615,7 +617,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 				}
 				MelderString_append (& saveCmd, U"selectObject: ", iobj, U"\nSave as WAV file: \"", escapedObjPath.string, U"\"\n");
 				try {
-					praat_executeScriptFromText (saveCmd.string);
+					praat_executeScriptFromText_withFullTrust (saveCmd.string);
 				} catch (...) {
 					structMelderFile objMelderFile { };
 					Melder_pathToFile (objPath32.get(), & objMelderFile);
@@ -652,7 +654,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			MelderString_append (& restoreSelectionCmd, U"plusObject: ", selectedIds [i], U"\n");
 		}
 		try {
-			praat_executeScriptFromText (restoreSelectionCmd.string);
+			praat_executeScriptFromText_withFullTrust (restoreSelectionCmd.string);
 		} catch (...) {}
 	}
 
@@ -875,7 +877,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 				autostring32 script32 = Melder_8to32_e (content.c_str());
 				if (script32 && script32 [0] != U'\0') {
 					try {
-						praat_executeScriptFromText (script32.get());
+						praat_executeScriptFromText_withFullTrust (script32.get());
 					} catch (MelderError) {
 						Melder_flushError (U"Error executing Praat commands from Python script.");
 					}
@@ -915,7 +917,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 				autoMelderString cmd;
 				MelderString_append (& cmd, U"Read from file: \"", escapedPath.string, U"\"\n");
 				try {
-					praat_executeScriptFromText (cmd.string);
+					praat_executeScriptFromText_withFullTrust (cmd.string);
 				} catch (MelderError) {
 					Melder_clearError ();
 				}
@@ -948,4 +950,162 @@ void praat_runPythonScriptText (conststring32 scriptText, conststring32 optional
 	std::string scriptPathStr = path_to_utf8 (scriptPath);
 	autostring32 scriptPath32 = Melder_8to32_e (scriptPathStr.c_str());
 	praat_runPythonScriptFile (scriptPath32.get(), optionalScriptDirectory);
+}
+
+autostring32 praat_python_generateAgentPrompt () {
+	autoMelderString prompt;
+	bool isZh = (g_language_choice != 0);
+
+	if (isZh) {
+		MelderString_append (& prompt,
+			U"[Praat Python 脚本开发任务]\n"
+			U"你是精通 Praat 声学语音学及 Python 科学计算 (parselmouth, numpy, pandas, matplotlib, scipy) 的专家。\n"
+			U"我正在使用 Praat-ZH 内置的 Python 环境编写数据处理与声学分析脚本。\n\n"
+			U"【交互准则】\n"
+			U"1. 请不要立即编写猜测的代码。请先仔细阅读下方当前 Praat 对象的上下文(对象类型、名称、音频属性、TextGrid 层结构与抽样标注)。\n"
+			U"2. 主动向我提问我的分析意图：针对我的数据特征，提出 3~4 个最可能的处理方向供我选择(如: A.批量提取 F0/共振峰/时长导出表格; B.按 TextGrid 标注层切分音段统计; C.音频处理/滤波/合成并导回 Praat; D.声学曲线与语图可视化; E.自定义实验)。\n"
+			U"3. 待我确认需求后，再提供完整、健壮、带中文注释的代码，并提示按 Ctrl+R 运行。\n"
+			U"4. 【依赖规范】优先使用标准库及 parselmouth, numpy, pandas, matplotlib, scipy。切勿强制引入 praatio 等额外库；如需解析 TextGrid，推荐直接写轻量原生解析函数或使用 parselmouth。\n\n"
+			U"【Praat-ZH Python API 规范】\n"
+			U"1. 运行机制: import praat 交互，Ctrl+R 运行全脚本，Ctrl+T 运行选区。所有 print 输出及报错堆栈均显示在 Praat Info 窗口。\n"
+			U"2. praat.get_selected(): 返回选中对象 [{'id':1, 'name':'八', 'class':'Sound', 'file':'...'}, ...]。Sound 自动导出为 16-bit WAV，TextGrid 导出为 .TextGrid。\n"
+			U"3. praat.call(cmd, *args): 调度 Praat 原生算法(如: praat.call('To Pitch (ac)...', 0.0, 75, 15, 'yes', 0.03, 0.45, 0.01, 0.35, 0.14, 600); praat.call('To Formant (burg)...', 0.0, 5, 5500, 0.025, 50))。\n"
+			U"4. praat.select(id), praat.plus_select(id), praat.rename(new_name), praat.remove() 管理对象；praat.run_praat_script(text) 追加执行原生脚本。\n"
+			U"5. praat.get_output_dir(): 保存到此目录的 .wav 或 .TextGrid 在脚本结束后会自动导回 Praat 对象列表。\n\n"
+			U"【当前 Praat 对象快照】\n"
+		);
+	} else {
+		MelderString_append (& prompt,
+			U"[Praat Python Scripting Task]\n"
+			U"You are an expert in Praat acoustic phonetics and Python scientific computing (parselmouth, numpy, pandas, matplotlib, scipy).\n"
+			U"I am using Praat-ZH built-in Python environment to write data analysis and audio processing scripts.\n\n"
+			U"[Interaction Guidelines]\n"
+			U"1. Do not output guessed code directly. First read the real Praat objects context snapshot below.\n"
+			U"2. Actively ask about my analysis goals: propose 3-4 tailored options based on my data (e.g. A. Batch F0/formant/duration extraction to CSV; B. TextGrid-based segmentation & metrics; C. Audio processing/filtering & auto-import; D. Visualization; E. Custom).\n"
+			U"3. After I confirm my goals, provide complete, robust code with comments, and remind to run via Ctrl+R.\n"
+			U"4. [Dependencies] Prefer standard library and parselmouth, numpy, pandas, matplotlib, scipy. Avoid forcing extra libraries like praatio; parse TextGrid with lightweight helper or parselmouth if needed.\n\n"
+			U"[Praat-ZH Python API Reference]\n"
+			U"1. Execution: import praat to interact. Ctrl+R run all, Ctrl+T run selection. Console output and traceback shown in Info window.\n"
+			U"2. praat.get_selected(): returns selected objects [{'id':1, 'name':'Sound_1', 'class':'Sound', 'file':'...'}, ...]. Sound -> 16-bit WAV, TextGrid -> .TextGrid.\n"
+			U"3. praat.call(cmd, *args): dispatches native Praat commands (e.g. praat.call('To Pitch (ac)...', 0.0, 75, 15, 'yes', ...)).\n"
+			U"4. praat.select(id), praat.plus_select(id), praat.rename(name), praat.remove(), praat.run_praat_script(text).\n"
+			U"5. praat.get_output_dir(): files saved here are auto-imported into Praat Objects upon script completion.\n\n"
+			U"[Current Praat Objects Snapshot]\n"
+		);
+	}
+
+	integer totalObjects = (theCurrentPraatObjects ? theCurrentPraatObjects -> n : 0);
+	integer totalSelected = (theCurrentPraatObjects ? theCurrentPraatObjects -> totalSelection : 0);
+
+	if (totalObjects == 0) {
+		if (isZh)
+			MelderString_append (& prompt, U"• 当前 Praat 对象列表中没有任何对象（列表为空）。\n\n");
+		else
+			MelderString_append (& prompt, U"• Currently Praat Objects list is empty.\n\n");
+	} else {
+		if (isZh) {
+			MelderString_append (& prompt, U"• 统计：对象总数 ", totalObjects, U" 个，当前选中 ", totalSelected, U" 个对象。\n");
+			MelderString_append (& prompt, U"• 对象明细与抽样：\n");
+		} else {
+			MelderString_append (& prompt, U"• Summary: Total ", totalObjects, U" objects, ", totalSelected, U" selected.\n");
+			MelderString_append (& prompt, U"• Object Details & Samples:\n");
+		}
+
+		const integer MAX_SHOW_HEAD = 6;
+		const integer MAX_SHOW_TAIL = 2;
+		bool needTruncation = (totalObjects > (MAX_SHOW_HEAD + MAX_SHOW_TAIL + 2));
+
+		for (integer iobj = 1; iobj <= totalObjects; iobj ++) {
+			if (needTruncation && iobj > MAX_SHOW_HEAD && iobj <= totalObjects - MAX_SHOW_TAIL) {
+				if (iobj == MAX_SHOW_HEAD + 1) {
+					integer skipped = totalObjects - MAX_SHOW_HEAD - MAX_SHOW_TAIL;
+					if (isZh)
+						MelderString_append (& prompt, U"    • ... [其余 ", skipped, U" 个对象结构相似，已自动折叠] ...\n");
+					else
+						MelderString_append (& prompt, U"    • ... [Remaining ", skipped, U" objects omitted for brevity] ...\n");
+				}
+				continue;
+			}
+
+			Daata object = theCurrentPraatObjects -> list [iobj]. object;
+			conststring32 name = theCurrentPraatObjects -> list [iobj]. name.get();
+			conststring32 className = (object ? Thing_className (object) : U"Unknown");
+			bool isSelected = theCurrentPraatObjects -> list [iobj]. isSelected;
+
+			MelderString_append (& prompt, U"  ", (isSelected ? U"▶" : U"•"), U" [ID ", iobj, U"] ", className, U" \"", (name ? name : U""), U"\"");
+
+			if (object) {
+				if (str32equ (className, U"Sound")) {
+					Sound snd = (Sound) object;
+					double dur = snd -> xmax - snd -> xmin;
+					double sr = (snd -> dx > 0 ? 1.0 / snd -> dx : 0.0);
+					integer ch = snd -> ny;
+					if (isZh)
+						MelderString_append (& prompt, U" (时长: ", Melder_fixed (dur, 3), U"s, 采样率: ", (integer) (sr + 0.5), U"Hz, ", (ch == 1 ? U"单声道" : (ch == 2 ? U"双声道" : U"多声道")), U")");
+					else
+						MelderString_append (& prompt, U" (Duration: ", Melder_fixed (dur, 3), U"s, SR: ", (integer) (sr + 0.5), U"Hz, ", (ch == 1 ? U"Mono" : (ch == 2 ? U"Stereo" : U"Multichannel")), U")");
+				} else if (str32equ (className, U"TextGrid")) {
+					TextGrid tg = (TextGrid) object;
+					integer numTiers = (tg -> tiers ? tg -> tiers -> size : 0);
+					if (isZh)
+						MelderString_append (& prompt, U" (层数: ", numTiers);
+					else
+						MelderString_append (& prompt, U" (Tiers: ", numTiers);
+
+					if (numTiers > 0) {
+						MelderString_append (& prompt, U" [");
+						for (integer itier = 1; itier <= numTiers && itier <= 4; itier ++) {
+							Function tier = (Function) tg -> tiers -> at [itier];
+							conststring32 tName = (tier -> name ? tier -> name.get() : U"unnamed");
+							conststring32 tClass = Thing_className (tier);
+							if (itier > 1) MelderString_append (& prompt, U", ");
+							MelderString_append (& prompt, tName, U": ", tClass);
+						}
+						if (numTiers > 4) MelderString_append (& prompt, U", ...");
+						MelderString_append (& prompt, U"]");
+
+						for (integer itier = 1; itier <= numTiers; itier ++) {
+							Function tier = (Function) tg -> tiers -> at [itier];
+							if (str32equ (Thing_className (tier), U"IntervalTier")) {
+								IntervalTier it = (IntervalTier) tier;
+								integer numInt = it -> intervals.size;
+								integer sampleCount = 0;
+								autoMelderString samplesStr;
+								for (integer iint = 1; iint <= numInt && sampleCount < 4; iint ++) {
+									TextInterval ti = it -> intervals.at [iint];
+									if (ti && ti -> text && ti -> text.get()[0] != U'\0') {
+										if (sampleCount > 0) MelderString_append (& samplesStr, U", ");
+										MelderString_append (& samplesStr, U"[", Melder_fixed (ti -> xmin, 2), U"-", Melder_fixed (ti -> xmax, 2), U"s: \"", ti -> text.get(), U"\"]");
+										sampleCount ++;
+									}
+								}
+								if (sampleCount > 0) {
+									if (isZh)
+										MelderString_append (& prompt, U", 层 \"", (tier -> name ? tier -> name.get() : U""), U"\" 标注样本: ", samplesStr.string);
+									else
+										MelderString_append (& prompt, U", Tier \"", (tier -> name ? tier -> name.get() : U""), U"\" Samples: ", samplesStr.string);
+								}
+								break;
+							}
+						}
+					}
+					MelderString_append (& prompt, U")");
+				}
+			}
+			MelderString_append (& prompt, U"\n");
+		}
+		MelderString_append (& prompt, U"\n");
+	}
+
+	if (isZh) {
+		MelderString_append (& prompt,
+			U"请根据以上提供的 API 规范与当前 Praat 数据上下文，开始向我提问我的分析意图！\n"
+		);
+	} else {
+		MelderString_append (& prompt,
+			U"Please begin by analyzing the data context above and actively inquiring about my analysis goals!\n"
+		);
+	}
+
+	return Melder_dup (prompt.string);
 }

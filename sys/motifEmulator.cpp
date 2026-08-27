@@ -2486,6 +2486,9 @@ modifiers & _motif_SHIFT_MASK ? " shift" : "", message -> message == WM_KEYDOWN 
 			} else if ((modifiers & _motif_COMMAND_MASK) && ! (modifiers & _motif_OPTION_MASK)) {
 				if (MEMBER (me, Text) && (kar == 'X' || kar == 'C' || kar == 'V' || kar == 'Z')) {
 					;   // let window proc handle text editing
+				} else if (MEMBER (me, Text) && (kar == 'A' || kar == 'a')) {
+					Edit_SetSel (my window, 0, -1);
+					return;
 				} else if (kar >= 186) {
 					const int shift = modifiers & _motif_SHIFT_MASK;
 					/*
@@ -2516,11 +2519,14 @@ modifiers & _motif_SHIFT_MASK ? " shift" : "", message -> message == WM_KEYDOWN 
 		/* Not me or not my shell: let windowProc handle. */
 	} else if (message -> message == WM_CHAR) {
 		int kar = LOWORD (message -> wParam);
+		GuiObject me = (GuiObject) GetWindowLongPtr (message -> hwnd, GWLP_USERDATA);
+		if (me && MEMBER (me, Text) && kar == 1) {
+			return;   // swallow Ctrl+A in WM_CHAR
+		}
 		/*
 		 * Catch character messages to push buttons and toggle buttons:
 		 * divert them to a drawing area, if possible.
 		 */
-		GuiObject me = (GuiObject) GetWindowLongPtr (message -> hwnd, GWLP_USERDATA);
 		if (me && MEMBER2 (me, PushButton, ToggleButton)) {
 			GuiObject drawingArea = _motif_findDrawingArea (my shell);
 			if (drawingArea) {

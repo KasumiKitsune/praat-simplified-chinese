@@ -123,10 +123,13 @@ void structInterpreter :: v9_destroy () noexcept {
 	our Interpreter_Parent :: v9_destroy ();
 }
 
+bool theUntitledScriptsTrustedInThisSession = false;
+
 autoInterpreter Interpreter_createFromEnvironment (InterpreterStack interpreterStack, Editor optionalInterpreterOwningEditor, MelderFile optionalFile) {
 	Melder_assert (interpreterStack);
 	try {
 		autoInterpreter me = Thing_new (Interpreter);
+		my isTrusted = theUntitledScriptsTrustedInThisSession;
 		my owningInterpreterStack = interpreterStack;
 		if (optionalFile) {
 			MelderFile_copy (optionalFile, & my file);

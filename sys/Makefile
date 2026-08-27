@@ -2,7 +2,7 @@
 # Paul Boersma, 23 May 2026
 
 # -I ../sys is there because e.g. Graphics.cpp include fon/Function.h, which again includes something from sys
-CPPFLAGS += -I ../kar -I ../melder -I ../sys -I ../dwsys
+CPPFLAGS += -I ../kar -I ../melder -I ../sys -I ../dwsys -I ../stat -I ../fon
 
 OBJECTS = Thing.o Data.o Simple.o Collection.o Strings.o \
    Graphics.o Graphics_linesAndAreas.o Graphics_text.o Graphics_colour.o \

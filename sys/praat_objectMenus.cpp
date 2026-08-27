@@ -418,6 +418,21 @@ FORM (PRAAT__pythonSettings, U"Python settings", U"Python settings...") {
 	PRAAT_END
 }
 
+DIRECT (PRAAT__copyAgentPrompt) {
+	PRAAT
+		autostring32 prompt = praat_python_generateAgentPrompt ();
+		Gui_copyTextToClipboard (prompt.get());
+		MelderInfo_open ();
+		MelderInfo_write (praat_translate (
+			U"AI Agent prompt has been copied to clipboard!\n"
+			U"You can now paste (Ctrl+V) it directly into ChatGPT, Gemini, Deepseek, Doubao, etc.\n\n"
+			U"==================== Prompt Preview ====================\n\n"
+		));
+		MelderInfo_write (prompt.get());
+		MelderInfo_close ();
+	PRAAT_END
+}
+
 DIRECT (WINDOW_openPictureWindow) {
 	PRAAT
 		praat_picture_open ();
@@ -1132,6 +1147,8 @@ void praat_addMenus (GuiWindow window) {
 			PRAAT__newPythonScript);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Open Python script...", nullptr, GuiMenu_NO_API,
 			PRAAT__openPythonScript);
+	praat_addMenuCommand (U"Objects", U"Praat", U"Copy AI Agent prompt (for Python)...", nullptr, GuiMenu_NO_API,
+			PRAAT__copyAgentPrompt);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Python settings...", nullptr, GuiMenu_NO_API,
 			PRAAT__pythonSettings);
 	praat_addMenuCommand (U"Objects", U"Praat", U"Open Picture window", nullptr, GuiMenu_NO_API,

@@ -25,5 +25,6 @@ autostring32 praat_python_getApiDoc ();
 autostring32 praat_python_getExampleBatch ();
 autostring32 praat_python_getExampleTextGrid ();
 autostring32 praat_python_getExampleSound ();
+autostring32 praat_python_generateAgentPrompt ();
 
 #endif

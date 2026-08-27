@@ -52,7 +52,7 @@ GuiDialog GuiTrust_createDialog (GuiWindow optionalParent,
 	*/
 	int x = Gui_LEFT_DIALOG_SPACING, buttonWidth = DIALOG_WIDTH - x - Gui_RIGHT_DIALOG_SPACING;
 	GuiDialog me = GuiDialog_create (optionalParent, 150, 70, DIALOG_WIDTH, dialogHeight,
-			U"Praat Trust window: checking for security and safety", nullptr, nullptr, GuiDialog_Modality::BLOCKING);
+			praat_translate (U"Praat Trust window: checking for security and safety"), nullptr, nullptr, GuiDialog_Modality::BLOCKING);
 	/*
 		Add the labels.
 	*/

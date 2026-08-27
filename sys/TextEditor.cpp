@@ -451,6 +451,10 @@ static void menu_cb_paste (TextEditor me, EDITOR_ARGS) {
 	GuiText_paste (my textWidget);
 }
 
+static void menu_cb_selectAll (TextEditor me, EDITOR_ARGS) {
+	GuiText_setSelection (my textWidget, 0, 100000000);
+}
+
 static void menu_cb_erase (TextEditor me, EDITOR_ARGS) {
 	GuiText_remove (my textWidget);
 }
@@ -863,6 +867,7 @@ void structTextEditor :: v_createMenus () {
 	Editor_addCommand (this, U"Edit", U"Cut", 'X', menu_cb_cut);
 	Editor_addCommand (this, U"Edit", U"Copy", 'C', menu_cb_copy);
 	Editor_addCommand (this, U"Edit", U"Paste", 'V', menu_cb_paste);
+	Editor_addCommand (this, U"Edit", U"Select all", 'A', menu_cb_selectAll);
 	Editor_addCommand (this, U"Edit", U"Erase", 0, menu_cb_erase);
 	Editor_addCommand (this, U"Edit", U"-- layout --", 0, nullptr);
 	Editor_addCommand (this, U"Edit", U"Shift right", ']', menu_cb_shiftRight);

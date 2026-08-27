@@ -32,6 +32,7 @@
 #include "Script.h"
 #include "Notebook.h"
 #include "DemoEditor.h"
+#include "praat_translate.h"
 
 static Interpreter theInterpreter;
 static autoInterpreterStack theLocalInterpreterStack;
@@ -7668,32 +7669,34 @@ static void do_askForTrust () {
 		U"The function “askForTrust” should have no arguments.");
 	const Editor optionalTrustWindowOwningEditor = theInterpreter -> optionalDynamicEnvironmentEditor();
 	const GuiWindow parentShell = ( optionalTrustWindowOwningEditor ? optionalTrustWindowOwningEditor -> windowForm : theCurrentPraatApplication -> topShell );
-	const bool isAlreadyTrusted = theInterpreter -> scriptReference && theInterpreter -> scriptReference -> trusted;
+	const bool isAlreadyTrusted = (theInterpreter -> scriptReference && theInterpreter -> scriptReference -> trusted) ||
+	                              (theInterpreter -> notebookReference && theInterpreter -> notebookReference -> trusted) ||
+	                              theInterpreter -> isTrusted || theUntitledScriptsTrustedInThisSession;
 	if (! isAlreadyTrusted) {
 		conststring32 message [1+5] = { };
 		if (theInterpreter -> scriptReference) {
-			message [1] = U"The script";
+			message [1] = praat_translate (U"The script");
 			message [2] = Melder_cat (U"“", theInterpreter -> scriptReference -> string.get(), U"”");
 		} else if (theInterpreter -> notebookReference) {
-			message [1] = U"The notebook";
+			message [1] = praat_translate (U"The notebook");
 			message [2] = Melder_cat (U"“", theInterpreter -> notebookReference -> string.get(), U"”");
 		} else
-			message [1] =  U"Your untitled script or notebook";
-		message [3] = U"requests permission to control your computer (e.g. it may want to overwrite files,\n"
-				"delete folders, run system commands, and/or access the internet).";
-		message [4] = U"Allow this only if you fully trust the intentions and skills of the author(s),\n"
-				"AND the intentions and skills of the author(s) of the script(s) called by this script directly or indirectly.";
-		conststring32 option1 = U"CANCEL\n(because I don’t completely trust the authors’ skills and/or intentions)";
+			message [1] = praat_translate (U"Your untitled script or notebook");
+		message [3] = praat_translate (U"requests permission to control your computer (e.g. it may want to overwrite files,\n"
+				"delete folders, run system commands, and/or access the internet).");
+		message [4] = praat_translate (U"Allow this only if you fully trust the intentions and skills of the author(s),\n"
+				"AND the intentions and skills of the author(s) of the script(s) called by this script directly or indirectly.");
+		conststring32 option1 = praat_translate (U"CANCEL\n(because I don’t completely trust the authors’ skills and/or intentions)");
 		conststring32 option2 =
 			theInterpreter -> scriptReference ?
-				U"Yes, I allow this script to CONTROL MY COMPUTER, because I fully trust the skills and\n"
-				"intentions of its authors AND of those of the authors of any scripts called by it directly or indirectly."
+				praat_translate (U"Yes, I allow this script to CONTROL MY COMPUTER, because I fully trust the skills and\n"
+				"intentions of its authors AND of those of the authors of any scripts called by it directly or indirectly.")
 			: theInterpreter -> notebookReference ?
-				U"Yes, I allow this notebook to CONTROL MY COMPUTER, because I fully trust the skills and\n"
-				"intentions of its authors AND of those of the authors of any scripts called by it directly or indirectly."
+				praat_translate (U"Yes, I allow this notebook to CONTROL MY COMPUTER, because I fully trust the skills and\n"
+				"intentions of its authors AND of those of the authors of any scripts called by it directly or indirectly.")
 			:
-				U"Yes, I allow this script or notebook to CONTROL MY COMPUTER, because I fully trust the skills and\n"
-				"intentions of its authors AND of those of the authors of any scripts called by it directly or indirectly.";
+				praat_translate (U"Yes, I allow this script or notebook to CONTROL MY COMPUTER, because I fully trust the skills and\n"
+				"intentions of its authors AND of those of the authors of any scripts called by it directly or indirectly.");
 		const bool trusted = GuiTrust_get (parentShell, optionalTrustWindowOwningEditor,
 			message [1], message [2], message [3], message [4], message [5],
 			option1, option2, nullptr, nullptr, nullptr, theInterpreter
@@ -7703,6 +7706,9 @@ static void do_askForTrust () {
 				theInterpreter -> scriptReference -> trusted = true;
 			else if (theInterpreter -> notebookReference)
 				theInterpreter -> notebookReference -> trusted = true;
+			else
+				theUntitledScriptsTrustedInThisSession = true;
+			theInterpreter -> isTrusted = true;
 		}
 	}
 	pushNumber (1);

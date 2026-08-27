@@ -383,41 +383,56 @@ static void gui_trust (void *void_interpreter, conststring32 action) {
 	if (interpreter) {
 		Script script = interpreter -> scriptReference;
 		Notebook notebook = interpreter -> notebookReference;
-		if (script && script -> trusted || notebook && notebook -> trusted)
+		if (script && script -> trusted || notebook && notebook -> trusted || interpreter -> isTrusted || theUntitledScriptsTrustedInThisSession)
 			return;   // the request should be granted
 		if (Melder_appVersion() < 7000)
 			return;   // no trust checking before Praat 7.0
 		conststring32 paragraphs [1+5] = { };
 		if (script) {
-			paragraphs [1] = U"The script";
+			paragraphs [1] = praat_translate (U"The script");
 			paragraphs [2] = Melder_cat (U"“", script -> string.get(), U"”");
 		} else if (notebook) {
-			paragraphs [1] = U"The notebook";
+			paragraphs [1] = praat_translate (U"The notebook");
 			paragraphs [2] = Melder_cat (U"“", notebook -> string.get(), U"”");
 		} else
-			paragraphs [1] =  U"Your untitled script or notebook";
-		paragraphs [3] = U"requests permission to:";
-		paragraphs [4] = action;
-		conststring32 option1 = U"CANCEL\n(because I don’t want the requested action to happen)";
+			paragraphs [1] = praat_translate (U"Your untitled script or notebook");
+		paragraphs [3] = praat_translate (U"requests permission to:");
+		autoMelderString translatedAction;
+		if (action) {
+			const char32 *newlinePos = str32chr (action, U'\n');
+			if (newlinePos) {
+				autoMelderString firstLine;
+				for (const char32 *p = action; p < newlinePos; p ++)
+					MelderString_appendCharacter (& firstLine, *p);
+				conststring32 translatedFirstLine = praat_translate (firstLine.string);
+				MelderString_append (& translatedAction, translatedFirstLine, newlinePos);
+				paragraphs [4] = translatedAction.string;
+			} else {
+				paragraphs [4] = praat_translate (action);
+			}
+		} else {
+			paragraphs [4] = nullptr;
+		}
+		conststring32 option1 = praat_translate (U"CANCEL\n(because I don’t want the requested action to happen)");
 		conststring32 option2 =
 			script ?
-				U"Yes, I allow this script to perform the action that it requests\n(and ask me again next time)"
+				praat_translate (U"Yes, I allow this script to perform the action that it requests\n(and ask me again next time)")
 			: notebook ?
-				U"Yes, I allow this notebook to perform the action that it requests\n(and ask me again next time)"
+				praat_translate (U"Yes, I allow this notebook to perform the action that it requests\n(and ask me again next time)")
 			:
-				U"Yes, I allow this script or notebook to perform the action that it requests\n(and ask me again next time)";
+				praat_translate (U"Yes, I allow this script or notebook to perform the action that it requests\n(and ask me again next time)");
 		conststring32 option3 =
 			script ?
-				U"Yes, and I even allow this script to CONTROL MY COMPUTER from now on (i.e. to perform any action,\n"
+				praat_translate (U"Yes, and I even allow this script to CONTROL MY COMPUTER from now on (i.e. to perform any action,\n"
 				"including saving, deleting, calling system commands, and internetting), because I FULLY TRUST\n"
-				"the skills and intentions of the authors of the script AND of all the scripts called by it."
+				"the skills and intentions of the authors of the script AND of all the scripts called by it.")
 			: notebook ?
-				U"Yes, and I even allow this notebook to CONTROL MY COMPUTER from now on (i.e. to perform any action,\n"
+				praat_translate (U"Yes, and I even allow this notebook to CONTROL MY COMPUTER from now on (i.e. to perform any action,\n"
 				"including saving, deleting, calling system commands, and internetting), because I FULLY TRUST\n"
-				"the skills and intentions of the authors of the notebook AND of all the scripts and notebooks called by it."
+				"the skills and intentions of the authors of the notebook AND of all the scripts and notebooks called by it.")
 			:
-				U"(The option to allow this script or notebook to control your computer will be available\n"
-				"after you save the script or notebook. Until then, clicking here will allow only this one action.)";
+				praat_translate (U"Yes, trust this script or notebook for this session\n"
+				"(allow all actions without asking again during this session)");
 		const integer buttonClicked = GuiTrust_get (nullptr, nullptr,
 			paragraphs [1], paragraphs [2], paragraphs [3], paragraphs [4], paragraphs [5],
 			option1, option2, option3, nullptr, nullptr, interpreter
@@ -429,6 +444,9 @@ static void gui_trust (void *void_interpreter, conststring32 action) {
 			script -> trusted = true;
 		else if (notebook)
 			notebook -> trusted = true;
+		else
+			theUntitledScriptsTrustedInThisSession = true;
+		interpreter -> isTrusted = true;
 	}
 }
 

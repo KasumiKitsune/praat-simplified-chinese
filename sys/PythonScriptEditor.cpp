@@ -81,6 +81,19 @@ static void menu_cb_exampleSound (PythonScriptEditor me, EDITOR_ARGS) {
 	GuiText_setString (my textWidget, praat_python_getExampleSound ().get());
 }
 
+static void menu_cb_copyAgentPrompt (PythonScriptEditor /* me */, EDITOR_ARGS) {
+	autostring32 prompt = praat_python_generateAgentPrompt ();
+	Gui_copyTextToClipboard (prompt.get());
+	MelderInfo_open ();
+	MelderInfo_write (praat_translate (
+		U"AI Agent prompt has been copied to clipboard!\n"
+		U"You can now paste (Ctrl+V) it directly into ChatGPT, Gemini, Deepseek, Doubao, etc.\n\n"
+		U"==================== Prompt Preview ====================\n\n"
+	));
+	MelderInfo_write (prompt.get());
+	MelderInfo_close ();
+}
+
 void structPythonScriptEditor :: v_nameChanged () {
 	const bool dirtinessAlreadyShown = GuiWindow_setDirty (our windowForm, our dirty);
 	static MelderString buffer;
@@ -95,6 +108,8 @@ void structPythonScriptEditor :: v_createMenus () {
 	Editor_addMenu (this, U"Run", 0);
 	Editor_addCommand (this, U"Run", U"Run", 'R', menu_cb_run);
 	Editor_addCommand (this, U"Run", U"Run selection", 'T', menu_cb_runSelection);
+	Editor_addCommand (this, U"Run", U"-- agent --", 0, nullptr);
+	Editor_addCommand (this, U"Run", U"Copy AI Agent prompt...", 0, menu_cb_copyAgentPrompt);
 	Editor_addCommand (this, U"Run", U"-- template --", 0, nullptr);
 	Editor_addCommand (this, U"Run", U"Insert Praat Python template", 0, menu_cb_insertTemplate);
 	Editor_addCommand (this, U"Run", U"-- settings --", 0, nullptr);
@@ -103,6 +118,8 @@ void structPythonScriptEditor :: v_createMenus () {
 
 void structPythonScriptEditor :: v_createMenuItems_help (EditorMenu menu) {
 	PythonScriptEditor_Parent :: v_createMenuItems_help (menu);
+	EditorMenu_addCommand (menu, U"-- agent help --", 0, nullptr);
+	EditorMenu_addCommand (menu, U"Copy AI Agent prompt (for Python)", 0, menu_cb_copyAgentPrompt);
 	EditorMenu_addCommand (menu, U"-- python help --", 0, nullptr);
 	EditorMenu_addCommand (menu, U"Python scripting tutorial", 0, menu_cb_tutorial);
 	EditorMenu_addCommand (menu, U"Praat Python API reference", 0, menu_cb_apiRef);

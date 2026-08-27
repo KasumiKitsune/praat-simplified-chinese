@@ -35,6 +35,58 @@ def to_cpp_unicode_literal(s):
 
 # 1. Exact string mappings for critical GUI items
 EXACT_MAP = {
+    # Text editing
+    "Select all": "全选",
+
+    # AI Agent prompt generator
+    "Copy AI Agent prompt (for Python)...": "复制 AI 提示词 (写 Python 脚本)...",
+    "Copy AI Agent prompt (for Python)": "复制 AI 提示词 (写 Python 脚本)",
+    "Copy AI Agent prompt...": "复制 AI 提示词...",
+    "AI Agent prompt has been copied to clipboard!\nYou can now paste (Ctrl+V) it directly into ChatGPT, Gemini, Deepseek, Doubao, etc.\n\n==================== Prompt Preview ====================\n\n": "AI 提示词已成功复制到剪贴板！\n您现在可以直接粘贴 (Ctrl+V) 给 ChatGPT、Gemini、Deepseek、豆包 等 AI 助手。\n\n==================== 提示词内容预览 ====================\n\n",
+    "AI Agent prompt has been copied to clipboard!\nYou can now paste (Ctrl+V) it directly into ChatGPT, Claude, Gemini, Cursor, etc.": "AI 提示词已成功复制到剪贴板！\n您现在可以直接粘贴 (Ctrl+V) 给 ChatGPT、Gemini、Deepseek、豆包 等 AI 助手。",
+
+    # Security trust dialog (GuiTrust, Gui_messages, Formula)
+    "Praat Trust window: checking for security and safety": "Praat 安全信任窗口：检查安全性",
+    "The script": "脚本",
+    "The notebook": "笔记",
+    "Your untitled script or notebook": "您未命名的脚本或笔记",
+    "requests permission to:": "请求执行以下操作的权限：",
+    "requests permission to control your computer (e.g. it may want to overwrite files,\ndelete folders, run system commands, and/or access the internet).": "请求获得控制计算机的权限（例如覆盖文件、删除文件夹、运行系统命令或访问网络）。",
+    "Allow this only if you fully trust the intentions and skills of the author(s),\nAND the intentions and skills of the author(s) of the script(s) called by this script directly or indirectly.": "仅在您完全信任该脚本作者的意图与技术，以及该脚本直接或间接调用的所有脚本作者的意图与技术时才允许执行。",
+    "save the selected Sound object(s) to the WAV file": "将选中的 Sound 对象保存为 WAV 文件",
+    "save the selected LongSound object(s) to the WAV file": "将选中的 LongSound 对象保存为 WAV 文件",
+    "save the selected Sound and LongSound object(s) to the WAV file": "将选中的声音与长音频对象保存为 WAV 文件",
+    "save the selected Sound object(s) to the AIFF file": "将选中的 Sound 对象保存为 AIFF 文件",
+    "save the selected Sound object(s) to the AIFC file": "将选中的 Sound 对象保存为 AIFC 文件",
+    "save the selected Sound object(s) to the FLAC file": "将选中的 Sound 对象保存为 FLAC 文件",
+    "save the selected Sound object(s) to the NeXT/Sun file": "将选中的 Sound 对象保存为 NeXT/Sun 文件",
+    "save the selected Sound object(s) to the NIST file": "将选中的 Sound 对象保存为 NIST 文件",
+    "save the selected Sound object(s) to the 24-bit WAV file": "将选中的 Sound 对象保存为 24 位 WAV 文件",
+    "save the selected Sound object(s) to the 32-bit WAV file": "将选中的 Sound 对象保存为 32 位 WAV 文件",
+    "save some text to the file": "保存文本至文件",
+    "save a line of text to the file": "保存一行文本至文件",
+    "append some text to the file": "追加文本至文件",
+    "append a line of text to the file": "追加一行文本至文件",
+    "try to write to the file": "尝试写入文件",
+    "try to append to the file": "尝试追加到文件",
+    "delete the file": "删除文件",
+    "move or rename the file": "移动或重命名文件",
+    "create the folder": "创建文件夹",
+    "create the directory": "创建目录",
+    "run the system command:": "运行系统命令：",
+    "run the subprocess command:": "运行子进程命令：",
+    "CANCEL\n(because I don’t want the requested action to happen)": "CANCEL\n(取消：我不希望执行请求的操作)",
+    "CANCEL\n(because I don’t completely trust the authors’ skills and/or intentions)": "CANCEL\n(取消：我不完全信任作者的技术和/或意图)",
+    "Yes, I allow this script to perform the action that it requests\n(and ask me again next time)": "是，允许该脚本执行请求的操作\n(下次再次询问我)",
+    "Yes, I allow this notebook to perform the action that it requests\n(and ask me again next time)": "是，允许该笔记执行请求的操作\n(下次再次询问我)",
+    "Yes, I allow this script or notebook to perform the action that it requests\n(and ask me again next time)": "是，允许该脚本或笔记执行请求的操作\n(下次再次询问我)",
+    "Yes, and I even allow this script to CONTROL MY COMPUTER from now on (i.e. to perform any action,\nincluding saving, deleting, calling system commands, and internetting), because I FULLY TRUST\nthe skills and intentions of the authors of the script AND of all the scripts called by it.": "是，从此信任并允许该脚本完全控制（包括保存、删除、调用系统命令等，后续不再提示）",
+    "Yes, and I even allow this notebook to CONTROL MY COMPUTER from now on (i.e. to perform any action,\nincluding saving, deleting, calling system commands, and internetting), because I FULLY TRUST\nthe skills and intentions of the authors of the notebook AND of all the scripts and notebooks called by it.": "是，从此信任并允许该笔记完全控制（包括保存、删除、调用系统命令等，后续不再提示）",
+    "Yes, trust this script or notebook for this session\n(allow all actions without asking again during this session)": "是，在本次会话中信任此脚本或笔记\n(允许所有操作，后续不再弹窗提示)",
+    "Yes, I allow this script to CONTROL MY COMPUTER, because I fully trust the skills and\nintentions of its authors AND of those of the authors of any scripts called by it directly or indirectly.": "是，允许该脚本完全控制（包括保存、删除、调用系统命令等，后续不再提示）",
+    "Yes, I allow this notebook to CONTROL MY COMPUTER, because I fully trust the skills and\nintentions of its authors AND of those of the authors of any scripts called by it directly or indirectly.": "是，允许该笔记完全控制（包括保存、删除、调用系统命令等，后续不再提示）",
+    "Yes, I allow this script or notebook to CONTROL MY COMPUTER, because I fully trust the skills and\nintentions of its authors AND of those of the authors of any scripts called by it directly or indirectly.": "是，允许该脚本或笔记完全控制（包括保存、删除、调用系统命令等，后续不再提示）",
+
     # Context menus in TextGridArea.cpp
     "- Modify tier:": "- 修改层：",
     "- Extract to list of objects:": "- 提取至对象列表：",
