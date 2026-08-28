@@ -38,6 +38,16 @@ EXACT_MAP = {
     # Text editing
     "Select all": "全选",
 
+    # Quit confirmation dialog & project saving
+    "Save Project (.praat)": "保存工程 (.praat)",
+    "Quit Application": "退出程序",
+    "Save workspace as .praat file": "保存工程为 .praat 文件",
+
+    # SoundRecorder channel switcher
+    "Channels:": "声道：",
+    "Mono": "单声道",
+    "Stereo": "双声道",
+
     # AI Agent prompt generator
     "Copy AI Agent prompt (for Python)...": "复制 AI 提示词 (写 Python 脚本)...",
     "Copy AI Agent prompt (for Python)": "复制 AI 提示词 (写 Python 脚本)",

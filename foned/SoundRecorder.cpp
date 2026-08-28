@@ -1185,6 +1185,65 @@ static void gui_radiobutton_cb_fsamp (SoundRecorder me, GuiRadioButtonEvent even
 	}
 }
 
+static void gui_radiobutton_cb_channels (SoundRecorder me, GuiRadioButtonEvent event) {
+	if (my recording)
+		return;
+	try {
+		const int requestedChannels = ( event -> toggle == my stereoButton ? 2 : 1 );
+		if (requestedChannels == my numberOfChannels)
+			return;
+
+		my numberOfChannels = requestedChannels;
+
+		if (my inputUsesPortAudio) {
+			closePortAudioStream (me);
+		} else {
+			#if defined (_WIN32)
+				// deferred to the start of recording
+			#elif defined (macintosh)
+				initialize (me);
+			#elif defined (linux) && ! defined (NO_AUDIO)
+				close (my fd);
+				initialize (me);
+			#endif
+		}
+
+		autoMelderString title;
+		MelderString_copy (& title, U"SoundRecorder (", ( my numberOfChannels == 1 ? U"mono" : U"stereo" ), U")");
+		Thing_setName (me, title.string);
+		if (my windowForm)
+			GuiShell_setTitle (my windowForm, title.string);
+
+		integer nmax_bytes_pref = preferences.bufferSizeInMegabytes * 1000000;
+		integer nmax_bytes = ( my inputUsesPortAudio ? nmax_bytes_pref :
+			#if defined (_WIN32)
+				66150000
+			#else
+				nmax_bytes_pref
+			#endif
+		);
+		my nmax = nmax_bytes / (sizeof (short) * my numberOfChannels);
+		my nsamp = 0;
+		my firstSample = 0;
+		my lastSample = 0;
+		my lastLeftMaximum = 0;
+		my lastRightMaximum = 0;
+		try {
+			my recordBuffer = newvectorzero <short> (my nmax * my numberOfChannels);
+		} catch (MelderError) {
+			Melder_clearError ();
+		}
+
+		showMeter (me, nullptr, 0);
+		if (my monoButton && my numberOfChannels == 1)
+			GuiRadioButton_set (my monoButton);
+		if (my stereoButton && my numberOfChannels == 2)
+			GuiRadioButton_set (my stereoButton);
+	} catch (MelderError) {
+		Melder_flushError ();
+	}
+}
+
 static void gui_drawingarea_cb_expose (SoundRecorder me, GuiDrawingArea_ExposeEvent /* event */) {
 	if (! my graphics)
 		return;   // could be the case in the very beginning
@@ -1258,6 +1317,24 @@ void structSoundRecorder :: v_createChildren ()
 			);
 		}
 	}
+	GuiRadioGroup_end ();
+
+	/*
+		Channels (Right bottom).
+	*/
+	y += Gui_RADIOBUTTON_HEIGHT + 14;
+	GuiLabel_createShown (our windowForm, -160, -10, y, y + Gui_LABEL_HEIGHT, U"Channels:", 0);
+	GuiRadioGroup_begin ();
+	y += Gui_RADIOBUTTON_HEIGHT + Gui_RADIOBUTTON_SPACING;
+	our monoButton = GuiRadioButton_createShown (our windowForm,
+		-150, -10, y, y + Gui_RADIOBUTTON_HEIGHT,
+		U"Mono", gui_radiobutton_cb_channels, this, our numberOfChannels == 1 ? GuiRadioButton_SET : 0
+	);
+	y += Gui_RADIOBUTTON_HEIGHT + Gui_RADIOBUTTON_SPACING;
+	our stereoButton = GuiRadioButton_createShown (our windowForm,
+		-150, -10, y, y + Gui_RADIOBUTTON_HEIGHT,
+		U"Stereo", gui_radiobutton_cb_channels, this, our numberOfChannels == 2 ? GuiRadioButton_SET : 0
+	);
 	GuiRadioGroup_end ();
 
 	GuiLabel_createShown (our windowForm, 10, 130, -128, -108, U"Buffer usage:", 0);
