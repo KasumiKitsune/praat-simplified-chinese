@@ -98,13 +98,13 @@ constexpr bool theCommandKeyIsToTheLeftOfTheOptionKey =
 #define Gui_LABEL_HEIGHT  16
 #define Gui_RADIOBUTTON_HEIGHT  18
 #define Gui_RADIOBUTTON_SPACING  8
-#define Gui_CHECKBUTTON_HEIGHT  20
+#define Gui_CHECKBUTTON_HEIGHT  22
 #define Gui_LABEL_SPACING  8
-#define Gui_OPTIONMENU_HEIGHT  20
+#define Gui_OPTIONMENU_HEIGHT  26
 #define Gui_PUSHBUTTON_HEIGHT  Machine_getButtonHeight ()
-#define Gui_OK_BUTTON_WIDTH  69
-#define Gui_CANCEL_BUTTON_WIDTH  69
-#define Gui_APPLY_BUTTON_WIDTH  69
+#define Gui_OK_BUTTON_WIDTH  76
+#define Gui_CANCEL_BUTTON_WIDTH  76
+#define Gui_APPLY_BUTTON_WIDTH  76
 
 #define Gui_HOMOGENEOUS  1
 

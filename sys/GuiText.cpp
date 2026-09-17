@@ -659,6 +659,136 @@ void _GuiText_exit () {
 	@end
 #endif
 
+#if motif
+	static LRESULT CALLBACK _ModernEditSubclassProc (
+		HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData
+	) {
+		bool isScrolled = (dwRefData & GuiText_SCROLLED) != 0;
+		switch (uMsg) {
+			case WM_MOUSEMOVE: {
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof (TRACKMOUSEEVENT);
+				tme.dwFlags = TME_LEAVE;
+				tme.hwndTrack = hwnd;
+				tme.dwHoverTime = 0;
+				TrackMouseEvent (& tme);
+
+				if (! GetPropW (hwnd, L"PraatHover")) {
+					SetPropW (hwnd, L"PraatHover", (HANDLE) 1);
+					RedrawWindow (hwnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE);
+				}
+				break;
+			}
+			case WM_MOUSELEAVE: {
+				if (GetPropW (hwnd, L"PraatHover")) {
+					RemovePropW (hwnd, L"PraatHover");
+					RedrawWindow (hwnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE);
+				}
+				break;
+			}
+			case WM_SETFOCUS:
+			case WM_KILLFOCUS:
+			case WM_ENABLE: {
+				LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, lParam);
+				RedrawWindow (hwnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE);
+				return res;
+			}
+			case WM_SIZE: {
+				LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, lParam);
+				if (! isScrolled) {
+					RECT rc;
+					GetClientRect (hwnd, & rc);
+					if (rc.right > 12 && rc.bottom > 8) {
+						rc.left += 6;
+						rc.right -= 6;
+						rc.top += 4;
+						rc.bottom -= 2;
+						SendMessage (hwnd, EM_SETRECT, 0, (LPARAM) & rc);
+					}
+				}
+				return res;
+			}
+			case WM_NCPAINT: {
+				HDC hdc = GetWindowDC (hwnd);
+				if (! hdc)
+					break;
+
+				RECT rcWin;
+				GetWindowRect (hwnd, & rcWin);
+				OffsetRect (& rcWin, -rcWin.left, -rcWin.top);
+
+				bool isEnabled = IsWindowEnabled (hwnd);
+				bool isFocus   = (GetFocus () == hwnd) && isEnabled;
+				bool isHover   = (GetPropW (hwnd, L"PraatHover") != nullptr) && isEnabled;
+
+				COLORREF borderCol;
+				if (! isEnabled)
+					borderCol = RGB (226, 232, 240);   // #E2E8F0
+				else if (isFocus)
+					borderCol = RGB (0, 103, 192);     // #0067C0 Win11 Fluent Blue
+				else if (isHover)
+					borderCol = RGB (148, 163, 184);   // #94A3B8 Slate-400
+				else
+					borderCol = RGB (209, 213, 219);   // #D1D5DB Neutral Gray-300
+
+				HPEN hPen = CreatePen (PS_SOLID, 1, borderCol);
+				HPEN oldPen = (HPEN) SelectObject (hdc, hPen);
+				HBRUSH oldBrush = (HBRUSH) SelectObject (hdc, GetStockObject (NULL_BRUSH));
+
+				if (! isScrolled) {
+					RoundRect (hdc, rcWin.left, rcWin.top, rcWin.right, rcWin.bottom, 6, 6);
+
+					// If focused, draw modern 2px accent underline
+					if (isFocus && rcWin.bottom > 4) {
+						HPEN hAccentPen = CreatePen (PS_SOLID, 2, RGB (0, 103, 192));
+						SelectObject (hdc, hAccentPen);
+						MoveToEx (hdc, rcWin.left + 2, rcWin.bottom - 1, nullptr);
+						LineTo (hdc, rcWin.right - 2, rcWin.bottom - 1);
+						SelectObject (hdc, oldPen);
+						DeleteObject (hAccentPen);
+					}
+				} else {
+					// Scrolled editor: sleek crisp 1px rectangle border
+					Rectangle (hdc, rcWin.left, rcWin.top, rcWin.right, rcWin.bottom);
+				}
+
+				SelectObject (hdc, oldPen);
+				SelectObject (hdc, oldBrush);
+				DeleteObject (hPen);
+				ReleaseDC (hwnd, hdc);
+				return 0;
+			}
+			case WM_NCDESTROY: {
+				RemovePropW (hwnd, L"PraatHover");
+				RemoveWindowSubclass (hwnd, _ModernEditSubclassProc, uIdSubclass);
+				break;
+			}
+			default: break;
+		}
+		return DefSubclassProc (hwnd, uMsg, wParam, lParam);
+	}
+
+	void _GuiWin_subclassModernEdit (HWND hwnd, uint32 flags) {
+		if (! hwnd)
+			return;
+		bool isScrolled = (flags & GuiText_SCROLLED) != 0;
+		if (! isScrolled) {
+			SendMessage (hwnd, EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, MAKELPARAM (6, 6));
+			RECT rc;
+			GetClientRect (hwnd, & rc);
+			if (rc.right > 12 && rc.bottom > 8) {
+				rc.left += 6;
+				rc.right -= 6;
+				rc.top += 4;
+				rc.bottom -= 2;
+				SendMessage (hwnd, EM_SETRECT, 0, (LPARAM) & rc);
+			}
+		}
+		SetWindowSubclass (hwnd, _ModernEditSubclassProc, 2, (DWORD_PTR) flags);
+	}
+#endif
+
 GuiText GuiText_create (GuiForm parent, int left, int right, int top, int bottom, uint32 flags) {
 	autoGuiText me = Thing_new (GuiText);
 	my d_shell = parent -> d_shell;
@@ -776,6 +906,7 @@ GuiText GuiText_create (GuiForm parent, int left, int right, int top, int bottom
 		}
 		SetWindowFont (my d_widget -> window, (flags & GuiText_SCROLLED) ? font12 : theWinGuiNormalLabelFont (), false);
 		Edit_LimitText (my d_widget -> window, 0);
+		_GuiWin_subclassModernEdit (my d_widget -> window, flags);
 		my v_positionInForm (my d_widget, left, right, top, bottom, parent);
 		/*
 			The first created text widget shall attract the input focus.

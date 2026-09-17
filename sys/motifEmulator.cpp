@@ -2916,6 +2916,14 @@ static HBRUSH on_ctlColorEdit (HWND window, HDC hdc, HWND controlWindow, int typ
 	if (parent) {
 		GuiObject control = (GuiObject) GetWindowLongPtr (controlWindow, GWLP_USERDATA);
 		if (control) {
+			if (! IsWindowEnabled (controlWindow)) {
+				SetTextColor (hdc, RGB (156, 163, 175));
+				SetBkColor (hdc, RGB (248, 249, 250));
+				static HBRUSH disabledBrush;
+				if (! disabledBrush)
+					disabledBrush = CreateSolidBrush (RGB (248, 249, 250));
+				return disabledBrush;
+			}
 			SetTextColor (hdc, RGB (17, 24, 39));
 			SetBkColor (hdc, RGB (255, 255, 255));
 			static HBRUSH whiteBrush;

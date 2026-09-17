@@ -86,32 +86,136 @@ Thing_implement (GuiButton, GuiControl, 0);
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData
 	) {
 		switch (uMsg) {
+			case WM_LBUTTONDOWN: {
+				SetCapture (hwnd);
+				SetFocus (hwnd);
+				SetPropW (hwnd, L"PraatPressed", (HANDLE) 1);
+				SetPropW (hwnd, L"PraatHover", (HANDLE) 1);
+				InvalidateRect (hwnd, nullptr, FALSE);
+				UpdateWindow (hwnd);
+				return 0;
+			}
 			case WM_MOUSEMOVE: {
-				TRACKMOUSEEVENT tme;
-				tme.cbSize = sizeof (TRACKMOUSEEVENT);
-				tme.dwFlags = TME_LEAVE;
-				tme.hwndTrack = hwnd;
-				tme.dwHoverTime = 0;
-				TrackMouseEvent (& tme);
+				POINT pt = { GET_X_LPARAM (lParam), GET_Y_LPARAM (lParam) };
+				RECT rc;
+				GetClientRect (hwnd, & rc);
+				bool isCaptured = (GetCapture () == hwnd);
 
-				if (! GetPropW (hwnd, L"PraatHover")) {
-					SetPropW (hwnd, L"PraatHover", (HANDLE) 1);
+				if (isCaptured) {
+					bool inside = PtInRect (& rc, pt);
+					bool wasPressed = (GetPropW (hwnd, L"PraatPressed") != nullptr);
+					if (inside != wasPressed) {
+						if (inside)
+							SetPropW (hwnd, L"PraatPressed", (HANDLE) 1);
+						else
+							RemovePropW (hwnd, L"PraatPressed");
+						InvalidateRect (hwnd, nullptr, FALSE);
+						UpdateWindow (hwnd);
+					}
+				} else {
+					TRACKMOUSEEVENT tme;
+					tme.cbSize = sizeof (TRACKMOUSEEVENT);
+					tme.dwFlags = TME_LEAVE;
+					tme.hwndTrack = hwnd;
+					tme.dwHoverTime = 0;
+					TrackMouseEvent (& tme);
+
+					if (! GetPropW (hwnd, L"PraatHover")) {
+						SetPropW (hwnd, L"PraatHover", (HANDLE) 1);
+						InvalidateRect (hwnd, nullptr, FALSE);
+					}
+				}
+				return 0;
+			}
+			case WM_MOUSELEAVE: {
+				if (GetCapture () != hwnd) {
+					if (GetPropW (hwnd, L"PraatHover")) {
+						RemovePropW (hwnd, L"PraatHover");
+						InvalidateRect (hwnd, nullptr, FALSE);
+					}
+				}
+				return 0;
+			}
+			case WM_LBUTTONUP: {
+				bool isCaptured = (GetCapture () == hwnd);
+				if (isCaptured) {
+					ReleaseCapture ();
+					bool wasPressed = (GetPropW (hwnd, L"PraatPressed") != nullptr);
+					RemovePropW (hwnd, L"PraatPressed");
+					POINT pt = { GET_X_LPARAM (lParam), GET_Y_LPARAM (lParam) };
+					RECT rc;
+					GetClientRect (hwnd, & rc);
+					bool inside = PtInRect (& rc, pt);
+					if (! inside)
+						RemovePropW (hwnd, L"PraatHover");
 					InvalidateRect (hwnd, nullptr, FALSE);
+					UpdateWindow (hwnd);
+
+					if (inside && wasPressed) {
+						HWND hParent = GetParent (hwnd);
+						UINT id = (UINT) GetWindowLongPtr (hwnd, GWLP_ID);
+						SendMessageW (hParent, WM_COMMAND, MAKEWPARAM (id, BN_CLICKED), (LPARAM) hwnd);
+					}
+				}
+				return 0;
+			}
+			case WM_CAPTURECHANGED: {
+				if (GetPropW (hwnd, L"PraatPressed")) {
+					RemovePropW (hwnd, L"PraatPressed");
+					InvalidateRect (hwnd, nullptr, FALSE);
+				}
+				return 0;
+			}
+			case WM_KEYDOWN: {
+				if (wParam == VK_SPACE) {
+					if (! GetPropW (hwnd, L"PraatPressed")) {
+						SetPropW (hwnd, L"PraatPressed", (HANDLE) 1);
+						InvalidateRect (hwnd, nullptr, FALSE);
+					}
+					return 0;
 				}
 				break;
 			}
-			case WM_MOUSELEAVE: {
-				if (GetPropW (hwnd, L"PraatHover")) {
-					RemovePropW (hwnd, L"PraatHover");
-					InvalidateRect (hwnd, nullptr, FALSE);
+			case WM_KEYUP: {
+				if (wParam == VK_SPACE) {
+					if (GetPropW (hwnd, L"PraatPressed")) {
+						RemovePropW (hwnd, L"PraatPressed");
+						InvalidateRect (hwnd, nullptr, FALSE);
+						HWND hParent = GetParent (hwnd);
+						UINT id = (UINT) GetWindowLongPtr (hwnd, GWLP_ID);
+						SendMessageW (hParent, WM_COMMAND, MAKEWPARAM (id, BN_CLICKED), (LPARAM) hwnd);
+					}
+					return 0;
 				}
 				break;
+			}
+			case BM_CLICK: {
+				HWND hParent = GetParent (hwnd);
+				UINT id = (UINT) GetWindowLongPtr (hwnd, GWLP_ID);
+				SendMessageW (hParent, WM_COMMAND, MAKEWPARAM (id, BN_CLICKED), (LPARAM) hwnd);
+				return 0;
+			}
+			case BM_SETSTATE: {
+				if (wParam)
+					SetPropW (hwnd, L"PraatPressed", (HANDLE) 1);
+				else
+					RemovePropW (hwnd, L"PraatPressed");
+				InvalidateRect (hwnd, nullptr, FALSE);
+				return 0;
+			}
+			case BM_GETSTATE: {
+				LRESULT res = 0;
+				if (GetPropW (hwnd, L"PraatPressed"))
+					res |= BST_PUSHED;
+				if (GetFocus () == hwnd)
+					res |= BST_FOCUS;
+				return res;
 			}
 			case WM_SETFOCUS:
 			case WM_KILLFOCUS:
 			case WM_ENABLE:
 				InvalidateRect (hwnd, nullptr, FALSE);
-				break;
+				return DefSubclassProc (hwnd, uMsg, wParam, lParam);
 
 			case WM_ERASEBKGND:
 				return 1;   // Double-buffered in WM_PAINT to prevent flicker
@@ -138,7 +242,7 @@ Thing_implement (GuiButton, GuiControl, 0);
 				FillRect (memDC, & rc, theWinGuiBackgroundBrush ());
 
 				bool isEnabled = IsWindowEnabled (hwnd);
-				bool isPressed = (SendMessage (hwnd, BM_GETSTATE, 0, 0) & BST_PUSHED) != 0;
+				bool isPressed = (GetPropW (hwnd, L"PraatPressed") != nullptr) && isEnabled;
 				bool isHovered = (GetPropW (hwnd, L"PraatHover") != nullptr) && isEnabled;
 				bool isFocus   = (GetFocus () == hwnd) && isEnabled;
 				bool isDefault = (dwRefData & (GuiButton_DEFAULT | GuiButton_ATTRACTIVE)) != 0;
@@ -254,6 +358,7 @@ Thing_implement (GuiButton, GuiControl, 0);
 
 			case WM_NCDESTROY: {
 				RemovePropW (hwnd, L"PraatHover");
+				RemovePropW (hwnd, L"PraatPressed");
 				RemoveWindowSubclass (hwnd, _ModernButtonSubclassProc, uIdSubclass);
 				break;
 			}

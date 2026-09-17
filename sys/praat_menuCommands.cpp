@@ -435,7 +435,7 @@ void praat_addFixedButtonCommand_ (GuiForm parent, conststring32 title, UiCallba
 	if (theCurrentPraatApplication -> batch) {
 		my button = nullptr;
 	} else {
-		GuiThing button = my button = GuiButton_create (parent, x, x + 82, -y - Gui_PUSHBUTTON_HEIGHT, -y,
+		GuiThing button = my button = GuiButton_create (parent, x, x + 86, -y - Gui_PUSHBUTTON_HEIGHT, -y,
 			title, gui_button_cb_menu, me.get(), 0);
 		GuiThing_setSensitive (button, false);
 		GuiThing_show (button);

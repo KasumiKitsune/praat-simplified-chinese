@@ -985,13 +985,13 @@ void praat_show () {
 /********** Menu descriptions. **********/
 
 void praat_addFixedButtons (GuiWindow window) {
-	praat_addFixedButtonCommand (window, U"Rename...", MODIFY_Rename, 8, 70);
-	praat_addFixedButtonCommand (window, U"Copy...", NEW1_Copy, 98, 70);
+	praat_addFixedButtonCommand (window, U"Rename...", MODIFY_Rename, 8, 76);
+	praat_addFixedButtonCommand (window, U"Copy...", NEW1_Copy, 98, 76);
 	praat_addFixedButtonCommand (window, U"Inspect",
-			PRAAT__Inspect, 8, 40);
-	praat_addFixedButtonCommand (window, U"Info", INFO_Info, 98, 40);
-	praat_addFixedButtonCommand (window, U"Remove", PRAAT_Remove, 8, 10);
-	praat_addFixedButtonCommand (window, U"Bilingual", PRAAT__BilingualTable, 98, 10);
+			PRAAT__Inspect, 8, 42);
+	praat_addFixedButtonCommand (window, U"Info", INFO_Info, 98, 42);
+	praat_addFixedButtonCommand (window, U"Remove", PRAAT_Remove, 8, 8);
+	praat_addFixedButtonCommand (window, U"Bilingual", PRAAT__BilingualTable, 98, 8);
 	praat_sensitivizeFixedButtonCommand (U"Bilingual", true);
 }
 

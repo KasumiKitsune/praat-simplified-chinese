@@ -40,6 +40,7 @@ class GuiControlBlockValueChangedCallbacks {
 	void GuiGtk_initialize ();
 #elif motif
 	#include <windows.h>
+	#include <windowsx.h>
 	#include <commctrl.h>
 	#include <uxtheme.h>
 	#include <dwmapi.h>
@@ -183,6 +184,7 @@ class GuiControlBlockValueChangedCallbacks {
 	/********** GuiText.cpp **********/
 	void _GuiWinText_destroy (GuiObject widget);
 	void _GuiWinText_map (GuiObject widget);
+	void _GuiWin_subclassModernEdit (HWND hwnd, uint32 flags);
 	void _GuiText_handleFocusReception (GuiObject widget);
 	void _GuiText_handleFocusLoss (GuiObject widget);
 	void _GuiText_setTheTextFocus (GuiObject widget);

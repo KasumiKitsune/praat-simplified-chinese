@@ -110,7 +110,7 @@ int Machine_getTextHeight () {
 		29,   // HP
 		29,   // Sun4
 		22,   // Mac
-		20,   // Win32
+		28,   // Win32
 		25,   // Linux
 		23,   // Cocoa
 		31,   // Chrome
@@ -127,7 +127,7 @@ int Machine_getButtonHeight () {
 		20,   // HP
 		20,   // Sun4
 		20,   // Mac
-		20,   // Win32
+		28,   // Win32
 		30,   // Linux
 		20,   // Cocoa
 		40,   // Chrome
