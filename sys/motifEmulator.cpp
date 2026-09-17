@@ -643,6 +643,7 @@ static void _GuiNativizeWidget (GuiObject me) {
 				( str32equ (my name.get(), U"verticalScrollBar") ? SBS_VERT : SBS_HORZ ) | WS_CLIPSIBLINGS,
 				my x, my y, my width, my height, my parent -> window, (HMENU) 1, theGui.instance, NULL);
 			SetWindowLongPtr (my window, GWLP_USERDATA, (LONG_PTR) me);
+			SetWindowTheme (my window, L"Explorer", nullptr);
 			NativeScrollBar_set (me);
 			my minimum = 0;
 			my maximum = 100;
@@ -697,6 +698,15 @@ static void _GuiNativizeWidget (GuiObject me) {
 			SetWindowLongPtr (my window, GWLP_USERDATA, (LONG_PTR) me);
 			my motiff.shell.isDialog = theDialogHint;   // so we can maintain a single Shell class instead of two different
 			DragAcceptFiles (my window, TRUE);   // enable drag-and-drop of files onto the window
+
+			#ifndef DWMWA_WINDOW_CORNER_PREFERENCE
+			#define DWMWA_WINDOW_CORNER_PREFERENCE 33
+			#endif
+			#ifndef DWMWCP_ROUND
+			#define DWMWCP_ROUND 2
+			#endif
+			DWORD cornerPreference = DWMWCP_ROUND;
+			DwmSetWindowAttribute (my window, DWMWA_WINDOW_CORNER_PREFERENCE, & cornerPreference, sizeof (cornerPreference));
 		} break;
 		default: break;
 	}
@@ -1862,7 +1872,10 @@ void GuiWin_initialize2 (unsigned int argc, char **argv)
 	RegisterClassEx (& windowClass);
 	windowClass. lpszClassName = Melder_32toW (theApplicationClassName).transfer();
 	RegisterClassEx (& windowClass);
-	InitCommonControls ();
+	INITCOMMONCONTROLSEX icex;
+	icex.dwSize = sizeof (INITCOMMONCONTROLSEX);
+	icex.dwICC = ICC_WIN95_CLASSES | ICC_STANDARD_CLASSES | ICC_PROGRESS_CLASS | ICC_BAR_CLASSES;
+	InitCommonControlsEx (& icex);
 	#ifdef _WIN64
 		EnableMouseInPointer (TRUE);   // from Windows 8 on
 	#endif
@@ -2877,6 +2890,7 @@ static HBRUSH on_ctlColorStatic (HWND window, HDC hdc, HWND controlWindow, int t
 		GuiObject control = (GuiObject) GetWindowLongPtr (controlWindow, GWLP_USERDATA);
 		if (control) {
 			SetBkMode (hdc, TRANSPARENT);
+			SetTextColor (hdc, RGB (31, 41, 55));
 			return theWinGuiBackgroundBrush ();
 		}
 	}
@@ -2889,10 +2903,43 @@ static HBRUSH on_ctlColorBtn (HWND window, HDC hdc, HWND controlWindow, int type
 		GuiObject control = (GuiObject) GetWindowLongPtr (controlWindow, GWLP_USERDATA);
 		if (control) {
 			SetBkMode (hdc, TRANSPARENT);
+			SetTextColor (hdc, RGB (31, 41, 55));
 			return theWinGuiBackgroundBrush ();
 		}
 	}
 	return FORWARD_WM_CTLCOLORBTN (window, hdc, controlWindow, DefWindowProc);
+}
+static HBRUSH on_ctlColorEdit (HWND window, HDC hdc, HWND controlWindow, int type) {
+	GuiObject parent = (GuiObject) GetWindowLongPtr (window, GWLP_USERDATA);
+	(void) type;
+	if (parent) {
+		GuiObject control = (GuiObject) GetWindowLongPtr (controlWindow, GWLP_USERDATA);
+		if (control) {
+			SetTextColor (hdc, RGB (17, 24, 39));
+			SetBkColor (hdc, RGB (255, 255, 255));
+			static HBRUSH whiteBrush;
+			if (! whiteBrush)
+				whiteBrush = CreateSolidBrush (RGB (255, 255, 255));
+			return whiteBrush;
+		}
+	}
+	return FORWARD_WM_CTLCOLOREDIT (window, hdc, controlWindow, DefWindowProc);
+}
+static HBRUSH on_ctlColorListBox (HWND window, HDC hdc, HWND controlWindow, int type) {
+	GuiObject parent = (GuiObject) GetWindowLongPtr (window, GWLP_USERDATA);
+	(void) type;
+	if (parent) {
+		GuiObject control = (GuiObject) GetWindowLongPtr (controlWindow, GWLP_USERDATA);
+		if (control) {
+			SetTextColor (hdc, RGB (17, 24, 39));
+			SetBkColor (hdc, RGB (255, 255, 255));
+			static HBRUSH whiteBrush;
+			if (! whiteBrush)
+				whiteBrush = CreateSolidBrush (RGB (255, 255, 255));
+			return whiteBrush;
+		}
+	}
+	return FORWARD_WM_CTLCOLORLISTBOX (window, hdc, controlWindow, DefWindowProc);
 }
 static void on_activate (HWND window, UINT state, HWND hActive, BOOL minimized) {
 	GuiObject me = (GuiObject) GetWindowLongPtr (window, GWLP_USERDATA);
@@ -2924,6 +2971,8 @@ static LRESULT CALLBACK windowProc (HWND window, UINT message, WPARAM wParam, LP
 		HANDLE_MSG (window, WM_MOVE, on_move);
 		HANDLE_MSG (window, WM_CTLCOLORBTN, on_ctlColorBtn);
 		HANDLE_MSG (window, WM_CTLCOLORSTATIC, on_ctlColorStatic);
+		HANDLE_MSG (window, WM_CTLCOLOREDIT, on_ctlColorEdit);
+		HANDLE_MSG (window, WM_CTLCOLORLISTBOX, on_ctlColorListBox);
 		HANDLE_MSG (window, WM_ACTIVATE, on_activate);
 		#ifdef _WIN64
 		case WM_POINTERWHEEL: {   // from Windows 8 on

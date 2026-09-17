@@ -128,22 +128,47 @@ void Gui_getWindowPositioningBounds (double *x, double *y, double *width, double
 		return font;
 	}
 #elif defined (_WIN32)
+	static HFONT createModernUIFont (int height, int weight) {
+		NONCLIENTMETRICSW ncm;
+		memset (& ncm, 0, sizeof (ncm));
+		ncm.cbSize = sizeof (ncm);
+		if (SystemParametersInfoW (SPI_GETNONCLIENTMETRICS, sizeof (ncm), & ncm, 0)) {
+			LOGFONTW lf = ncm.lfMessageFont;
+			lf.lfQuality = CLEARTYPE_QUALITY;
+			lf.lfWeight = weight;
+			if (lf.lfFaceName [0] != L'\0' &&
+			    wcscmp (lf.lfFaceName, L"Tahoma") != 0 &&
+			    wcscmp (lf.lfFaceName, L"MS Sans Serif") != 0 &&
+			    wcscmp (lf.lfFaceName, L"SimSun") != 0)
+			{
+				HFONT hf = CreateFontIndirectW (& lf);
+				if (hf) return hf;
+			}
+		}
+		return CreateFontW (
+			height, 0, 0, 0, weight, FALSE, FALSE, FALSE,
+			DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+			CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+			L"Microsoft YaHei UI"
+		);
+	}
+
 	HFONT theWinGuiNormalLabelFont () {
 		static HFONT font;
 		if (! font)
-			font = CreateFont (15, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, nullptr);
+			font = createModernUIFont (-14, FW_NORMAL);
 		return font;
 	}
 	HFONT theWinGuiBoldLabelFont () {
 		static HFONT font;
 		if (! font)
-			font = CreateFont (15, 0, 0, 0, FW_HEAVY/*FW_BOLD*/, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, nullptr);
+			font = createModernUIFont (-14, FW_SEMIBOLD);
 		return font;
 	}
 	HBRUSH theWinGuiBackgroundBrush () {
 		static HBRUSH brush;
 		if (! brush)
-			brush = CreateSolidBrush (RGB (224, 224, 224));
+			brush = CreateSolidBrush (RGB (245, 246, 248));
 		return brush;
 	}
 #endif

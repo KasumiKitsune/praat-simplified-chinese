@@ -41,6 +41,8 @@ class GuiControlBlockValueChangedCallbacks {
 #elif motif
 	#include <windows.h>
 	#include <commctrl.h>
+	#include <uxtheme.h>
+	#include <dwmapi.h>
 
 	#define MEMBER(widget,klas)  ((widget -> widgetClass & xm##klas##WidgetClass) != 0)
 	#define MEMBER2(widget,klas1,klas2)  ((widget -> widgetClass & (xm##klas1##WidgetClass | xm##klas2##WidgetClass)) != 0)

@@ -237,6 +237,7 @@ GuiList GuiList_create (GuiForm parent, int left, int right, int top, int bottom
 			my d_widget -> parent -> window, nullptr, theGui.instance, nullptr);
 		SetWindowLongPtr (my d_widget -> window, GWLP_USERDATA, (LONG_PTR) my d_widget);
 		SetWindowFont (my d_widget -> window, theWinGuiNormalLabelFont (), false);
+		SetWindowTheme (my d_widget -> window, L"Explorer", nullptr);
 		/*if (MEMBER (my parent, ScrolledWindow)) {
 			XtDestroyWidget (my d_widget -> parent -> motiff.scrolledWindow.horizontalBar);
 			my d_widget -> parent -> motiff.scrolledWindow.horizontalBar = nullptr;
