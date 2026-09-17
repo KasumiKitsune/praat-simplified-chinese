@@ -141,6 +141,7 @@ class GuiControlBlockValueChangedCallbacks {
 	void _GuiWinButton_destroy (GuiObject widget);
 	void _GuiWinButton_handleClick (GuiObject widget);
 	bool _GuiWinButton_tryToHandleShortcutKey (GuiObject widget);
+	void _GuiWin_subclassModernButton (HWND hwnd, uint32 flags);
 
 	/********** GuiCheckButton.cpp **********/
 	void _GuiWinCheckButton_destroy (GuiObject widget);

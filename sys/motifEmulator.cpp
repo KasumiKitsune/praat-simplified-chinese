@@ -627,6 +627,7 @@ static void _GuiNativizeWidget (GuiObject me) {
 					my x, my y, my width, my height, my parent -> window, (HMENU) 1, theGui.instance, NULL);
 				SetWindowLongPtr (my window, GWLP_USERDATA, (LONG_PTR) me);
 				SetWindowFont (my window, theWinGuiNormalLabelFont (), false);
+				_GuiWin_subclassModernButton (my window, 0);
 			}
 		} break;
 		case xmPushButtonWidgetClass: Melder_crash (U"Should be implemented in GuiButton."); break;

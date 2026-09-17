@@ -80,6 +80,192 @@ Thing_implement (GuiButton, GuiControl, 0);
 		}
 		return false;
 	}
+
+	static LRESULT CALLBACK _ModernButtonSubclassProc (
+		HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData
+	) {
+		switch (uMsg) {
+			case WM_MOUSEMOVE: {
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof (TRACKMOUSEEVENT);
+				tme.dwFlags = TME_LEAVE;
+				tme.hwndTrack = hwnd;
+				tme.dwHoverTime = 0;
+				TrackMouseEvent (& tme);
+
+				if (! GetPropW (hwnd, L"PraatHover")) {
+					SetPropW (hwnd, L"PraatHover", (HANDLE) 1);
+					InvalidateRect (hwnd, nullptr, FALSE);
+				}
+				break;
+			}
+			case WM_MOUSELEAVE: {
+				if (GetPropW (hwnd, L"PraatHover")) {
+					RemovePropW (hwnd, L"PraatHover");
+					InvalidateRect (hwnd, nullptr, FALSE);
+				}
+				break;
+			}
+			case WM_SETFOCUS:
+			case WM_KILLFOCUS:
+			case WM_ENABLE:
+				InvalidateRect (hwnd, nullptr, FALSE);
+				break;
+
+			case WM_ERASEBKGND:
+				return 1;   // Double-buffered in WM_PAINT to prevent flicker
+
+			case WM_PAINT: {
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint (hwnd, & ps);
+				if (! hdc)
+					return 0;
+
+				RECT rc;
+				GetClientRect (hwnd, & rc);
+				if (rc.right <= 0 || rc.bottom <= 0) {
+					EndPaint (hwnd, & ps);
+					return 0;
+				}
+
+				// Double buffering: create memory DC & bitmap
+				HDC memDC = CreateCompatibleDC (hdc);
+				HBITMAP memBmp = CreateCompatibleBitmap (hdc, rc.right, rc.bottom);
+				HBITMAP oldBmp = (HBITMAP) SelectObject (memDC, memBmp);
+
+				// Fill background with window background color so rounded corners blend seamlessly
+				FillRect (memDC, & rc, theWinGuiBackgroundBrush ());
+
+				bool isEnabled = IsWindowEnabled (hwnd);
+				bool isPressed = (SendMessage (hwnd, BM_GETSTATE, 0, 0) & BST_PUSHED) != 0;
+				bool isHovered = (GetPropW (hwnd, L"PraatHover") != nullptr) && isEnabled;
+				bool isFocus   = (GetFocus () == hwnd) && isEnabled;
+				bool isDefault = (dwRefData & (GuiButton_DEFAULT | GuiButton_ATTRACTIVE)) != 0;
+
+				COLORREF bgCol, borderCol, textCol, bottomLineCol;
+				if (! isEnabled) {
+					bgCol         = RGB (248, 249, 250);   // #F8F9FA
+					borderCol     = RGB (226, 232, 240);   // #E2E8F0
+					textCol       = RGB (156, 163, 175);   // #9CA3AF
+					bottomLineCol = borderCol;
+				} else if (isDefault) {
+					// Windows 11 Fluent Primary Blue Accent
+					if (isPressed) {
+						bgCol     = RGB (0, 95, 184);      // #005FB8
+						borderCol = RGB (0, 78, 152);
+					} else if (isHovered) {
+						bgCol     = RGB (24, 115, 196);    // #1873C4
+						borderCol = RGB (0, 95, 184);
+					} else {
+						bgCol     = RGB (0, 103, 192);     // #0067C0
+						borderCol = RGB (0, 95, 184);
+					}
+					textCol       = RGB (255, 255, 255);
+					bottomLineCol = borderCol;
+				} else {
+					// Modern Flat Card Button
+					if (isPressed) {
+						bgCol         = RGB (226, 232, 240);   // #E2E8F0
+						borderCol     = RGB (148, 163, 184);   // #94A3B8
+						bottomLineCol = borderCol;
+					} else if (isHovered) {
+						bgCol         = RGB (241, 245, 249);   // #F1F5F9
+						borderCol     = RGB (148, 163, 184);   // #94A3B8
+						bottomLineCol = borderCol;
+					} else {
+						bgCol         = RGB (255, 255, 255);   // #FFFFFF Crisp Card
+						borderCol     = RGB (209, 213, 219);   // #D1D5DB Subtle Border
+						bottomLineCol = RGB (190, 195, 203);   // Subtle 3D depth
+					}
+					textCol = RGB (31, 41, 55);                // #1F2937 Clean Dark Slate
+				}
+
+				// Draw modern rounded rectangle
+				int radius = 8;
+				HPEN hPen = CreatePen (PS_SOLID, 1, borderCol);
+				HBRUSH hBrush = CreateSolidBrush (bgCol);
+				HPEN oldPen = (HPEN) SelectObject (memDC, hPen);
+				HBRUSH oldBrush = (HBRUSH) SelectObject (memDC, hBrush);
+
+				RoundRect (memDC, rc.left, rc.top, rc.right, rc.bottom, radius, radius);
+
+				// Subtle 1px bottom shadow line for unpressed standard buttons (tactile card effect)
+				if (isEnabled && ! isPressed && ! isDefault && rc.bottom > 18) {
+					HPEN hBottomPen = CreatePen (PS_SOLID, 1, bottomLineCol);
+					SelectObject (memDC, hBottomPen);
+					MoveToEx (memDC, rc.left + 4, rc.bottom - 2, nullptr);
+					LineTo (memDC, rc.right - 4, rc.bottom - 2);
+					SelectObject (memDC, oldPen);
+					DeleteObject (hBottomPen);
+				}
+
+				SelectObject (memDC, oldPen);
+				SelectObject (memDC, oldBrush);
+				DeleteObject (hPen);
+				DeleteObject (hBrush);
+
+				// Draw subtle focus ring when focused
+				if (isFocus) {
+					RECT focusRc = rc;
+					InflateRect (& focusRc, -3, -3);
+					HPEN hFocusPen = CreatePen (PS_DOT, 1, isDefault ? RGB (255, 255, 255) : RGB (100, 116, 139));
+					SelectObject (memDC, hFocusPen);
+					SelectObject (memDC, GetStockObject (NULL_BRUSH));
+					RoundRect (memDC, focusRc.left, focusRc.top, focusRc.right, focusRc.bottom, 4, 4);
+					SelectObject (memDC, oldPen);
+					DeleteObject (hFocusPen);
+				}
+
+				// Draw Button Text
+				WCHAR textBuf [512];
+				int textLen = GetWindowTextW (hwnd, textBuf, 512);
+				if (textLen > 0) {
+					HFONT hFont = (isDefault ? theWinGuiBoldLabelFont () : theWinGuiNormalLabelFont ());
+					HFONT oldFont = (HFONT) SelectObject (memDC, hFont);
+					SetBkMode (memDC, TRANSPARENT);
+					SetTextColor (memDC, textCol);
+
+					RECT textRc = rc;
+					// Inset slightly to prevent text clipping
+					InflateRect (& textRc, -3, 0);
+					if (isPressed)
+						OffsetRect (& textRc, 0, 1);
+
+					UINT drawFlags = DT_CENTER | DT_VCENTER;
+					if (dwRefData & GuiButton_MULTILINE)
+						drawFlags |= DT_WORDBREAK;
+					else
+						drawFlags |= DT_SINGLELINE;
+
+					DrawTextW (memDC, textBuf, -1, & textRc, drawFlags);
+
+					SelectObject (memDC, oldFont);
+				}
+
+				BitBlt (hdc, 0, 0, rc.right, rc.bottom, memDC, 0, 0, SRCCOPY);
+
+				SelectObject (memDC, oldBmp);
+				DeleteObject (memBmp);
+				DeleteDC (memDC);
+				EndPaint (hwnd, & ps);
+				return 0;
+			}
+
+			case WM_NCDESTROY: {
+				RemovePropW (hwnd, L"PraatHover");
+				RemoveWindowSubclass (hwnd, _ModernButtonSubclassProc, uIdSubclass);
+				break;
+			}
+			default: break;
+		}
+		return DefSubclassProc (hwnd, uMsg, wParam, lParam);
+	}
+
+	void _GuiWin_subclassModernButton (HWND hwnd, uint32 flags) {
+		if (hwnd)
+			SetWindowSubclass (hwnd, _ModernButtonSubclassProc, 1, (DWORD_PTR) flags);
+	}
 #elif cocoa
 	@implementation GuiCocoaButton {
 		GuiButton d_userData;
@@ -178,6 +364,7 @@ GuiButton GuiButton_create (GuiForm parent, int left, int right, int top, int bo
 		);
 		SetWindowLongPtr (my d_widget -> window, GWLP_USERDATA, (LONG_PTR) my d_widget);
 		SetWindowFont (my d_widget -> window, flags & GuiButton_DEFAULT ? theWinGuiBoldLabelFont () : theWinGuiNormalLabelFont (), false);
+		_GuiWin_subclassModernButton (my d_widget -> window, flags);
 		my v_positionInForm (my d_widget, left, right, top, bottom, parent);
 		if (flags & GuiButton_DEFAULT || flags & GuiButton_ATTRACTIVE)
 			parent -> d_widget -> shell -> defaultButton = parent -> d_widget -> defaultButton = my d_widget;
