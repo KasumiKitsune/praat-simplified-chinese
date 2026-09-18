@@ -120,7 +120,7 @@ Thing_implement (GuiButton, GuiControl, 0);
 		if (MATCHES (L"Table") || MATCHES (L"表格"))
 			return L"\uE80A";   // Grid table
 
-		if (MATCHES (L"Record") || MATCHES (L"录音"))
+		if (MATCHES (L"Record") || MATCHES (L"录音") || MATCHES (L"录制"))
 			return L"\uE720";   // Microphone
 
 		if (MATCHES (L"Draw") || MATCHES (L"绘制"))

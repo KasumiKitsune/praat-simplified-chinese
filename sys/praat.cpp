@@ -129,26 +129,41 @@ static GuiButton praatButton_open;
 static GuiButton praatButton_save;
 
 static void gui_cb_topButton_record (Thing /* boss */, GuiButtonEvent /* event */) {
-	praat_executeCommand (nullptr, (char32 *) U"Record mono Sound...");
+	try {
+		praat_doMenuCommand (U"Record mono Sound...", nullptr, nullptr);
+		praat_updateSelection ();
+	} catch (MelderError) {
+		Melder_flushError ();
+	}
 }
 
 static void gui_cb_topButton_open (Thing /* boss */, GuiButtonEvent /* event */) {
-	praat_executeCommand (nullptr, (char32 *) U"Read from file...");
+	try {
+		praat_doMenuCommand (U"Read from file...", nullptr, nullptr);
+		praat_updateSelection ();
+	} catch (MelderError) {
+		Melder_flushError ();
+	}
 }
 
 static void gui_cb_topButton_save (Thing /* boss */, GuiButtonEvent /* event */) {
-	if (praat_actions_canExecute (U"Save as WAV file..."))
-		praat_actions_executeByName (U"Save as WAV file...");
-	else if (praat_actions_canExecute (U"Save as text file..."))
-		praat_actions_executeByName (U"Save as text file...");
-	else if (praat_actions_canExecute (U"Save as tab-separated file..."))
-		praat_actions_executeByName (U"Save as tab-separated file...");
-	else if (praat_actions_canExecute (U"Save as short text file..."))
-		praat_actions_executeByName (U"Save as short text file...");
-	else if (praat_actions_canExecute (U"Save as binary file..."))
-		praat_actions_executeByName (U"Save as binary file...");
-	else
-		praat_executeCommand (nullptr, (char32 *) U"Save as text file...");
+	try {
+		if (praat_actions_canExecute (U"Save as WAV file..."))
+			praat_actions_executeByName (U"Save as WAV file...");
+		else if (praat_actions_canExecute (U"Save as text file..."))
+			praat_actions_executeByName (U"Save as text file...");
+		else if (praat_actions_canExecute (U"Save as tab-separated file..."))
+			praat_actions_executeByName (U"Save as tab-separated file...");
+		else if (praat_actions_canExecute (U"Save as short text file..."))
+			praat_actions_executeByName (U"Save as short text file...");
+		else if (praat_actions_canExecute (U"Save as binary file..."))
+			praat_actions_executeByName (U"Save as binary file...");
+		else
+			praat_doMenuCommand (U"Save as text file...", nullptr, nullptr);
+		praat_updateSelection ();
+	} catch (MelderError) {
+		Melder_flushError ();
+	}
 }
 
 void praat_refreshObjectsWindowLanguage () {
@@ -949,6 +964,7 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 			break;
 		default:
 			break;
+	}
 #else
 	(void) event;
 #endif
