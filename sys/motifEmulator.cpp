@@ -3396,6 +3396,43 @@ static void on_activate (HWND window, UINT state, HWND hActive, BOOL minimized) 
 		return;
 	} else FORWARD_WM_ACTIVATE (window, state, hActive, minimized, DefWindowProc);
 }
+
+static const wchar_t *getObjectTypeIconGlyph (const wchar_t *text) {
+	if (! text || text [0] == L'\0') return nullptr;
+	const wchar_t *p = wcschr (text, L'.');
+	if (p) {
+		p ++;
+		while (*p == L' ' || *p == L'\t') p ++;
+	} else {
+		p = text;
+	}
+	if (wcsncmp (p, L"Sound", 5) == 0 || wcsncmp (p, L"LongSound", 9) == 0)
+		return L"\uE767";   // Audio wave / Volume
+	if (wcsncmp (p, L"TextGrid", 8) == 0)
+		return L"\uEA37";   // Segmented table
+	if (wcsncmp (p, L"Pitch", 5) == 0)
+		return L"\uE9D2";   // Trend curve
+	if (wcsncmp (p, L"Spectrum", 8) == 0 || wcsncmp (p, L"Spectrogram", 11) == 0)
+		return L"\uE9E9";   // Frequency bars / Equalizer
+	if (wcsncmp (p, L"Formant", 7) == 0)
+		return L"\uE81E";   // Peaks / Scatter
+	if (wcsncmp (p, L"Intensity", 9) == 0)
+		return L"\uE9F9";   // Activity line
+	if (wcsncmp (p, L"Harmonicity", 11) == 0)
+		return L"\uE767";
+	if (wcsncmp (p, L"Table", 5) == 0)
+		return L"\uE802";   // Data table
+	if (wcsncmp (p, L"Strings", 7) == 0)
+		return L"\uE8A5";   // Document list
+	if (wcsncmp (p, L"Collection", 10) == 0 || wcsncmp (p, L"Corpus", 6) == 0)
+		return L"\uE838";   // Folder
+	if (wcsncmp (p, L"Matrix", 6) == 0 || wcsncmp (p, L"Polygon", 7) == 0)
+		return L"\uE802";
+	if (p != text && *p != L'\0')
+		return L"\uE7C3";   // Generic item document
+	return nullptr;
+}
+
 static LRESULT CALLBACK windowProc (HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 		HANDLE_MSG (window, WM_CLOSE, on_close);
@@ -3516,13 +3553,28 @@ static LRESULT CALLBACK windowProc (HWND window, UINT message, WPARAM wParam, LP
 					else
 						textCol = RGB (15, 23, 42);    // #0F172A Modern Slate
 
-					HFONT hFont = theWinGuiNormalLabelFont ();
-					HFONT oldFont = (HFONT) SelectObject (dis -> hDC, hFont);
 					SetBkMode (dis -> hDC, TRANSPARENT);
 					SetTextColor (dis -> hDC, textCol);
 
+					const wchar_t *iconGlyph = getObjectTypeIconGlyph (textBuf);
+					int contentLeft = dis -> rcItem.left + (isSelected ? 14 : 10);
+
+					if (iconGlyph) {
+						HFONT hIconFont = theWinGuiIconFont (-13);
+						HFONT oldFont = (HFONT) SelectObject (dis -> hDC, hIconFont);
+						RECT rcIcon = dis -> rcItem;
+						rcIcon.left = contentLeft;
+						rcIcon.right = rcIcon.left + 16;
+						DrawTextW (dis -> hDC, iconGlyph, -1, & rcIcon, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+						SelectObject (dis -> hDC, oldFont);
+						contentLeft += 20;
+					}
+
+					HFONT hFont = theWinGuiNormalLabelFont ();
+					HFONT oldFont = (HFONT) SelectObject (dis -> hDC, hFont);
+
 					RECT rcText = dis -> rcItem;
-					rcText.left += (isSelected ? 14 : 10);
+					rcText.left = contentLeft;
 					rcText.right -= 4;
 					DrawTextW (dis -> hDC, textBuf, -1, & rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 

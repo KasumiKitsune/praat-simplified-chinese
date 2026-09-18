@@ -213,6 +213,7 @@ class GuiControlBlockValueChangedCallbacks {
 	extern NSFont *theMacGuiNormalLabelFont (), *theMacGuiBoldLabelFont ();
 #elif defined (_WIN32)
 	extern HFONT theWinGuiNormalLabelFont (), theWinGuiBoldLabelFont ();
+	extern HFONT theWinGuiIconFont (int height = -14);
 	extern HBRUSH theWinGuiBackgroundBrush ();
 #endif
 

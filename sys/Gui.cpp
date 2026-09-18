@@ -165,6 +165,54 @@ void Gui_getWindowPositioningBounds (double *x, double *y, double *width, double
 			font = createModernUIFont (-14, FW_SEMIBOLD);
 		return font;
 	}
+
+	HFONT theWinGuiIconFont (int height) {
+		static HFONT fontDefault;
+		if (height == -14 && fontDefault)
+			return fontDefault;
+
+		static const wchar_t *families [] = {
+			L"Segoe Fluent Icons",
+			L"Segoe MDL2 Assets",
+			L"Segoe UI Symbol"
+		};
+		HDC screenDc = GetDC (nullptr);
+		HFONT result = nullptr;
+		if (screenDc) {
+			for (const wchar_t *family : families) {
+				HFONT hf = CreateFontW (
+					height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+					DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+					CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+					family
+				);
+				if (hf) {
+					HFONT old = (HFONT) SelectObject (screenDc, hf);
+					wchar_t actual [64] = { 0 };
+					GetTextFaceW (screenDc, 64, actual);
+					SelectObject (screenDc, old);
+					if (wcsicmp (actual, family) == 0) {
+						result = hf;
+						break;
+					}
+					DeleteObject (hf);
+				}
+			}
+			ReleaseDC (nullptr, screenDc);
+		}
+		if (! result) {
+			result = CreateFontW (
+				height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+				CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+				L"Segoe UI Symbol"
+			);
+		}
+		if (height == -14)
+			fontDefault = result;
+		return result;
+	}
+
 	HBRUSH theWinGuiBackgroundBrush () {
 		static HBRUSH brush;
 		if (! brush)

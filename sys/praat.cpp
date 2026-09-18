@@ -481,6 +481,57 @@ static void gui_cb_list_selectionChanged (Thing /* boss */, GuiList_SelectionCha
 	praat_show ();
 }
 
+static HBITMAP createMenuIcon (const wchar_t *glyph, COLORREF color) {
+	HDC hdcScreen = GetDC (nullptr);
+	if (! hdcScreen) return nullptr;
+	HDC hdcMem = CreateCompatibleDC (hdcScreen);
+	if (! hdcMem) {
+		ReleaseDC (nullptr, hdcScreen);
+		return nullptr;
+	}
+	BITMAPINFO bi;
+	memset (& bi, 0, sizeof (bi));
+	bi.bmiHeader.biSize = sizeof (BITMAPINFOHEADER);
+	bi.bmiHeader.biWidth = 16;
+	bi.bmiHeader.biHeight = 16;
+	bi.bmiHeader.biPlanes = 1;
+	bi.bmiHeader.biBitCount = 32;
+	bi.bmiHeader.biCompression = BI_RGB;
+	void *pBits = nullptr;
+	HBITMAP hbmp = CreateDIBSection (hdcMem, & bi, DIB_RGB_COLORS, & pBits, nullptr, 0);
+	if (hbmp && pBits) {
+		HBITMAP oldBmp = (HBITMAP) SelectObject (hdcMem, hbmp);
+		HFONT hFont = theWinGuiIconFont (-13);
+		HFONT oldFont = (HFONT) SelectObject (hdcMem, hFont);
+		SetBkMode (hdcMem, TRANSPARENT);
+		SetTextColor (hdcMem, color);
+		RECT rc = { 0, 0, 16, 16 };
+		DrawTextW (hdcMem, glyph, -1, & rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+		// Windows 32-bit menu bitmaps require PARGB alpha channel
+		DWORD *pixels = (DWORD *) pBits;
+		for (int i = 0; i < 16 * 16; i ++) {
+			if ((pixels [i] & 0x00FFFFFF) != 0)
+				pixels [i] |= 0xFF000000;
+		}
+		SelectObject (hdcMem, oldFont);
+		SelectObject (hdcMem, oldBmp);
+	}
+	DeleteDC (hdcMem);
+	ReleaseDC (nullptr, hdcScreen);
+	return hbmp;
+}
+
+static void setMenuItemIcon (HMENU hMenu, UINT cmdId, HBITMAP hbmp) {
+	if (! hbmp) return;
+	MENUITEMINFOW mii;
+	memset (& mii, 0, sizeof (mii));
+	mii.cbSize = sizeof (mii);
+	mii.fMask = MIIM_BITMAP;
+	mii.hbmpItem = hbmp;
+	SetMenuItemInfoW (hMenu, cmdId, FALSE, & mii);
+}
+
 static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent event) {
 #if motif
 	if (! praatList_objects || theCurrentPraatObjects -> n == 0)
@@ -613,11 +664,44 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 		Melder_sprint (textBufRemove, 128, titleRemove);
 	AppendMenuW (hMenu, flagRemove, CMD_REMOVE, Melder_peek32toW (textBufRemove));
 
+	// Set Menu Icons
+	HBITMAP bmpViewEdit   = createMenuIcon (L"\uE70F", canViewEdit ? RGB (0, 103, 192) : RGB (156, 163, 175));
+	HBITMAP bmpPlay       = canPlay ? createMenuIcon (L"\uE768", RGB (16, 124, 65)) : nullptr;
+	HBITMAP bmpRename     = createMenuIcon (L"\uE8AC", canRename ? RGB (55, 65, 81) : RGB (156, 163, 175));
+	HBITMAP bmpCopy       = createMenuIcon (L"\uE8C8", canCopy ? RGB (55, 65, 81) : RGB (156, 163, 175));
+	HBITMAP bmpInfo       = createMenuIcon (L"\uE946", canInfo ? RGB (0, 103, 192) : RGB (156, 163, 175));
+	HBITMAP bmpInspect    = createMenuIcon (L"\uE721", canInspect ? RGB (55, 65, 81) : RGB (156, 163, 175));
+	HBITMAP bmpSelectAll  = createMenuIcon (L"\uE8B3", RGB (55, 65, 81));
+	HBITMAP bmpDeselectAll= hasSelection ? createMenuIcon (L"\uE894", RGB (55, 65, 81)) : nullptr;
+	HBITMAP bmpRemove     = createMenuIcon (L"\uE74D", canRemove ? RGB (220, 38, 38) : RGB (156, 163, 175));
+
+	setMenuItemIcon (hMenu, CMD_VIEW_EDIT, bmpViewEdit);
+	if (bmpPlay)
+		setMenuItemIcon (hMenu, CMD_PLAY, bmpPlay);
+	setMenuItemIcon (hMenu, CMD_RENAME, bmpRename);
+	setMenuItemIcon (hMenu, CMD_COPY, bmpCopy);
+	setMenuItemIcon (hMenu, CMD_INFO, bmpInfo);
+	setMenuItemIcon (hMenu, CMD_INSPECT, bmpInspect);
+	setMenuItemIcon (hMenu, CMD_SELECT_ALL, bmpSelectAll);
+	if (bmpDeselectAll)
+		setMenuItemIcon (hMenu, CMD_DESELECT_ALL, bmpDeselectAll);
+	setMenuItemIcon (hMenu, CMD_REMOVE, bmpRemove);
+
 	HWND hwnd = praatList_objects -> d_widget -> window;
 	SetForegroundWindow (hwnd);
 	int cmd = TrackPopupMenuEx (hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
 		event -> x, event -> y, hwnd, nullptr);
 	DestroyMenu (hMenu);
+
+	if (bmpViewEdit) DeleteObject (bmpViewEdit);
+	if (bmpPlay) DeleteObject (bmpPlay);
+	if (bmpRename) DeleteObject (bmpRename);
+	if (bmpCopy) DeleteObject (bmpCopy);
+	if (bmpInfo) DeleteObject (bmpInfo);
+	if (bmpInspect) DeleteObject (bmpInspect);
+	if (bmpSelectAll) DeleteObject (bmpSelectAll);
+	if (bmpDeselectAll) DeleteObject (bmpDeselectAll);
+	if (bmpRemove) DeleteObject (bmpRemove);
 
 	switch (cmd) {
 		case CMD_VIEW_EDIT:

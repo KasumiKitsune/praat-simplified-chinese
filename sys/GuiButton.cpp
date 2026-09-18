@@ -81,6 +81,74 @@ Thing_implement (GuiButton, GuiControl, 0);
 		return false;
 	}
 
+	static const wchar_t *getButtonIconGlyph (const wchar_t *text) {
+		if (! text || text [0] == L'\0') return nullptr;
+		while (*text == L'+' || *text == 0x207A || *text == L' ' || *text == L'\t') text ++;
+
+		#define MATCHES(t) (wcsstr (text, t) != nullptr)
+		if (MATCHES (L"View & Edit") || MATCHES (L"查看与编辑") || MATCHES (L"查看并编辑") ||
+		    MATCHES (L"Edit alone") || MATCHES (L"Edit...") || wcscmp (text, L"Edit") == 0 || wcscmp (text, L"编辑") == 0)
+			return L"\uE70F";   // Edit pencil
+
+		if (MATCHES (L"Play") || MATCHES (L"播放"))
+			return L"\uE768";   // Play triangle
+
+		if (MATCHES (L"Stop") || MATCHES (L"停止"))
+			return L"\uE71A";   // Stop square
+
+		if (MATCHES (L"Rename") || MATCHES (L"重命名"))
+			return L"\uE8AC";   // Rename tag
+
+		if (MATCHES (L"Copy") || MATCHES (L"复制"))
+			return L"\uE8C8";   // Copy pages
+
+		if (MATCHES (L"Remove") || MATCHES (L"删除") || MATCHES (L"移除"))
+			return L"\uE74D";   // Trash can
+
+		if (MATCHES (L"Inspect") || MATCHES (L"检查"))
+			return L"\uE721";   // Magnifying glass
+
+		if (MATCHES (L"Info") || MATCHES (L"信息"))
+			return L"\uE946";   // Info circle
+
+		if (MATCHES (L"Bilingual") || MATCHES (L"双语"))
+			return L"\uE775";   // Globe
+
+		if (MATCHES (L"Record") || MATCHES (L"录音"))
+			return L"\uE720";   // Microphone
+
+		if (MATCHES (L"Draw") || MATCHES (L"绘制"))
+			return L"\uE90A";   // Paint brush
+
+		if (MATCHES (L"Query") || MATCHES (L"查询"))
+			return L"\uE721";   // Search
+
+		if (MATCHES (L"Modify") || MATCHES (L"修改"))
+			return L"\uE790";   // Settings wrench
+
+		if (MATCHES (L"Apply") || MATCHES (L"应用"))
+			return L"\uE8FB";   // Checkmark
+
+		if (wcscmp (text, L"OK") == 0 || wcscmp (text, L"确定") == 0)
+			return L"\uE73E";   // OK check
+
+		if (wcscmp (text, L"Cancel") == 0 || wcscmp (text, L"取消") == 0 ||
+		    wcscmp (text, L"Close") == 0 || wcscmp (text, L"关闭") == 0)
+			return L"\uE711";   // Close X
+
+		if (MATCHES (L"Help") || MATCHES (L"帮助"))
+			return L"\uE897";   // Help question mark
+
+		if (MATCHES (L"Save") || MATCHES (L"保存") || MATCHES (L"Write") || MATCHES (L"写入"))
+			return L"\uE74E";   // Save disk
+
+		if (MATCHES (L"Open") || MATCHES (L"打开"))
+			return L"\uE8E5";   // Folder open
+
+		#undef MATCHES
+		return nullptr;
+	}
+
 	static LRESULT CALLBACK _ModernButtonSubclassProc (
 		HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData
@@ -253,7 +321,7 @@ Thing_implement (GuiButton, GuiControl, 0);
 					g.DrawPath (& borderPen, & path);
 				}
 
-				// Draw Button Text
+				// Draw Button Text & Icon
 				WCHAR textBuf [512];
 				int textLen = GetWindowTextW (hwnd, textBuf, 512);
 				if (textLen > 0) {
@@ -268,13 +336,37 @@ Thing_implement (GuiButton, GuiControl, 0);
 					if (isPressed)
 						OffsetRect (& textRc, 0, 1);
 
-					UINT drawFlags = DT_CENTER | DT_VCENTER;
-					if (dwRefData & GuiButton_MULTILINE)
-						drawFlags |= DT_WORDBREAK;
-					else
-						drawFlags |= DT_SINGLELINE;
+					const wchar_t *iconGlyph = getButtonIconGlyph (textBuf);
+					if (iconGlyph && ! (dwRefData & GuiButton_MULTILINE)) {
+						SIZE szText;
+						GetTextExtentPoint32W (memDC, textBuf, textLen, & szText);
+						const int iconW = 14;
+						const int gap = 6;
+						int totalW = iconW + gap + szText.cx;
+						int boxW = textRc.right - textRc.left;
+						int startX = textRc.left + (boxW - totalW) / 2;
+						if (startX < textRc.left + 2)
+							startX = textRc.left + 2;
 
-					DrawTextW (memDC, textBuf, -1, & textRc, drawFlags);
+						// 1. Draw Icon
+						HFONT hIconFont = theWinGuiIconFont (-12);
+						SelectObject (memDC, hIconFont);
+						RECT rcIcon = { startX, textRc.top, startX + iconW, textRc.bottom };
+						DrawTextW (memDC, iconGlyph, -1, & rcIcon, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+						// 2. Draw Text
+						SelectObject (memDC, hFont);
+						RECT rcLabel = { startX + iconW + gap, textRc.top, textRc.right - 2, textRc.bottom };
+						DrawTextW (memDC, textBuf, -1, & rcLabel, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+					} else {
+						UINT drawFlags = DT_CENTER | DT_VCENTER;
+						if (dwRefData & GuiButton_MULTILINE)
+							drawFlags |= DT_WORDBREAK;
+						else
+							drawFlags |= DT_SINGLELINE | DT_NOPREFIX;
+
+						DrawTextW (memDC, textBuf, -1, & textRc, drawFlags);
+					}
 
 					SelectObject (memDC, oldFont);
 				}
