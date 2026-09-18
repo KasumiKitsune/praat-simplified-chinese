@@ -24,6 +24,8 @@
 #include "Sound.h"
 
 #include "SoundRecorder_enums.h"
+#include <mutex>
+#include <thread>
 
 #include "../external/portaudio/portaudio.h"
 #if defined (_WIN32)
@@ -102,6 +104,8 @@ Thing_define (SoundRecorder, Editor) {
 
 	const PaDeviceInfo *deviceInfos [1+SoundRecorder_IDEVICE_MAX];
 	PaDeviceIndex deviceIndices [1+SoundRecorder_IDEVICE_MAX];
+	std::mutex portAudioMutex;
+	std::thread portaudioInitThread;
 	PaStream *portaudioStream;
 	short monitorBuffer [2048 * 2];
 	integer monitorSamples;

@@ -59,6 +59,13 @@ autoTextGridEditor TextGridEditor_create (conststring32 title, TextGrid textGrid
 		}
 		my textGridArea() -> spellingChecker = spellingChecker;
 		my callbackSocket = Melder_dup (callbackSocket);
+		if (! optionalSoundOrLongSound) {
+			if (my classPref_shellHeight() > 420)
+				my setClassPref_shellHeight (420);
+			if (my classPref_shellWidth() > 750)
+				my setClassPref_shellWidth (750);
+		}
+		my setInstancePref_showSelectionViewer (false);
 		FunctionEditor_init (me.get(), title, textGrid);
 
 		Melder_assert (isdefined (my startSelection));   // precondition of v_updateText()

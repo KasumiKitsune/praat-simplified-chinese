@@ -56,6 +56,170 @@ Thing_implement (GuiCheckButton, GuiControl, 0);
 			my d_valueChangedCallback (my d_valueChangedBoss, & event);
 		}
 	}
+
+	static LRESULT CALLBACK _ModernCheckButtonSubclassProc (
+		HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData
+	) {
+		(void) dwRefData;
+		switch (uMsg) {
+			case WM_MOUSEMOVE: {
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof (TRACKMOUSEEVENT);
+				tme.dwFlags = TME_LEAVE;
+				tme.hwndTrack = hwnd;
+				tme.dwHoverTime = 0;
+				TrackMouseEvent (& tme);
+
+				if (! GetPropW (hwnd, L"PraatHover")) {
+					SetPropW (hwnd, L"PraatHover", (HANDLE) 1);
+					InvalidateRect (hwnd, nullptr, FALSE);
+				}
+				if (GetCapture () == hwnd) {
+					InvalidateRect (hwnd, nullptr, FALSE);
+					UpdateWindow (hwnd);
+				}
+				break;
+			}
+			case WM_MOUSELEAVE: {
+				if (GetPropW (hwnd, L"PraatHover")) {
+					RemovePropW (hwnd, L"PraatHover");
+					InvalidateRect (hwnd, nullptr, FALSE);
+				}
+				break;
+			}
+			case WM_LBUTTONDOWN:
+			case WM_LBUTTONUP:
+			case WM_CAPTURECHANGED:
+			case BM_SETSTATE:
+			case BM_SETCHECK: {
+				LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, lParam);
+				InvalidateRect (hwnd, nullptr, FALSE);
+				UpdateWindow (hwnd);
+				return res;
+			}
+			case WM_SETFOCUS:
+			case WM_KILLFOCUS:
+			case WM_ENABLE:
+			case WM_KEYDOWN:
+			case WM_KEYUP: {
+				LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, lParam);
+				InvalidateRect (hwnd, nullptr, FALSE);
+				return res;
+			}
+			case WM_ERASEBKGND:
+				return 1;
+			case WM_PAINT: {
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint (hwnd, & ps);
+				RECT rc;
+				GetClientRect (hwnd, & rc);
+
+				HDC memDC = CreateCompatibleDC (hdc);
+				HBITMAP memBitmap = CreateCompatibleBitmap (hdc, rc.right, rc.bottom);
+				HBITMAP oldBitmap = (HBITMAP) SelectObject (memDC, memBitmap);
+
+				// Fill background with parent dialog background
+				FillRect (memDC, & rc, theWinGuiBackgroundBrush ());
+
+				int state = Button_GetState (hwnd);
+				bool isChecked  = (state & 0x0003) == BST_CHECKED;
+				bool isEnabled  = IsWindowEnabled (hwnd);
+				bool isPressed  = ((state & BST_PUSHED) != 0 || (GetCapture () == hwnd)) && isEnabled;
+				bool isHover    = (GetPropW (hwnd, L"PraatHover") != nullptr) && isEnabled;
+
+				// Checkbox geometry: 18x18px rounded square, vertically centered
+				int boxSize = 18;
+				int boxLeft = rc.left + 2;
+				int boxTop  = rc.top + (rc.bottom - rc.top - boxSize) / 2;
+				if (boxTop < 0)
+					boxTop = 0;
+
+				_GuiWin_ensureGdiplus ();
+				{
+					Gdiplus::Graphics g (memDC);
+					g.SetSmoothingMode (Gdiplus::SmoothingModeAntiAlias);
+					g.SetPixelOffsetMode (Gdiplus::PixelOffsetModeHighQuality);
+
+					float x = (float) boxLeft;
+					float y = (float) boxTop;
+					float size = (float) boxSize;
+					float r = 4.0f;
+
+					Gdiplus::GraphicsPath path;
+					path.AddArc (x, y, r * 2.0f, r * 2.0f, 180.0f, 90.0f);
+					path.AddArc (x + size - r * 2.0f, y, r * 2.0f, r * 2.0f, 270.0f, 90.0f);
+					path.AddArc (x + size - r * 2.0f, y + size - r * 2.0f, r * 2.0f, r * 2.0f, 0.0f, 90.0f);
+					path.AddArc (x, y + size - r * 2.0f, r * 2.0f, r * 2.0f, 90.0f, 90.0f);
+					path.CloseFigure ();
+
+					if (! isEnabled) {
+						Gdiplus::SolidBrush disabledBg (Gdiplus::Color (255, 243, 244, 246));
+						Gdiplus::Pen disabledBorder (Gdiplus::Color (255, 209, 213, 219), 1.0f);
+						g.FillPath (& disabledBg, & path);
+						g.DrawPath (& disabledBorder, & path);
+					} else if (isChecked) {
+						Gdiplus::Color bgCol = isPressed ? Gdiplus::Color (255, 0, 90, 168)
+							: (isHover ? Gdiplus::Color (255, 0, 120, 215) : Gdiplus::Color (255, 0, 103, 192));
+						Gdiplus::SolidBrush blueBrush (bgCol);
+						g.FillPath (& blueBrush, & path);
+
+						// Anti-aliased white checkmark with rounded joins and ends
+						Gdiplus::Pen checkPen (Gdiplus::Color (255, 255, 255, 255), 2.0f);
+						checkPen.SetStartCap (Gdiplus::LineCapRound);
+						checkPen.SetEndCap (Gdiplus::LineCapRound);
+						checkPen.SetLineJoin (Gdiplus::LineJoinRound);
+
+						Gdiplus::PointF pts [3] = {
+							{ x + 4.5f, y + 9.5f },
+							{ x + 7.5f, y + 13.0f },
+							{ x + 13.8f, y + 5.5f }
+						};
+						g.DrawLines (& checkPen, pts, 3);
+					} else {
+						Gdiplus::Color bgCol = isPressed ? Gdiplus::Color (255, 229, 231, 235)
+							: (isHover ? Gdiplus::Color (255, 248, 250, 252) : Gdiplus::Color (255, 255, 255, 255));
+						Gdiplus::Color borderCol = isHover ? Gdiplus::Color (255, 100, 116, 139)
+							: Gdiplus::Color (255, 140, 140, 140);
+						Gdiplus::SolidBrush bgBrush (bgCol);
+						Gdiplus::Pen borderPen (borderCol, 1.2f);
+						g.FillPath (& bgBrush, & path);
+						g.DrawPath (& borderPen, & path);
+					}
+				}
+
+				// Draw label text
+				WCHAR textBuf [512];
+				int textLen = GetWindowTextW (hwnd, textBuf, 512);
+				if (textLen > 0) {
+					HFONT hFont = theWinGuiNormalLabelFont ();
+					HFONT oldFont = (HFONT) SelectObject (memDC, hFont);
+					SetBkMode (memDC, TRANSPARENT);
+					SetTextColor (memDC, isEnabled ? RGB (17, 24, 39) : RGB (156, 163, 175));
+
+					RECT textRc = rc;
+					textRc.left = boxLeft + boxSize + 8;
+					DrawTextW (memDC, textBuf, -1, & textRc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+
+					SelectObject (memDC, oldFont);
+				}
+
+				BitBlt (hdc, 0, 0, rc.right, rc.bottom, memDC, 0, 0, SRCCOPY);
+				SelectObject (memDC, oldBitmap);
+				DeleteObject (memBitmap);
+				DeleteDC (memDC);
+				EndPaint (hwnd, & ps);
+				return 0;
+			}
+			case WM_NCDESTROY: {
+				RemovePropW (hwnd, L"PraatHover");
+				RemoveWindowSubclass (hwnd, _ModernCheckButtonSubclassProc, uIdSubclass);
+				break;
+			}
+			default: break;
+		}
+		return DefSubclassProc (hwnd, uMsg, wParam, lParam);
+	}
 #elif cocoa
 	@implementation GuiCocoaCheckButton {
 		GuiCheckButton d_userData;
@@ -114,6 +278,7 @@ GuiCheckButton GuiCheckButton_create (GuiForm parent, int left, int right, int t
 			my d_widget -> parent -> window, (HMENU) 1, theGui.instance, nullptr);
 		SetWindowLongPtr (my d_widget -> window, GWLP_USERDATA, (LONG_PTR) my d_widget);
 		SetWindowFont (my d_widget -> window, theWinGuiNormalLabelFont (), false);
+		SetWindowSubclass (my d_widget -> window, _ModernCheckButtonSubclassProc, 1, 0);
 		my v_positionInForm (my d_widget, left, right, top, bottom, parent);
 		if (flags & GuiCheckButton_SET) {
 			Button_SetCheck (my d_widget -> window, BST_CHECKED);

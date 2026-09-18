@@ -108,11 +108,9 @@ Thing_define (FunctionEditor, Editor) {
 	}
 	constexpr static double SELECTION_VIEWER_MARGIN = 0.0;
 	void viewInnerSelectionViewerAsFractionByFraction () const {
-		Graphics_setViewport (our graphics.get(), our _selectionViewerLeft + our MARGIN, our _selectionViewerRight - our MARGIN,
-				our BOTTOM_MARGIN + our space * 3, our height_pxlt - (our TOP_MARGIN + our space));
 		Graphics_setViewport (our graphics.get(),
 			our _selectionViewerLeft + our SELECTION_VIEWER_MARGIN, our _selectionViewerRight - our SELECTION_VIEWER_MARGIN,
-			our SELECTION_VIEWER_MARGIN, our height_pxlt - our space - our SELECTION_VIEWER_MARGIN
+			our SELECTION_VIEWER_MARGIN, our height_pxlt - our space - 20.0
 		);
 		Graphics_setWindow (our graphics.get(), 0.0, 1.0, 0.0, 1.0);
 	}
@@ -138,6 +136,13 @@ Thing_define (FunctionEditor, Editor) {
 	bool group, enableUpdates;
 	int nrect;
 	struct { double left, right, bottom, top; } rect [8];
+	int hoveredPlayButton = -1;
+	int pressedPlayButton = -1;
+	double playButtonPressTime = 0.0;
+	bool hoveredToggleViewer = false;
+	int hoveredIpaRow = 0, hoveredIpaCol = 0;
+	int pressedIpaRow = 0, pressedIpaCol = 0;
+	double ipaPressTime = 0.0;
 	double marker [1 + 3], playCursor, startZoomHistory, endZoomHistory;
 	int numberOfMarkers;
 

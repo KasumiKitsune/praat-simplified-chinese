@@ -65,14 +65,14 @@ void structDataGui :: v_do_pictureMargins (EditorCommand /* cmd */) {
 	Therefore, all of these definitions have to invoke their own MelderColour initialization.
 */
 MelderColour
-	DataGuiColour_WINDOW_BACKGROUND = MelderColour (0.95, 0.95, 0.90),   // cream
+	DataGuiColour_WINDOW_BACKGROUND = MelderColour (245.0 / 255.0, 246.0 / 255.0, 248.0 / 255.0),   // #F5F6F8 Modern Fluent clean background
 	DataGuiColour_AREA_BACKGROUND = MelderColour (1.0, 1.0, 1.0),   // whitish; DON'T REPLACE with Melder_WHITE
-	DataGuiColour_EDITABLE = MelderColour (0.0, 0.4, 0.5),   // greenish blue (almost teal)
-	DataGuiColour_EDITABLE_FRAME = MelderColour (0.0, 0.8, 1.0),   // same hue as the lines
-	DataGuiColour_EDITABLE_SELECTED = MelderColour (0.75, 0.35, 0.0),   // orangy
-	DataGuiColour_NONEDITABLE = MelderColour (0.25),   // dark grey
-	DataGuiColour_NONEDITABLE_FRAME = MelderColour (0.85),   // same hue as the lines; DON'T REPLACE with Melder_SILVER
-	DataGuiColour_NONEDITABLE_SELECTED = MelderColour (0.8, 0.0, 0.0);   // reddish
+	DataGuiColour_EDITABLE = MelderColour (0.0, 0.45, 0.72),   // #0073B8 Modern Fluent Blue waveform
+	DataGuiColour_EDITABLE_FRAME = MelderColour (0.0, 0.45, 0.72),   // #0073B8 Matching modern blue frame
+	DataGuiColour_EDITABLE_SELECTED = MelderColour (0.88, 0.36, 0.10),   // #E15B1A Vibrant Coral selection
+	DataGuiColour_NONEDITABLE = MelderColour (0.35, 0.40, 0.45),   // #596673 Modern Slate grey
+	DataGuiColour_NONEDITABLE_FRAME = MelderColour (0.80, 0.83, 0.86),   // #CCD4DB Clean neutral border
+	DataGuiColour_NONEDITABLE_SELECTED = MelderColour (0.85, 0.15, 0.15);   // #D92626 Clean red
 
 void DataGui_openPraatPicture (DataGui me) {
 	my _pictureGraphics = praat_picture_datagui_open (my instancePref_picture_eraseFirst());

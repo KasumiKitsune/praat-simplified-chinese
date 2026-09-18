@@ -211,6 +211,10 @@ Thing_implement (GuiButton, GuiControl, 0);
 						bgCol         = RGB (241, 245, 249);   // #F1F5F9
 						borderCol     = RGB (148, 163, 184);   // #94A3B8
 						bottomLineCol = borderCol;
+					} else if (isFocus) {
+						bgCol         = RGB (255, 255, 255);   // #FFFFFF
+						borderCol     = RGB (0, 103, 192);     // #0067C0 Fluent Blue border
+						bottomLineCol = borderCol;
 					} else {
 						bgCol         = RGB (255, 255, 255);   // #FFFFFF Crisp Card
 						borderCol     = RGB (209, 213, 219);   // #D1D5DB Subtle Border
@@ -219,40 +223,34 @@ Thing_implement (GuiButton, GuiControl, 0);
 					textCol = RGB (31, 41, 55);                // #1F2937 Clean Dark Slate
 				}
 
-				// Draw modern rounded rectangle
-				int radius = 8;
-				HPEN hPen = CreatePen (PS_SOLID, 1, borderCol);
-				HBRUSH hBrush = CreateSolidBrush (bgCol);
-				HPEN oldPen = (HPEN) SelectObject (memDC, hPen);
-				HBRUSH oldBrush = (HBRUSH) SelectObject (memDC, hBrush);
+				// Draw modern rounded rectangle with GDI+ for perfectly uniform borders on all 4 sides
+				_GuiWin_ensureGdiplus ();
+				{
+					Gdiplus::Graphics g (memDC);
+					g.SetSmoothingMode (Gdiplus::SmoothingModeAntiAlias);
+					g.SetPixelOffsetMode (Gdiplus::PixelOffsetModeHighQuality);
 
-				RoundRect (memDC, rc.left, rc.top, rc.right, rc.bottom, radius, radius);
+					float strokeW = isFocus ? 1.5f : 1.0f;
+					float x = strokeW / 2.0f;
+					float y = strokeW / 2.0f;
+					float w = (float) rc.right - strokeW;
+					float h = (float) rc.bottom - strokeW;
+					float r = 5.0f;
+					if (r * 2.0f > h) r = h / 2.0f;
+					if (r * 2.0f > w) r = w / 2.0f;
 
-				// Subtle 1px bottom shadow line for unpressed standard buttons (tactile card effect)
-				if (isEnabled && ! isPressed && ! isDefault && rc.bottom > 18) {
-					HPEN hBottomPen = CreatePen (PS_SOLID, 1, bottomLineCol);
-					SelectObject (memDC, hBottomPen);
-					MoveToEx (memDC, rc.left + 4, rc.bottom - 2, nullptr);
-					LineTo (memDC, rc.right - 4, rc.bottom - 2);
-					SelectObject (memDC, oldPen);
-					DeleteObject (hBottomPen);
-				}
+					Gdiplus::GraphicsPath path;
+					path.AddArc (x, y, r * 2.0f, r * 2.0f, 180.0f, 90.0f);
+					path.AddArc (x + w - r * 2.0f, y, r * 2.0f, r * 2.0f, 270.0f, 90.0f);
+					path.AddArc (x + w - r * 2.0f, y + h - r * 2.0f, r * 2.0f, r * 2.0f, 0.0f, 90.0f);
+					path.AddArc (x, y + h - r * 2.0f, r * 2.0f, r * 2.0f, 90.0f, 90.0f);
+					path.CloseFigure ();
 
-				SelectObject (memDC, oldPen);
-				SelectObject (memDC, oldBrush);
-				DeleteObject (hPen);
-				DeleteObject (hBrush);
+					Gdiplus::SolidBrush bgBrush (Gdiplus::Color (255, GetRValue (bgCol), GetGValue (bgCol), GetBValue (bgCol)));
+					Gdiplus::Pen borderPen (Gdiplus::Color (255, GetRValue (borderCol), GetGValue (borderCol), GetBValue (borderCol)), strokeW);
 
-				// Draw subtle focus ring when focused
-				if (isFocus) {
-					RECT focusRc = rc;
-					InflateRect (& focusRc, -3, -3);
-					HPEN hFocusPen = CreatePen (PS_DOT, 1, isDefault ? RGB (255, 255, 255) : RGB (100, 116, 139));
-					SelectObject (memDC, hFocusPen);
-					SelectObject (memDC, GetStockObject (NULL_BRUSH));
-					RoundRect (memDC, focusRc.left, focusRc.top, focusRc.right, focusRc.bottom, 4, 4);
-					SelectObject (memDC, oldPen);
-					DeleteObject (hFocusPen);
+					g.FillPath (& bgBrush, & path);
+					g.DrawPath (& borderPen, & path);
 				}
 
 				// Draw Button Text

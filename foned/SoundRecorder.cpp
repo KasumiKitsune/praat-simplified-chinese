@@ -197,6 +197,7 @@ static void win_waveInClose (SoundRecorder me) {
 #endif
 
 static void closePortAudioStream (SoundRecorder me) {
+	std::lock_guard <std::mutex> lock (my portAudioMutex);
 	if (my portaudioStream) {
 		try {
 			Pa_StopStream (my portaudioStream);
@@ -250,6 +251,12 @@ void structSoundRecorder :: v9_destroy () noexcept {
 			XtRemoveWorkProc (our workProcId);
 	#endif
 
+	if (our portaudioInitThread.joinable ()) {
+		try {
+			our portaudioInitThread.join ();
+		} catch (...) { }
+	}
+
 	if (our inputUsesPortAudio) {
 		closePortAudioStream (this);
 	} else {
@@ -274,22 +281,63 @@ static void showMaximum (SoundRecorder me, int channel, double maximum) {
 		my numberOfChannels == 1 || channel == 1 ? 0.0 : -1.0,
 		my numberOfChannels == 1 || channel == 2 ? 1.0 : 2.0,
 		0.0, 1.0);
-	Graphics_setGrey (my graphics.get(), 0.9);
-	Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, maximum, 1.0);
-	Graphics_setColour (my graphics.get(), Melder_GREEN);
-	if (maximum < 0.75) {
-		Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, maximum);
-	} else {
-		Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, 0.75);
-		Graphics_setColour (my graphics.get(), Melder_YELLOW);
-		if (maximum < 0.92) {
-			Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.75, maximum);
+
+	// Light modern container background (matching clean Praat light theme)
+	Graphics_setColour (my graphics.get(), Melder_WHITE);
+	Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
+
+	const double xLeft   = 0.22;
+	const double xRight  = 0.78;
+	const double yBottom = 0.10;
+	const double yTop    = 0.94;
+
+	// Soft groove / track behind segments
+	Graphics_setColour (my graphics.get(), MelderColour (0.945, 0.961, 0.976)); // #F1F5F9 Slate-100
+	Graphics_fillRoundedRectangle (my graphics.get(), xLeft - 0.03, xRight + 0.03, yBottom - 0.015, yTop + 0.015, 0.02);
+	Graphics_setColour (my graphics.get(), MelderColour (0.886, 0.910, 0.941)); // #E2E8F0
+	Graphics_roundedRectangle (my graphics.get(), xLeft - 0.03, xRight + 0.03, yBottom - 0.015, yTop + 0.015, 0.02);
+
+	const int NUM_SEGMENTS = 28;
+	for (int k = 0; k < NUM_SEGMENTS; k ++) {
+		const double frac = (double) (k + 1) / NUM_SEGMENTS;
+		const double segBottom = yBottom + (yTop - yBottom) * ((double) k / NUM_SEGMENTS) + 0.003;
+		const double segTop    = yBottom + (yTop - yBottom) * ((double) (k + 1) / NUM_SEGMENTS) - 0.003;
+		const bool isActive = (frac <= maximum);
+
+		MelderColour segCol;
+		if (isActive) {
+			if (frac <= 0.70) {
+				// Normal emerald green
+				segCol = MelderColour (0.063, 0.725, 0.506); // #10B981
+			} else if (frac <= 0.88) {
+				// Warning amber
+				segCol = MelderColour (0.961, 0.620, 0.043); // #F59E0B
+			} else {
+				// Peak red
+				segCol = MelderColour (0.937, 0.267, 0.267); // #EF4444
+			}
 		} else {
-			Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.75, 0.92);
-			Graphics_setColour (my graphics.get(), Melder_RED);
-			Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.92, maximum);
+			// Inactive soft gray LED
+			segCol = MelderColour (0.886, 0.910, 0.941); // #E2E8F0
 		}
+
+		Graphics_setColour (my graphics.get(), segCol);
+		Graphics_fillRoundedRectangle (my graphics.get(), xLeft, xRight, segBottom, segTop, 0.015);
 	}
+
+	// Channel label at bottom
+	Graphics_setFont (my graphics.get(), kGraphics_font::HELVETICA);
+	Graphics_setFontSize (my graphics.get(), 11.0);
+	Graphics_setTextAlignment (my graphics.get(), Graphics_CENTRE, Graphics_HALF);
+	Graphics_setColour (my graphics.get(), MelderColour (0.392, 0.455, 0.545)); // #64748B
+	if (my numberOfChannels == 1) {
+		Graphics_text (my graphics.get(), 0.5, 0.05, U"MONO");
+	} else if (channel == 1) {
+		Graphics_text (my graphics.get(), 0.5, 0.05, U"L");
+	} else {
+		Graphics_text (my graphics.get(), 0.5, 0.05, U"R");
+	}
+	Graphics_setColour (my graphics.get(), Melder_BLACK);
 }
 
 static integer getSelectedTakeIndex (SoundRecorder me) {
@@ -317,7 +365,7 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 			Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
 			Graphics_setColour (my graphics.get(), Melder_WHITE);
 			Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
-			Graphics_setColour (my graphics.get(), Melder_BLACK);
+			Graphics_setColour (my graphics.get(), MelderColour (0.0, 0.45, 0.72));
 
 			const double totalDuration = sound -> xmax - sound -> xmin;
 			const double ROW_DURATION = 10.0;
@@ -353,14 +401,23 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 		}
 
 		Graphics_clearWs (my graphics.get());
+		for (int ch = 1; ch <= my numberOfChannels; ch ++) {
+			showMaximum (me, ch, 0.0);
+		}
+
+		// Centered modern light standby badge overlay
 		Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
-		#if defined (macintosh)
-			Graphics_setColour (my graphics.get(), Melder_WHITE);
-			Graphics_fillRectangle (my graphics.get(), 0.2, 0.8, 0.3, 0.7);
-		#endif
+		Graphics_setColour (my graphics.get(), MelderColour (0.945, 0.961, 0.976)); // #F1F5F9 Slate-100
+		Graphics_fillRoundedRectangle (my graphics.get(), 0.20, 0.80, 0.44, 0.56, 0.04);
+		Graphics_setColour (my graphics.get(), MelderColour (0.796, 0.835, 0.882)); // #CBD5E1 Slate-300
+		Graphics_roundedRectangle (my graphics.get(), 0.20, 0.80, 0.44, 0.56, 0.04);
+
+		Graphics_setFont (my graphics.get(), kGraphics_font::HELVETICA);
+		Graphics_setFontSize (my graphics.get(), 12.0);
 		Graphics_setTextAlignment (my graphics.get(), Graphics_CENTRE, Graphics_HALF);
+		Graphics_setColour (my graphics.get(), MelderColour (0.278, 0.333, 0.412)); // #475569 Slate-600
+		Graphics_text (my graphics.get(), 0.5, 0.50, praat_translate (U"Not recording."));
 		Graphics_setColour (my graphics.get(), Melder_BLACK);
-		Graphics_text (my graphics.get(), 0.5, 0.5, praat_translate (U"Not recording."));
 		return;
 	}
 	if (my instancePref_meter_which() == kSoundRecorder_meter::INTENSITY) {
@@ -668,6 +725,7 @@ static int portaudioStreamCallback (
 }
 
 static void ensurePortAudioStream (SoundRecorder me) {
+	std::lock_guard <std::mutex> lock (my portAudioMutex);
 	if (my portaudioStream)
 		return;
 	PaStreamParameters streamParameters = { };
@@ -1685,11 +1743,13 @@ gui_drawingarea_cb_resize (me.get(), & event);
 		#endif
 		updateMenus (me.get());
 		if (my inputUsesPortAudio) {
-			try {
-				ensurePortAudioStream (me.get());
-			} catch (MelderError) {
-				Melder_clearError ();
-			}
+			my portaudioInitThread = std::thread ([me_ptr = me.get()] () {
+				try {
+					ensurePortAudioStream (me_ptr);
+				} catch (MelderError) {
+					Melder_clearError ();
+				}
+			});
 		}
 		return me;
 	} catch (MelderError) {

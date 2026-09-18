@@ -56,6 +56,129 @@ Thing_implement (GuiList, GuiControl, 0);
 			my d_selectionChangedCallback (my d_selectionChangedBoss, & event);
 		}
 	}
+
+	static LRESULT CALLBACK _ModernListSubclassProc (
+		HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData
+	) {
+		(void) dwRefData;
+		switch (uMsg) {
+			case WM_MOUSEMOVE: {
+				LRESULT itemRes = SendMessageW (hwnd, LB_ITEMFROMPOINT, 0, lParam);
+				int newHover = (HIWORD (itemRes) == 0) ? (int) LOWORD (itemRes) : -1;
+				int oldHover = (int) (LONG_PTR) GetPropW (hwnd, L"Praat_HoverItem") - 1;
+				if (newHover != oldHover) {
+					if (newHover >= 0)
+						SetPropW (hwnd, L"Praat_HoverItem", (HANDLE) (LONG_PTR) (newHover + 1));
+					else
+						RemovePropW (hwnd, L"Praat_HoverItem");
+					if (oldHover >= 0) {
+						RECT rc;
+						if (SendMessageW (hwnd, LB_GETITEMRECT, oldHover, (LPARAM) & rc) != LB_ERR)
+							InvalidateRect (hwnd, & rc, FALSE);
+					}
+					if (newHover >= 0) {
+						RECT rc;
+						if (SendMessageW (hwnd, LB_GETITEMRECT, newHover, (LPARAM) & rc) != LB_ERR)
+							InvalidateRect (hwnd, & rc, FALSE);
+					}
+				}
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof (TRACKMOUSEEVENT);
+				tme.dwFlags = TME_LEAVE;
+				tme.hwndTrack = hwnd;
+				tme.dwHoverTime = 0;
+				TrackMouseEvent (& tme);
+				break;
+			}
+			case WM_MOUSELEAVE: {
+				int oldHover = (int) (LONG_PTR) GetPropW (hwnd, L"Praat_HoverItem") - 1;
+				if (oldHover >= 0) {
+					RemovePropW (hwnd, L"Praat_HoverItem");
+					RECT rc;
+					if (SendMessageW (hwnd, LB_GETITEMRECT, oldHover, (LPARAM) & rc) != LB_ERR)
+						InvalidateRect (hwnd, & rc, FALSE);
+				}
+				break;
+			}
+			case WM_RBUTTONDOWN: {
+				POINT pt = { GET_X_LPARAM (lParam), GET_Y_LPARAM (lParam) };
+				LRESULT itemRes = SendMessageW (hwnd, LB_ITEMFROMPOINT, 0, lParam);
+				int clickedItem = (HIWORD (itemRes) == 0) ? (int) LOWORD (itemRes) : -1;
+				if (clickedItem >= 0) {
+					LRESULT isSel = SendMessageW (hwnd, LB_GETSEL, clickedItem, 0);
+					if (! isSel) {
+						SendMessageW (hwnd, LB_SETSEL, FALSE, -1);
+						SendMessageW (hwnd, LB_SETSEL, TRUE, clickedItem);
+						SendMessageW (hwnd, LB_SETCARETINDEX, clickedItem, FALSE);
+						GuiObject widget = (GuiObject) GetWindowLongPtr (hwnd, GWLP_USERDATA);
+						if (widget)
+							_GuiWinList_handleClick (widget);
+					}
+				}
+				SetFocus (hwnd);
+				return 0;
+			}
+			case WM_CONTEXTMENU: {
+				int x = GET_X_LPARAM (lParam);
+				int y = GET_Y_LPARAM (lParam);
+				POINT pt = { x, y };
+				int clickedItem = -1;
+				if (x == -1 && y == -1) {
+					int cur = (int) SendMessageW (hwnd, LB_GETCARETINDEX, 0, 0);
+					if (cur >= 0) {
+						RECT rc;
+						if (SendMessageW (hwnd, LB_GETITEMRECT, cur, (LPARAM) & rc) != LB_ERR) {
+							pt.x = (rc.left + rc.right) / 2;
+							pt.y = (rc.top + rc.bottom) / 2;
+							ClientToScreen (hwnd, & pt);
+							clickedItem = cur;
+						}
+					}
+				} else {
+					POINT ptClient = pt;
+					ScreenToClient (hwnd, & ptClient);
+					LRESULT itemRes = SendMessageW (hwnd, LB_ITEMFROMPOINT, 0, MAKELPARAM (ptClient.x, ptClient.y));
+					clickedItem = (HIWORD (itemRes) == 0) ? (int) LOWORD (itemRes) : -1;
+				}
+				GuiObject widget = (GuiObject) GetWindowLongPtr (hwnd, GWLP_USERDATA);
+				if (widget) {
+					iam_list;
+					if (my d_contextMenuCallback) {
+						struct structGuiList_ContextMenuEvent event { me, (int) pt.x, (int) pt.y, (integer) (clickedItem >= 0 ? clickedItem + 1 : 0) };
+						my d_contextMenuCallback (my d_contextMenuBoss, & event);
+						return 0;
+					}
+				}
+				break;
+			}
+			case WM_NCPAINT: {
+				DefSubclassProc (hwnd, uMsg, wParam, lParam);
+				HDC hdc = GetWindowDC (hwnd);
+				if (hdc) {
+					RECT rc;
+					GetWindowRect (hwnd, & rc);
+					OffsetRect (& rc, -rc.left, -rc.top);
+					HPEN hPen = CreatePen (PS_SOLID, 1, RGB (209, 213, 219));   // #D1D5DB Clean modern border
+					HPEN oldPen = (HPEN) SelectObject (hdc, hPen);
+					HBRUSH oldBrush = (HBRUSH) SelectObject (hdc, GetStockObject (NULL_BRUSH));
+					Rectangle (hdc, rc.left, rc.top, rc.right, rc.bottom);
+					SelectObject (hdc, oldPen);
+					SelectObject (hdc, oldBrush);
+					DeleteObject (hPen);
+					ReleaseDC (hwnd, hdc);
+				}
+				return 0;
+			}
+			case WM_NCDESTROY: {
+				RemovePropW (hwnd, L"Praat_HoverItem");
+				RemoveWindowSubclass (hwnd, _ModernListSubclassProc, uIdSubclass);
+				break;
+			}
+			default: break;
+		}
+		return DefSubclassProc (hwnd, uMsg, wParam, lParam);
+	}
 #elif cocoa
 	@implementation GuiCocoaList {
 		GuiList userData;
@@ -232,12 +355,13 @@ GuiList GuiList_create (GuiForm parent, int left, int right, int top, int bottom
 		_GuiObject_setUserData (my d_widget, me.get());
 		my d_widget -> window = CreateWindowEx (0, L"listbox", L"list",
 			WS_CHILD | WS_BORDER | WS_VSCROLL | LBS_NOTIFY | WS_CLIPSIBLINGS |
+			LBS_OWNERDRAWFIXED | LBS_HASSTRINGS |
 			( allowMultipleSelection ? LBS_EXTENDEDSEL : 0 ),
 			my d_widget -> x, my d_widget -> y, my d_widget -> width, my d_widget -> height,
 			my d_widget -> parent -> window, nullptr, theGui.instance, nullptr);
 		SetWindowLongPtr (my d_widget -> window, GWLP_USERDATA, (LONG_PTR) my d_widget);
 		SetWindowFont (my d_widget -> window, theWinGuiNormalLabelFont (), false);
-		SetWindowTheme (my d_widget -> window, L"Explorer", nullptr);
+		SetWindowSubclass (my d_widget -> window, _ModernListSubclassProc, 1, 0);
 		/*if (MEMBER (my parent, ScrolledWindow)) {
 			XtDestroyWidget (my d_widget -> parent -> motiff.scrolledWindow.horizontalBar);
 			my d_widget -> parent -> motiff.scrolledWindow.horizontalBar = nullptr;
@@ -524,6 +648,11 @@ void GuiList_setDoubleClickCallback (GuiList me, GuiList_DoubleClickCallback cal
 void GuiList_setScrollCallback (GuiList me, GuiList_ScrollCallback callback, Thing boss) {
 	my d_scrollCallback = callback;
 	my d_scrollBoss = boss;
+}
+
+void GuiList_setContextMenuCallback (GuiList me, GuiList_ContextMenuCallback callback, Thing boss) {
+	my d_contextMenuCallback = callback;
+	my d_contextMenuBoss = boss;
 }
 
 void GuiList_setTopPosition (GuiList me, integer topPosition) {

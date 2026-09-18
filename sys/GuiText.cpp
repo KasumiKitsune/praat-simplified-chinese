@@ -694,16 +694,44 @@ void _GuiText_exit () {
 				RedrawWindow (hwnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE);
 				return res;
 			}
+			case WM_NCCALCSIZE: {
+				if (! isScrolled) {
+					if (wParam) {
+						NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *) lParam;
+						p -> rgrc [0].left   += 2;
+						p -> rgrc [0].top    += 2;
+						p -> rgrc [0].right  -= 2;
+						p -> rgrc [0].bottom -= 2;
+						return 0;
+					}
+					RECT *r = (RECT *) lParam;
+					r -> left   += 2;
+					r -> top    += 2;
+					r -> right  -= 2;
+					r -> bottom -= 2;
+					return 0;
+				} else {
+					LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, lParam);
+					if (wParam) {
+						NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *) lParam;
+						p -> rgrc [0].left   += 1;
+						p -> rgrc [0].top    += 1;
+						p -> rgrc [0].right  -= 1;
+						p -> rgrc [0].bottom -= 1;
+					}
+					return res;
+				}
+			}
 			case WM_SIZE: {
 				LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, lParam);
 				if (! isScrolled) {
 					RECT rc;
 					GetClientRect (hwnd, & rc);
-					if (rc.right > 12 && rc.bottom > 8) {
-						rc.left += 6;
-						rc.right -= 6;
-						rc.top += 4;
-						rc.bottom -= 2;
+					if (rc.right > 12 && rc.bottom > 6) {
+						rc.left += 4;
+						rc.right -= 4;
+						rc.top += 2;
+						rc.bottom -= 1;
 						SendMessage (hwnd, EM_SETRECT, 0, (LPARAM) & rc);
 					}
 				}
@@ -722,35 +750,53 @@ void _GuiText_exit () {
 				bool isFocus   = (GetFocus () == hwnd) && isEnabled;
 				bool isHover   = (GetPropW (hwnd, L"PraatHover") != nullptr) && isEnabled;
 
+				// Exclude the client area so non-client painting never clips or overwrites text
+				RECT rcClient;
+				GetClientRect (hwnd, & rcClient);
+				POINT ptClient = { 0, 0 };
+				ClientToScreen (hwnd, & ptClient);
+				RECT rcWinScreen;
+				GetWindowRect (hwnd, & rcWinScreen);
+				OffsetRect (& rcClient, ptClient.x - rcWinScreen.left, ptClient.y - rcWinScreen.top);
+				ExcludeClipRect (hdc, rcClient.left, rcClient.top, rcClient.right, rcClient.bottom);
+
+				// Fill non-client background with parent dialog background brush
+				FillRect (hdc, & rcWin, theWinGuiBackgroundBrush ());
+
 				COLORREF borderCol;
 				if (! isEnabled)
 					borderCol = RGB (226, 232, 240);   // #E2E8F0
-				else if (isFocus)
-					borderCol = RGB (0, 103, 192);     // #0067C0 Win11 Fluent Blue
-				else if (isHover)
+				else if (isHover || isFocus)
 					borderCol = RGB (148, 163, 184);   // #94A3B8 Slate-400
 				else
 					borderCol = RGB (209, 213, 219);   // #D1D5DB Neutral Gray-300
 
+				// Always use a clean 1px border on all 4 sides
 				HPEN hPen = CreatePen (PS_SOLID, 1, borderCol);
 				HPEN oldPen = (HPEN) SelectObject (hdc, hPen);
 				HBRUSH oldBrush = (HBRUSH) SelectObject (hdc, GetStockObject (NULL_BRUSH));
 
 				if (! isScrolled) {
+					// Draw uniform 1px rounded card border
 					RoundRect (hdc, rcWin.left, rcWin.top, rcWin.right, rcWin.bottom, 6, 6);
 
-					// If focused, draw modern 2px accent underline
-					if (isFocus && rcWin.bottom > 4) {
-						HPEN hAccentPen = CreatePen (PS_SOLID, 2, RGB (0, 103, 192));
-						SelectObject (hdc, hAccentPen);
-						MoveToEx (hdc, rcWin.left + 2, rcWin.bottom - 1, nullptr);
-						LineTo (hdc, rcWin.right - 2, rcWin.bottom - 1);
-						SelectObject (hdc, oldPen);
-						DeleteObject (hAccentPen);
+					// Windows 11 Fluent Design: ONLY the bottom edge displays the 2px accent underline when focused!
+					if (isFocus && rcWin.bottom > 3) {
+						RECT rcAccent = { rcWin.left + 2, rcWin.bottom - 2, rcWin.right - 2, rcWin.bottom };
+						HBRUSH hAccentBrush = CreateSolidBrush (RGB (0, 103, 192)); // #0067C0 Win11 Fluent Blue
+						FillRect (hdc, & rcAccent, hAccentBrush);
+						DeleteObject (hAccentBrush);
 					}
 				} else {
 					// Scrolled editor: sleek crisp 1px rectangle border
 					Rectangle (hdc, rcWin.left, rcWin.top, rcWin.right, rcWin.bottom);
+
+					if (isFocus && rcWin.bottom > 3) {
+						RECT rcAccent = { rcWin.left, rcWin.bottom - 2, rcWin.right, rcWin.bottom };
+						HBRUSH hAccentBrush = CreateSolidBrush (RGB (0, 103, 192));
+						FillRect (hdc, & rcAccent, hAccentBrush);
+						DeleteObject (hAccentBrush);
+					}
 				}
 
 				SelectObject (hdc, oldPen);
@@ -773,19 +819,11 @@ void _GuiText_exit () {
 		if (! hwnd)
 			return;
 		bool isScrolled = (flags & GuiText_SCROLLED) != 0;
-		if (! isScrolled) {
-			SendMessage (hwnd, EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, MAKELPARAM (6, 6));
-			RECT rc;
-			GetClientRect (hwnd, & rc);
-			if (rc.right > 12 && rc.bottom > 8) {
-				rc.left += 6;
-				rc.right -= 6;
-				rc.top += 4;
-				rc.bottom -= 2;
-				SendMessage (hwnd, EM_SETRECT, 0, (LPARAM) & rc);
-			}
-		}
+		if (isScrolled)
+			return; // Scrolled multiline editors manage their own non-client scrollbars
+		SendMessage (hwnd, EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, MAKELPARAM (6, 6));
 		SetWindowSubclass (hwnd, _ModernEditSubclassProc, 2, (DWORD_PTR) flags);
+		SetWindowPos (hwnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 #endif
 
@@ -890,7 +928,7 @@ GuiText GuiText_create (GuiForm parent, int left, int right, int top, int bottom
 		my d_widget = _Gui_initializeWidget (xmTextWidgetClass, parent -> d_widget, flags & GuiText_SCROLLED ? U"scrolledText" : U"text");
 		_GuiObject_setUserData (my d_widget, me.get());
 		my d_editable = (flags & GuiText_NONEDITABLE) == 0;
-		my d_widget -> window = CreateWindow (L"edit", nullptr, WS_CHILD | WS_BORDER
+		my d_widget -> window = CreateWindow (L"edit", nullptr, WS_CHILD
 			| ( flags & GuiText_ANYWRAP ? ES_AUTOVSCROLL : ES_AUTOHSCROLL )
 			| ES_MULTILINE | ES_WANTRETURN | WS_CLIPSIBLINGS
 			| ( flags & GuiText_SCROLLED ? WS_VSCROLL | ( flags & GuiText_ANYWRAP ? 0 : WS_HSCROLL ) : 0 ),

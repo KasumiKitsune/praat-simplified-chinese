@@ -135,6 +135,7 @@ void praat_showLogo ();
 void praat_menuCommands_exit_optimizeByLeaking ();
 int praat_doMenuCommand (conststring32 command, conststring32 arguments, Interpreter interpreter);   // 0 = not found
 int praat_doMenuCommand (conststring32 command, integer narg, Stackel args, Interpreter interpreter);   // 0 = not found
+bool praat_canExecuteMenuCommand (conststring32 title);
 integer praat_getNumberOfMenuCommands ();
 Praat_Command praat_getMenuCommand (integer i);
 
@@ -149,6 +150,8 @@ int praat_doAction (conststring32 command, conststring32 arguments, Interpreter 
 int praat_doAction (conststring32 command, integer narg, Stackel args, Interpreter interpreter);   // 0 = not found
 integer praat_getNumberOfActions ();   // for ButtonEditor
 Praat_Command praat_getAction (integer i);   // for ButtonEditor
+bool praat_actions_canExecute (conststring32 titlePrefix);
+bool praat_actions_executeByName (conststring32 titlePrefix);
 
 /* Communication with praat_statistics.cpp: */
 void praat_statistics_prefs ();   // at init time

@@ -129,6 +129,11 @@ Thing_define (Graphics, Thing) {
 		{
 			v_rectangle (a_x1DC, a_x2DC, a_y1DC, a_y2DC);   // the simplest implementation
 		}
+	virtual void v_buttonEx (double a_x1DC, double a_x2DC, double a_y1DC, double a_y2DC, int state)
+		{
+			(void) state;
+			v_button (a_x1DC, a_x2DC, a_y1DC, a_y2DC);
+		}
 	virtual void v_roundedRectangle (double x1DC, double x2DC, double y1DC, double y2DC, double r);
 	virtual void v_fillRoundedRectangle (double x1DC, double x2DC, double y1DC, double y2DC, double r);
 	virtual void v_arrowHead (double xDC, double yDC, double angle);
@@ -234,6 +239,7 @@ void Graphics_doubleArrow (Graphics me, double x1, double y1, double x2, double 
 void Graphics_arcArrow (Graphics me, double x, double y, double r, double fromAngle, double toAngle, int arrowAtStart, int arrowAtEnd);
 void Graphics_mark (Graphics me, double x, double y, double size_mm, conststring32 markString /* cattable */);
 void Graphics_button (Graphics me, double x1, double x2, double y1, double y2);
+void Graphics_buttonEx (Graphics me, double x1, double x2, double y1, double y2, int state);
 void Graphics_innerRectangle (Graphics me, double x1, double x2, double y1, double y2);
 
 void Graphics_setColour (Graphics me, MelderColour colour);

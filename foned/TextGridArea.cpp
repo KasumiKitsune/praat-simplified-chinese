@@ -44,6 +44,10 @@ Thing_implement (TextGridArea, FunctionArea, 0);
  * if the selected tier is an interval tier.
  */
 
+static const MelderColour modernSelectionYellow = MelderColour (0.98, 0.94, 0.65);
+static const MelderColour modernMatchGreen = MelderColour (0.75, 0.93, 0.75);
+static const MelderColour tierDividerColour = MelderColour (0.80, 0.83, 0.86);
+
 static void checkTierSelection (constTextGridArea me, conststring32 verbPhrase) {
 	if (my selectedTier < 1 || my selectedTier > my textGrid() -> tiers->size)
 		Melder_throw (U"To ", verbPhrase, U", first select a tier by clicking anywhere inside it.");
@@ -253,11 +257,11 @@ void structTextGridArea :: v_specializedHighlightBackground () const {
 				const double bottom = 1.0 - double (itier) / numberOfTiers;
 				const double top = 1.0 - double (itier - 1) / numberOfTiers;
 				if (labelDoesMatch) {
-					Graphics_setColour (our graphics(), Melder_LIME);
+					Graphics_setColour (our graphics(), modernMatchGreen);
 					Graphics_fillRectangle (our graphics(), startInterval, endInterval, bottom, top);
 				}
 				if (intervalIsSelected) {
-					Graphics_setColour (our graphics(), Melder_YELLOW);
+					Graphics_setColour (our graphics(), modernSelectionYellow);
 					Graphics_fillRectangle (our graphics(),
 						labelDoesMatch ? 0.85 * startInterval + 0.15 * endInterval : startInterval,
 						labelDoesMatch ? 0.15 * startInterval + 0.85 * endInterval : endInterval,
@@ -304,7 +308,7 @@ static void do_drawIntervalTier (TextGridArea me, IntervalTier tier, integer iti
 			Graphics_line (my graphics(), my startSelection(), 0.0, my startSelection(), 1.0);
 			Graphics_setLineWidth (my graphics(), 1.0);
 			if (my editable()) {
-				Graphics_setColour (my graphics(), Melder_BLUE);
+				Graphics_setColour (my graphics(), DataGuiColour_EDITABLE);
 				Graphics_circle_mm (my graphics(), my startSelection(), 1.0 - dy, 3.0);
 			}
 		}
@@ -333,7 +337,7 @@ static void do_drawIntervalTier (TextGridArea me, IntervalTier tier, integer iti
 				Show alignment with cursor.
 			*/
 			if (startInterval == my startSelection()) {
-				Graphics_setColour (my graphics(), Melder_YELLOW);
+				Graphics_setColour (my graphics(), modernSelectionYellow);
 				Graphics_setLineWidth (my graphics(), platformUsesAntiAliasing ? 2.0 : 1.0);
 				Graphics_line (my graphics(), startInterval, 0.0, startInterval, 1.0);
 			}
@@ -419,7 +423,7 @@ static void do_drawTextTier (TextGridArea me, TextTier tier, integer itier) {
 				Show alignment with cursor.
 			*/
 			if (my startSelection() == my endSelection() && t == my startSelection()) {
-				Graphics_setColour (my graphics(), Melder_YELLOW);
+				Graphics_setColour (my graphics(), modernSelectionYellow);
 				Graphics_setLineWidth (my graphics(), platformUsesAntiAliasing ? 2.0 : 1.0);
 				Graphics_line (my graphics(), t, 0.0, t, 0.2);
 				Graphics_line (my graphics(), t, 0.8, t, 1.0);
@@ -451,7 +455,7 @@ void structTextGridArea :: v_drawInside () {
 			1.0 - (double) itier / (double) numberOfTiers,
 			1.0 - (double) (itier - 1) / (double) numberOfTiers
 		);
-		Graphics_setColour (our graphics(), Melder_BLACK);
+		Graphics_setColour (our graphics(), tierDividerColour);
 		if (itier != 1)
 			Graphics_line (our graphics(), our startWindow(), 1.0, our endWindow(), 1.0);
 
@@ -460,7 +464,7 @@ void structTextGridArea :: v_drawInside () {
 		*/
 		if (tierIsSelected) {
 			MelderColour oldColour = Graphics_inqColour (our graphics());
-			Graphics_setColour (our graphics(), Melder_YELLOW);
+			Graphics_setColour (our graphics(), modernSelectionYellow);
 			Graphics_fillRectangle (our graphics(), xleft, our startWindow(), 0.0, 1.0);
 			Graphics_fillRectangle (our graphics(), our endWindow(), xright, 0.0, 1.0);
 			Graphics_setColour (our graphics(), oldColour);
@@ -2153,9 +2157,39 @@ static const conststring32 characters [12] [10] = {
 
 void TextGridArea_drawSelectionViewer (TextGridArea me) {
 	Graphics_setWindow (my graphics(), 0.5, 10.5, 0.5, 12.5);
-	Graphics_setColour (my graphics(), Melder_WHITE);
+	Graphics_setColour (my graphics(), MelderColour (0.973, 0.980, 0.988)); // #F8FAFC
 	Graphics_fillRectangle (my graphics(), 0.5, 10.5, 0.5, 12.5);
-	Graphics_setColour (my graphics(), Melder_BLACK);
+
+	const int hRow = my functionEditor() -> hoveredIpaRow;
+	const int hCol = my functionEditor() -> hoveredIpaCol;
+	const int pRow = my functionEditor() -> pressedIpaRow;
+	const int pCol = my functionEditor() -> pressedIpaCol;
+
+	// 1. Draw cell cards (hover / pressed feedback)
+	for (integer irow = 1; irow <= 12; irow ++) {
+		for (integer icol = 1; icol <= 10; icol ++) {
+			const double cellLeft   = icol - 0.45;
+			const double cellRight  = icol + 0.45;
+			const double cellBottom = 13.0 - irow - 0.45;
+			const double cellTop    = 13.0 - irow + 0.45;
+			const bool isPressed = (irow == pRow && icol == pCol);
+			const bool isHovered = (irow == hRow && icol == hCol);
+
+			if (isPressed) {
+				Graphics_setColour (my graphics(), MelderColour (0.859, 0.918, 0.996)); // #DBEAFE
+				Graphics_fillRoundedRectangle (my graphics(), cellLeft, cellRight, cellBottom, cellTop, 0.15);
+				Graphics_setColour (my graphics(), MelderColour (0.0, 0.45, 0.72));     // #0073B8
+				Graphics_roundedRectangle (my graphics(), cellLeft, cellRight, cellBottom, cellTop, 0.15);
+			} else if (isHovered) {
+				Graphics_setColour (my graphics(), MelderColour (0.945, 0.961, 0.976)); // #F1F5F9
+				Graphics_fillRoundedRectangle (my graphics(), cellLeft, cellRight, cellBottom, cellTop, 0.15);
+				Graphics_setColour (my graphics(), MelderColour (0.580, 0.639, 0.722)); // #94A3B8
+				Graphics_roundedRectangle (my graphics(), cellLeft, cellRight, cellBottom, cellTop, 0.15);
+			}
+		}
+	}
+
+	// 2. Draw character glyphs
 	Graphics_setFont (my graphics(), kGraphics_font::TIMES);
 	const double pointsPerMillimetre = 72.0 / 25.4;
 	const double cellWidth_points = Graphics_dxWCtoMM (my graphics(), 1.0) * pointsPerMillimetre;
@@ -2163,9 +2197,20 @@ void TextGridArea_drawSelectionViewer (TextGridArea me) {
 	const double fontSize = std::min (0.8 * cellHeight_points, 1.2 * cellWidth_points);
 	Graphics_setFontSize (my graphics(), fontSize);
 	Graphics_setTextAlignment (my graphics(), Graphics_CENTRE, Graphics_HALF);
-	for (integer irow = 1; irow <= 12; irow ++)
-		for (integer icol = 1; icol <= 10; icol ++)
+	for (integer irow = 1; irow <= 12; irow ++) {
+		for (integer icol = 1; icol <= 10; icol ++) {
+			const bool isPressed = (irow == pRow && icol == pCol);
+			const bool isHovered = (irow == hRow && icol == hCol);
+			if (isPressed)
+				Graphics_setColour (my graphics(), MelderColour (0.0, 0.35, 0.62));
+			else if (isHovered)
+				Graphics_setColour (my graphics(), MelderColour (0.06, 0.09, 0.16));
+			else
+				Graphics_setColour (my graphics(), MelderColour (0.20, 0.25, 0.33));
 			Graphics_text (my graphics(), 0.0 + 1.0 * icol, 13.0 - 1.0 * irow, characters [irow-1] [icol-1]);
+		}
+	}
+	Graphics_setColour (my graphics(), Melder_BLACK);
 }
 void TextGridArea_clickSelectionViewer (TextGridArea me, double x_fraction, double y_fraction) {
 	const integer rowNumber = Melder_iceiling ((1.0 - y_fraction) * 12.0);

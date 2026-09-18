@@ -460,6 +460,18 @@ void praat_sensitivizeFixedButtonCommand (conststring32 title, bool sensitive) {
 		GuiThing_setSensitive (commandFound -> button, sensitive);
 }
 
+bool praat_canExecuteMenuCommand (conststring32 title) {
+	for (integer i = 1; i <= theCommands.size; i ++) {
+		Praat_Command command = theCommands.at [i];
+		if (str32equ (command -> title.get(), title) &&
+			(str32equ (command -> window.get(), U"Objects") || str32equ (command -> window.get(), U"Picture")))
+		{
+			return command -> executable;
+		}
+	}
+	return false;
+}
+
 int praat_doMenuCommand (conststring32 title, conststring32 arguments, Interpreter interpreter) {
 	Praat_Command commandFound = nullptr;
 	for (integer i = 1; i <= theCommands.size; i ++) {

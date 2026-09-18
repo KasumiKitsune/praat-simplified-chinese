@@ -126,6 +126,8 @@ Thing_define (GraphicsScreen, Graphics) {
 		override;
 	void v_button (double x1DC, double x2DC, double y1DC, double y2DC)
 		override;
+	void v_buttonEx (double x1DC, double x2DC, double y1DC, double y2DC, int state)
+		override;
 	void v_roundedRectangle (double x1DC, double x2DC, double y1DC, double y2DC, double r)
 		override;
 	void v_arrowHead (double xDC, double yDC, double angle)

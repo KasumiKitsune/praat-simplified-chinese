@@ -370,6 +370,8 @@ Thing_implement (GuiDrawingArea, GuiControl, 0);
 						Melder_flushError (U"Mouse drag not completely handled.");
 					break; case structGuiDrawingArea_MouseEvent::Phase::DROP:
 						Melder_flushError (U"Mouse drop not completely handled.");
+					break; case structGuiDrawingArea_MouseEvent::Phase::MOVE:
+						Melder_flushError (U"Mouse move not completely handled.");
 					break;
 				}
 			}

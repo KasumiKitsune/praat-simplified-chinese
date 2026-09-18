@@ -447,8 +447,413 @@ static void NativeScrollBar_set (GuiObject me) {
 		scrollInfo. nPage = (32767.0 * my sliderSize) / (my maximum - my minimum);
 		scrollInfo. nPos = ((32767.0 - scrollInfo. nPage) * (my value - my minimum)) / (my maximum - my minimum - my sliderSize);
 	}
-	if (my window)
-		SetScrollInfo (my window, SB_CTL, & scrollInfo, true);
+	if (my window) {
+		SetScrollInfo (my window, SB_CTL, & scrollInfo, FALSE);
+		InvalidateRect (my window, nullptr, FALSE);
+	}
+}
+
+static HWND s_scrollDragHwnd = nullptr;
+static int s_scrollDragPart = 0; // 1=arrow1, 2=pageUp, 3=thumb, 4=pageDown, 5=arrow2
+static int s_scrollDragStartMouse = 0;
+static int s_scrollDragStartPos = 0;
+static int s_scrollDragCurPos = 0;
+
+static LRESULT CALLBACK _ModernScrollBarSubclassProc (
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData
+) {
+	bool isVert = (dwRefData == 1);
+	switch (uMsg) {
+		case WM_LBUTTONDOWN: {
+			SetCapture (hwnd);
+			POINT pt;
+			pt.x = (int) (short) LOWORD (lParam);
+			pt.y = (int) (short) HIWORD (lParam);
+			RECT rc;
+			GetClientRect (hwnd, & rc);
+			int w = rc.right - rc.left;
+			int h = rc.bottom - rc.top;
+			int arrowSize = isVert ? w : h;
+			if (arrowSize * 2 > (isVert ? h : w))
+				arrowSize = (isVert ? h : w) / 2;
+
+			SCROLLINFO si;
+			si.cbSize = sizeof (SCROLLINFO);
+			si.fMask = SIF_ALL;
+			GetScrollInfo (hwnd, SB_CTL, & si);
+
+			int trackLength = (isVert ? h : w) - arrowSize * 2;
+			int range = si.nMax - si.nMin + 1;
+			int thumbStart = 0, thumbEnd = 0;
+			bool hasThumb = false;
+			if (range > 0 && (int) si.nPage < range && trackLength > 0) {
+				int thumbLength = (int) (((double) si.nPage * trackLength) / range);
+				if (thumbLength < 18) thumbLength = 18;
+				if (thumbLength > trackLength) thumbLength = trackLength;
+				int maxPos = si.nMax - si.nPage + 1;
+				int thumbOffset = 0;
+				if (maxPos > si.nMin)
+					thumbOffset = (int) (((double) (si.nPos - si.nMin) * (trackLength - thumbLength)) / (maxPos - si.nMin));
+				thumbStart = arrowSize + thumbOffset;
+				thumbEnd = thumbStart + thumbLength;
+				hasThumb = true;
+			}
+
+			int mouseCoord = isVert ? pt.y : pt.x;
+			s_scrollDragHwnd = hwnd;
+			if (mouseCoord < arrowSize) {
+				s_scrollDragPart = 1;
+				SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_LINEUP, 0), (LPARAM) hwnd);
+				SetTimer (hwnd, 9001, 250, nullptr);
+			} else if (mouseCoord >= (isVert ? h : w) - arrowSize) {
+				s_scrollDragPart = 5;
+				SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_LINEDOWN, 0), (LPARAM) hwnd);
+				SetTimer (hwnd, 9001, 250, nullptr);
+			} else if (hasThumb && mouseCoord >= thumbStart && mouseCoord < thumbEnd) {
+				s_scrollDragPart = 3;
+				s_scrollDragStartMouse = mouseCoord;
+				s_scrollDragStartPos = si.nPos;
+				s_scrollDragCurPos = si.nPos;
+			} else if (hasThumb && mouseCoord < thumbStart) {
+				s_scrollDragPart = 2;
+				SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_PAGEUP, 0), (LPARAM) hwnd);
+				SetTimer (hwnd, 9001, 250, nullptr);
+			} else if (hasThumb && mouseCoord >= thumbEnd) {
+				s_scrollDragPart = 4;
+				SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_PAGEDOWN, 0), (LPARAM) hwnd);
+				SetTimer (hwnd, 9001, 250, nullptr);
+			}
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return 0;
+		}
+		case WM_MOUSEMOVE: {
+			TRACKMOUSEEVENT tme;
+			tme.cbSize = sizeof (TRACKMOUSEEVENT);
+			tme.dwFlags = TME_LEAVE;
+			tme.hwndTrack = hwnd;
+			tme.dwHoverTime = 0;
+			TrackMouseEvent (& tme);
+
+			if (s_scrollDragHwnd == hwnd && s_scrollDragPart == 3) {
+				POINT pt;
+				pt.x = (int) (short) LOWORD (lParam);
+				pt.y = (int) (short) HIWORD (lParam);
+				RECT rc;
+				GetClientRect (hwnd, & rc);
+				int w = rc.right - rc.left;
+				int h = rc.bottom - rc.top;
+				int arrowSize = isVert ? w : h;
+				if (arrowSize * 2 > (isVert ? h : w))
+					arrowSize = (isVert ? h : w) / 2;
+
+				SCROLLINFO si;
+				si.cbSize = sizeof (SCROLLINFO);
+				si.fMask = SIF_ALL;
+				GetScrollInfo (hwnd, SB_CTL, & si);
+
+				int trackLength = (isVert ? h : w) - arrowSize * 2;
+				int range = si.nMax - si.nMin + 1;
+				int thumbLength = (int) (((double) si.nPage * trackLength) / range);
+				if (thumbLength < 18) thumbLength = 18;
+				if (thumbLength > trackLength) thumbLength = trackLength;
+				int maxPos = si.nMax - si.nPage + 1;
+				int availablePixels = trackLength - thumbLength;
+
+				if (availablePixels > 0 && maxPos > si.nMin) {
+					int mouseCoord = isVert ? pt.y : pt.x;
+					int deltaPixels = mouseCoord - s_scrollDragStartMouse;
+					int newPos = s_scrollDragStartPos + (int) (((double) deltaPixels * (maxPos - si.nMin)) / availablePixels);
+					if (newPos < si.nMin) newPos = si.nMin;
+					if (newPos > maxPos) newPos = maxPos;
+					if (newPos != s_scrollDragCurPos) {
+						s_scrollDragCurPos = newPos;
+						SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_THUMBTRACK, newPos), (LPARAM) hwnd);
+					}
+				}
+			}
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return 0;
+		}
+		case WM_LBUTTONUP: {
+			if (GetCapture () == hwnd)
+				ReleaseCapture ();
+			KillTimer (hwnd, 9001);
+			if (s_scrollDragHwnd == hwnd) {
+				if (s_scrollDragPart == 3) {
+					SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_THUMBPOSITION, s_scrollDragCurPos), (LPARAM) hwnd);
+				}
+				s_scrollDragHwnd = nullptr;
+				s_scrollDragPart = 0;
+			}
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return 0;
+		}
+		case WM_CAPTURECHANGED: {
+			KillTimer (hwnd, 9001);
+			s_scrollDragHwnd = nullptr;
+			s_scrollDragPart = 0;
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return 0;
+		}
+		case WM_TIMER: {
+			if (wParam == 9001 && s_scrollDragHwnd == hwnd) {
+				SetTimer (hwnd, 9001, 50, nullptr);
+				if (s_scrollDragPart == 1)
+					SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_LINEUP, 0), (LPARAM) hwnd);
+				else if (s_scrollDragPart == 5)
+					SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_LINEDOWN, 0), (LPARAM) hwnd);
+				else if (s_scrollDragPart == 2)
+					SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_PAGEUP, 0), (LPARAM) hwnd);
+				else if (s_scrollDragPart == 4)
+					SendMessage (GetParent (hwnd), isVert ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM (SB_PAGEDOWN, 0), (LPARAM) hwnd);
+				InvalidateRect (hwnd, nullptr, FALSE);
+				return 0;
+			}
+			break;
+		}
+		case WM_MOUSELEAVE: {
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return 0;
+		}
+		case SBM_SETPOS: {
+			LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, FALSE);
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return res;
+		}
+		case SBM_SETRANGEREDRAW: {
+			LRESULT res = DefSubclassProc (hwnd, SBM_SETRANGE, wParam, lParam);
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return res;
+		}
+		case SBM_SETSCROLLINFO: {
+			LRESULT res = DefSubclassProc (hwnd, uMsg, FALSE, lParam);
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return res;
+		}
+		case SBM_SETRANGE:
+		case SBM_ENABLE_ARROWS: {
+			LRESULT res = DefSubclassProc (hwnd, uMsg, wParam, lParam);
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return res;
+		}
+		case WM_ERASEBKGND:
+			return 1;
+		case WM_PRINTCLIENT:
+		case WM_PAINT: {
+			PAINTSTRUCT ps;
+			HDC hdc = (uMsg == WM_PRINTCLIENT) ? (HDC) wParam : BeginPaint (hwnd, & ps);
+			if (! hdc)
+				return 0;
+			RECT rc;
+			GetClientRect (hwnd, & rc);
+			int w = rc.right - rc.left;
+			int h = rc.bottom - rc.top;
+			if (w <= 0 || h <= 0) {
+				if (uMsg == WM_PAINT)
+					EndPaint (hwnd, & ps);
+				return 0;
+			}
+
+			SCROLLINFO si;
+			si.cbSize = sizeof (SCROLLINFO);
+			si.fMask = SIF_ALL;
+			bool haveSi = GetScrollInfo (hwnd, SB_CTL, & si) != FALSE;
+
+			HDC memDC = CreateCompatibleDC (hdc);
+			HBITMAP memBitmap = CreateCompatibleBitmap (hdc, w, h);
+			HBITMAP oldBitmap = (HBITMAP) SelectObject (memDC, memBitmap);
+
+			_GuiWin_ensureGdiplus ();
+			{
+				Gdiplus::Graphics g (memDC);
+				g.SetSmoothingMode (Gdiplus::SmoothingModeAntiAlias);
+				g.SetPixelOffsetMode (Gdiplus::PixelOffsetModeHighQuality);
+
+				// 1. Draw track background: modern clean soft neutral
+				Gdiplus::SolidBrush trackBg (Gdiplus::Color (255, 243, 244, 246));   // #F3F4F6
+				g.FillRectangle (& trackBg, 0, 0, w, h);
+
+				// Subtle separator line
+				Gdiplus::Pen borderPen (Gdiplus::Color (255, 229, 231, 235), 1.0f);  // #E5E7EB
+				if (isVert) {
+					g.DrawLine (& borderPen, 0.0f, 0.0f, 0.0f, (float) h);
+				} else {
+					g.DrawLine (& borderPen, 0.0f, 0.0f, (float) w, 0.0f);
+				}
+
+				POINT ptCursor;
+				GetCursorPos (& ptCursor);
+				ScreenToClient (hwnd, & ptCursor);
+				bool mouseInWindow = PtInRect (& rc, ptCursor) && (GetCapture () == hwnd || GetCapture () == NULL);
+
+				int arrowSize = isVert ? w : h;
+				if (arrowSize * 2 > (isVert ? h : w))
+					arrowSize = (isVert ? h : w) / 2;
+
+				RECT rcArrow1, rcArrow2;
+				if (isVert) {
+					SetRect (& rcArrow1, 0, 0, w, arrowSize);
+					SetRect (& rcArrow2, 0, h - arrowSize, w, h);
+				} else {
+					SetRect (& rcArrow1, 0, 0, arrowSize, h);
+					SetRect (& rcArrow2, w - arrowSize, 0, w, h);
+				}
+
+				bool arrow1Pressed = (s_scrollDragHwnd == hwnd && s_scrollDragPart == 1);
+				bool arrow1Hover   = mouseInWindow && PtInRect (& rcArrow1, ptCursor);
+
+				bool arrow2Pressed = (s_scrollDragHwnd == hwnd && s_scrollDragPart == 5);
+				bool arrow2Hover   = mouseInWindow && PtInRect (& rcArrow2, ptCursor);
+
+				// Draw arrow 1 button background if hovered or pressed
+				if (arrow1Pressed) {
+					Gdiplus::SolidBrush btnPress (Gdiplus::Color (255, 203, 213, 225)); // #CBD5E1
+					g.FillRectangle (& btnPress, (INT) rcArrow1.left, (INT) rcArrow1.top, (INT) (rcArrow1.right - rcArrow1.left), (INT) (rcArrow1.bottom - rcArrow1.top));
+				} else if (arrow1Hover) {
+					Gdiplus::SolidBrush btnHov (Gdiplus::Color (255, 226, 232, 240));   // #E2E8F0
+					g.FillRectangle (& btnHov, (INT) rcArrow1.left, (INT) rcArrow1.top, (INT) (rcArrow1.right - rcArrow1.left), (INT) (rcArrow1.bottom - rcArrow1.top));
+				}
+
+				// Draw arrow 2 button background if hovered or pressed
+				if (arrow2Pressed) {
+					Gdiplus::SolidBrush btnPress (Gdiplus::Color (255, 203, 213, 225)); // #CBD5E1
+					g.FillRectangle (& btnPress, (INT) rcArrow2.left, (INT) rcArrow2.top, (INT) (rcArrow2.right - rcArrow2.left), (INT) (rcArrow2.bottom - rcArrow2.top));
+				} else if (arrow2Hover) {
+					Gdiplus::SolidBrush btnHov (Gdiplus::Color (255, 226, 232, 240));   // #E2E8F0
+					g.FillRectangle (& btnHov, (INT) rcArrow2.left, (INT) rcArrow2.top, (INT) (rcArrow2.right - rcArrow2.left), (INT) (rcArrow2.bottom - rcArrow2.top));
+				}
+
+				// Arrow 1 vector chevron
+				{
+					Gdiplus::Color arrowCol = arrow1Pressed ? Gdiplus::Color (255, 0, 103, 192)
+						: (arrow1Hover ? Gdiplus::Color (255, 15, 23, 42) : Gdiplus::Color (255, 100, 116, 139));
+					Gdiplus::Pen arrowPen (arrowCol, 1.6f);
+					arrowPen.SetStartCap (Gdiplus::LineCapRound);
+					arrowPen.SetEndCap (Gdiplus::LineCapRound);
+					float cx = (rcArrow1.left + rcArrow1.right) / 2.0f;
+					float cy = (rcArrow1.top + rcArrow1.bottom) / 2.0f;
+					if (isVert) {
+						g.DrawLine (& arrowPen, cx - 3.5f, cy + 1.5f, cx, cy - 2.0f);
+						g.DrawLine (& arrowPen, cx, cy - 2.0f, cx + 3.5f, cy + 1.5f);
+					} else {
+						g.DrawLine (& arrowPen, cx + 1.5f, cy - 3.5f, cx - 2.0f, cy);
+						g.DrawLine (& arrowPen, cx - 2.0f, cy, cx + 1.5f, cy + 3.5f);
+					}
+				}
+
+				// Arrow 2 vector chevron
+				{
+					Gdiplus::Color arrowCol = arrow2Pressed ? Gdiplus::Color (255, 0, 103, 192)
+						: (arrow2Hover ? Gdiplus::Color (255, 15, 23, 42) : Gdiplus::Color (255, 100, 116, 139));
+					Gdiplus::Pen arrowPen (arrowCol, 1.6f);
+					arrowPen.SetStartCap (Gdiplus::LineCapRound);
+					arrowPen.SetEndCap (Gdiplus::LineCapRound);
+					float cx = (rcArrow2.left + rcArrow2.right) / 2.0f;
+					float cy = (rcArrow2.top + rcArrow2.bottom) / 2.0f;
+					if (isVert) {
+						g.DrawLine (& arrowPen, cx - 3.5f, cy - 1.5f, cx, cy + 2.0f);
+						g.DrawLine (& arrowPen, cx, cy + 2.0f, cx + 3.5f, cy - 1.5f);
+					} else {
+						g.DrawLine (& arrowPen, cx - 1.5f, cy - 3.5f, cx + 2.0f, cy);
+						g.DrawLine (& arrowPen, cx + 2.0f, cy, cx - 1.5f, cy + 3.5f);
+					}
+				}
+
+				// 2. Draw Thumb
+				int thumbStart = 0, thumbEnd = 0;
+				bool hasThumb = false;
+				if (haveSi) {
+					int trackLength = (isVert ? h : w) - arrowSize * 2;
+					int range = si.nMax - si.nMin + 1;
+					if (range > 0 && (int) si.nPage < range && trackLength > 0) {
+						int thumbLength = (int) (((double) si.nPage * trackLength) / range);
+						if (thumbLength < 18)
+							thumbLength = 18;
+						if (thumbLength > trackLength)
+							thumbLength = trackLength;
+						int maxPos = si.nMax - si.nPage + 1;
+						int curPos = (s_scrollDragHwnd == hwnd && s_scrollDragPart == 3) ? s_scrollDragCurPos : si.nPos;
+						int thumbOffset = 0;
+						if (maxPos > si.nMin)
+							thumbOffset = (int) (((double) (curPos - si.nMin) * (trackLength - thumbLength)) / (maxPos - si.nMin));
+						thumbStart = arrowSize + thumbOffset;
+						thumbEnd = thumbStart + thumbLength;
+						hasThumb = true;
+					}
+				}
+
+				if (hasThumb) {
+					RECT rcThumb;
+					float tx, ty, tw, th;
+					if (isVert) {
+						tx = (float) rc.left + 3.0f;
+						tw = (float) (w - 6);
+						ty = (float) thumbStart;
+						th = (float) (thumbEnd - thumbStart);
+						if (th < 18.0f) th = 18.0f;
+						if (tw < 4.0f) tw = 4.0f;
+						SetRect (& rcThumb, (int) tx, (int) ty, (int) (tx + tw), (int) (ty + th));
+					} else {
+						ty = (float) rc.top + 3.0f;
+						th = (float) (h - 6);
+						tx = (float) thumbStart;
+						tw = (float) (thumbEnd - thumbStart);
+						if (tw < 18.0f) tw = 18.0f;
+						if (th < 4.0f) th = 4.0f;
+						SetRect (& rcThumb, (int) tx, (int) ty, (int) (tx + tw), (int) (ty + th));
+					}
+
+					bool thumbPressed = (s_scrollDragHwnd == hwnd && s_scrollDragPart == 3);
+					bool thumbHover = mouseInWindow && PtInRect (& rcThumb, ptCursor);
+
+					Gdiplus::Color thumbCol;
+					if (thumbPressed)
+						thumbCol = Gdiplus::Color (255, 0, 103, 192);    // #0067C0 Win11 Fluent Blue active
+					else if (thumbHover)
+						thumbCol = Gdiplus::Color (255, 140, 147, 157);  // #8C939D Slate Hover
+					else
+						thumbCol = Gdiplus::Color (255, 193, 199, 205);  // #C1C7CD Neutral Gray
+
+					Gdiplus::SolidBrush thumbBrush (thumbCol);
+
+					float radius = (isVert ? tw : th) / 2.0f;
+					if (radius > 4.0f)
+						radius = 4.0f;
+					if (radius < 1.0f)
+						radius = 1.0f;
+
+					Gdiplus::GraphicsPath thumbPath;
+					thumbPath.AddArc (tx, ty, radius * 2.0f, radius * 2.0f, 180.0f, 90.0f);
+					thumbPath.AddArc (tx + tw - radius * 2.0f, ty, radius * 2.0f, radius * 2.0f, 270.0f, 90.0f);
+					thumbPath.AddArc (tx + tw - radius * 2.0f, ty + th - radius * 2.0f, radius * 2.0f, radius * 2.0f, 0.0f, 90.0f);
+					thumbPath.AddArc (tx, ty + th - radius * 2.0f, radius * 2.0f, radius * 2.0f, 90.0f, 90.0f);
+					thumbPath.CloseFigure ();
+
+					g.FillPath (& thumbBrush, & thumbPath);
+				}
+			}
+
+			BitBlt (hdc, 0, 0, w, h, memDC, 0, 0, SRCCOPY);
+			SelectObject (memDC, oldBitmap);
+			DeleteObject (memBitmap);
+			DeleteDC (memDC);
+			if (uMsg == WM_PAINT)
+				EndPaint (hwnd, & ps);
+			return 0;
+		}
+		case WM_NCDESTROY: {
+			if (s_scrollDragHwnd == hwnd) {
+				s_scrollDragHwnd = nullptr;
+				s_scrollDragPart = 0;
+			}
+			KillTimer (hwnd, 9001);
+			RemoveWindowSubclass (hwnd, _ModernScrollBarSubclassProc, uIdSubclass);
+			break;
+		}
+		default: break;
+	}
+	return DefSubclassProc (hwnd, uMsg, wParam, lParam);
 }
 
 static void NativeMenuItem_delete (GuiObject me) {
@@ -640,11 +1045,12 @@ static void _GuiNativizeWidget (GuiObject me) {
 			SendMessage (my window, PBM_SETRANGE, (WPARAM) 0, (LPARAM) MAKELONG (0, 10000));
 		} break;
 		case xmScrollBarWidgetClass: {
+			bool isVert = str32equ (my name.get(), U"verticalScrollBar");
 			my window = CreateWindow (L"scrollbar", Melder_peek32toW (my name.get()), WS_CHILD |
-				( str32equ (my name.get(), U"verticalScrollBar") ? SBS_VERT : SBS_HORZ ) | WS_CLIPSIBLINGS,
+				( isVert ? SBS_VERT : SBS_HORZ ) | WS_CLIPSIBLINGS,
 				my x, my y, my width, my height, my parent -> window, (HMENU) 1, theGui.instance, NULL);
 			SetWindowLongPtr (my window, GWLP_USERDATA, (LONG_PTR) me);
-			SetWindowTheme (my window, L"Explorer", nullptr);
+			SetWindowSubclass (my window, _ModernScrollBarSubclassProc, 1, isVert ? 1 : 0);
 			NativeScrollBar_set (me);
 			my minimum = 0;
 			my maximum = 100;
@@ -2599,6 +3005,18 @@ void GuiMainLoop () {
 extern int main (int argc, char *argv []);
 int APIENTRY WinMain (HINSTANCE instance, HINSTANCE /*previousInstance*/, LPSTR commandLine, int commandShow) {
 	trace (U"Entering WinMain");
+	#ifndef DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED
+		#define DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED ((HANDLE)-5)
+	#endif
+	typedef BOOL (WINAPI *SetProcessDpiAwarenessContextProc) (HANDLE);
+	HMODULE hUser32 = GetModuleHandleW (L"user32.dll");
+	if (hUser32) {
+		SetProcessDpiAwarenessContextProc setDpiContext =
+			(SetProcessDpiAwarenessContextProc) (void*) GetProcAddress (hUser32, "SetProcessDpiAwarenessContext");
+		if (setDpiContext) {
+			setDpiContext (DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
+		}
+	}
 	theGui.instance = instance;
 	theGui.commandShow = commandShow;
 	int argc;
@@ -2735,14 +3153,31 @@ static void on_lbuttonDown (HWND window, BOOL doubleClick, int x, int y, UINT fl
 		if (MEMBER (me, DrawingArea)) {
 			SetCapture (window);
 			_GuiWinDrawingArea_handleMouse (me, structGuiDrawingArea_MouseEvent::Phase::CLICK, x, y);
-		} else FORWARD_WM_LBUTTONDOWN (window, doubleClick, x, y, flags, DefWindowProc);
-	} else FORWARD_WM_LBUTTONDOWN (window, doubleClick, x, y, flags, DefWindowProc);
+		} else {
+			SetFocus (window);
+			FORWARD_WM_LBUTTONDOWN (window, doubleClick, x, y, flags, DefWindowProc);
+		}
+	} else {
+		SetFocus (window);
+		FORWARD_WM_LBUTTONDOWN (window, doubleClick, x, y, flags, DefWindowProc);
+	}
 }
 static void on_mouseMove (HWND window, int x, int y, UINT flags) {
 	GuiObject me = (GuiObject) GetWindowLongPtr (window, GWLP_USERDATA);
 	if (me) {
-		if (MEMBER (me, DrawingArea) && (flags & MK_LBUTTON)) {
-			_GuiWinDrawingArea_handleMouse (me, structGuiDrawingArea_MouseEvent::Phase::DRAG, x, y);
+		if (MEMBER (me, DrawingArea)) {
+			TRACKMOUSEEVENT tme;
+			tme.cbSize = sizeof (TRACKMOUSEEVENT);
+			tme.dwFlags = TME_LEAVE;
+			tme.hwndTrack = window;
+			tme.dwHoverTime = 0;
+			TrackMouseEvent (& tme);
+
+			if (flags & MK_LBUTTON) {
+				_GuiWinDrawingArea_handleMouse (me, structGuiDrawingArea_MouseEvent::Phase::DRAG, x, y);
+			} else {
+				_GuiWinDrawingArea_handleMouse (me, structGuiDrawingArea_MouseEvent::Phase::MOVE, x, y);
+			}
 		} else FORWARD_WM_MOUSEMOVE (window, x, y, flags, DefWindowProc);
 	} else FORWARD_WM_MOUSEMOVE (window, x, y, flags, DefWindowProc);
 }
@@ -2970,6 +3405,13 @@ static LRESULT CALLBACK windowProc (HWND window, UINT message, WPARAM wParam, LP
 		HANDLE_MSG (window, WM_LBUTTONDBLCLK, on_lbuttonDown);   // double-click counts as two clicks
 		HANDLE_MSG (window, WM_LBUTTONUP, on_lbuttonUp);
 		HANDLE_MSG (window, WM_MOUSEMOVE, on_mouseMove);
+		case WM_MOUSELEAVE: {
+			GuiObject me = (GuiObject) GetWindowLongPtr (window, GWLP_USERDATA);
+			if (me && MEMBER (me, DrawingArea)) {
+				_GuiWinDrawingArea_handleMouse (me, structGuiDrawingArea_MouseEvent::Phase::MOVE, -100, -100);
+			}
+			break;
+		}
 		HANDLE_MSG (window, WM_PAINT, on_paint);
 		HANDLE_MSG (window, WM_HSCROLL, on_hscroll);
 		HANDLE_MSG (window, WM_VSCROLL, on_vscroll);
@@ -2982,7 +3424,114 @@ static LRESULT CALLBACK windowProc (HWND window, UINT message, WPARAM wParam, LP
 		HANDLE_MSG (window, WM_CTLCOLORSTATIC, on_ctlColorStatic);
 		HANDLE_MSG (window, WM_CTLCOLOREDIT, on_ctlColorEdit);
 		HANDLE_MSG (window, WM_CTLCOLORLISTBOX, on_ctlColorListBox);
+		case WM_CTLCOLORSCROLLBAR: return (LRESULT) theWinGuiBackgroundBrush ();
 		HANDLE_MSG (window, WM_ACTIVATE, on_activate);
+		case WM_MEASUREITEM: {
+			MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT *) lParam;
+			if (mis && mis -> CtlType == ODT_LISTBOX) {
+				mis -> itemHeight = 28;
+				return TRUE;
+			}
+			break;
+		}
+		case WM_DRAWITEM: {
+			DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT *) lParam;
+			if (dis && dis -> CtlType == ODT_LISTBOX) {
+				if (dis -> itemID != (UINT) -1) {
+					bool isSelected = (dis -> itemState & ODS_SELECTED) != 0;
+					bool isEnabled  = ! (dis -> itemState & ODS_DISABLED);
+					int hoverItem   = (int) (LONG_PTR) GetPropW (dis -> hwndItem, L"Praat_HoverItem") - 1;
+					bool isHovered  = (hoverItem >= 0 && (UINT) hoverItem == dis -> itemID);
+
+					// Fill item background (pure white)
+					HBRUSH bgBrush = CreateSolidBrush (RGB (255, 255, 255));
+					FillRect (dis -> hDC, & dis -> rcItem, bgBrush);
+					DeleteObject (bgBrush);
+
+					if (isSelected) {
+						// Modern Fluent soft blue rounded selection pill (slightly deeper if hovered)
+						RECT rcCapsule = dis -> rcItem;
+						InflateRect (& rcCapsule, -2, -1);
+
+						COLORREF bgCol = isHovered ? RGB (212, 232, 247) : RGB (224, 238, 249);
+						COLORREF borderCol = isHovered ? RGB (120, 190, 250) : RGB (153, 209, 255);
+
+						HBRUSH hCapsuleBrush = CreateSolidBrush (bgCol);
+						HPEN hCapsulePen = CreatePen (PS_SOLID, 1, borderCol);
+						HPEN oldPen = (HPEN) SelectObject (dis -> hDC, hCapsulePen);
+						HBRUSH oldBrush = (HBRUSH) SelectObject (dis -> hDC, hCapsuleBrush);
+
+						RoundRect (dis -> hDC, rcCapsule.left, rcCapsule.top, rcCapsule.right, rcCapsule.bottom, 6, 6);
+
+						SelectObject (dis -> hDC, oldBrush);
+						SelectObject (dis -> hDC, oldPen);
+						DeleteObject (hCapsuleBrush);
+						DeleteObject (hCapsulePen);
+
+						// Left vertical accent indicator pill (Fluent Blue #0067C0)
+						RECT rcBar;
+						rcBar.left   = rcCapsule.left + 2;
+						rcBar.right  = rcBar.left + 3;
+						rcBar.top    = rcCapsule.top + 3;
+						rcBar.bottom = rcCapsule.bottom - 3;
+						HBRUSH hBarBrush = CreateSolidBrush (RGB (0, 103, 192));
+						HPEN hBarPen = CreatePen (PS_SOLID, 1, RGB (0, 103, 192));
+						oldPen = (HPEN) SelectObject (dis -> hDC, hBarPen);
+						oldBrush = (HBRUSH) SelectObject (dis -> hDC, hBarBrush);
+
+						RoundRect (dis -> hDC, rcBar.left, rcBar.top, rcBar.right, rcBar.bottom, 2, 2);
+
+						SelectObject (dis -> hDC, oldBrush);
+						SelectObject (dis -> hDC, oldPen);
+						DeleteObject (hBarBrush);
+						DeleteObject (hBarPen);
+					} else if (isHovered) {
+						// Modern Fluent subtle hover pill (#F3F4F6 with subtle border #E5E7EB)
+						RECT rcCapsule = dis -> rcItem;
+						InflateRect (& rcCapsule, -2, -1);
+
+						HBRUSH hCapsuleBrush = CreateSolidBrush (RGB (243, 244, 246));
+						HPEN hCapsulePen = CreatePen (PS_SOLID, 1, RGB (229, 231, 235));
+						HPEN oldPen = (HPEN) SelectObject (dis -> hDC, hCapsulePen);
+						HBRUSH oldBrush = (HBRUSH) SelectObject (dis -> hDC, hCapsuleBrush);
+
+						RoundRect (dis -> hDC, rcCapsule.left, rcCapsule.top, rcCapsule.right, rcCapsule.bottom, 6, 6);
+
+						SelectObject (dis -> hDC, oldBrush);
+						SelectObject (dis -> hDC, oldPen);
+						DeleteObject (hCapsuleBrush);
+						DeleteObject (hCapsulePen);
+					}
+
+					// Get item text
+					WCHAR textBuf [1024];
+					textBuf [0] = L'\0';
+					SendMessageW (dis -> hwndItem, LB_GETTEXT, dis -> itemID, (LPARAM) textBuf);
+
+					COLORREF textCol;
+					if (! isEnabled)
+						textCol = RGB (156, 163, 175);
+					else if (isSelected)
+						textCol = RGB (0, 62, 115);   // #003E73 Dark Blue for strong contrast
+					else
+						textCol = RGB (15, 23, 42);    // #0F172A Modern Slate
+
+					HFONT hFont = theWinGuiNormalLabelFont ();
+					HFONT oldFont = (HFONT) SelectObject (dis -> hDC, hFont);
+					SetBkMode (dis -> hDC, TRANSPARENT);
+					SetTextColor (dis -> hDC, textCol);
+
+					RECT rcText = dis -> rcItem;
+					rcText.left += (isSelected ? 14 : 10);
+					rcText.right -= 4;
+					DrawTextW (dis -> hDC, textBuf, -1, & rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+
+					SelectObject (dis -> hDC, oldFont);
+				}
+				return TRUE;
+			}
+			break;
+		}
 		#ifdef _WIN64
 		case WM_POINTERWHEEL: {   // from Windows 8 on
 			int zDelta = GET_WHEEL_DELTA_WPARAM (wParam);
@@ -3038,6 +3587,7 @@ static LRESULT CALLBACK windowProc (HWND window, UINT message, WPARAM wParam, LP
 		}
 		default: return DefWindowProc (window, message, wParam, lParam);
 	}
+	return DefWindowProc (window, message, wParam, lParam);
 }
 void motif_win_setUserMessageCallback (int (*userMessageCallback) (void)) {
 	theUserMessageCallback = userMessageCallback;

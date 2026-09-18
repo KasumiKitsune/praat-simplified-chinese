@@ -21,6 +21,7 @@
 #include "EditorM.h"
 #include "GuiP.h"
 #include "FunctionArea.h"
+#include <algorithm>
 
 Thing_implement_pureVirtual (FunctionEditor, Editor, 0);
 
@@ -38,7 +39,7 @@ namespace {
 	constexpr double SCROLL_INCREMENT_FRACTION = 20.0;
 	constexpr int TEXT_HEIGHT = 50;
 	constexpr int BUTTON_X = 3;
-	constexpr int BUTTON_WIDTH = 40;
+	constexpr int BUTTON_WIDTH = 46;
 	constexpr int BUTTON_SPACING = 8;
 
 	constexpr integer THE_MAXIMUM_GROUP_SIZE = 100;
@@ -89,6 +90,27 @@ static void updateGroup (FunctionEditor me, const bool windowMarkersChanged, con
 			FunctionEditor_redraw (thee);   // BUG: does this do *two* updates if thou containst the same data as me?
 		}
 	}
+}
+
+static void getToggleButtonBounds (FunctionEditor me, double *out_left, double *out_right, double *out_bottom, double *out_top) {
+	my viewAllAsPixelettes ();
+	int w = GuiControl_getWidth (my drawingArea);
+	if (w <= 0)
+		w = 800;
+	// 24x24 px true square button, inset 10px from right and 8px from top
+	int dcRight  = w - 10;
+	int dcLeft   = dcRight - 24;
+	int dcTop    = 8;
+	int dcBottom = dcTop + 24;
+
+	double x1, y1, x2, y2;
+	Graphics_DCtoWC (my graphics.get(), dcLeft, dcTop, & x1, & y1);
+	Graphics_DCtoWC (my graphics.get(), dcRight, dcBottom, & x2, & y2);
+
+	*out_left   = std::min (x1, x2);
+	*out_right  = std::max (x1, x2);
+	*out_bottom = std::min (y1, y2);
+	*out_top    = std::max (y1, y2);
 }
 
 static void drawBackgroundAndData (FunctionEditor me) {
@@ -229,25 +251,40 @@ static void drawBackgroundAndData (FunctionEditor me) {
 	Graphics_setTextAlignment (my graphics.get(), Graphics_CENTRE, Graphics_HALF);
 	for (integer i = 0; i < 8; i ++) {
 		const double left = my rect [i]. left, right = my rect [i]. right;
-		if (left < right)
-			Graphics_button (my graphics.get(), left, right, my rect [i]. bottom, my rect [i]. top);
+		if (left < right) {
+			const int btnState = ( (int) i == my pressedPlayButton ? 2 : ( (int) i == my hoveredPlayButton ? 1 : 0 ) );
+			Graphics_buttonEx (my graphics.get(), left, right, my rect [i]. bottom, my rect [i]. top, btnState);
+		}
 	}
 
 	/*
-		Opening triangle (sometimes over button).
+		Opening chevron button (sleek modern toggle).
 	*/
 	if (my v_hasSelectionViewer() && ! my instancePref_showSelectionViewer()) {
-		const bool weHaveToDrawOverSelectionRectangleWithText = ( selectionIsNonempty && my endSelection == my tmax && my endWindow != my tmax );
+		my viewAllAsPixelettes ();
+		double left, right, bottom, top;
+		getToggleButtonBounds (me, & left, & right, & bottom, & top);
 		Graphics_setLineWidth (my graphics.get(), 1.0);
-		const double left = my _functionViewerRight - my space + 9.0, right = my _functionViewerRight - 3.0;
-		const double bottom = my height_pxlt - my space - my TOP_MARGIN + 3.0, top = my height_pxlt - my TOP_MARGIN - 3.0;
-		Graphics_setColour (my graphics.get(), Melder_PINK);
-		const double x [] = { left, right, left }, y [] = { bottom, 0.5 * (bottom + top), top };
-		Graphics_fillArea (my graphics.get(), 3, x, y);
-		if (! weHaveToDrawOverSelectionRectangleWithText) {
-			Graphics_setColour (my graphics.get(), Melder_GREY);
-			Graphics_polyline_closed (my graphics.get(), 3, x, y);
+		if (my hoveredToggleViewer) {
+			Graphics_setColour (my graphics.get(), MelderColour (0.937, 0.965, 1.0));   // #EFF6FF
+			Graphics_fillRoundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.576, 0.773, 0.992)); // #93C5FD
+			Graphics_roundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.145, 0.388, 0.922)); // #2563EB
+		} else {
+			Graphics_setColour (my graphics.get(), MelderColour (0.973, 0.980, 0.988)); // #F8FAFC
+			Graphics_fillRoundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.796, 0.835, 0.882)); // #CBD5E1
+			Graphics_roundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.392, 0.455, 0.545)); // #64748B
 		}
+		// Modern sleek chevron pointing left '<'
+		const double midX = 0.5 * (left + right);
+		const double midY = 0.5 * (bottom + top);
+		Graphics_setLineWidth (my graphics.get(), 1.6);
+		Graphics_line (my graphics.get(), midX + 3.0, midY + 4.5, midX - 3.0, midY);
+		Graphics_line (my graphics.get(), midX - 3.0, midY, midX + 3.0, midY - 4.5);
+		Graphics_setLineWidth (my graphics.get(), 1.0);
 		Graphics_setColour (my graphics.get(), Melder_BLACK);
 	}
 
@@ -263,6 +300,15 @@ static void drawBackgroundAndData (FunctionEditor me) {
 		const double left = my rect [i]. left, right = my rect [i]. right;
 		const double bottom = my rect [i]. bottom, top = my rect [i]. top;
 		if (left < right) {
+			const int btnState = ( (int) i == my pressedPlayButton ? 2 : ( (int) i == my hoveredPlayButton ? 1 : 0 ) );
+			const double vCorrection = verticalCorrection + (btnState == 2 ? 1.0 : 0.0);
+			if (btnState == 1)
+				Graphics_setColour (my graphics.get(), DataGuiColour_EDITABLE);
+			else if (btnState == 2)
+				Graphics_setColour (my graphics.get(), MelderColour (0.0, 0.35, 0.65));
+			else
+				Graphics_setColour (my graphics.get(), Melder_BLACK);
+
 			conststring8 format = my v_format_long ();
 			double value = undefined, inverseValue = 0.0;
 			switch (i) {
@@ -275,14 +321,19 @@ static void drawBackgroundAndData (FunctionEditor me) {
 					/*
 						Window domain text.
 					*/
-					Graphics_setColour (my graphics.get(), Melder_BLUE);
+					Graphics_setColour (my graphics.get(), btnState == 1 ? DataGuiColour_EDITABLE : (btnState == 2 ? MelderColour (0.0, 0.35, 0.65) : DataGuiColour_EDITABLE));
 					Graphics_setTextAlignment (my graphics.get(), Graphics_LEFT, Graphics_HALF);
-					Graphics_text (my graphics.get(), left, 0.5 * (bottom + top) - verticalCorrection,
+					Graphics_text (my graphics.get(), left, 0.5 * (bottom + top) - vCorrection,
 							Melder_fixed (my startWindow, my v_fixedPrecision_long ()));
 					Graphics_setTextAlignment (my graphics.get(), Graphics_RIGHT, Graphics_HALF);
-					Graphics_text (my graphics.get(), right, 0.5 * (bottom + top) - verticalCorrection,
+					Graphics_text (my graphics.get(), right, 0.5 * (bottom + top) - vCorrection,
 							Melder_fixed (my endWindow, my v_fixedPrecision_long ()));
-					Graphics_setColour (my graphics.get(), Melder_BLACK);
+					if (btnState == 1)
+						Graphics_setColour (my graphics.get(), DataGuiColour_EDITABLE);
+					else if (btnState == 2)
+						Graphics_setColour (my graphics.get(), MelderColour (0.0, 0.35, 0.65));
+					else
+						Graphics_setColour (my graphics.get(), Melder_BLACK);
 					Graphics_setTextAlignment (my graphics.get(), Graphics_CENTRE, Graphics_HALF);
 				} break; case 2: {
 					value = my startWindow - my tmin;
@@ -304,22 +355,22 @@ static void drawBackgroundAndData (FunctionEditor me) {
 			snprintf (text8, 100, format, value, inverseValue);
 			autostring32 text = Melder_8to32_e (text8);
 			if (Graphics_textWidth (my graphics.get(), text.get()) < right - left) {
-				Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - verticalCorrection, text.get());
+				Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - vCorrection, text.get());
 			} else if (format == my v_format_long()) {
 				snprintf (text8, 100, my v_format_short(), value);
 				text = Melder_8to32_e (text8);
 				if (Graphics_textWidth (my graphics.get(), text.get()) < right - left)
-					Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - verticalCorrection, text.get());
+					Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - vCorrection, text.get());
 			} else {
 				snprintf (text8, 100, my v_format_long(), value);
 				text = Melder_8to32_e (text8);
 				if (Graphics_textWidth (my graphics.get(), text.get()) < right - left) {
-					Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - verticalCorrection, text.get());
+					Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - vCorrection, text.get());
 				} else {
 					snprintf (text8, 100, my v_format_short(), my endSelection - my startSelection);
 					text = Melder_8to32_e (text8);
 					if (Graphics_textWidth (my graphics.get(), text.get()) < right - left)
-						Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - verticalCorrection, text.get());
+						Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - vCorrection, text.get());
 				}
 			}
 		}
@@ -1298,19 +1349,6 @@ static void gui_drawingarea_cb_expose (FunctionEditor me, GuiDrawingArea_ExposeE
 	*/
 	if (my instancePref_showSelectionViewer()) {
 		/*
-			Draw closing box.
-		*/
-		my viewAllAsPixelettes ();
-		Graphics_setLineWidth (my graphics.get(), 1.0);
-		const double left = my width_pxlt - my space + 9.0, right = my width_pxlt - 3.0;
-		const double bottom = my height_pxlt - my space + 5.0, top = my height_pxlt - 5.0;
-		Graphics_setColour (my graphics.get(), Melder_PINK);
-		Graphics_fillRectangle (my graphics.get(), left, right, bottom, top);
-		Graphics_setColour (my graphics.get(), Melder_GREY);
-		Graphics_line (my graphics.get(), left + 2.0, bottom + 2.0, right - 2.0, top - 2.0);
-		Graphics_line (my graphics.get(), left + 2.0, top - 2.0, right - 2.0, bottom + 2.0);
-		Graphics_setColour (my graphics.get(), Melder_BLACK);
-		/*
 			Draw content.
 		*/
 		my viewInnerSelectionViewerAsFractionByFraction ();
@@ -1318,6 +1356,35 @@ static void gui_drawingarea_cb_expose (FunctionEditor me, GuiDrawingArea_ExposeE
 			my v_drawRealTimeSelectionViewer (my playCursor);
 		else
 			my v_drawSelectionViewer ();
+
+		/*
+			Draw closing box (sleek modern close button).
+		*/
+		my viewAllAsPixelettes ();
+		double left, right, bottom, top;
+		getToggleButtonBounds (me, & left, & right, & bottom, & top);
+		Graphics_setLineWidth (my graphics.get(), 1.0);
+		if (my hoveredToggleViewer) {
+			Graphics_setColour (my graphics.get(), MelderColour (0.996, 0.886, 0.886)); // #FEE2E2
+			Graphics_fillRoundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.988, 0.647, 0.647)); // #FCA5A5
+			Graphics_roundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.863, 0.149, 0.149)); // #DC2626
+		} else {
+			Graphics_setColour (my graphics.get(), MelderColour (0.973, 0.980, 0.988)); // #F8FAFC
+			Graphics_fillRoundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.796, 0.835, 0.882)); // #CBD5E1
+			Graphics_roundedRectangle (my graphics.get(), left, right, bottom, top, 4.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.392, 0.455, 0.545)); // #64748B
+		}
+		const double midX = 0.5 * (left + right);
+		const double midY = 0.5 * (bottom + top);
+		const double halfSize = 4.0;
+		Graphics_setLineWidth (my graphics.get(), 1.6);
+		Graphics_line (my graphics.get(), midX - halfSize, midY - halfSize, midX + halfSize, midY + halfSize);
+		Graphics_line (my graphics.get(), midX - halfSize, midY + halfSize, midX + halfSize, midY - halfSize);
+		Graphics_setLineWidth (my graphics.get(), 1.0);
+		Graphics_setColour (my graphics.get(), Melder_BLACK);
 	}
 
 	/*
@@ -1422,16 +1489,108 @@ static void gui_drawingarea_cb_mouse (FunctionEditor me, GuiDrawingArea_MouseEve
 	my viewAllAsPixelettes ();
 	double x_pxlt, y_pxlt;
 	Graphics_DCtoWC (my graphics.get(), event -> x, event -> y, & x_pxlt, & y_pxlt);
-	if (event -> isClick()) {
-		if (my v_hasSelectionViewer() || my instancePref_showSelectionViewer()) {
-			const double left = my width_pxlt - my space + 9.0, right = my width_pxlt - 3.0;
-			const double bottom = my height_pxlt - my space + 5.0, top = my height_pxlt - 5.0;
-			if (x_pxlt > left && x_pxlt < right && y_pxlt > bottom && y_pxlt < top) {
-				my setInstancePref_showSelectionViewer (! my instancePref_showSelectionViewer());   // toggle
-				my updateGeometry (GuiControl_getWidth (my drawingArea), GuiControl_getHeight (my drawingArea));
-				FunctionEditor_redraw (me);
-				return;
+
+	// Determine toggle button bounds
+	double toggleLeft, toggleRight, toggleBottom, toggleTop;
+	getToggleButtonBounds (me, & toggleLeft, & toggleRight, & toggleBottom, & toggleTop);
+	bool overToggle = (my v_hasSelectionViewer() || my instancePref_showSelectionViewer()) &&
+	                  (x_pxlt >= toggleLeft && x_pxlt <= toggleRight && y_pxlt >= toggleBottom && y_pxlt <= toggleTop);
+
+	if (event -> isMove()) {
+		int newHoveredPlay = -1;
+		if (event -> x >= 0 && event -> y >= 0) {
+			for (integer i = 0; i < 8; i ++) {
+				if (x_pxlt > my rect [i]. left && x_pxlt < my rect [i]. right &&
+				    y_pxlt > my rect [i]. bottom && y_pxlt < my rect [i]. top) {
+					newHoveredPlay = (int) i;
+					break;
+				}
 			}
+		}
+
+		int newIpaRow = 0, newIpaCol = 0;
+		if (my instancePref_showSelectionViewer() && my isInSelectionViewer (x_pxlt)) {
+			my viewInnerSelectionViewerAsFractionByFraction ();
+			double x_fraction, y_fraction;
+			Graphics_DCtoWC (my graphics.get(), event -> x, event -> y, & x_fraction, & y_fraction);
+			int r = (int) Melder_iceiling ((1.0 - y_fraction) * 12.0);
+			int c = (int) Melder_iceiling (x_fraction * 10.0);
+			if (r >= 1 && r <= 12 && c >= 1 && c <= 10) {
+				newIpaRow = r;
+				newIpaCol = c;
+			}
+		}
+
+		#ifdef _WIN32
+			if (newHoveredPlay != -1 || overToggle || (newIpaRow > 0 && newIpaCol > 0)) {
+				SetCursor (LoadCursor (nullptr, IDC_HAND));
+			} else if (my hoveredPlayButton != -1 || my hoveredToggleViewer || my hoveredIpaRow != 0) {
+				SetCursor (LoadCursor (nullptr, IDC_ARROW));
+			}
+		#endif
+
+		bool needRedraw = false;
+		if (newHoveredPlay != my hoveredPlayButton) {
+			my hoveredPlayButton = newHoveredPlay;
+			needRedraw = true;
+		}
+		if (overToggle != my hoveredToggleViewer) {
+			my hoveredToggleViewer = overToggle;
+			needRedraw = true;
+		}
+		if (newIpaRow != my hoveredIpaRow || newIpaCol != my hoveredIpaCol) {
+			my hoveredIpaRow = newIpaRow;
+			my hoveredIpaCol = newIpaCol;
+			needRedraw = true;
+		}
+
+		if (needRedraw)
+			FunctionEditor_redraw (me);
+		return;
+	}
+
+	if (event -> isDrop()) {
+		if (my pressedPlayButton != -1) {
+			double elapsed = Melder_clock () - my playButtonPressTime;
+			if (elapsed < 0.08) {
+				#ifdef _WIN32
+				Sleep ((DWORD) ((0.08 - elapsed) * 1000.0));
+				#endif
+			}
+			my pressedPlayButton = -1;
+			FunctionEditor_redraw (me);
+			#if gdi
+				if (my drawingArea && my drawingArea -> d_widget)
+					UpdateWindow ((HWND) my drawingArea -> d_widget);
+			#endif
+		}
+		if (my pressedIpaRow != 0) {
+			double elapsed = Melder_clock () - my ipaPressTime;
+			if (elapsed < 0.08) {
+				#ifdef _WIN32
+				Sleep ((DWORD) ((0.08 - elapsed) * 1000.0));
+				#endif
+			}
+			my pressedIpaRow = 0;
+			my pressedIpaCol = 0;
+			FunctionEditor_redraw (me);
+			#if gdi
+				if (my drawingArea && my drawingArea -> d_widget)
+					UpdateWindow ((HWND) my drawingArea -> d_widget);
+			#endif
+		}
+	}
+
+	if (event -> isClick()) {
+		if (overToggle) {
+			my setInstancePref_showSelectionViewer (! my instancePref_showSelectionViewer());   // toggle
+			my updateGeometry (GuiControl_getWidth (my drawingArea), GuiControl_getHeight (my drawingArea));
+			FunctionEditor_redraw (me);
+			#if gdi
+				if (my drawingArea && my drawingArea -> d_widget)
+					UpdateWindow ((HWND) my drawingArea -> d_widget);
+			#endif
+			return;
 		}
 		my clickWasModifiedByShiftKey = event -> shiftKeyPressed;
 		my clickWasModifiedByOptionKey = event -> optionKeyPressed;
@@ -1444,11 +1603,20 @@ static void gui_drawingarea_cb_mouse (FunctionEditor me, GuiDrawingArea_MouseEve
 		double x_fraction, y_fraction;
 		Graphics_DCtoWC (my graphics.get(), event -> x, event -> y, & x_fraction, & y_fraction);
 		if (event -> isClick()) {
+			int r = (int) Melder_iceiling ((1.0 - y_fraction) * 12.0);
+			int c = (int) Melder_iceiling (x_fraction * 10.0);
+			if (r >= 1 && r <= 12 && c >= 1 && c <= 10) {
+				my pressedIpaRow = r;
+				my pressedIpaCol = c;
+				my ipaPressTime = Melder_clock ();
+				FunctionEditor_redraw (me);
+				#if gdi
+					if (my drawingArea && my drawingArea -> d_widget)
+						UpdateWindow ((HWND) my drawingArea -> d_widget);
+				#endif
+			}
 			my v_clickSelectionViewer (x_fraction, y_fraction);
-			//Melder_assert (isdefined (my startSelection));   // precondition of v_updateText()
-			//my v_updateText ();
-			FunctionEditor_redraw (me);
-			updateGroup (me, false, false);   // TODO: why needed?
+			updateGroup (me, false, false);
 		} else;   // no dragging (yet?) in any selection viewer
 	} else if (my anchorIsInWideDataView) {
 		my viewDataAsWorldByFraction ();
@@ -1463,6 +1631,13 @@ static void gui_drawingarea_cb_mouse (FunctionEditor me, GuiDrawingArea_MouseEve
 			if (event -> isClick()) {
 				for (integer i = 0; i < 8; i ++) {
 					if (x_pxlt > my rect [i]. left && x_pxlt < my rect [i]. right && y_pxlt > my rect [i]. bottom && y_pxlt < my rect [i]. top) {
+						my pressedPlayButton = (int) i;
+						my playButtonPressTime = Melder_clock ();
+						FunctionEditor_redraw (me);
+						#if gdi
+							if (my drawingArea && my drawingArea -> d_widget)
+								UpdateWindow ((HWND) my drawingArea -> d_widget);
+						#endif
 						switch (i) {
 							case 0: my v_play (my tmin, my tmax); break;
 							case 1: my v_play (my startWindow, my endWindow); break;
@@ -1475,7 +1650,16 @@ static void gui_drawingarea_cb_mouse (FunctionEditor me, GuiDrawingArea_MouseEve
 						}
 					}
 				}
-			} else;   // no dragging in the play rectangles
+			} else if (event -> isDrag()) {
+				if (my pressedPlayButton != -1) {
+					integer i = my pressedPlayButton;
+					if (! (x_pxlt > my rect [i]. left && x_pxlt < my rect [i]. right &&
+					       y_pxlt > my rect [i]. bottom && y_pxlt < my rect [i]. top)) {
+						my pressedPlayButton = -1;
+						FunctionEditor_redraw (me);
+					}
+				}
+			}
 		} catch (MelderError) {
 			Melder_flushError ();
 		}

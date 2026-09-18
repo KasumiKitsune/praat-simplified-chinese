@@ -44,6 +44,17 @@ class GuiControlBlockValueChangedCallbacks {
 	#include <commctrl.h>
 	#include <uxtheme.h>
 	#include <dwmapi.h>
+	#include <gdiplus.h>
+
+	inline void _GuiWin_ensureGdiplus () {
+		static bool initialized = false;
+		if (! initialized) {
+			Gdiplus::GdiplusStartupInput input;
+			ULONG_PTR token;
+			Gdiplus::GdiplusStartup (& token, & input, nullptr);
+			initialized = true;
+		}
+	}
 
 	#define MEMBER(widget,klas)  ((widget -> widgetClass & xm##klas##WidgetClass) != 0)
 	#define MEMBER2(widget,klas1,klas2)  ((widget -> widgetClass & (xm##klas1##WidgetClass | xm##klas2##WidgetClass)) != 0)

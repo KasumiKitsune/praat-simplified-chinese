@@ -17,6 +17,7 @@
  */
 
 #include "GraphicsP.h"
+#include "GuiP.h"
 
 /* Normally on, because e.g. the intensity contour in the Sound window should not run through the play buttons: */
 #define FUNCTIONS_ARE_CLIPPED  1
@@ -615,17 +616,53 @@ void structGraphicsScreen :: v_button (double x1DC, double x2DC, double y1DC, do
 		CGContextSetAllowsAntialiasing (our d_macGraphicsContext, true);
 		CGContextSetLineDash (our d_macGraphicsContext, 0, nullptr, 0);
 	#elif gdi
+		v_buttonEx (x1DC, x2DC, y1DC, y2DC, 0);
+	#endif
+}
+
+void structGraphicsScreen :: v_buttonEx (double x1DC, double x2DC, double y1DC, double y2DC, int state) {
+	#if cairo
+		(void) state;
+		v_button (x1DC, x2DC, y1DC, y2DC);
+	#elif quartz
+		(void) state;
+		v_button (x1DC, x2DC, y1DC, y2DC);
+	#elif gdi
 		RECT rect;
-		rect. left = x1DC, rect. right = x2DC, rect. top = y2DC, rect. bottom = y1DC;
-		DrawEdge (our d_gdiGraphicsContext, & rect, EDGE_RAISED, BF_RECT);
-		SelectPen (our d_gdiGraphicsContext, GetStockPen (NULL_PEN));
-		static HBRUSH brush;
-		if (! brush)
-			brush = CreateSolidBrush (RGB (0.75 * 255, 0.75 * 255, 0.65 * 255));
-		SelectBrush (our d_gdiGraphicsContext, brush);
-		Rectangle (our d_gdiGraphicsContext, x1DC + 1, y2DC + 1, x2DC - 1, y1DC - 1);
-		SelectPen (our d_gdiGraphicsContext, GetStockPen (BLACK_PEN));
-		SelectBrush (our d_gdiGraphicsContext, GetStockBrush (NULL_BRUSH));
+		rect.left   = (LONG) (x1DC < x2DC ? x1DC : x2DC);
+		rect.right  = (LONG) (x1DC < x2DC ? x2DC : x1DC);
+		rect.top    = (LONG) (y2DC < y1DC ? y2DC : y1DC);
+		rect.bottom = (LONG) (y2DC < y1DC ? y1DC : y2DC);
+
+		COLORREF bgCol, borderCol;
+		if (state == 2) {
+			// Pressed: modern active slate-blue
+			bgCol     = RGB (226, 232, 240);   // #E2E8F0
+			borderCol = RGB (0, 115, 184);     // #0073B8
+		} else if (state == 1) {
+			// Hovered: crisp modern soft highlight
+			bgCol     = RGB (241, 245, 249);   // #F1F5F9
+			borderCol = RGB (148, 163, 184);   // #94A3B8
+		} else {
+			// Normal: clean modern flat white card
+			bgCol     = RGB (255, 255, 255);   // #FFFFFF
+			borderCol = RGB (203, 213, 225);   // #CBD5E1
+		}
+
+		_GuiWin_ensureGdiplus ();
+		Gdiplus::Graphics g (our d_gdiGraphicsContext);
+		g.SetSmoothingMode (Gdiplus::SmoothingModeNone);
+
+		float x = (float) rect.left;
+		float y = (float) rect.top;
+		float w = (float) (rect.right - rect.left);
+		float h = (float) (rect.bottom - rect.top);
+
+		Gdiplus::SolidBrush bgBrush (Gdiplus::Color (255, GetRValue (bgCol), GetGValue (bgCol), GetBValue (bgCol)));
+		Gdiplus::Pen borderPen (Gdiplus::Color (255, GetRValue (borderCol), GetGValue (borderCol), GetBValue (borderCol)), 1.0f);
+
+		g.FillRectangle (& bgBrush, x, y, w, h);
+		g.DrawRectangle (& borderPen, x, y, w > 1.0f ? w - 1.0f : 0.0f, h > 1.0f ? h - 1.0f : 0.0f);
 	#endif
 }
 
@@ -937,10 +974,14 @@ void Graphics_fillRoundedRectangle (Graphics me, double x1WC, double x2WC, doubl
 }
 
 void Graphics_button (Graphics me, double x1WC, double x2WC, double y1WC, double y2WC) {
+	Graphics_buttonEx (me, x1WC, x2WC, y1WC, y2WC, 0);
+}
+
+void Graphics_buttonEx (Graphics me, double x1WC, double x2WC, double y1WC, double y2WC, int state) {
 	if (my recording) {
 		op (BUTTON, 4); put (x1WC); put (x2WC); put (y1WC); put (y2WC);
 	} else
-		my v_button (wdx (x1WC), wdx (x2WC), wdy (y1WC), wdy (y2WC));
+		my v_buttonEx (wdx (x1WC), wdx (x2WC), wdy (y1WC), wdy (y2WC), state);
 }
 
 void Graphics_innerRectangle (Graphics me, double x1WC, double x2WC, double y1WC, double y2WC) {

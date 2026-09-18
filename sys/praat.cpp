@@ -47,6 +47,7 @@
 #include "../kar/UnicodeData.h"
 #include "InfoEditor.h"
 #include "praat_translate.h"
+#include "GuiP.h"
 
 extern "C" char *sendpraat (void *display, const char *programName, long timeOut, const char *text);
 
@@ -54,7 +55,7 @@ Thing_implement (Praat_Command, Thing, 0);
 
 #define EDITOR  theCurrentPraatObjects -> list [IOBJECT]. editors
 
-#define WINDOW_WIDTH 520
+#define WINDOW_WIDTH 580
 #define WINDOW_HEIGHT 700
 
 /*
@@ -478,6 +479,187 @@ static void gui_cb_list_selectionChanged (Thing /* boss */, GuiList_SelectionCha
 		theCurrentPraatObjects -> totalSelection += 1;
 	}
 	praat_show ();
+}
+
+static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent event) {
+#if motif
+	if (! praatList_objects || theCurrentPraatObjects -> n == 0)
+		return;
+
+	HMENU hMenu = CreatePopupMenu ();
+	if (! hMenu)
+		return;
+
+	enum {
+		CMD_VIEW_EDIT = 1001,
+		CMD_PLAY,
+		CMD_RENAME,
+		CMD_COPY,
+		CMD_INFO,
+		CMD_INSPECT,
+		CMD_SELECT_ALL,
+		CMD_DESELECT_ALL,
+		CMD_REMOVE
+	};
+
+	bool canViewEdit = praat_actions_canExecute (U"View & Edit") ||
+	                   praat_actions_canExecute (U"Edit") ||
+	                   praat_actions_canExecute (U"Open");
+	bool canPlay     = praat_actions_canExecute (U"Play");
+	bool canRename   = praat_canExecuteMenuCommand (U"Rename...");
+	bool canCopy     = praat_canExecuteMenuCommand (U"Copy...");
+	bool canInfo     = praat_canExecuteMenuCommand (U"Info");
+	bool canInspect  = praat_canExecuteMenuCommand (U"Inspect");
+	bool canRemove   = praat_canExecuteMenuCommand (U"Remove");
+	bool hasSelection = (theCurrentPraatObjects -> totalSelection > 0);
+
+	// 1. View & Edit (查看与编辑)
+	UINT flagViewEdit = (canViewEdit ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	conststring32 titleViewEdit = praat_translate (U"View & Edit");
+	char32 textBufViewEdit [128];
+	if (str32equ (titleViewEdit, U"View & Edit"))
+		Melder_sprint (textBufViewEdit, 128, U"查看与编辑 (View & Edit)");
+	else
+		Melder_sprint (textBufViewEdit, 128, titleViewEdit);
+	AppendMenuW (hMenu, flagViewEdit, CMD_VIEW_EDIT, Melder_peek32toW (textBufViewEdit));
+
+	if (canViewEdit)
+		SetMenuDefaultItem (hMenu, CMD_VIEW_EDIT, FALSE);
+
+	// 2. Play (播放)
+	if (canPlay) {
+		conststring32 titlePlay = praat_translate (U"Play");
+		char32 textBufPlay [128];
+		if (str32equ (titlePlay, U"Play"))
+			Melder_sprint (textBufPlay, 128, U"播放 (Play)");
+		else
+			Melder_sprint (textBufPlay, 128, titlePlay);
+		AppendMenuW (hMenu, MF_STRING, CMD_PLAY, Melder_peek32toW (textBufPlay));
+	}
+
+	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 3. Rename... (重命名...)
+	UINT flagRename = (canRename ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	conststring32 titleRename = praat_translate (U"Rename...");
+	char32 textBufRename [128];
+	if (str32equ (titleRename, U"Rename..."))
+		Melder_sprint (textBufRename, 128, U"重命名... (Rename...)");
+	else
+		Melder_sprint (textBufRename, 128, titleRename);
+	AppendMenuW (hMenu, flagRename, CMD_RENAME, Melder_peek32toW (textBufRename));
+
+	// 4. Copy... (复制...)
+	UINT flagCopy = (canCopy ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	conststring32 titleCopy = praat_translate (U"Copy...");
+	char32 textBufCopy [128];
+	if (str32equ (titleCopy, U"Copy..."))
+		Melder_sprint (textBufCopy, 128, U"复制... (Copy...)");
+	else
+		Melder_sprint (textBufCopy, 128, titleCopy);
+	AppendMenuW (hMenu, flagCopy, CMD_COPY, Melder_peek32toW (textBufCopy));
+
+	// 5. Info (信息)
+	UINT flagInfo = (canInfo ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	conststring32 titleInfo = praat_translate (U"Info");
+	char32 textBufInfo [128];
+	if (str32equ (titleInfo, U"Info"))
+		Melder_sprint (textBufInfo, 128, U"信息 (Info)");
+	else
+		Melder_sprint (textBufInfo, 128, titleInfo);
+	AppendMenuW (hMenu, flagInfo, CMD_INFO, Melder_peek32toW (textBufInfo));
+
+	// 6. Inspect (检查)
+	UINT flagInspect = (canInspect ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	conststring32 titleInspect = praat_translate (U"Inspect");
+	char32 textBufInspect [128];
+	if (str32equ (titleInspect, U"Inspect"))
+		Melder_sprint (textBufInspect, 128, U"检查 (Inspect)");
+	else
+		Melder_sprint (textBufInspect, 128, titleInspect);
+	AppendMenuW (hMenu, flagInspect, CMD_INSPECT, Melder_peek32toW (textBufInspect));
+
+	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 7. Select All (全选)
+	conststring32 titleSelectAll = praat_translate (U"Select all");
+	char32 textBufSelectAll [128];
+	if (str32equ (titleSelectAll, U"Select all"))
+		Melder_sprint (textBufSelectAll, 128, U"全选 (Select All)");
+	else
+		Melder_sprint (textBufSelectAll, 128, titleSelectAll);
+	AppendMenuW (hMenu, MF_STRING, CMD_SELECT_ALL, Melder_peek32toW (textBufSelectAll));
+
+	// 8. Deselect All (取消全选)
+	if (hasSelection) {
+		conststring32 titleDeselectAll = praat_translate (U"Deselect all");
+		char32 textBufDeselectAll [128];
+		if (str32equ (titleDeselectAll, U"Deselect all"))
+			Melder_sprint (textBufDeselectAll, 128, U"取消全选 (Deselect All)");
+		else
+			Melder_sprint (textBufDeselectAll, 128, titleDeselectAll);
+		AppendMenuW (hMenu, MF_STRING, CMD_DESELECT_ALL, Melder_peek32toW (textBufDeselectAll));
+	}
+
+	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 9. Remove (删除)
+	UINT flagRemove = (canRemove ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	conststring32 titleRemove = praat_translate (U"Remove");
+	char32 textBufRemove [128];
+	if (str32equ (titleRemove, U"Remove"))
+		Melder_sprint (textBufRemove, 128, U"删除 (Remove)");
+	else
+		Melder_sprint (textBufRemove, 128, titleRemove);
+	AppendMenuW (hMenu, flagRemove, CMD_REMOVE, Melder_peek32toW (textBufRemove));
+
+	HWND hwnd = praatList_objects -> d_widget -> window;
+	SetForegroundWindow (hwnd);
+	int cmd = TrackPopupMenuEx (hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+		event -> x, event -> y, hwnd, nullptr);
+	DestroyMenu (hMenu);
+
+	switch (cmd) {
+		case CMD_VIEW_EDIT:
+			if (praat_actions_canExecute (U"View & Edit"))
+				praat_actions_executeByName (U"View & Edit");
+			else if (praat_actions_canExecute (U"Edit"))
+				praat_actions_executeByName (U"Edit");
+			else if (praat_actions_canExecute (U"Open"))
+				praat_actions_executeByName (U"Open");
+			break;
+		case CMD_PLAY:
+			praat_actions_executeByName (U"Play");
+			break;
+		case CMD_RENAME:
+			praat_doMenuCommand (U"Rename...", nullptr, nullptr);
+			break;
+		case CMD_COPY:
+			praat_doMenuCommand (U"Copy...", nullptr, nullptr);
+			break;
+		case CMD_INFO:
+			praat_doMenuCommand (U"Info", nullptr, nullptr);
+			break;
+		case CMD_INSPECT:
+			praat_doMenuCommand (U"Inspect", nullptr, nullptr);
+			break;
+		case CMD_SELECT_ALL:
+			praat_selectAll ();
+			praat_show ();
+			break;
+		case CMD_DESELECT_ALL:
+			praat_deselectAll ();
+			praat_show ();
+			break;
+		case CMD_REMOVE:
+			praat_doMenuCommand (U"Remove", nullptr, nullptr);
+			break;
+		default:
+			break;
+	}
+#else
+	(void) event;
+#endif
 }
 
 void praat_list_renameAndSelect (integer position, conststring32 name) {
@@ -2137,6 +2319,7 @@ void praat_init (conststring32 title,
 		praatLabel_objects = GuiLabel_createShown (raam, 3, -250, Machine_getMenuBarBottom () + 5, Machine_getMenuBarBottom () + 5 + Gui_LABEL_HEIGHT, U"Objects:", 0);
 		praatList_objects = GuiList_create (raam, 0, -250, Machine_getMenuBarBottom () + 26, -114, true, U" Objects ");
 		GuiList_setSelectionChangedCallback (praatList_objects, gui_cb_list_selectionChanged, nullptr);
+		GuiList_setContextMenuCallback (praatList_objects, gui_cb_list_contextMenu, nullptr);
 		GuiThing_show (praatList_objects);
 		praat_addFixedButtons (raam);
 
