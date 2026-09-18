@@ -1766,13 +1766,30 @@
                   <h3><i class="fa-solid fa-i-cursor"></i> 多对象批量重命名</h3>
                   <p>选中多个对象时自动显示批量重命名工具，支持统一前后缀与序号递增。</p>
                 </div>
+
+                <div class="feature-item-compact">
+                  <h3><i class="fa-solid fa-shapes"></i> 现代化交互与右键菜单</h3>
+                  <p>Fluent 矢量图标、列表平滑悬停、右键快捷菜单与二级子菜单、顶部常用工具栏及播放暂停断点续播。</p>
+                </div>
               </div>
 
-              <!-- Screenshot Window Frame -->
+              <!-- Screenshot Window Frame: Modern Edition -->
+              <div class="shot-window" style="margin-bottom: 24px;">
+                <div class="shot-titlebar">
+                  <span class="shot-dots"><i></i><i></i><i></i></span>
+                  <span class="shot-filename">praat-zh-modern-ui.png · 现代化分支 (Modern Edition) 界面预览</span>
+                </div>
+                <div class="screenshot-wrapper" onclick="openLightbox('pictures/praat-zh-modern-ui.png', 'Praat 汉化现代化分支界面（Fluent 矢量图标、顶部快捷栏、右键上下文菜单及二级子菜单）')">
+                  <img src="pictures/praat-zh-modern-ui.png" alt="Praat 汉化现代化版本界面预览">
+                  <div class="screenshot-zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
+                </div>
+              </div>
+
+              <!-- Screenshot Window Frame: Classic Main Window -->
               <div class="shot-window">
                 <div class="shot-titlebar">
                   <span class="shot-dots"><i></i><i></i><i></i></span>
-                  <span class="shot-filename">praat-zh-main-window.png · 主窗口与常用操作</span>
+                  <span class="shot-filename">praat-zh-main-window.png · 主窗口与常用操作（经典版）</span>
                 </div>
                 <div class="screenshot-wrapper" onclick="openLightbox('pictures/praat-zh-main-window.png', 'Praat 汉化版主窗口与常用固定操作区')">
                   <img src="pictures/praat-zh-main-window.png" alt="Praat 汉化版主窗口预览">
@@ -1790,21 +1807,39 @@
               </div>
 
               <div class="download-grid-compact">
-                <!-- Windows Card -->
-                <div class="download-card-compact featured">
+                <!-- Windows Modern Card -->
+                <div class="download-card-compact featured" style="border-color: #0078d4;">
                   <div class="dl-card-header">
                     <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
-                    <span>Windows (x64)</span>
+                    <span>Windows (x64) · 现代增强版</span>
                   </div>
                   <div class="dl-meta">
-                    <span>v7.0-zh.3</span><i></i><span>.zip · 便携免安装</span>
+                    <span>Modern</span><i></i><span>.zip · Fluent 图标 / 快捷栏</span>
                   </div>
                   <div class="dl-card-desc">
-                    适用于 64 位 Windows 10 及 11。解压后双击即可运行。
+                    引入 Fluent 矢量图标、列表悬停与右键菜单、顶部常用快捷栏及播放暂停断点续播。
                   </div>
-                  <a id="dl-win-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Windows-x64.zip" class="praat-btn accent" style="padding: 10px;">
+                  <a id="dl-win-modern-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Modern-Windows-x64.zip" class="praat-btn accent" style="padding: 10px;">
                     <i class="fa-solid fa-download"></i>
-                    <span>下载 Windows x64 便携包 (.zip)</span>
+                    <span>下载 Modern 便携包 (.zip)</span>
+                  </a>
+                </div>
+
+                <!-- Windows Classic Card -->
+                <div class="download-card-compact">
+                  <div class="dl-card-header">
+                    <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
+                    <span>Windows (x64) · 经典原版</span>
+                  </div>
+                  <div class="dl-meta">
+                    <span>Classic</span><i></i><span>.zip · 原生官方外观</span>
+                  </div>
+                  <div class="dl-card-desc">
+                    保持 Praat 原生经典 Motif 界面风格，纯简体中文本地化。
+                  </div>
+                  <a id="dl-win-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Windows-x64.zip" class="praat-btn" style="padding: 10px;">
+                    <i class="fa-solid fa-download"></i>
+                    <span>下载 Classic 便携包 (.zip)</span>
                   </a>
                 </div>
 

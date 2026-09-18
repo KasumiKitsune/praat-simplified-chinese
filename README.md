@@ -15,15 +15,26 @@
 > 本文档是 Praat 英文 `README.md` 的中文翻译版本，旨在为中文用户提供更好的阅读和开发参考。
 
 <div align="center">
-  <img src="docs/pictures/praat-zh-main-window.png" width="32%" alt="Praat 汉化版主窗口" />
-  <img src="docs/pictures/praat-zh-manuel.png" width="32%" alt="Praat 汉化版帮助手册" />
-  <img src="docs/pictures/praat-zh-sound-recorder.png" width="32%" alt="Praat 录音窗口增强" />
+  <img src="docs/pictures/praat-zh-modern-ui.png" width="28%" alt="Praat 汉化现代版主窗口与右键菜单" />
+  <img src="docs/pictures/praat-zh-main-window.png" width="22%" alt="Praat 汉化版主窗口" />
+  <img src="docs/pictures/praat-zh-manuel.png" width="22%" alt="Praat 汉化版帮助手册" />
+  <img src="docs/pictures/praat-zh-sound-recorder.png" width="22%" alt="Praat 录音窗口增强" />
 </div>
 
 > [!TIP]
 > **本地化版新增特性与调整**
 > 
 > 为了优化日常使用体验，本中文汉化版本在此前基础上，进行了一些细节功能的调整与补充：
+> * **界面现代化与快捷操作（`modern` 分支）**
+>   * **特性截图**：
+>     <div align="center">
+>       <img src="docs/pictures/praat-zh-modern-ui.png" width="460" alt="Praat 汉化版现代分支主窗口与右键菜单" />
+>     </div>
+>   * **Fluent 矢量图标系统**：引入 Windows 原生矢量图标（自适应 Win11 `Segoe Fluent Icons` 与 Win10 `Segoe MDL2 Assets`），为主窗口动作按钮、固定操作区、对象类型图标及右键菜单提供视觉指引。
+>   * **对象列表交互优化**：行高增至 28px，增加鼠标悬停微圆角浅灰提示；默认列表宽度拓宽至 330px，减少长对象名称截断。
+>   * **右键上下文菜单**：右键点击列表条目即可触发常用操作（查看与编辑、播放、重命名、复制、信息、检查、全选、移除），并提供二级子菜单（`保存为 ▶` 支持 WAV、文本、短文本及二进制；`查询 ▶` 支持查询时长、采样率与采样点数）。
+>   * **顶部常驻快捷栏**：对象列表正上方新增“录制”、“打开...”、“保存”三个按钮，并根据选定状态自动切换可用性。
+>   * **音频播放暂停与断点续播**：主界面播放操作支持“播放 / 暂停”切换，暂停后再次点击可从暂停位置继续播放。
 > * **Windows 平台文件拖拽打开支持**
 >   * **特性描述**：增加了在 Windows 系统下将音频（.wav）、标注（.TextGrid）或脚本（.praat）等文件拖进窗口直接打开的功能，并支持一次性打开多个文件。
 > * **启动时默认隐藏图像窗口**
