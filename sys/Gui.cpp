@@ -167,9 +167,11 @@ void Gui_getWindowPositioningBounds (double *x, double *y, double *width, double
 	}
 
 	HFONT theWinGuiIconFont (int height) {
-		static HFONT fontDefault;
-		if (height == -14 && fontDefault)
-			return fontDefault;
+		static struct { int h; HFONT font; } s_cached [8];
+		for (int i = 0; i < 8; i ++) {
+			if (s_cached [i].h == height && s_cached [i].font)
+				return s_cached [i].font;
+		}
 
 		static const wchar_t *families [] = {
 			L"Segoe Fluent Icons",
@@ -183,7 +185,7 @@ void Gui_getWindowPositioningBounds (double *x, double *y, double *width, double
 				HFONT hf = CreateFontW (
 					height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
 					DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-					CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+					ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 					family
 				);
 				if (hf) {
@@ -204,12 +206,17 @@ void Gui_getWindowPositioningBounds (double *x, double *y, double *width, double
 			result = CreateFontW (
 				height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
 				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-				CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+				ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 				L"Segoe UI Symbol"
 			);
 		}
-		if (height == -14)
-			fontDefault = result;
+		for (int i = 0; i < 8; i ++) {
+			if (s_cached [i].font == nullptr) {
+				s_cached [i].h = height;
+				s_cached [i].font = result;
+				break;
+			}
+		}
 		return result;
 	}
 

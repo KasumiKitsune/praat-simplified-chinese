@@ -3409,7 +3409,7 @@ static const wchar_t *getObjectTypeIconGlyph (const wchar_t *text) {
 	if (wcsncmp (p, L"Sound", 5) == 0 || wcsncmp (p, L"LongSound", 9) == 0)
 		return L"\uE767";   // Audio wave / Volume
 	if (wcsncmp (p, L"TextGrid", 8) == 0)
-		return L"\uEA37";   // Segmented table
+		return L"\uE80A";   // Grid table (distinct grid box, never confused with "三")
 	if (wcsncmp (p, L"Pitch", 5) == 0)
 		return L"\uE9D2";   // Trend curve
 	if (wcsncmp (p, L"Spectrum", 8) == 0 || wcsncmp (p, L"Spectrogram", 11) == 0)
@@ -3421,13 +3421,13 @@ static const wchar_t *getObjectTypeIconGlyph (const wchar_t *text) {
 	if (wcsncmp (p, L"Harmonicity", 11) == 0)
 		return L"\uE767";
 	if (wcsncmp (p, L"Table", 5) == 0)
-		return L"\uE802";   // Data table
+		return L"\uF0E3";   // Table / Checklist
 	if (wcsncmp (p, L"Strings", 7) == 0)
-		return L"\uE8A5";   // Document list
+		return L"\uE71D";   // Bullet list
 	if (wcsncmp (p, L"Collection", 10) == 0 || wcsncmp (p, L"Corpus", 6) == 0)
 		return L"\uE838";   // Folder
 	if (wcsncmp (p, L"Matrix", 6) == 0 || wcsncmp (p, L"Polygon", 7) == 0)
-		return L"\uE802";
+		return L"\uE80A";   // Grid
 	if (p != text && *p != L'\0')
 		return L"\uE7C3";   // Generic item document
 	return nullptr;

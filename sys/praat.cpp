@@ -482,6 +482,11 @@ static void gui_cb_list_selectionChanged (Thing /* boss */, GuiList_SelectionCha
 }
 
 static HBITMAP createMenuIcon (const wchar_t *glyph, COLORREF color) {
+	int cx = GetSystemMetrics (SM_CXSMICON);
+	int cy = GetSystemMetrics (SM_CYSMICON);
+	if (cx <= 0) cx = 16;
+	if (cy <= 0) cy = 16;
+
 	HDC hdcScreen = GetDC (nullptr);
 	if (! hdcScreen) return nullptr;
 	HDC hdcMem = CreateCompatibleDC (hdcScreen);
@@ -492,27 +497,46 @@ static HBITMAP createMenuIcon (const wchar_t *glyph, COLORREF color) {
 	BITMAPINFO bi;
 	memset (& bi, 0, sizeof (bi));
 	bi.bmiHeader.biSize = sizeof (BITMAPINFOHEADER);
-	bi.bmiHeader.biWidth = 16;
-	bi.bmiHeader.biHeight = 16;
+	bi.bmiHeader.biWidth = cx;
+	bi.bmiHeader.biHeight = cy;
 	bi.bmiHeader.biPlanes = 1;
 	bi.bmiHeader.biBitCount = 32;
 	bi.bmiHeader.biCompression = BI_RGB;
 	void *pBits = nullptr;
 	HBITMAP hbmp = CreateDIBSection (hdcMem, & bi, DIB_RGB_COLORS, & pBits, nullptr, 0);
 	if (hbmp && pBits) {
+		memset (pBits, 0, cx * cy * sizeof (DWORD));
 		HBITMAP oldBmp = (HBITMAP) SelectObject (hdcMem, hbmp);
-		HFONT hFont = theWinGuiIconFont (-13);
+		int fontHeight = - (cy * 4 / 5);
+		if (fontHeight > -11) fontHeight = -11;
+		HFONT hFont = theWinGuiIconFont (fontHeight);
 		HFONT oldFont = (HFONT) SelectObject (hdcMem, hFont);
 		SetBkMode (hdcMem, TRANSPARENT);
-		SetTextColor (hdcMem, color);
-		RECT rc = { 0, 0, 16, 16 };
+		SetTextColor (hdcMem, RGB (255, 255, 255));
+		RECT rc = { 0, 0, cx, cy };
 		DrawTextW (hdcMem, glyph, -1, & rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
-		// Windows 32-bit menu bitmaps require PARGB alpha channel
+		// Convert pure white antialiased mask into true Premultiplied ARGB (PARGB)
 		DWORD *pixels = (DWORD *) pBits;
-		for (int i = 0; i < 16 * 16; i ++) {
-			if ((pixels [i] & 0x00FFFFFF) != 0)
-				pixels [i] |= 0xFF000000;
+		BYTE rTarget = GetRValue (color);
+		BYTE gTarget = GetGValue (color);
+		BYTE bTarget = GetBValue (color);
+
+		for (int i = 0; i < cx * cy; i ++) {
+			DWORD px = pixels [i];
+			BYTE r = (BYTE) (px & 0xFF);
+			BYTE g = (BYTE) ((px >> 8) & 0xFF);
+			BYTE b = (BYTE) ((px >> 16) & 0xFF);
+			BYTE a = r > g ? (r > b ? r : b) : (g > b ? g : b);
+
+			if (a > 0) {
+				BYTE pr = (BYTE) (((int) rTarget * a + 127) / 255);
+				BYTE pg = (BYTE) (((int) gTarget * a + 127) / 255);
+				BYTE pb = (BYTE) (((int) bTarget * a + 127) / 255);
+				pixels [i] = ((DWORD) a << 24) | ((DWORD) pr << 16) | ((DWORD) pg << 8) | pb;
+			} else {
+				pixels [i] = 0;
+			}
 		}
 		SelectObject (hdcMem, oldFont);
 		SelectObject (hdcMem, oldBmp);
@@ -667,11 +691,11 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	// Set Menu Icons
 	HBITMAP bmpViewEdit   = createMenuIcon (L"\uE70F", canViewEdit ? RGB (0, 103, 192) : RGB (156, 163, 175));
 	HBITMAP bmpPlay       = canPlay ? createMenuIcon (L"\uE768", RGB (16, 124, 65)) : nullptr;
-	HBITMAP bmpRename     = createMenuIcon (L"\uE8AC", canRename ? RGB (55, 65, 81) : RGB (156, 163, 175));
+	HBITMAP bmpRename     = createMenuIcon (L"\uE8EC", canRename ? RGB (55, 65, 81) : RGB (156, 163, 175));
 	HBITMAP bmpCopy       = createMenuIcon (L"\uE8C8", canCopy ? RGB (55, 65, 81) : RGB (156, 163, 175));
 	HBITMAP bmpInfo       = createMenuIcon (L"\uE946", canInfo ? RGB (0, 103, 192) : RGB (156, 163, 175));
 	HBITMAP bmpInspect    = createMenuIcon (L"\uE721", canInspect ? RGB (55, 65, 81) : RGB (156, 163, 175));
-	HBITMAP bmpSelectAll  = createMenuIcon (L"\uE8B3", RGB (55, 65, 81));
+	HBITMAP bmpSelectAll  = createMenuIcon (L"\uE762", RGB (55, 65, 81));
 	HBITMAP bmpDeselectAll= hasSelection ? createMenuIcon (L"\uE894", RGB (55, 65, 81)) : nullptr;
 	HBITMAP bmpRemove     = createMenuIcon (L"\uE74D", canRemove ? RGB (220, 38, 38) : RGB (156, 163, 175));
 

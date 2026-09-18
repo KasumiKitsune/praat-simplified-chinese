@@ -97,7 +97,7 @@ Thing_implement (GuiButton, GuiControl, 0);
 			return L"\uE71A";   // Stop square
 
 		if (MATCHES (L"Rename") || MATCHES (L"重命名"))
-			return L"\uE8AC";   // Rename tag
+			return L"\uE8EC";   // Clean tag icon
 
 		if (MATCHES (L"Copy") || MATCHES (L"复制"))
 			return L"\uE8C8";   // Copy pages
@@ -111,8 +111,14 @@ Thing_implement (GuiButton, GuiControl, 0);
 		if (MATCHES (L"Info") || MATCHES (L"信息"))
 			return L"\uE946";   // Info circle
 
-		if (MATCHES (L"Bilingual") || MATCHES (L"双语"))
-			return L"\uE775";   // Globe
+		if (MATCHES (L"Bilingual") || MATCHES (L"双语") || MATCHES (L"对照表") || MATCHES (L"术语对照表"))
+			return L"\uF2B7";   // Globe with A and 字 (Bilingual Translation)
+
+		if (MATCHES (L"Tabulate") || MATCHES (L"制表"))
+			return L"\uF0E3";   // Tabulate / Report checklist
+
+		if (MATCHES (L"Table") || MATCHES (L"表格"))
+			return L"\uE80A";   // Grid table
 
 		if (MATCHES (L"Record") || MATCHES (L"录音"))
 			return L"\uE720";   // Microphone
