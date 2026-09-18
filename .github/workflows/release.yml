@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: "Release tag, e.g. v7.0-zh.1"
+        description: "Release tag, e.g. v7.0-zh.3"
         required: true
-        default: "v7.0-zh.1"
+        default: "v7.0-zh.3"
         type: string
       release_name:
         description: "Release title"
@@ -14,10 +14,15 @@ on:
         default: "Praat 7.0 中文版 (v7.0-zh.3)"
         type: string
       release_notes:
-        description: "Release notes / description"
+        description: "Release notes / description (appended to existing release notes if release exists)"
         required: false
-        default: ""
+        default: "- **现代化增强版 (Modern Edition)**：\n  - 引入 Fluent 矢量图标系统（自动适配 Win11 Segoe Fluent Icons / Win10 Segoe MDL2 Assets）\n  - 对象列表条目高度优化与圆角平滑悬停微动效\n  - 对象列表原生右键上下文菜单（支持二级子菜单“保存为 ▶”、“查询 ▶”及常用高频操作）\n  - 对象列表上方新增常用快捷工具栏按钮（录制、打开...、保存）\n  - 音频播放按钮支持“播放 / 暂停”状态切换与精确断点续播\n  - 独立区分对话框“应用”按钮图标与“确定”按钮图标"
         type: string
+      build_macos:
+        description: "Build macOS package (Modern UI enhancements are Windows Win32 only)"
+        required: false
+        default: false
+        type: boolean
       praat_upstream_tag:
         description: "Upstream Praat tag used for the Xcode project, e.g. v7.0.01"
         required: false
@@ -76,7 +81,7 @@ jobs:
 
       - name: Prepare release package
         env:
-          PACKAGE_NAME: Praat-${{ inputs.tag_name }}-Windows-x64.zip
+          PACKAGE_NAME: Praat-${{ inputs.tag_name }}-Modern-Windows-x64.zip
         run: |
           mkdir -p dist
           cp Praat.exe dist/Praat.exe
@@ -87,12 +92,13 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Praat-${{ inputs.tag_name }}-Windows-x64
-          path: dist/Praat-${{ inputs.tag_name }}-Windows-x64.zip
+          name: Praat-${{ inputs.tag_name }}-Modern-Windows-x64
+          path: dist/Praat-${{ inputs.tag_name }}-Modern-Windows-x64.zip
 
   build-macos:
     name: Build macOS universal
     runs-on: macos-14
+    if: ${{ inputs.build_macos }}
 
     steps:
       - name: Check out source
@@ -268,6 +274,7 @@ jobs:
     needs:
       - build-windows-x64
       - build-macos
+    if: always() && !cancelled() && needs.build-windows-x64.result == 'success' && (needs.build-macos.result == 'success' || needs.build-macos.result == 'skipped')
 
     steps:
       - name: Check out source
@@ -291,16 +298,21 @@ jobs:
         run: |
           set -euo pipefail
 
-          NOTES="$RELEASE_NOTES"
-          if [ -z "$NOTES" ]; then
-            NOTES="基于 Praat 7.0 的非官方中文本地化版本。包含 Windows x64 与 macOS universal 构建产物。"
-          fi
-
           if gh release view "$TAG_NAME" --repo "$GH_REPO" >/dev/null 2>&1; then
-            echo "Release $TAG_NAME exists, uploading artifacts..."
+            echo "Release $TAG_NAME exists, uploading Modern Edition artifacts..."
             gh release upload "$TAG_NAME" dist/* --repo "$GH_REPO" --clobber
-            gh release edit "$TAG_NAME" --repo "$GH_REPO" --title "$RELEASE_NAME" --notes "$NOTES"
+            if [ -n "$RELEASE_NOTES" ]; then
+              EXISTING_NOTES="$(gh release view "$TAG_NAME" --repo "$GH_REPO" --json body -q .body)"
+              if [[ "$EXISTING_NOTES" != *"Modern Edition"* ]]; then
+                UPDATED_NOTES=$(printf "%s\n\n### 现代化版本 (Modern Edition)\n\n%s" "$EXISTING_NOTES" "$RELEASE_NOTES")
+                gh release edit "$TAG_NAME" --repo "$GH_REPO" --notes "$UPDATED_NOTES"
+              fi
+            fi
           else
+            NOTES="$RELEASE_NOTES"
+            if [ -z "$NOTES" ]; then
+              NOTES="基于 Praat 7.0 的非官方中文现代化版本。"
+            fi
             args=(
               release create "$TAG_NAME"
               dist/*
