@@ -2718,7 +2718,7 @@ static const std::unordered_map<std::u32string, std::u32string> g_translation_ma
 	{ U"RealTier help", U"\u5b9e\u6570\u5c42\u5e2e\u52a9" },
 	{ U"RealTier: Formula", U"\u5b9e\u6570\u5c42\uff1a\u516c\u5f0f" },
 	{ U"RealTier: Formula...", U"\u5b9e\u6570\u5c42\uff1a\u516c\u5f0f..." },
-	{ U"Record", U"\u5f55\u97f3" },
+	{ U"Record", U"\u5f55\u5236" },
 	{ U"Record Sound", U"\u5f55\u5236\u58f0\u97f3" },
 	{ U"Record Sound (fixed time)...", U"\u5f55\u5236\u58f0\u97f3 (\u56fa\u5b9a\u65f6\u95f4)..." },
 	{ U"Record mono Sound...", U"\u5f55\u5236\u5355\u58f0\u9053\u58f0\u97f3..." },

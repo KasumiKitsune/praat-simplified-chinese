@@ -172,6 +172,7 @@ void praat_addFixedButtons (GuiWindow window);
 void praat_addMenus (GuiWindow window);
 void praat_addMenus2 ();
 void praat_refreshObjectsWindowLanguage ();
+void praat_updateTopButtons ();
 
 /* API creation: */
 void praat_library_createC (bool isInHeaderFile, bool includeCreateAPI, bool includeReadAPI, bool includeSaveAPI,

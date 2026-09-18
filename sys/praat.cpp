@@ -48,6 +48,7 @@
 #include "InfoEditor.h"
 #include "praat_translate.h"
 #include "GuiP.h"
+#include "melder_audio.h"
 
 extern "C" char *sendpraat (void *display, const char *programName, long timeOut, const char *text);
 
@@ -123,10 +124,49 @@ static structMelderFile messageFile { };
 
 static GuiList praatList_objects;
 static GuiLabel praatLabel_objects;
+static GuiButton praatButton_record;
+static GuiButton praatButton_open;
+static GuiButton praatButton_save;
+
+static void gui_cb_topButton_record (Thing /* boss */, GuiButtonEvent /* event */) {
+	praat_executeCommand (nullptr, (char32 *) U"Record mono Sound...");
+}
+
+static void gui_cb_topButton_open (Thing /* boss */, GuiButtonEvent /* event */) {
+	praat_executeCommand (nullptr, (char32 *) U"Read from file...");
+}
+
+static void gui_cb_topButton_save (Thing /* boss */, GuiButtonEvent /* event */) {
+	if (praat_actions_canExecute (U"Save as WAV file..."))
+		praat_actions_executeByName (U"Save as WAV file...");
+	else if (praat_actions_canExecute (U"Save as text file..."))
+		praat_actions_executeByName (U"Save as text file...");
+	else if (praat_actions_canExecute (U"Save as tab-separated file..."))
+		praat_actions_executeByName (U"Save as tab-separated file...");
+	else if (praat_actions_canExecute (U"Save as short text file..."))
+		praat_actions_executeByName (U"Save as short text file...");
+	else if (praat_actions_canExecute (U"Save as binary file..."))
+		praat_actions_executeByName (U"Save as binary file...");
+	else
+		praat_executeCommand (nullptr, (char32 *) U"Save as text file...");
+}
 
 void praat_refreshObjectsWindowLanguage () {
 	if (praatLabel_objects)
 		GuiLabel_setText (praatLabel_objects, U"Objects:");
+	if (praatButton_record)
+		GuiButton_setText (praatButton_record, praat_translate (U"Record"));
+	if (praatButton_open)
+		GuiButton_setText (praatButton_open, praat_translate (U"Open..."));
+	if (praatButton_save)
+		GuiButton_setText (praatButton_save, praat_translate (U"Save"));
+}
+
+void praat_updateTopButtons () {
+	if (praatButton_save) {
+		bool hasSelection = (theCurrentPraatObjects && theCurrentPraatObjects -> totalSelection > 0);
+		GuiThing_setSensitive (praatButton_save, hasSelection);
+	}
 }
 
 /***** selection *****/
@@ -494,6 +534,7 @@ static HBITMAP createMenuIcon (const wchar_t *glyph, COLORREF color) {
 		ReleaseDC (nullptr, hdcScreen);
 		return nullptr;
 	}
+
 	BITMAPINFO bi;
 	memset (& bi, 0, sizeof (bi));
 	bi.bmiHeader.biSize = sizeof (BITMAPINFOHEADER);
@@ -502,48 +543,85 @@ static HBITMAP createMenuIcon (const wchar_t *glyph, COLORREF color) {
 	bi.bmiHeader.biPlanes = 1;
 	bi.bmiHeader.biBitCount = 32;
 	bi.bmiHeader.biCompression = BI_RGB;
-	void *pBits = nullptr;
-	HBITMAP hbmp = CreateDIBSection (hdcMem, & bi, DIB_RGB_COLORS, & pBits, nullptr, 0);
-	if (hbmp && pBits) {
-		memset (pBits, 0, cx * cy * sizeof (DWORD));
-		HBITMAP oldBmp = (HBITMAP) SelectObject (hdcMem, hbmp);
-		int fontHeight = - (cy * 4 / 5);
-		if (fontHeight > -11) fontHeight = -11;
-		HFONT hFont = theWinGuiIconFont (fontHeight);
-		HFONT oldFont = (HFONT) SelectObject (hdcMem, hFont);
-		SetBkMode (hdcMem, TRANSPARENT);
-		SetTextColor (hdcMem, RGB (255, 255, 255));
-		RECT rc = { 0, 0, cx, cy };
-		DrawTextW (hdcMem, glyph, -1, & rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	void *pBitsDst = nullptr;
+	HBITMAP hbmpDst = CreateDIBSection (hdcMem, & bi, DIB_RGB_COLORS, & pBitsDst, nullptr, 0);
+	if (! hbmpDst || ! pBitsDst) {
+		DeleteDC (hdcMem);
+		ReleaseDC (nullptr, hdcScreen);
+		return nullptr;
+	}
 
-		// Convert pure white antialiased mask into true Premultiplied ARGB (PARGB)
-		DWORD *pixels = (DWORD *) pBits;
+	// 2x Supersampling to eliminate small-font rasterization fuzziness
+	const int scale = 2;
+	int wBig = cx * scale;
+	int hBig = cy * scale;
+	HDC hdcBig = CreateCompatibleDC (hdcScreen);
+	BITMAPINFO biBig;
+	memset (& biBig, 0, sizeof (biBig));
+	biBig.bmiHeader.biSize = sizeof (BITMAPINFOHEADER);
+	biBig.bmiHeader.biWidth = wBig;
+	biBig.bmiHeader.biHeight = hBig;
+	biBig.bmiHeader.biPlanes = 1;
+	biBig.bmiHeader.biBitCount = 32;
+	biBig.bmiHeader.biCompression = BI_RGB;
+	void *pBitsBig = nullptr;
+	HBITMAP hbmpBig = CreateDIBSection (hdcBig, & biBig, DIB_RGB_COLORS, & pBitsBig, nullptr, 0);
+
+	if (hdcBig && hbmpBig && pBitsBig) {
+		memset (pBitsBig, 0, wBig * hBig * sizeof (DWORD));
+		HBITMAP oldBmpBig = (HBITMAP) SelectObject (hdcBig, hbmpBig);
+		int fontHeightBig = - (hBig * 4 / 5);
+		HFONT hFontBig = theWinGuiIconFont (fontHeightBig);
+		HFONT oldFontBig = (HFONT) SelectObject (hdcBig, hFontBig);
+
+		SetBkMode (hdcBig, TRANSPARENT);
+		SetTextColor (hdcBig, RGB (255, 255, 255));
+		RECT rcBig = { 0, 0, wBig, hBig };
+		DrawTextW (hdcBig, glyph, -1, & rcBig, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+		// Box-filter downsampling to cx * cy
+		DWORD *pixelsBig = (DWORD *) pBitsBig;
+		DWORD *pixelsDst = (DWORD *) pBitsDst;
 		BYTE rTarget = GetRValue (color);
 		BYTE gTarget = GetGValue (color);
 		BYTE bTarget = GetBValue (color);
 
-		for (int i = 0; i < cx * cy; i ++) {
-			DWORD px = pixels [i];
-			BYTE r = (BYTE) (px & 0xFF);
-			BYTE g = (BYTE) ((px >> 8) & 0xFF);
-			BYTE b = (BYTE) ((px >> 16) & 0xFF);
-			BYTE a = r > g ? (r > b ? r : b) : (g > b ? g : b);
-
-			if (a > 0) {
-				BYTE pr = (BYTE) (((int) rTarget * a + 127) / 255);
-				BYTE pg = (BYTE) (((int) gTarget * a + 127) / 255);
-				BYTE pb = (BYTE) (((int) bTarget * a + 127) / 255);
-				pixels [i] = ((DWORD) a << 24) | ((DWORD) pr << 16) | ((DWORD) pg << 8) | pb;
-			} else {
-				pixels [i] = 0;
+		for (int y = 0; y < cy; y ++) {
+			for (int x = 0; x < cx; x ++) {
+				int sumA = 0;
+				for (int dy = 0; dy < scale; dy ++) {
+					for (int dx = 0; dx < scale; dx ++) {
+						int sy = y * scale + dy;
+						int sx = x * scale + dx;
+						DWORD px = pixelsBig [sy * wBig + sx];
+						BYTE r = (BYTE) (px & 0xFF);
+						BYTE g = (BYTE) ((px >> 8) & 0xFF);
+						BYTE b = (BYTE) ((px >> 16) & 0xFF);
+						BYTE maxVal = r > g ? (r > b ? r : b) : (g > b ? g : b);
+						sumA += maxVal;
+					}
+				}
+				int a = sumA / (scale * scale);
+				if (a > 0) {
+					BYTE pr = (BYTE) (((int) rTarget * a + 127) / 255);
+					BYTE pg = (BYTE) (((int) gTarget * a + 127) / 255);
+					BYTE pb = (BYTE) (((int) bTarget * a + 127) / 255);
+					pixelsDst [y * cx + x] = ((DWORD) a << 24) | ((DWORD) pr << 16) | ((DWORD) pg << 8) | pb;
+				} else {
+					pixelsDst [y * cx + x] = 0;
+				}
 			}
 		}
-		SelectObject (hdcMem, oldFont);
-		SelectObject (hdcMem, oldBmp);
+
+		SelectObject (hdcBig, oldFontBig);
+		SelectObject (hdcBig, oldBmpBig);
+		DeleteObject (hbmpBig);
+		DeleteDC (hdcBig);
 	}
+
 	DeleteDC (hdcMem);
 	ReleaseDC (nullptr, hdcScreen);
-	return hbmp;
+	return hbmpDst;
 }
 
 static void setMenuItemIcon (HMENU hMenu, UINT cmdId, HBITMAP hbmp) {
@@ -554,6 +632,16 @@ static void setMenuItemIcon (HMENU hMenu, UINT cmdId, HBITMAP hbmp) {
 	mii.fMask = MIIM_BITMAP;
 	mii.hbmpItem = hbmp;
 	SetMenuItemInfoW (hMenu, cmdId, FALSE, & mii);
+}
+
+static void setMenuItemIconByPos (HMENU hMenu, UINT pos, HBITMAP hbmp) {
+	if (! hbmp) return;
+	MENUITEMINFOW mii;
+	memset (& mii, 0, sizeof (mii));
+	mii.cbSize = sizeof (mii);
+	mii.fMask = MIIM_BITMAP;
+	mii.hbmpItem = hbmp;
+	SetMenuItemInfoW (hMenu, pos, TRUE, & mii);
 }
 
 static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent event) {
@@ -574,7 +662,15 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 		CMD_INSPECT,
 		CMD_SELECT_ALL,
 		CMD_DESELECT_ALL,
-		CMD_REMOVE
+		CMD_REMOVE,
+		CMD_SAVE_WAV,
+		CMD_SAVE_TEXTGRID,
+		CMD_SAVE_TAB,
+		CMD_SAVE_SHORT,
+		CMD_SAVE_BINARY,
+		CMD_QUERY_DURATION,
+		CMD_QUERY_SAMPLERATE,
+		CMD_QUERY_NUMSAMPLES
 	};
 
 	bool canViewEdit = praat_actions_canExecute (U"View & Edit") ||
@@ -587,6 +683,7 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	bool canInspect  = praat_canExecuteMenuCommand (U"Inspect");
 	bool canRemove   = praat_canExecuteMenuCommand (U"Remove");
 	bool hasSelection = (theCurrentPraatObjects -> totalSelection > 0);
+	bool isCurrentlyPlaying = MelderAudio_isPlaying;
 
 	// 1. View & Edit (查看与编辑)
 	UINT flagViewEdit = (canViewEdit ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
@@ -601,15 +698,19 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	if (canViewEdit)
 		SetMenuDefaultItem (hMenu, CMD_VIEW_EDIT, FALSE);
 
-	// 2. Play (播放)
+	// 2. Play / Pause (播放 / 暂停)
 	if (canPlay) {
-		conststring32 titlePlay = praat_translate (U"Play");
-		char32 textBufPlay [128];
-		if (str32equ (titlePlay, U"Play"))
-			Melder_sprint (textBufPlay, 128, U"播放 (Play)");
-		else
-			Melder_sprint (textBufPlay, 128, titlePlay);
-		AppendMenuW (hMenu, MF_STRING, CMD_PLAY, Melder_peek32toW (textBufPlay));
+		if (isCurrentlyPlaying) {
+			AppendMenuW (hMenu, MF_STRING, CMD_PLAY, L"暂停 (Pause)");
+		} else {
+			conststring32 titlePlay = praat_translate (U"Play");
+			char32 textBufPlay [128];
+			if (str32equ (titlePlay, U"Play"))
+				Melder_sprint (textBufPlay, 128, U"播放 (Play)");
+			else
+				Melder_sprint (textBufPlay, 128, titlePlay);
+			AppendMenuW (hMenu, MF_STRING, CMD_PLAY, Melder_peek32toW (textBufPlay));
+		}
 	}
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
@@ -656,7 +757,65 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
-	// 7. Select All (全选)
+	// 7. Submenu: Save as ▶ (保存为)
+	HMENU hSubMenuSave = CreatePopupMenu ();
+	bool canSaveWav = praat_actions_canExecute (U"Save as WAV file...");
+	bool canSaveTextGrid = praat_actions_canExecute (U"Save as text file...");
+	bool canSaveTab = praat_actions_canExecute (U"Save as tab-separated file...");
+	bool canSaveShort = praat_actions_canExecute (U"Save as short text file...");
+	bool canSaveBinary = praat_actions_canExecute (U"Save as binary file...");
+
+	if (canSaveWav)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_WAV, L"保存为 WAV 音频... (Save as WAV file...)");
+	if (canSaveTextGrid)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TEXTGRID, L"保存为 TextGrid 文本... (Save as text file...)");
+	if (canSaveTab)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TAB, L"保存为制表符文件... (Save as tab-separated file...)");
+	if (canSaveShort)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_SHORT, L"保存为短文本文件... (Save as short text file...)");
+	if (canSaveBinary)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_BINARY, L"保存为二进制文件... (Save as binary file...)");
+
+	HBITMAP bmpSaveAs = nullptr;
+	int posSaveAs = -1;
+	if (GetMenuItemCount (hSubMenuSave) > 0) {
+		posSaveAs = GetMenuItemCount (hMenu);
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuSave, L"保存为 (Save as)...");
+		bmpSaveAs = createMenuIcon (L"\uE74E", RGB (55, 65, 81));
+		setMenuItemIconByPos (hMenu, posSaveAs, bmpSaveAs);
+	} else {
+		DestroyMenu (hSubMenuSave);
+		hSubMenuSave = nullptr;
+	}
+
+	// 8. Submenu: Query ▶ (查询)
+	HMENU hSubMenuQuery = CreatePopupMenu ();
+	bool canGetDuration = praat_actions_canExecute (U"Get total duration");
+	bool canGetSampleRate = praat_actions_canExecute (U"Get sampling frequency");
+	bool canGetNumSamples = praat_actions_canExecute (U"Get number of samples");
+
+	if (canGetDuration)
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_DURATION, L"查询总时长 (Get total duration)");
+	if (canGetSampleRate)
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_SAMPLERATE, L"查询采样率 (Get sampling frequency)");
+	if (canGetNumSamples)
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_NUMSAMPLES, L"查询采样点数 (Get number of samples)");
+
+	HBITMAP bmpQuery = nullptr;
+	int posQuery = -1;
+	if (GetMenuItemCount (hSubMenuQuery) > 0) {
+		posQuery = GetMenuItemCount (hMenu);
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuQuery, L"查询 (Query)...");
+		bmpQuery = createMenuIcon (L"\uE721", RGB (55, 65, 81));
+		setMenuItemIconByPos (hMenu, posQuery, bmpQuery);
+	} else {
+		DestroyMenu (hSubMenuQuery);
+		hSubMenuQuery = nullptr;
+	}
+
+	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 9. Select All (全选)
 	conststring32 titleSelectAll = praat_translate (U"Select all");
 	char32 textBufSelectAll [128];
 	if (str32equ (titleSelectAll, U"Select all"))
@@ -665,7 +824,7 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 		Melder_sprint (textBufSelectAll, 128, titleSelectAll);
 	AppendMenuW (hMenu, MF_STRING, CMD_SELECT_ALL, Melder_peek32toW (textBufSelectAll));
 
-	// 8. Deselect All (取消全选)
+	// 10. Deselect All (取消全选)
 	if (hasSelection) {
 		conststring32 titleDeselectAll = praat_translate (U"Deselect all");
 		char32 textBufDeselectAll [128];
@@ -678,7 +837,7 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
-	// 9. Remove (删除)
+	// 11. Remove (删除)
 	UINT flagRemove = (canRemove ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
 	conststring32 titleRemove = praat_translate (U"Remove");
 	char32 textBufRemove [128];
@@ -690,7 +849,7 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 
 	// Set Menu Icons
 	HBITMAP bmpViewEdit   = createMenuIcon (L"\uE70F", canViewEdit ? RGB (0, 103, 192) : RGB (156, 163, 175));
-	HBITMAP bmpPlay       = canPlay ? createMenuIcon (L"\uE768", RGB (16, 124, 65)) : nullptr;
+	HBITMAP bmpPlay       = canPlay ? createMenuIcon (isCurrentlyPlaying ? L"\uE769" : L"\uE768", isCurrentlyPlaying ? RGB (217, 119, 6) : RGB (16, 124, 65)) : nullptr;
 	HBITMAP bmpRename     = createMenuIcon (L"\uE8EC", canRename ? RGB (55, 65, 81) : RGB (156, 163, 175));
 	HBITMAP bmpCopy       = createMenuIcon (L"\uE8C8", canCopy ? RGB (55, 65, 81) : RGB (156, 163, 175));
 	HBITMAP bmpInfo       = createMenuIcon (L"\uE946", canInfo ? RGB (0, 103, 192) : RGB (156, 163, 175));
@@ -723,6 +882,8 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	if (bmpCopy) DeleteObject (bmpCopy);
 	if (bmpInfo) DeleteObject (bmpInfo);
 	if (bmpInspect) DeleteObject (bmpInspect);
+	if (bmpSaveAs) DeleteObject (bmpSaveAs);
+	if (bmpQuery) DeleteObject (bmpQuery);
 	if (bmpSelectAll) DeleteObject (bmpSelectAll);
 	if (bmpDeselectAll) DeleteObject (bmpDeselectAll);
 	if (bmpRemove) DeleteObject (bmpRemove);
@@ -751,6 +912,30 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 		case CMD_INSPECT:
 			praat_doMenuCommand (U"Inspect", nullptr, nullptr);
 			break;
+		case CMD_SAVE_WAV:
+			praat_actions_executeByName (U"Save as WAV file...");
+			break;
+		case CMD_SAVE_TEXTGRID:
+			praat_actions_executeByName (U"Save as text file...");
+			break;
+		case CMD_SAVE_TAB:
+			praat_actions_executeByName (U"Save as tab-separated file...");
+			break;
+		case CMD_SAVE_SHORT:
+			praat_actions_executeByName (U"Save as short text file...");
+			break;
+		case CMD_SAVE_BINARY:
+			praat_actions_executeByName (U"Save as binary file...");
+			break;
+		case CMD_QUERY_DURATION:
+			praat_actions_executeByName (U"Get total duration");
+			break;
+		case CMD_QUERY_SAMPLERATE:
+			praat_actions_executeByName (U"Get sampling frequency");
+			break;
+		case CMD_QUERY_NUMSAMPLES:
+			praat_actions_executeByName (U"Get number of samples");
+			break;
 		case CMD_SELECT_ALL:
 			praat_selectAll ();
 			praat_show ();
@@ -764,7 +949,6 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 			break;
 		default:
 			break;
-	}
 #else
 	(void) event;
 #endif
@@ -2423,9 +2607,17 @@ void praat_init (conststring32 title,
 		praatP.menuBar = raam;
 		praat_addMenus (praatP.menuBar);
 
-		trace (U"creating the object list in the Objects window");
-		praatLabel_objects = GuiLabel_createShown (raam, 3, -250, Machine_getMenuBarBottom () + 5, Machine_getMenuBarBottom () + 5 + Gui_LABEL_HEIGHT, U"Objects:", 0);
-		praatList_objects = GuiList_create (raam, 0, -250, Machine_getMenuBarBottom () + 26, -114, true, U" Objects ");
+		trace (U"creating the object list and top toolbar in the Objects window");
+		const int topBarY = Machine_getMenuBarBottom () + 5;
+		const int topBarH = 28;
+		praatButton_record = GuiButton_createShown (raam, 4, 82, topBarY, topBarY + topBarH,
+			praat_translate (U"Record"), gui_cb_topButton_record, nullptr, 0);
+		praatButton_open = GuiButton_createShown (raam, 86, 168, topBarY, topBarY + topBarH,
+			praat_translate (U"Open..."), gui_cb_topButton_open, nullptr, 0);
+		praatButton_save = GuiButton_createShown (raam, 172, 250, topBarY, topBarY + topBarH,
+			praat_translate (U"Save"), gui_cb_topButton_save, nullptr, 0);
+
+		praatList_objects = GuiList_create (raam, 0, -250, topBarY + topBarH + 4, -114, true, U" Objects ");
 		GuiList_setSelectionChangedCallback (praatList_objects, gui_cb_list_selectionChanged, nullptr);
 		GuiList_setContextMenuCallback (praatList_objects, gui_cb_list_contextMenu, nullptr);
 		GuiThing_show (praatList_objects);

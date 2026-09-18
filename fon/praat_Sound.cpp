@@ -38,6 +38,7 @@
 #include "SpeechRecognizer.h"
 
 #include "praat_Sound.h"
+#include "melder_audio.h"
 
 /***** LONGSOUND *****/
 
@@ -1160,10 +1161,39 @@ DO
 	MODIFY_EACH_END
 }
 
+static double s_soundPausedTime = 0.0;
+static Sound s_soundPausedPtr = nullptr;
+
 DIRECT (PLAY_EACH__Sound_play) {
-	FIND_ALL_LISTED (Sound, SoundList)
-		SoundList_play (list.get(), nullptr, nullptr);
-	END_NO_NEW_DATA
+	if (MelderAudio_isPlaying) {
+		integer samplesPlayed = MelderAudio_getSamplesPlayed ();
+		FIND_ALL_LISTED (Sound, SoundList)
+		if (list -> size >= 1) {
+			Sound snd = list -> at [1];
+			s_soundPausedPtr = snd;
+			s_soundPausedTime = snd -> x1 + (samplesPlayed - 1) * snd -> dx;
+			if (s_soundPausedTime < snd -> xmin) s_soundPausedTime = snd -> xmin;
+			if (s_soundPausedTime >= snd -> xmax) {
+				s_soundPausedTime = 0.0;
+				s_soundPausedPtr = nullptr;
+			}
+		}
+		MelderAudio_stopPlaying (MelderAudio_EXPLICIT);
+	} else {
+		FIND_ALL_LISTED (Sound, SoundList)
+		if (list -> size == 1 && s_soundPausedPtr == list -> at [1] && s_soundPausedTime > 0.0) {
+			Sound snd = list -> at [1];
+			double tResume = s_soundPausedTime;
+			s_soundPausedTime = 0.0;
+			s_soundPausedPtr = nullptr;
+			Sound_playPart (snd, tResume, snd -> xmax, nullptr, nullptr);
+		} else {
+			s_soundPausedTime = 0.0;
+			s_soundPausedPtr = nullptr;
+			SoundList_play (list.get(), nullptr, nullptr);
+		}
+	}
+END_NO_NEW_DATA
 }
 
 FORM (MODIFY_Sound_preemphasizeInplace, U"Sound: Pre-emphasize (in-place)", U"Sound: Pre-emphasize (in-place)...") {

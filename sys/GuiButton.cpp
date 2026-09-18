@@ -133,7 +133,10 @@ Thing_implement (GuiButton, GuiControl, 0);
 			return L"\uE790";   // Settings wrench
 
 		if (MATCHES (L"Apply") || MATCHES (L"应用"))
-			return L"\uE8FB";   // Checkmark
+			return L"\uE895";   // Refresh / Sync / Update (distinct from OK)
+
+		if (MATCHES (L"Pause") || MATCHES (L"暂停"))
+			return L"\uE769";   // Pause double bars
 
 		if (wcscmp (text, L"OK") == 0 || wcscmp (text, L"确定") == 0)
 			return L"\uE73E";   // OK check
