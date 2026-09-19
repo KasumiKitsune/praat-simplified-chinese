@@ -282,20 +282,29 @@ static void showMaximum (SoundRecorder me, int channel, double maximum) {
 		my numberOfChannels == 1 || channel == 2 ? 1.0 : 2.0,
 		0.0, 1.0);
 
-	// Light modern container background (matching clean Praat light theme)
+	// Light modern Fluent card surface
 	Graphics_setColour (my graphics.get(), Melder_WHITE);
 	Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
 
-	const double xLeft   = 0.22;
-	const double xRight  = 0.78;
-	const double yBottom = 0.10;
+	// Modern rounded card border (#E2E8F0)
+	Graphics_setColour (my graphics.get(), MelderColour (0.886, 0.910, 0.941)); // #E2E8F0
+	if (my numberOfChannels == 1) {
+		Graphics_roundedRectangle (my graphics.get(), 0.005, 0.995, 0.005, 0.995, 0.02);
+	} else if (channel == 1) {
+		Graphics_roundedRectangle (my graphics.get(), 0.005, 1.995, 0.005, 0.995, 0.02);
+		Graphics_line (my graphics.get(), 1.0, 0.04, 1.0, 0.96);
+	}
+
+	const double xLeft   = 0.23;
+	const double xRight  = 0.77;
+	const double yBottom = 0.11;
 	const double yTop    = 0.94;
 
-	// Soft groove / track behind segments
+	// Soft groove / track behind segments (#F1F5F9 Slate-100 with #E2E8F0 border)
 	Graphics_setColour (my graphics.get(), MelderColour (0.945, 0.961, 0.976)); // #F1F5F9 Slate-100
-	Graphics_fillRoundedRectangle (my graphics.get(), xLeft - 0.03, xRight + 0.03, yBottom - 0.015, yTop + 0.015, 0.02);
+	Graphics_fillRoundedRectangle (my graphics.get(), xLeft - 0.03, xRight + 0.03, yBottom - 0.015, yTop + 0.015, 0.025);
 	Graphics_setColour (my graphics.get(), MelderColour (0.886, 0.910, 0.941)); // #E2E8F0
-	Graphics_roundedRectangle (my graphics.get(), xLeft - 0.03, xRight + 0.03, yBottom - 0.015, yTop + 0.015, 0.02);
+	Graphics_roundedRectangle (my graphics.get(), xLeft - 0.03, xRight + 0.03, yBottom - 0.015, yTop + 0.015, 0.025);
 
 	const int NUM_SEGMENTS = 28;
 	for (int k = 0; k < NUM_SEGMENTS; k ++) {
@@ -365,6 +374,8 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 			Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
 			Graphics_setColour (my graphics.get(), Melder_WHITE);
 			Graphics_fillRectangle (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.886, 0.910, 0.941)); // #E2E8F0
+			Graphics_roundedRectangle (my graphics.get(), 0.005, 0.995, 0.005, 0.995, 0.02);
 			Graphics_setColour (my graphics.get(), MelderColour (0.0, 0.45, 0.72));
 
 			const double totalDuration = sound -> xmax - sound -> xmin;
@@ -1356,7 +1367,7 @@ void structSoundRecorder :: v_createChildren ()
 	GuiLabel_createShown (our windowForm, 290, -170, y, y + Gui_LABEL_HEIGHT, U"Meter", GuiLabel_CENTRE);
 	our meter = GuiDrawingArea_createShown (our windowForm, 290, -170, y + Gui_LABEL_HEIGHT + 2, -145,
 		gui_drawingarea_cb_expose, nullptr,
-		nullptr, gui_drawingarea_cb_resize, nullptr, this, GuiDrawingArea_BORDER
+		nullptr, gui_drawingarea_cb_resize, nullptr, this, 0
 	);
 
 	/*

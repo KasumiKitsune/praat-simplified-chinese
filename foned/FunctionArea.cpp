@@ -18,6 +18,11 @@
 
 #include "FunctionArea.h"
 #include "EditorM.h"
+#include "praat_translate.h"
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <mutex>
 
 Thing_implement (FunctionArea, Thing, 0);
 
@@ -61,6 +66,40 @@ void FunctionArea_drawRightMark (FunctionArea me, double yWC, conststring32 yWC_
 	Graphics_text (my graphics(), my endWindow(), yWC, text.string);
 }
 
+static const char32* praat_translate_legend (const char32* text) {
+	if (! text || text [0] == U'\0')
+		return text;
+
+	if (g_language_choice == 0)
+		return praat_translate (text);
+
+	const char32* direct = praat_translate (text);
+	if (std::u32string_view (direct) != std::u32string_view (text))
+		return direct;
+
+	// Fallback: parse prefix and markup tag (e.g. "##" or "%%")
+	std::u32string s (text);
+	size_t tagPos = s.find (U"##");
+	if (tagPos == std::u32string::npos)
+		tagPos = s.find (U"%%");
+
+	if (tagPos != std::u32string::npos) {
+		std::u32string prefixAndTag = s.substr (0, tagPos + 2);
+		std::u32string coreText = s.substr (tagPos + 2);
+		const char32* transCore = praat_translate (coreText.c_str());
+		if (std::u32string_view (transCore) != std::u32string_view (coreText)) {
+			static std::unordered_map<std::u32string, std::u32string> dynamic_legend_cache;
+			static std::mutex dynamic_legend_mutex;
+			std::lock_guard<std::mutex> lock (dynamic_legend_mutex);
+			std::u32string result = prefixAndTag + transCore;
+			auto [it, inserted] = dynamic_legend_cache.emplace (s, result);
+			return it->second.c_str();
+		}
+	}
+
+	return text;
+}
+
 void FunctionArea_drawLegend_ (FunctionArea me,
 	conststring32 cattableText1, MelderColour colour1,
 	conststring32 cattableText2, MelderColour colour2,
@@ -72,12 +111,16 @@ void FunctionArea_drawLegend_ (FunctionArea me,
 	Graphics_setColour (my graphics(), colour1);
 	Graphics_setTextAlignment (my graphics(), kGraphics_horizontalAlignment::RIGHT, Graphics_BASELINE);
 	double fontSize = Graphics_inqFontSize (my graphics()), oldFontSize = fontSize;
-	Graphics_setFont (my graphics(), kGraphics_font::TIMES);
+	Graphics_setFont (my graphics(), kGraphics_font::HELVETICA);
 	//Graphics_setFontStyle (my graphics(), Graphics_ITALIC);
 	if (! cattableText1) cattableText1 = U"";
 	if (! cattableText2) cattableText2 = U"";
 	if (! cattableText3) cattableText3 = U"";
 	if (! cattableText4) cattableText4 = U"";
+	cattableText1 = praat_translate_legend (cattableText1);
+	cattableText2 = praat_translate_legend (cattableText2);
+	cattableText3 = praat_translate_legend (cattableText3);
+	cattableText4 = praat_translate_legend (cattableText4);
 	double lengthText1 = Graphics_textWidth (my graphics(), cattableText1);
 	double lengthText2 = Graphics_textWidth (my graphics(), cattableText2);
 	double lengthText3 = Graphics_textWidth (my graphics(), cattableText3);
@@ -118,7 +161,7 @@ void FunctionArea_drawLegend_ (FunctionArea me,
 		lengthSep3 = Graphics_textWidth (my graphics(), separator3);
 	}
 	Graphics_setColour (my graphics(), colour1);
-	const double y = my top_pxlt() + 2;
+	const double y = my top_pxlt() + 6;
 	Graphics_text (my graphics(), 1.0 - lengthText4 - lengthSep3 - lengthText3 - lengthSep2 - lengthText2 - lengthSep1,
 			y, cattableText1);
 	Graphics_setColour (my graphics(), colour2);

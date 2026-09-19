@@ -154,6 +154,23 @@ Thing_implement (GuiButton, GuiControl, 0);
 		if (MATCHES (L"Open") || MATCHES (L"打开"))
 			return L"\uE8E5";   // Folder open
 
+		// Zoom buttons (FunctionEditor bottom-left controls)
+		if (wcscmp (text, L"all") == 0 || wcscmp (text, L"全部") == 0 || wcscmp (text, L"All") == 0 ||
+		    MATCHES (L"Show all") || MATCHES (L"显示全部"))
+			return L"\uE9A6";   // Fit page / Fit to window (enclosing bounds)
+
+		if (wcscmp (text, L"in") == 0 || wcscmp (text, L"放大") == 0 || MATCHES (L"Zoom in"))
+			return L"\uE8A3";   // Zoom in (+)
+
+		if (wcscmp (text, L"out") == 0 || wcscmp (text, L"缩小") == 0 || MATCHES (L"Zoom out"))
+			return L"\uE71F";   // Zoom out (-)
+
+		if (wcscmp (text, L"sel") == 0 || wcscmp (text, L"选择") == 0 || MATCHES (L"Zoom to selection") || MATCHES (L"缩放到选区"))
+			return L"\uE740";   // FullScreen / Expand selection to full window
+
+		if (wcscmp (text, L"bak") == 0 || wcscmp (text, L"返回") == 0 || wcscmp (text, L"back") == 0 || MATCHES (L"Zoom back") || MATCHES (L"缩放返回"))
+			return L"\uE72B";   // Back arrow (<-)
+
 		#undef MATCHES
 		return nullptr;
 	}
@@ -340,32 +357,34 @@ Thing_implement (GuiButton, GuiControl, 0);
 					SetTextColor (memDC, textCol);
 
 					RECT textRc = rc;
+					int boxW = rc.right - rc.left;
+					const bool isCompact = (boxW <= 48);
 					// Inset slightly to prevent text clipping
-					InflateRect (& textRc, -3, 0);
+					InflateRect (& textRc, isCompact ? -2 : -3, 0);
 					if (isPressed)
 						OffsetRect (& textRc, 0, 1);
 
 					const wchar_t *iconGlyph = getButtonIconGlyph (textBuf);
 					if (iconGlyph && ! (dwRefData & GuiButton_MULTILINE)) {
+						const int iconW = isCompact ? 11 : 13;
+						const int gap = isCompact ? 2 : (boxW <= 64 ? 4 : 6);
 						SIZE szText;
 						GetTextExtentPoint32W (memDC, textBuf, textLen, & szText);
-						const int iconW = 14;
-						const int gap = 6;
 						int totalW = iconW + gap + szText.cx;
-						int boxW = textRc.right - textRc.left;
-						int startX = textRc.left + (boxW - totalW) / 2;
-						if (startX < textRc.left + 2)
-							startX = textRc.left + 2;
+						int innerBoxW = textRc.right - textRc.left;
+						int startX = textRc.left + (innerBoxW - totalW) / 2;
+						if (startX < textRc.left + 1)
+							startX = textRc.left + 1;
 
 						// 1. Draw Icon
-						HFONT hIconFont = theWinGuiIconFont (-12);
+						HFONT hIconFont = theWinGuiIconFont (isCompact ? -10 : -12);
 						SelectObject (memDC, hIconFont);
 						RECT rcIcon = { startX, textRc.top, startX + iconW, textRc.bottom };
 						DrawTextW (memDC, iconGlyph, -1, & rcIcon, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 						// 2. Draw Text
 						SelectObject (memDC, hFont);
-						RECT rcLabel = { startX + iconW + gap, textRc.top, textRc.right - 2, textRc.bottom };
+						RECT rcLabel = { startX + iconW + gap, textRc.top, textRc.right - 1, textRc.bottom };
 						DrawTextW (memDC, textBuf, -1, & rcLabel, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 					} else {
 						UINT drawFlags = DT_CENTER | DT_VCENTER;

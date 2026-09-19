@@ -21,6 +21,7 @@ Prefs_begin (FunctionEditor)
 	ClassPrefs_overrideInt   (FunctionEditor, shellWidth,                 1, U"700")
 	ClassPrefs_overrideInt   (FunctionEditor, shellHeight,                1, U"440")
 	ClassPrefs_addBool       (FunctionEditor, synchronizedZoomAndScroll,  1, true)
+	ClassPrefs_addInteger    (FunctionEditor, timeDecimals,                1, U"6")
 	InstancePrefs_addBool    (FunctionEditor, showSelectionViewer, 1, false)
 	InstancePrefs_addDouble  (FunctionEditor, arrowScrollStep,     1, U"0.05")
 

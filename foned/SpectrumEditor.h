@@ -48,13 +48,13 @@ Thing_define (SpectrumEditor, FunctionEditor) {
 	int v_fixedPrecision_long ()
 		override { return 2; }
 	conststring32 v_format_units_long ()
-		override { return U"赫兹"; }
+		override { return g_language_choice == 0 ? U"Hertz" : U"赫兹"; }
 	conststring32 v_format_units_short ()
 		override { return U"Hz"; }
 	const char * v_format_totalDuration ()
-		override { return u8"总带宽 %.2f 赫兹"; }
+		override { return g_language_choice == 0 ? "Total bandwidth %.2f Hz" : u8"总带宽 %.2f 赫兹"; }
 	const char * v_format_window ()
-		override { return u8"可见部分 %.2f 赫兹"; }
+		override { return g_language_choice == 0 ? "Visible part %.2f Hz" : u8"可见部分 %.2f 赫兹"; }
 	const char * v_format_selection ()
 		override { return u8"%.2f Hz"; }
 

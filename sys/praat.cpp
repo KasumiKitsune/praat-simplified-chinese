@@ -537,10 +537,37 @@ static void gui_cb_list_selectionChanged (Thing /* boss */, GuiList_SelectionCha
 }
 
 static HBITMAP createMenuIcon (const wchar_t *glyph, COLORREF color) {
-	int cx = GetSystemMetrics (SM_CXSMICON);
-	int cy = GetSystemMetrics (SM_CYSMICON);
+	HWND hwnd = (praatList_objects && praatList_objects -> d_widget) ? praatList_objects -> d_widget -> window : nullptr;
+	UINT dpi = 96;
+	HMODULE hUser32 = GetModuleHandleW (L"user32.dll");
+	if (hUser32 && hwnd) {
+		typedef UINT (WINAPI *GetDpiForWindowProc) (HWND);
+		GetDpiForWindowProc getDpi = (GetDpiForWindowProc) (void *) GetProcAddress (hUser32, "GetDpiForWindow");
+		if (getDpi)
+			dpi = getDpi (hwnd);
+	}
+	if (dpi <= 0) {
+		HDC hdcScreen = GetDC (nullptr);
+		if (hdcScreen) {
+			dpi = GetDeviceCaps (hdcScreen, LOGPIXELSX);
+			ReleaseDC (nullptr, hdcScreen);
+		}
+	}
+	if (dpi <= 0) dpi = 96;
+
+	// In Windows 10/11, menus scale with DPI.
+	// Standard small icon is 16px at 96 DPI, 20px at 120 DPI (125%), 24px at 144 DPI (150%), 32px at 192 DPI (200%).
+	int cx = MulDiv (16, dpi, 96);
+	if (hUser32) {
+		typedef int (WINAPI *GetSystemMetricsForDpiProc) (int, UINT);
+		GetSystemMetricsForDpiProc getMetricsDpi = (GetSystemMetricsForDpiProc) (void *) GetProcAddress (hUser32, "GetSystemMetricsForDpi");
+		if (getMetricsDpi) {
+			int smIcon = getMetricsDpi (SM_CXSMICON, dpi);
+			if (smIcon > cx) cx = smIcon;
+		}
+	}
 	if (cx <= 0) cx = 16;
-	if (cy <= 0) cy = 16;
+	int cy = cx;
 
 	HDC hdcScreen = GetDC (nullptr);
 	if (! hdcScreen) return nullptr;
@@ -699,76 +726,40 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	bool canRemove   = praat_canExecuteMenuCommand (U"Remove");
 	bool hasSelection = (theCurrentPraatObjects -> totalSelection > 0);
 	bool isCurrentlyPlaying = MelderAudio_isPlaying;
+	const bool isEnglish = (g_language_choice == 0);
 
 	// 1. View & Edit (查看与编辑)
 	UINT flagViewEdit = (canViewEdit ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	conststring32 titleViewEdit = praat_translate (U"View & Edit");
-	char32 textBufViewEdit [128];
-	if (str32equ (titleViewEdit, U"View & Edit"))
-		Melder_sprint (textBufViewEdit, 128, U"查看与编辑 (View & Edit)");
-	else
-		Melder_sprint (textBufViewEdit, 128, titleViewEdit);
-	AppendMenuW (hMenu, flagViewEdit, CMD_VIEW_EDIT, Melder_peek32toW (textBufViewEdit));
+	AppendMenuW (hMenu, flagViewEdit, CMD_VIEW_EDIT, isEnglish ? L"View & Edit" : L"查看与编辑 (View & Edit)");
 
 	if (canViewEdit)
 		SetMenuDefaultItem (hMenu, CMD_VIEW_EDIT, FALSE);
 
 	// 2. Play / Pause (播放 / 暂停)
 	if (canPlay) {
-		if (isCurrentlyPlaying) {
-			AppendMenuW (hMenu, MF_STRING, CMD_PLAY, L"暂停 (Pause)");
-		} else {
-			conststring32 titlePlay = praat_translate (U"Play");
-			char32 textBufPlay [128];
-			if (str32equ (titlePlay, U"Play"))
-				Melder_sprint (textBufPlay, 128, U"播放 (Play)");
-			else
-				Melder_sprint (textBufPlay, 128, titlePlay);
-			AppendMenuW (hMenu, MF_STRING, CMD_PLAY, Melder_peek32toW (textBufPlay));
-		}
+		const wchar_t* labelPlay = isCurrentlyPlaying
+			? (isEnglish ? L"Pause" : L"暂停 (Pause)")
+			: (isEnglish ? L"Play" : L"播放 (Play)");
+		AppendMenuW (hMenu, MF_STRING, CMD_PLAY, labelPlay);
 	}
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
 	// 3. Rename... (重命名...)
 	UINT flagRename = (canRename ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	conststring32 titleRename = praat_translate (U"Rename...");
-	char32 textBufRename [128];
-	if (str32equ (titleRename, U"Rename..."))
-		Melder_sprint (textBufRename, 128, U"重命名... (Rename...)");
-	else
-		Melder_sprint (textBufRename, 128, titleRename);
-	AppendMenuW (hMenu, flagRename, CMD_RENAME, Melder_peek32toW (textBufRename));
+	AppendMenuW (hMenu, flagRename, CMD_RENAME, isEnglish ? L"Rename..." : L"重命名... (Rename...)");
 
 	// 4. Copy... (复制...)
 	UINT flagCopy = (canCopy ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	conststring32 titleCopy = praat_translate (U"Copy...");
-	char32 textBufCopy [128];
-	if (str32equ (titleCopy, U"Copy..."))
-		Melder_sprint (textBufCopy, 128, U"复制... (Copy...)");
-	else
-		Melder_sprint (textBufCopy, 128, titleCopy);
-	AppendMenuW (hMenu, flagCopy, CMD_COPY, Melder_peek32toW (textBufCopy));
+	AppendMenuW (hMenu, flagCopy, CMD_COPY, isEnglish ? L"Copy..." : L"复制... (Copy...)");
 
 	// 5. Info (信息)
 	UINT flagInfo = (canInfo ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	conststring32 titleInfo = praat_translate (U"Info");
-	char32 textBufInfo [128];
-	if (str32equ (titleInfo, U"Info"))
-		Melder_sprint (textBufInfo, 128, U"信息 (Info)");
-	else
-		Melder_sprint (textBufInfo, 128, titleInfo);
-	AppendMenuW (hMenu, flagInfo, CMD_INFO, Melder_peek32toW (textBufInfo));
+	AppendMenuW (hMenu, flagInfo, CMD_INFO, isEnglish ? L"Info" : L"信息 (Info)");
 
 	// 6. Inspect (检查)
 	UINT flagInspect = (canInspect ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	conststring32 titleInspect = praat_translate (U"Inspect");
-	char32 textBufInspect [128];
-	if (str32equ (titleInspect, U"Inspect"))
-		Melder_sprint (textBufInspect, 128, U"检查 (Inspect)");
-	else
-		Melder_sprint (textBufInspect, 128, titleInspect);
-	AppendMenuW (hMenu, flagInspect, CMD_INSPECT, Melder_peek32toW (textBufInspect));
+	AppendMenuW (hMenu, flagInspect, CMD_INSPECT, isEnglish ? L"Inspect" : L"检查 (Inspect)");
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
@@ -781,21 +772,21 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	bool canSaveBinary = praat_actions_canExecute (U"Save as binary file...");
 
 	if (canSaveWav)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_WAV, L"保存为 WAV 音频... (Save as WAV file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_WAV, isEnglish ? L"Save as WAV file..." : L"保存为 WAV 音频... (Save as WAV file...)");
 	if (canSaveTextGrid)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TEXTGRID, L"保存为 TextGrid 文本... (Save as text file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TEXTGRID, isEnglish ? L"Save as TextGrid text file..." : L"保存为 TextGrid 文本... (Save as text file...)");
 	if (canSaveTab)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TAB, L"保存为制表符文件... (Save as tab-separated file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TAB, isEnglish ? L"Save as tab-separated file..." : L"保存为制表符文件... (Save as tab-separated file...)");
 	if (canSaveShort)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_SHORT, L"保存为短文本文件... (Save as short text file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_SHORT, isEnglish ? L"Save as short text file..." : L"保存为短文本文件... (Save as short text file...)");
 	if (canSaveBinary)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_BINARY, L"保存为二进制文件... (Save as binary file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_BINARY, isEnglish ? L"Save as binary file..." : L"保存为二进制文件... (Save as binary file...)");
 
 	HBITMAP bmpSaveAs = nullptr;
 	int posSaveAs = -1;
 	if (GetMenuItemCount (hSubMenuSave) > 0) {
 		posSaveAs = GetMenuItemCount (hMenu);
-		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuSave, L"保存为 (Save as)...");
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuSave, isEnglish ? L"Save as..." : L"保存为 (Save as)...");
 		bmpSaveAs = createMenuIcon (L"\uE74E", RGB (55, 65, 81));
 		setMenuItemIconByPos (hMenu, posSaveAs, bmpSaveAs);
 	} else {
@@ -810,17 +801,17 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	bool canGetNumSamples = praat_actions_canExecute (U"Get number of samples");
 
 	if (canGetDuration)
-		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_DURATION, L"查询总时长 (Get total duration)");
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_DURATION, isEnglish ? L"Get total duration" : L"查询总时长 (Get total duration)");
 	if (canGetSampleRate)
-		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_SAMPLERATE, L"查询采样率 (Get sampling frequency)");
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_SAMPLERATE, isEnglish ? L"Get sampling frequency" : L"查询采样率 (Get sampling frequency)");
 	if (canGetNumSamples)
-		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_NUMSAMPLES, L"查询采样点数 (Get number of samples)");
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_NUMSAMPLES, isEnglish ? L"Get number of samples" : L"查询采样点数 (Get number of samples)");
 
 	HBITMAP bmpQuery = nullptr;
 	int posQuery = -1;
 	if (GetMenuItemCount (hSubMenuQuery) > 0) {
 		posQuery = GetMenuItemCount (hMenu);
-		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuQuery, L"查询 (Query)...");
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuQuery, isEnglish ? L"Query..." : L"查询 (Query)...");
 		bmpQuery = createMenuIcon (L"\uE721", RGB (55, 65, 81));
 		setMenuItemIconByPos (hMenu, posQuery, bmpQuery);
 	} else {
@@ -831,36 +822,18 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
 	// 9. Select All (全选)
-	conststring32 titleSelectAll = praat_translate (U"Select all");
-	char32 textBufSelectAll [128];
-	if (str32equ (titleSelectAll, U"Select all"))
-		Melder_sprint (textBufSelectAll, 128, U"全选 (Select All)");
-	else
-		Melder_sprint (textBufSelectAll, 128, titleSelectAll);
-	AppendMenuW (hMenu, MF_STRING, CMD_SELECT_ALL, Melder_peek32toW (textBufSelectAll));
+	AppendMenuW (hMenu, MF_STRING, CMD_SELECT_ALL, isEnglish ? L"Select all" : L"全选 (Select All)");
 
 	// 10. Deselect All (取消全选)
 	if (hasSelection) {
-		conststring32 titleDeselectAll = praat_translate (U"Deselect all");
-		char32 textBufDeselectAll [128];
-		if (str32equ (titleDeselectAll, U"Deselect all"))
-			Melder_sprint (textBufDeselectAll, 128, U"取消全选 (Deselect All)");
-		else
-			Melder_sprint (textBufDeselectAll, 128, titleDeselectAll);
-		AppendMenuW (hMenu, MF_STRING, CMD_DESELECT_ALL, Melder_peek32toW (textBufDeselectAll));
+		AppendMenuW (hMenu, MF_STRING, CMD_DESELECT_ALL, isEnglish ? L"Deselect all" : L"取消全选 (Deselect All)");
 	}
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
 	// 11. Remove (删除)
 	UINT flagRemove = (canRemove ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	conststring32 titleRemove = praat_translate (U"Remove");
-	char32 textBufRemove [128];
-	if (str32equ (titleRemove, U"Remove"))
-		Melder_sprint (textBufRemove, 128, U"删除 (Remove)");
-	else
-		Melder_sprint (textBufRemove, 128, titleRemove);
-	AppendMenuW (hMenu, flagRemove, CMD_REMOVE, Melder_peek32toW (textBufRemove));
+	AppendMenuW (hMenu, flagRemove, CMD_REMOVE, isEnglish ? L"Remove" : L"删除 (Remove)");
 
 	// Set Menu Icons
 	HBITMAP bmpViewEdit   = createMenuIcon (L"\uE70F", canViewEdit ? RGB (0, 103, 192) : RGB (156, 163, 175));
@@ -1437,7 +1410,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 	Melder_sprint (line2Text, 200, praat_translate (U"Do you still want to quit "), Melder_upperCaseAppName(), U"?");
 
 	if (! theQuitDialog) {
-		const int dialogWidth = 470;
+		const int dialogWidth = 550;
 		const int dialogHeight = 135;
 		theQuitDialog = GuiDialog_create (theCurrentPraatApplication -> topShell,
 			150, 70, dialogWidth, dialogHeight,
@@ -1460,16 +1433,16 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 		const int buttonY = dialogHeight - Gui_BOTTOM_DIALOG_SPACING - Gui_PUSHBUTTON_HEIGHT;
 
 		// Button 1: Help
-		const int helpWidth = 65;
+		const int helpWidth = 75;
 		GuiButton_createShown (theQuitDialog,
 			Gui_LEFT_DIALOG_SPACING, Gui_LEFT_DIALOG_SPACING + helpWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Help", gui_button_cb_helpQuit, nullptr, 0);
 
 		// Right-aligned buttons: Cancel, Save Project (.praat), Quit
-		const int cancelWidth = 65;
-		const int saveWidth = 145;
-		const int quitWidth = 85;
+		const int cancelWidth = 80;
+		const int saveWidth = 180;
+		const int quitWidth = 140;
 		const int spacing = 10;
 
 		int x = dialogWidth - Gui_RIGHT_DIALOG_SPACING - quitWidth - spacing - saveWidth - spacing - cancelWidth;
@@ -1688,6 +1661,9 @@ static void installPraatShellPreferences () {
 	Printer_prefs ();   // paper size, printer command...
 	structTextEditor :: f_preferences ();   // font size...
 	Preferences_addInt (U"Praat.languageChoice", & g_language_choice, 1);
+	#if defined (_WIN32)
+		Preferences_addInt (U"Praat.dpiMode", & g_dpi_mode, 0);
+	#endif
 	praat_python_initPreferences ();
 }
 

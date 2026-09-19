@@ -2666,6 +2666,12 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 			Graphics_setFont (my graphics(), kGraphics_font::HELVETICA);
 		}
 	}
+	static const MelderColour modernPitchHalo      = MelderColour (0.49, 0.83, 0.99); // #7DD3FC Clean sky cyan
+	static const MelderColour modernPitchCore      = MelderColour (0.11, 0.38, 0.88); // #1D4ED8 Vibrant cobalt blue
+	static const MelderColour modernPitchText      = MelderColour (0.12, 0.25, 0.69); // #1E40AF Deep blue scale
+	static const MelderColour modernIntensityHalo  = MelderColour (0.43, 0.91, 0.72); // #6EE7B7 Soft mint green
+	static const MelderColour modernIntensityCore  = MelderColour (0.02, 0.59, 0.41); // #059669 Vibrant emerald green
+
 	if (my instancePref_pitch_show())
 		tryToHavePitch (me);
 	if (my instancePref_pitch_show() && my d_pitch) {
@@ -2678,7 +2684,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 		);
 		const bool undersampled = ( timeStep > greatestNonUndersamplingTimeStep );
 		const integer numberOfVisiblePitchPoints = (integer) ((my endWindow() - my startWindow()) / timeStep);   // BUG: why round down?
-		Graphics_setColour (my graphics(), Melder_CYAN);
+		Graphics_setColour (my graphics(), modernPitchHalo);
 		Graphics_setLineWidth (my graphics(), 3.0);
 		const kSoundAnalysisArea_pitch_drawingMethod drawingMethod = my dynamic_instancePref_pitch_drawingMethod();
 		if ((drawingMethod == kSoundAnalysisArea_pitch_drawingMethod::AUTOMATIC && (undersampled || numberOfVisiblePitchPoints < 101)) ||
@@ -2691,7 +2697,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 		{
 			Pitch_drawInside (my d_pitch.get(), my graphics(), my startWindow(), my endWindow(), pitchViewFrom_overt, pitchViewTo_overt, false, pitchUnit);
 		}
-		Graphics_setColour (my graphics(), Melder_BLUE);
+		Graphics_setColour (my graphics(), modernPitchCore);
 		Graphics_setLineWidth (my graphics(), 1.0);
 		if ((drawingMethod == kSoundAnalysisArea_pitch_drawingMethod::AUTOMATIC && (undersampled || numberOfVisiblePitchPoints < 101)) ||
 		    drawingMethod == kSoundAnalysisArea_pitch_drawingMethod::SPECKLE)
@@ -2708,11 +2714,11 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 	if (my instancePref_intensity_show())
 		tryToHaveIntensity (me);
 	if (my instancePref_intensity_show() && my d_intensity) {
-		Graphics_setColour (my graphics(), Melder_LIME);
+		Graphics_setColour (my graphics(), modernIntensityHalo);
 		Graphics_setLineWidth (my graphics(), 3.0);
 		Intensity_drawInside (my d_intensity.get(), my graphics(), my startWindow(), my endWindow(),
 				my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
-		Graphics_setColour (my graphics(), Melder_GREEN);
+		Graphics_setColour (my graphics(), modernIntensityCore);
 		Graphics_setLineWidth (my graphics(), 1.0);
 		Intensity_drawInside (my d_intensity.get(), my graphics(), my startWindow(), my endWindow(),
 				my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
@@ -2727,7 +2733,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 	if (my instancePref_pitch_show()) {
 		double pitchCursor_overt = undefined, pitchCursor_hidden = undefined;
 		Graphics_setWindow (my graphics(), my startWindow(), my endWindow(), pitchViewFrom_hidden, pitchViewTo_hidden);
-		Graphics_setColour (my graphics(), 1.2 * Melder_BLUE);
+		Graphics_setColour (my graphics(), modernPitchText);
 		if (my d_pitch) {
 			if (my startSelection() == my endSelection())
 				pitchCursor_hidden = Pitch_getValueAtTime (my d_pitch.get(), my startSelection(), pitchUnit, 1);
@@ -2741,7 +2747,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 					Melder_graphicalHalf (pitchCursor_overt), U" ",
 					Function_getUnitText (my d_pitch.get(), Pitch_LEVEL_FREQUENCY, (int) pitchUnit, Function_UNIT_TEXT_SHORT | Function_UNIT_TEXT_GRAPHICAL)
 				);
-				Graphics_setColour (my graphics(), 1.2 * Melder_BLUE);
+				Graphics_setColour (my graphics(), modernPitchText);
 			}
 			if (isundef (pitchCursor_hidden) || Graphics_dyWCtoMM (my graphics(), pitchCursor_hidden - pitchViewFrom_hidden) > 4.0) {
 				Graphics_setTextAlignment (my graphics(), Graphics_LEFT, Graphics_HALF);
@@ -2869,7 +2875,7 @@ void structSoundAnalysisArea :: v_draw_analysis_formants () {
 		Graphics_setSpeckleSize (our graphics(), our instancePref_formant_dotSize());
 		Formant_drawSpeckles_inside (our d_formant.get(), our graphics(), our startWindow(), our endWindow(),
 			our instancePref_spectrogram_viewFrom(), our instancePref_spectrogram_viewTo(), our instancePref_formant_dynamicRange(),
-			Melder_RED, Melder_PINK, true
+			MelderColour (0.88, 0.11, 0.28), MelderColour (0.99, 0.64, 0.69), true
 		);
 		Graphics_setColour (our graphics(), Melder_BLACK);
 	}

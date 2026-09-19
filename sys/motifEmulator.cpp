@@ -3001,22 +3001,69 @@ void GuiMainLoop () {
 	}
 }
 
-#define main wingwmain
-extern int main (int argc, char *argv []);
-int APIENTRY WinMain (HINSTANCE instance, HINSTANCE /*previousInstance*/, LPSTR commandLine, int commandShow) {
-	trace (U"Entering WinMain");
+int g_dpi_mode = 0; // 0 = GDI scaling, 1 = System aware, 2 = Per-monitor v2, 3 = Unaware
+
+static void initWinDpiAwareness () {
+	int mode = 0; // Default: GDI Scaling
+	wchar_t appData [MAX_PATH];
+	if (GetEnvironmentVariableW (L"APPDATA", appData, MAX_PATH) > 0) {
+		wchar_t prefPath [MAX_PATH];
+		swprintf (prefPath, MAX_PATH, L"%ls\\Praat\\Preferences.txt", appData);
+		FILE *f = _wfopen (prefPath, L"rt");
+		if (f) {
+			char line [256];
+			while (fgets (line, sizeof (line), f)) {
+				if (strncmp (line, "Praat.dpiMode:", 14) == 0) {
+					int val = 0;
+					if (sscanf (line + 14, "%d", & val) == 1) {
+						if (val >= 0 && val <= 3)
+							mode = val;
+					}
+					break;
+				}
+			}
+			fclose (f);
+		}
+	}
+	g_dpi_mode = mode;
+
 	#ifndef DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED
 		#define DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED ((HANDLE)-5)
 	#endif
+	#ifndef DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+		#define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ((HANDLE)-4)
+	#endif
+	#ifndef DPI_AWARENESS_CONTEXT_SYSTEM_AWARE
+		#define DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ((HANDLE)-2)
+	#endif
+	#ifndef DPI_AWARENESS_CONTEXT_UNAWARE
+		#define DPI_AWARENESS_CONTEXT_UNAWARE ((HANDLE)-1)
+	#endif
+
+	HANDLE ctx = DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED;
+	if (mode == 1)
+		ctx = DPI_AWARENESS_CONTEXT_SYSTEM_AWARE;
+	else if (mode == 2)
+		ctx = DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2;
+	else if (mode == 3)
+		ctx = DPI_AWARENESS_CONTEXT_UNAWARE;
+
 	typedef BOOL (WINAPI *SetProcessDpiAwarenessContextProc) (HANDLE);
 	HMODULE hUser32 = GetModuleHandleW (L"user32.dll");
 	if (hUser32) {
 		SetProcessDpiAwarenessContextProc setDpiContext =
 			(SetProcessDpiAwarenessContextProc) (void*) GetProcAddress (hUser32, "SetProcessDpiAwarenessContext");
 		if (setDpiContext) {
-			setDpiContext (DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
+			setDpiContext (ctx);
 		}
 	}
+}
+
+#define main wingwmain
+extern int main (int argc, char *argv []);
+int APIENTRY WinMain (HINSTANCE instance, HINSTANCE /*previousInstance*/, LPSTR commandLine, int commandShow) {
+	trace (U"Entering WinMain");
+	initWinDpiAwareness ();
 	theGui.instance = instance;
 	theGui.commandShow = commandShow;
 	int argc;

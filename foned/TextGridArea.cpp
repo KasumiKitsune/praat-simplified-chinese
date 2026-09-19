@@ -549,7 +549,7 @@ void structTextGridArea :: v_drawInside () {
 		our functionEditor() -> viewDataAsWorldByFraction ();
 		Graphics_setLineWidth (our graphics(), 1.0);
 		Graphics_line (our graphics(), our draggingTime, 0.0, our draggingTime, 1.0);
-		Graphics_text (our graphics(), our draggingTime, 1.0, Melder_fixed (our draggingTime, 6));
+		Graphics_text (our graphics(), our draggingTime, 1.0, Melder_fixed (our draggingTime, our functionEditor() -> v_fixedPrecision_long()));
 		Graphics_xorOff (our graphics());
 	}
 }

@@ -85,7 +85,8 @@ extern const char * ipaSerifRegularPS [];
 			font == kGraphics_font_JAPANESE ? DEFAULT_CHARSET :
 			font >= kGraphics_font_IPATIMES ? DEFAULT_CHARSET :
 			ANSI_CHARSET;
-		spec. lfOutPrecision = spec. lfClipPrecision = spec. lfQuality = 0;
+		spec. lfOutPrecision = spec. lfClipPrecision = 0;
+		spec. lfQuality = CLEARTYPE_QUALITY;
 		spec. lfPitchAndFamily =
 			( font == (int) kGraphics_font::COURIER ? FIXED_PITCH : font == kGraphics_font_IPATIMES ? DEFAULT_PITCH : VARIABLE_PITCH ) |
 			( font == (int) kGraphics_font::HELVETICA ? FF_SWISS : font == (int) kGraphics_font::COURIER ? FF_MODERN :
@@ -127,7 +128,7 @@ extern const char * ipaSerifRegularPS [];
 			                                     : L"Times New Roman"
 			                                   ) :
 			font == kGraphics_font_DINGBATS  ? L"Wingdings" :
-			font == kGraphics_font_CHINESE   ? L"SimSun" :
+			font == kGraphics_font_CHINESE   ? L"Microsoft YaHei" :
 			font == kGraphics_font_JAPANESE  ? L"MS UI Gothic" :
 			L"");
 		return CreateFontIndirectW (& spec);

@@ -39,12 +39,17 @@ namespace {
 	constexpr double SCROLL_INCREMENT_FRACTION = 20.0;
 	constexpr int TEXT_HEIGHT = 50;
 	constexpr int BUTTON_X = 3;
-	constexpr int BUTTON_WIDTH = 46;
+	constexpr int BUTTON_WIDTH = 58;
 	constexpr int BUTTON_SPACING = 8;
 
 	constexpr integer THE_MAXIMUM_GROUP_SIZE = 100;
 	integer theGroupSize = 0;
 	FunctionEditor theGroupMembers [1 + THE_MAXIMUM_GROUP_SIZE];
+
+	const MelderColour modernMarkerRed  = MelderColour (0.88, 0.12, 0.28); // #E11D48 Vibrant Rose Crimson
+	const MelderColour modernMarkerBlue = MelderColour (0.11, 0.38, 0.88); // #1D4ED8 Vibrant Cobalt Blue
+	const MelderColour modernMarkerCyan = MelderColour (0.01, 0.52, 0.78); // #0284C7 Clean Sky Cyan
+	const MelderColour modernGridCyan   = MelderColour (0.75, 0.83, 0.90); // #CBD5E1 Light subtle grid
 }
 
 static bool group_equalDomain (double tmin, double tmax) {
@@ -351,8 +356,18 @@ static void drawBackgroundAndData (FunctionEditor me) {
 					inverseValue = 1.0 / value;
 				}
 			}
+			const int prec = my v_fixedPrecision_long ();
+			char dynFormat [128];
+			const char *pPctF = strstr (format, "%f");
+			if (pPctF) {
+				int prefixLen = (int) (pPctF - format);
+				snprintf (dynFormat, sizeof (dynFormat), "%.*s%%.%df%s", prefixLen, format, prec, pPctF + 2);
+			} else {
+				strncpy (dynFormat, format, sizeof (dynFormat) - 1);
+				dynFormat [sizeof (dynFormat) - 1] = '\0';
+			}
 			char text8 [100];
-			snprintf (text8, 100, format, value, inverseValue);
+			snprintf (text8, 100, dynFormat, value, inverseValue);
 			autostring32 text = Melder_8to32_e (text8);
 			if (Graphics_textWidth (my graphics.get(), text.get()) < right - left) {
 				Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - vCorrection, text.get());
@@ -362,7 +377,9 @@ static void drawBackgroundAndData (FunctionEditor me) {
 				if (Graphics_textWidth (my graphics.get(), text.get()) < right - left)
 					Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - vCorrection, text.get());
 			} else {
-				snprintf (text8, 100, my v_format_long(), value);
+				char fallbackFmt [64];
+				snprintf (fallbackFmt, sizeof (fallbackFmt), "%%.%df", prec);
+				snprintf (text8, 100, fallbackFmt, value);
 				text = Melder_8to32_e (text8);
 				if (Graphics_textWidth (my graphics.get(), text.get()) < right - left) {
 					Graphics_text (my graphics.get(), 0.5 * (left + right), 0.5 * (bottom + top) - vCorrection, text.get());
@@ -381,7 +398,7 @@ static void drawBackgroundAndData (FunctionEditor me) {
 	/*
 		Red marker text.
 	*/
-	Graphics_setColour (my graphics.get(), Melder_RED);
+	Graphics_setColour (my graphics.get(), modernMarkerRed);
 	if (cursorIsVisible) {
 		Graphics_setTextAlignment (my graphics.get(), Graphics_CENTRE, Graphics_BOTTOM);
 		Graphics_text (my graphics.get(), my startSelection, my height_pxlt - (my TOP_MARGIN + my space*0.9) - verticalCorrection * 7,
@@ -411,7 +428,7 @@ static void drawBackgroundAndData (FunctionEditor me) {
 		Red dotted marker lines.
 	*/
 	my viewDataAsWorldByFraction ();
-	Graphics_setColour (my graphics.get(), Melder_RED);
+	Graphics_setColour (my graphics.get(), modernMarkerRed);
 	Graphics_setLineType (my graphics.get(), Graphics_DOTTED);
 	if (cursorIsVisible)
 		Graphics_line (my graphics.get(), my startSelection, 0.0, my startSelection, 1.0);
@@ -843,6 +860,18 @@ static void menu_cb_zoomAndScrollSettings (FunctionEditor me, EDITOR_ARGS) {
 		FunctionEditor_redraw (me);
 	EDITOR_END
 }
+static void menu_cb_timeDecimals (FunctionEditor me, EDITOR_ARGS) {
+	EDITOR_FORM (U"Time display precision", nullptr)
+		NATURAL (timeDecimals, U"Time display decimals (1-10)", my default_timeDecimals())
+	EDITOR_OK
+		SET_INTEGER (timeDecimals, my classPref_timeDecimals())
+	EDITOR_DO
+		Melder_require (timeDecimals >= 1 && timeDecimals <= 10,
+			U"Time display decimals must be between 1 and 10.");
+		my setClassPref_timeDecimals (timeDecimals);
+		FunctionEditor_redraw (me);
+	EDITOR_END
+}
 static void menu_cb_zoom (FunctionEditor me, EDITOR_ARGS) {
 	EDITOR_FORM (U"Zoom", nullptr)
 		REAL (from, Melder_cat (U"From (", my v_format_units_short(), U")"), U"0.0")
@@ -1198,6 +1227,7 @@ void structFunctionEditor :: v_createMenus () {
 
 	EditorMenu_addCommand (domainMenu, U"- Set visible part:", 0, nullptr);
 	EditorMenu_addCommand (domainMenu, U"Zoom and scroll settings...", 1, menu_cb_zoomAndScrollSettings);
+	EditorMenu_addCommand (domainMenu, U"Time display precision... || Time decimals...", 1, menu_cb_timeDecimals);
 	EditorMenu_addCommand (domainMenu, U"Zoom...", 1, menu_cb_zoom);
 	EditorMenu_addCommand (domainMenu, U"Show all", 'A' | GuiMenu_DEPTH_1, menu_cb_showAll);
 	EditorMenu_addCommand (domainMenu, U"Zoom in", 'I' | GuiMenu_DEPTH_1, menu_cb_zoomIn);
@@ -1892,7 +1922,7 @@ void FunctionEditor_drawRangeMark (FunctionEditor me, double yWC, conststring32 
 	static MelderString text;
 	MelderString_copy (& text, yWC_string, units);
 	double textWidth = Graphics_textWidth (my graphics.get(), text.string) + Graphics_dxMMtoWC (my graphics.get(), 0.5);
-	Graphics_setColour (my graphics.get(), Melder_BLUE);
+	Graphics_setColour (my graphics.get(), modernMarkerBlue);
 	Graphics_line (my graphics.get(), my endWindow, yWC, my endWindow + textWidth, yWC);
 	Graphics_setTextAlignment (my graphics.get(), Graphics_LEFT, verticalAlignment);
 	if (verticalAlignment == Graphics_BOTTOM)
@@ -1906,7 +1936,7 @@ void FunctionEditor_insertCursorFunctionValue (FunctionEditor me, double yWC, co
 	const bool tooLow = ( Graphics_dyWCtoMM (my graphics.get(), textY - minimum) < 5.0 );
 	if (yWC < minimum || yWC > maximum)
 		return;
-	Graphics_setColour (my graphics.get(), Melder_CYAN);
+	Graphics_setColour (my graphics.get(), modernMarkerCyan);
 	Graphics_line (my graphics.get(), 0.99 * my endWindow + 0.01 * my startWindow, yWC, my endWindow, yWC);
 	Graphics_fillCircle_mm (my graphics.get(), 0.5 * (my startSelection + my endSelection), yWC, 1.5);
 	if (tooHigh) {
@@ -1921,20 +1951,20 @@ void FunctionEditor_insertCursorFunctionValue (FunctionEditor me, double yWC, co
 	MelderString_copy (& text, yWC_string, units);
 	double textWidth = Graphics_textWidth (my graphics.get(), text.string);
 	Graphics_fillCircle_mm (my graphics.get(), my endWindow + textWidth + Graphics_dxMMtoWC (my graphics.get(), 1.5), textY, 1.5);
-	Graphics_setColour (my graphics.get(), Melder_RED);
+	Graphics_setColour (my graphics.get(), modernMarkerRed);
 	Graphics_setTextAlignment (my graphics.get(), Graphics_LEFT, Graphics_HALF);
 	Graphics_text (my graphics.get(), textX, textY, text.string);
 }
 
 void FunctionEditor_drawHorizontalHair (FunctionEditor me, double yWC, conststring32 yWC_string, conststring32 units) {
-	Graphics_setColour (my graphics.get(), Melder_RED);
+	Graphics_setColour (my graphics.get(), modernMarkerRed);
 	Graphics_line (my graphics.get(), my startWindow, yWC, my endWindow, yWC);
 	Graphics_setTextAlignment (my graphics.get(), Graphics_RIGHT, Graphics_HALF);
 	Graphics_text (my graphics.get(), my startWindow, yWC,   yWC_string, units);
 }
 
 void FunctionEditor_drawGridLine (FunctionEditor me, double yWC) {
-	Graphics_setColour (my graphics.get(), Melder_CYAN);
+	Graphics_setColour (my graphics.get(), modernGridCyan);
 	Graphics_setLineType (my graphics.get(), Graphics_DOTTED);
 	Graphics_line (my graphics.get(), my startWindow, yWC, my endWindow, yWC);
 	Graphics_setLineType (my graphics.get(), Graphics_DRAWN);

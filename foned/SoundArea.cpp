@@ -207,8 +207,10 @@ void SoundArea_draw (SoundArea me) {
 				Graphics_text (my graphics(), 0.0, 0.0, U"0");
 			}
 			Graphics_setLineType (my graphics(), Graphics_DOTTED);
+			Graphics_setColour (my graphics(), MelderColour (0.75, 0.80, 0.86));
 			Graphics_line (my graphics(), 0.0, 0.0, 1.0, 0.0);
 			Graphics_setLineType (my graphics(), Graphics_DRAWN);
+			Graphics_setColour (my graphics(), Melder_BLACK);
 		}
 		/*
 			Garnish the drawing area of each channel.

@@ -48,6 +48,9 @@ Thing_define (PreferencesDialog, Thing) {
 	// Panel 1: General & Language
 	GuiOptionMenu languageMenu;
 	GuiOptionMenu cjkFontStyleMenu;
+	#if defined (_WIN32)
+	GuiOptionMenu dpiModeMenu;
+	#endif
 	GuiButton openButtonEditorButton;
 
 	// Panel 2: Sound & Audio
@@ -174,6 +177,9 @@ static void PreferencesDialog_loadValues (PreferencesDialog me) {
 	// Panel 1: General & Language
 	GuiOptionMenu_setValue (my languageMenu, g_language_choice + 1);
 	GuiOptionMenu_setValue (my cjkFontStyleMenu, (int) theGraphicsCjkFontStyle - (int) kGraphics_cjkFontStyle::MIN + 1);
+	#if defined (_WIN32)
+	GuiOptionMenu_setValue (my dpiModeMenu, g_dpi_mode + 1);
+	#endif
 
 	// Panel 2: Sound & Audio
 	GuiText_setString (my recordingBufferSizeText, Melder_integer (SoundRecorder_getBufferSizePref_MB ()));
@@ -220,6 +226,9 @@ static void PreferencesDialog_restoreDefaults (PreferencesDialog me) {
 	// Panel 1: General & Language
 	GuiOptionMenu_setValue (my languageMenu, 2); // Simplified Chinese
 	GuiOptionMenu_setValue (my cjkFontStyleMenu, (int) kGraphics_cjkFontStyle::DEFAULT - (int) kGraphics_cjkFontStyle::MIN + 1);
+	#if defined (_WIN32)
+	GuiOptionMenu_setValue (my dpiModeMenu, 1); // GDI Scaling (Default)
+	#endif
 
 	// Panel 2: Sound & Audio
 	GuiText_setString (my recordingBufferSizeText, U"60");
@@ -258,6 +267,18 @@ static bool PreferencesDialog_apply (PreferencesDialog me) {
 
 		int cjkVal = GuiOptionMenu_getValue (my cjkFontStyleMenu);
 		theGraphicsCjkFontStyle = (kGraphics_cjkFontStyle) (cjkVal - 1 + (int) kGraphics_cjkFontStyle::MIN);
+
+		#if defined (_WIN32)
+		int dpiVal = GuiOptionMenu_getValue (my dpiModeMenu);
+		int newDpiMode = (dpiVal >= 1 && dpiVal <= 4) ? (dpiVal - 1) : 0;
+		bool dpiChanged = (g_dpi_mode != newDpiMode);
+		g_dpi_mode = newDpiMode;
+		if (dpiChanged) {
+			Melder_information (g_language_choice != 0 ?
+				U"DPI 缩放模式已更改。请重启 Praat 以使更改生效。" :
+				U"DPI scaling mode changed. Please restart Praat for the changes to take effect.");
+		}
+		#endif
 
 		// 2. Sound & Audio
 		autostring32 recBufStr = GuiText_getString (my recordingBufferSizeText);
@@ -415,7 +436,27 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 		for (int i = (int) kGraphics_cjkFontStyle::MIN; i <= (int) kGraphics_cjkFontStyle::MAX; i ++)
 			GuiOptionMenu_addOption (my cjkFontStyleMenu, praat_translate (kGraphics_cjkFontStyle_getText ((kGraphics_cjkFontStyle) i)));
 		ADD_PANEL_CONTROL (1, my cjkFontStyleMenu);
-		y += 44;
+		y += 32;
+
+		#if defined (_WIN32)
+		GuiLabel lDpi = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20,
+			g_language_choice != 0 ? U"DPI 缩放模式：" : U"DPI scaling mode:", GuiLabel_RIGHT);
+		ADD_PANEL_CONTROL (1, lDpi);
+		my dpiModeMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"GDI 缩放 (推荐，高清与兼容平衡)" : U"GDI Scaling (Default, crisp & compatible)");
+		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"系统原生缩放 (System DPI Aware)" : U"System DPI Aware");
+		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"每显示器感知 V2 (Per-Monitor V2)" : U"Per-Monitor DPI Aware V2");
+		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"传统兼容模式 (DPI Unaware - 防界面错位)" : U"DPI Unaware (Compatibility fallback)");
+		ADD_PANEL_CONTROL (1, my dpiModeMenu);
+		y += 24;
+
+		GuiLabel capDpi = GuiLabel_createShown (form, fieldX1, fullX2, y, y + 16,
+			g_language_choice != 0 ? U"(更改后需重启 Praat 生效)" : U"(Requires restarting Praat to take effect)", 0);
+		ADD_PANEL_CONTROL (1, capDpi);
+		y += 28;
+		#else
+		y += 12;
+		#endif
 
 		GuiLabel h2 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Shortcuts & Customization"), GuiLabel_BOLD);
 		ADD_PANEL_CONTROL (1, h2);
