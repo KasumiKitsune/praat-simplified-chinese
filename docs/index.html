@@ -224,7 +224,7 @@
       border: 1px solid var(--line);
       box-shadow: var(--shadow-pop);
       border-radius: 10px;
-      min-width: 184px;
+      min-width: 236px;
       padding: 6px;
       z-index: 100;
       animation: popIn 0.16s ease;
@@ -270,6 +270,14 @@
 
     .dropdown-item:hover { background: var(--sage-soft); color: var(--ink); text-decoration: none; }
     .dropdown-divider { height: 1px; background: var(--line); margin: 5px 8px; }
+    .dropdown-header {
+      padding: 6px 12px 3px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-3);
+      letter-spacing: 0.04em;
+    }
 
     .top-bar-right { display: flex; align-items: center; gap: 8px; }
 
@@ -664,7 +672,7 @@
     /* Download Cards & Meta */
     .download-grid-compact {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -713,6 +721,104 @@
     }
 
     .dl-card-desc { font-size: 12.8px; color: var(--ink-3); margin-bottom: 16px; flex: 1; line-height: 1.6; }
+
+    /* China Download Notice Banner */
+    .china-download-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f0f7ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+
+    .china-download-banner .banner-icon {
+      font-size: 20px;
+      color: #0284c7;
+      flex-shrink: 0;
+    }
+
+    .china-download-banner .banner-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #0369a1;
+      margin-bottom: 2px;
+    }
+
+    .china-download-banner .banner-desc {
+      font-size: 12.5px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    /* Download Card Actions & Domestic Cloud Buttons */
+    .dl-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .dl-pan-row {
+      display: flex;
+      gap: 6px;
+      align-items: stretch;
+    }
+
+    .praat-btn.dl-pan-btn {
+      flex: 1;
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #1e293b;
+      padding: 8px 10px;
+      font-weight: 500;
+    }
+
+    .praat-btn.dl-pan-btn:hover {
+      background: #f0f7ff;
+      border-color: #0284c7;
+      color: #0369a1;
+    }
+
+    .pan-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--paper-2);
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      padding: 0 10px;
+      font-size: 11.5px;
+      color: var(--ink-2);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .pan-copy-btn code {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #0284c7;
+    }
+
+    .pan-copy-btn:hover {
+      background: var(--sage-soft);
+      border-color: var(--olive);
+      color: var(--ink);
+    }
+
+    .pan-copy-btn.copied {
+      background: #ecfdf5;
+      border-color: #6ee7b7;
+      color: #065f46;
+    }
+
+    .pan-copy-btn.copied code {
+      color: #065f46;
+    }
 
     /* Terminology Table with Groups */
     .term-table-wrapper {
@@ -1298,6 +1404,22 @@
         font-size: 13.5px;
       }
 
+      .dl-pan-row {
+        display: flex;
+        gap: 8px;
+        align-items: stretch;
+      }
+
+      .dl-pan-row .praat-btn {
+        flex: 1;
+        width: auto;
+      }
+
+      .dl-pan-row .pan-copy-btn {
+        min-height: 44px;
+        padding: 0 14px;
+      }
+
       /* Split View on Mobile */
       .split-view {
         grid-template-columns: 1fr;
@@ -1544,18 +1666,36 @@
             <li class="menu-item">
               <button class="menu-btn" onclick="switchTab('tab-download')">下载 <i class="fa-solid fa-angle-down" style="font-size: 10px;"></i></button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" id="menu-dl-win" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Windows-x64.zip">
+                <a class="dropdown-item" id="menu-dl-win-modern" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Modern-Windows-x64.zip">
                   <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
-                  <span>Windows (.zip)</span>
+                  <span>Windows 现代版 (.zip)</span>
+                </a>
+                <a class="dropdown-item" id="menu-dl-win" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Windows-x64.zip">
+                  <i class="fa-brands fa-windows" style="color: #64748b;"></i>
+                  <span>Windows 经典原版 (.zip)</span>
                 </a>
                 <a class="dropdown-item" id="menu-dl-mac" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-macOS-universal.dmg">
                   <i class="fa-brands fa-apple" style="color: #1a1a1a;"></i>
-                  <span>macOS (.dmg)</span>
+                  <span>macOS 通用版 (.dmg)</span>
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank">
+                <div class="dropdown-header">国内网盘下载</div>
+                <a class="dropdown-item" href="https://pan.baidu.com/s/1CO5qOyH2_i0xA0Y_5QF7LA?pwd=pktf" target="_blank" rel="noopener noreferrer">
+                  <i class="fa-solid fa-cloud-arrow-down" style="color: #0284c7;"></i>
+                  <span>百度网盘 · Win 现代版 (pktf)</span>
+                </a>
+                <a class="dropdown-item" href="https://pan.baidu.com/s/1uRSRLzVMUm8n7tT_RTOUVQ?pwd=xm3c" target="_blank" rel="noopener noreferrer">
+                  <i class="fa-solid fa-cloud-arrow-down" style="color: #0284c7;"></i>
+                  <span>百度网盘 · Win 经典版 (xm3c)</span>
+                </a>
+                <a class="dropdown-item" href="https://pan.baidu.com/s/1wYH8D-EY6onMObEycKYg-A?pwd=nexa" target="_blank" rel="noopener noreferrer">
+                  <i class="fa-solid fa-cloud-arrow-down" style="color: #0284c7;"></i>
+                  <span>百度网盘 · macOS 版 (nexa)</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank" rel="noopener noreferrer">
                   <i class="fa-solid fa-clock-rotate-left" style="color: var(--ink-3);"></i>
-                  <span>所有历史版本</span>
+                  <span>所有历史版本 (GitHub)</span>
                 </a>
               </div>
             </li>
@@ -1806,12 +1946,21 @@
                 <svg class="wave-divider" viewBox="0 0 132 20" fill="none" aria-hidden="true"><path d="M2 10v0 M8 7v6 M14 4v12 M20 8v4 M26 2v16 M32 6v8 M38 9v2 M44 5v10 M50 3v14 M56 8v4 M62 6v8 M68 2v16 M74 7v6 M80 9v2 M86 4v12 M92 8v4 M98 6v8 M104 3v14 M110 8v4 M116 7v6 M122 9v2 M128 10v0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </div>
 
+              <!-- China Mirror Notice Banner -->
+              <div class="china-download-banner">
+                <i class="fa-solid fa-cloud banner-icon"></i>
+                <div class="banner-content">
+                  <div class="banner-title">国内网盘下载通道</div>
+                  <div class="banner-desc">若无法正常访问 GitHub 或下载中断，可使用下方各版本卡片中提供的<b>「百度网盘」</b>链接进行下载。</div>
+                </div>
+              </div>
+
               <div class="download-grid-compact">
                 <!-- Windows Modern Card -->
                 <div class="download-card-compact featured" style="border-color: #0078d4;">
                   <div class="dl-card-header">
                     <i class="fa-brands fa-windows" style="color: #0078d4;"></i>
-                    <span>Windows (x64) · 现代增强版</span>
+                    <span>Windows (x64) · 现代版</span>
                   </div>
                   <div class="dl-meta">
                     <span>Modern</span><i></i><span>.zip · Fluent 图标 / 快捷栏</span>
@@ -1819,10 +1968,22 @@
                   <div class="dl-card-desc">
                     引入 Fluent 矢量图标、列表悬停与右键菜单、顶部常用快捷栏及播放暂停断点续播。
                   </div>
-                  <a id="dl-win-modern-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Modern-Windows-x64.zip" class="praat-btn accent" style="padding: 10px;">
-                    <i class="fa-solid fa-download"></i>
-                    <span>下载 Modern 便携包 (.zip)</span>
-                  </a>
+                  <div class="dl-btn-group">
+                    <a id="dl-win-modern-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Modern-Windows-x64.zip" class="praat-btn accent" style="padding: 10px;">
+                      <i class="fa-brands fa-github"></i>
+                      <span>GitHub 直接下载 (.zip)</span>
+                    </a>
+                    <div class="dl-pan-row">
+                      <a href="https://pan.baidu.com/s/1CO5qOyH2_i0xA0Y_5QF7LA?pwd=pktf" target="_blank" rel="noopener noreferrer" class="praat-btn dl-pan-btn" title="点击打开百度网盘下载页面">
+                        <i class="fa-solid fa-cloud-arrow-down" style="color: #0284c7;"></i>
+                        <span>百度网盘下载</span>
+                      </a>
+                      <button type="button" class="pan-copy-btn" onclick="copyPanCode('pktf', this)" title="点击复制提取码 pktf">
+                        <code>pktf</code>
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Windows Classic Card -->
@@ -1837,10 +1998,22 @@
                   <div class="dl-card-desc">
                     保持 Praat 原生经典 Motif 界面风格，纯简体中文本地化。
                   </div>
-                  <a id="dl-win-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Windows-x64.zip" class="praat-btn" style="padding: 10px;">
-                    <i class="fa-solid fa-download"></i>
-                    <span>下载 Classic 便携包 (.zip)</span>
-                  </a>
+                  <div class="dl-btn-group">
+                    <a id="dl-win-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-Windows-x64.zip" class="praat-btn accent" style="padding: 10px;">
+                      <i class="fa-brands fa-github"></i>
+                      <span>GitHub 直接下载 (.zip)</span>
+                    </a>
+                    <div class="dl-pan-row">
+                      <a href="https://pan.baidu.com/s/1uRSRLzVMUm8n7tT_RTOUVQ?pwd=xm3c" target="_blank" rel="noopener noreferrer" class="praat-btn dl-pan-btn" title="点击打开百度网盘下载页面">
+                        <i class="fa-solid fa-cloud-arrow-down" style="color: #0284c7;"></i>
+                        <span>百度网盘下载</span>
+                      </a>
+                      <button type="button" class="pan-copy-btn" onclick="copyPanCode('xm3c', this)" title="点击复制提取码 xm3c">
+                        <code>xm3c</code>
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- macOS Card -->
@@ -1855,10 +2028,22 @@
                   <div class="dl-card-desc">
                     支持 Apple Silicon (M系列) 与 Intel 处理器的 Mac (macOS 11+)。
                   </div>
-                  <a id="dl-mac-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-macOS-universal.dmg" class="praat-btn" style="padding: 10px;">
-                    <i class="fa-solid fa-download"></i>
-                    <span>下载 macOS Universal (.dmg)</span>
-                  </a>
+                  <div class="dl-btn-group">
+                    <a id="dl-mac-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.3/Praat-v7.0-zh.3-macOS-universal.dmg" class="praat-btn accent" style="padding: 10px;">
+                      <i class="fa-brands fa-github"></i>
+                      <span>GitHub 直接下载 (.dmg)</span>
+                    </a>
+                    <div class="dl-pan-row">
+                      <a href="https://pan.baidu.com/s/1wYH8D-EY6onMObEycKYg-A?pwd=nexa" target="_blank" rel="noopener noreferrer" class="praat-btn dl-pan-btn" title="点击打开百度网盘下载页面">
+                        <i class="fa-solid fa-cloud-arrow-down" style="color: #0284c7;"></i>
+                        <span>百度网盘下载</span>
+                      </a>
+                      <button type="button" class="pan-copy-btn" onclick="copyPanCode('nexa', this)" title="点击复制提取码 nexa">
+                        <code>nexa</code>
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Linux / Source Card -->
@@ -1873,10 +2058,12 @@
                   <div class="dl-card-desc">
                     适用于 Ubuntu、Debian 等 Linux 发行版，或直接获取完整源码。
                   </div>
-                  <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" class="praat-btn" style="padding: 10px;">
-                    <i class="fa-brands fa-github"></i>
-                    <span>查看 GitHub 源码仓库</span>
-                  </a>
+                  <div class="dl-btn-group">
+                    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener noreferrer" class="praat-btn accent" style="padding: 10px;">
+                      <i class="fa-brands fa-github"></i>
+                      <span>查看 GitHub 源码仓库</span>
+                    </a>
+                  </div>
                 </div>
               </div>
 
@@ -1894,6 +2081,10 @@
                   <div class="version-tip-item">
                     <strong><i class="fa-brands fa-apple" style="color: #1a1a1a;"></i> Mac 用户</strong>
                     <p>下载 <code>.dmg</code> 镜像文件，双击打开后把 Praat 图标拖入「应用程序」即可（通用版已同时支持 M 系列芯片与 Intel 芯片机型）。</p>
+                  </div>
+                  <div class="version-tip-item full-width">
+                    <strong><i class="fa-solid fa-cloud-arrow-down" style="color: #0284c7;"></i> 国内网盘下载</strong>
+                    <p>国内网络访问 GitHub Releases 若遇到连接失败或下载中断，可使用上方卡片中的<b>百度网盘</b>下载。链接内已包含提取码，也可点击提取码复制。</p>
                   </div>
                   <div class="version-tip-item full-width">
                     <strong><i class="fa-solid fa-shield-halved" style="color: var(--ink-3);"></i> 首次打开提示安全拦截？</strong>
@@ -2453,8 +2644,15 @@
         .then(res => res.json())
         .then(data => {
           if (data && data.assets && data.assets.length > 0) {
-            const winAsset = data.assets.find(a => a.name.endsWith('.zip') && a.name.includes('Windows'));
+            const winModernAsset = data.assets.find(a => a.name.endsWith('.zip') && a.name.includes('Modern'));
+            const winAsset = data.assets.find(a => a.name.endsWith('.zip') && a.name.includes('Windows') && !a.name.includes('Modern'));
             const macAsset = data.assets.find(a => a.name.endsWith('.dmg') && a.name.includes('macOS'));
+            if (winModernAsset && winModernAsset.browser_download_url) {
+              const winModernBtn = document.getElementById('dl-win-modern-btn');
+              const menuWinModern = document.getElementById('menu-dl-win-modern');
+              if (winModernBtn) winModernBtn.href = winModernAsset.browser_download_url;
+              if (menuWinModern) menuWinModern.href = winModernAsset.browser_download_url;
+            }
             if (winAsset && winAsset.browser_download_url) {
               const winBtn = document.getElementById('dl-win-btn');
               const menuWin = document.getElementById('menu-dl-win');
@@ -2471,6 +2669,42 @@
         })
         .catch(() => {});
     })();
+
+    // Copy extraction code for Baidu Netdisk
+    function copyPanCode(code, btn) {
+      if (!btn || !code) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          showCopied(btn, code);
+        }).catch(() => fallbackCopy(code, btn));
+      } else {
+        fallbackCopy(code, btn);
+      }
+    }
+
+    function fallbackCopy(text, btn) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showCopied(btn, text);
+      } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    function showCopied(btn, code) {
+      const origHtml = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>已复制</span>';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = origHtml;
+      }, 1800);
+    }
 
     // Lightbox Modal for Image Zoom
     function openLightbox(imgSrc, captionText) {
