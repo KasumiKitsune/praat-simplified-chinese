@@ -1002,7 +1002,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 		GuiButton_createShown (theQuitDialog,
 			x, x + quitWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
-			U"Quit Application", gui_button_cb_directQuit, nullptr, GuiButton_DEFAULT);
+			(g_language_choice == 0 ? U"Quit" : U"Quit Application"), gui_button_cb_directQuit, nullptr, GuiButton_DEFAULT);
 	} else {
 		GuiLabel_setText (theQuitLabel1, line1Text);
 		GuiLabel_setText (theQuitLabel2, line2Text);
