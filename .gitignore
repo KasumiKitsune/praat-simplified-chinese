@@ -52,3 +52,6 @@ gui_candidates.txt
 translation_candidates.txt
 translation_check_report.md
 scratch/
+
+# Whisper models
+models/**/*.bin

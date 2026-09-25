@@ -4466,6 +4466,16 @@ EXACT_MAP = {
     "Frequency step (Hz)": "频率步长 (Hz)",
     "First frequency (Hz)": "起始频率 (Hz)",
     "Number of components": "分量数量",
+
+    # Whisper 模型下载向导
+    "Download Whisper models...": "下载 Whisper 模型...",
+    "Download Whisper models": "下载 Whisper 模型",
+    "Whisper Speech Recognition Models Setup": "Whisper 模型下载与配置向导",
+    "Open Model Folder": "打开模型文件夹",
+    "Download base model": "下载 base 模型",
+    "Browse all models...": "浏览全部模型...",
+    "No Whisper Speech Recognition Models Found (.bin)": "未检测到 Whisper 语音识别模型 (.bin)",
+    "Get Whisper model name": "获取 Whisper 模型名称",
 }
 
 PHRASE_REPLACEMENTS = [

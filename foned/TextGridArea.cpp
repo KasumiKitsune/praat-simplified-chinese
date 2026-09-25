@@ -1504,10 +1504,13 @@ static void menu_cb_TranscriptionSettings (TextGridArea me, EDITOR_ARGS) {
 		static autoSTRVEC modelNames;
 		modelNames = copy_STRVEC (theCurrentSpeechRecognizerModelNames());   // cannot be called twice in the same scope
 
-		Melder_require (modelNames.size > 0,
-			U"Found no Whisper-cpp models to do speech recognition with.\n"
-			U"You can install them into the subfolders “whispercpp” of the folder “models” in the Praat preferences folder."
-		);
+		if (modelNames.size == 0) {
+			SpeechRecognizer_showModelGuideDialog ();
+			Melder_throw (praat_translate (
+				U"未检测到 Whisper 语音识别模型。\n"
+				U"已为您打开模型下载与配置向导，您也可以直接将 ggml-*.bin 模型放置于软件同级目录的 models/whispercpp 文件夹中。"
+			));
+		}
 
 		SET_BOOLEAN (includeWords, my instancePref_transcribe_includeWords())
 		SET_BOOLEAN (includeDiarization, my instancePref_transcribe_diarize())
