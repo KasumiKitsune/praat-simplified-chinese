@@ -730,7 +730,7 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 
 	// 1. View & Edit (查看与编辑)
 	UINT flagViewEdit = (canViewEdit ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	AppendMenuW (hMenu, flagViewEdit, CMD_VIEW_EDIT, isEnglish ? L"View & Edit" : L"查看与编辑 (View & Edit)");
+	AppendMenuW (hMenu, flagViewEdit, CMD_VIEW_EDIT, isEnglish ? L"View & Edit" : L"查看与编辑");
 
 	if (canViewEdit)
 		SetMenuDefaultItem (hMenu, CMD_VIEW_EDIT, FALSE);
@@ -738,8 +738,8 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	// 2. Play / Pause (播放 / 暂停)
 	if (canPlay) {
 		const wchar_t* labelPlay = isCurrentlyPlaying
-			? (isEnglish ? L"Pause" : L"暂停 (Pause)")
-			: (isEnglish ? L"Play" : L"播放 (Play)");
+			? (isEnglish ? L"Pause" : L"暂停")
+			: (isEnglish ? L"Play" : L"播放");
 		AppendMenuW (hMenu, MF_STRING, CMD_PLAY, labelPlay);
 	}
 
@@ -747,19 +747,19 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 
 	// 3. Rename... (重命名...)
 	UINT flagRename = (canRename ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	AppendMenuW (hMenu, flagRename, CMD_RENAME, isEnglish ? L"Rename..." : L"重命名... (Rename...)");
+	AppendMenuW (hMenu, flagRename, CMD_RENAME, isEnglish ? L"Rename..." : L"重命名...");
 
 	// 4. Copy... (复制...)
 	UINT flagCopy = (canCopy ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	AppendMenuW (hMenu, flagCopy, CMD_COPY, isEnglish ? L"Copy..." : L"复制... (Copy...)");
+	AppendMenuW (hMenu, flagCopy, CMD_COPY, isEnglish ? L"Copy..." : L"复制...");
 
 	// 5. Info (信息)
 	UINT flagInfo = (canInfo ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	AppendMenuW (hMenu, flagInfo, CMD_INFO, isEnglish ? L"Info" : L"信息 (Info)");
+	AppendMenuW (hMenu, flagInfo, CMD_INFO, isEnglish ? L"Info" : L"信息");
 
 	// 6. Inspect (检查)
 	UINT flagInspect = (canInspect ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	AppendMenuW (hMenu, flagInspect, CMD_INSPECT, isEnglish ? L"Inspect" : L"检查 (Inspect)");
+	AppendMenuW (hMenu, flagInspect, CMD_INSPECT, isEnglish ? L"Inspect" : L"检查");
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
@@ -772,21 +772,21 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	bool canSaveBinary = praat_actions_canExecute (U"Save as binary file...");
 
 	if (canSaveWav)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_WAV, isEnglish ? L"Save as WAV file..." : L"保存为 WAV 音频... (Save as WAV file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_WAV, isEnglish ? L"Save as WAV file..." : L"保存为 WAV 音频...");
 	if (canSaveTextGrid)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TEXTGRID, isEnglish ? L"Save as TextGrid text file..." : L"保存为 TextGrid 文本... (Save as text file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TEXTGRID, isEnglish ? L"Save as TextGrid text file..." : L"保存为 TextGrid 文本...");
 	if (canSaveTab)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TAB, isEnglish ? L"Save as tab-separated file..." : L"保存为制表符文件... (Save as tab-separated file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TAB, isEnglish ? L"Save as tab-separated file..." : L"保存为制表符文件...");
 	if (canSaveShort)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_SHORT, isEnglish ? L"Save as short text file..." : L"保存为短文本文件... (Save as short text file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_SHORT, isEnglish ? L"Save as short text file..." : L"保存为短文本文件...");
 	if (canSaveBinary)
-		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_BINARY, isEnglish ? L"Save as binary file..." : L"保存为二进制文件... (Save as binary file...)");
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_BINARY, isEnglish ? L"Save as binary file..." : L"保存为二进制文件...");
 
 	HBITMAP bmpSaveAs = nullptr;
 	int posSaveAs = -1;
 	if (GetMenuItemCount (hSubMenuSave) > 0) {
 		posSaveAs = GetMenuItemCount (hMenu);
-		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuSave, isEnglish ? L"Save as..." : L"保存为 (Save as)...");
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuSave, isEnglish ? L"Save as..." : L"保存为...");
 		bmpSaveAs = createMenuIcon (L"\uE74E", RGB (55, 65, 81));
 		setMenuItemIconByPos (hMenu, posSaveAs, bmpSaveAs);
 	} else {
@@ -801,17 +801,17 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	bool canGetNumSamples = praat_actions_canExecute (U"Get number of samples");
 
 	if (canGetDuration)
-		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_DURATION, isEnglish ? L"Get total duration" : L"查询总时长 (Get total duration)");
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_DURATION, isEnglish ? L"Get total duration" : L"查询总时长");
 	if (canGetSampleRate)
-		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_SAMPLERATE, isEnglish ? L"Get sampling frequency" : L"查询采样率 (Get sampling frequency)");
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_SAMPLERATE, isEnglish ? L"Get sampling frequency" : L"查询采样率");
 	if (canGetNumSamples)
-		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_NUMSAMPLES, isEnglish ? L"Get number of samples" : L"查询采样点数 (Get number of samples)");
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_NUMSAMPLES, isEnglish ? L"Get number of samples" : L"查询采样点数");
 
 	HBITMAP bmpQuery = nullptr;
 	int posQuery = -1;
 	if (GetMenuItemCount (hSubMenuQuery) > 0) {
 		posQuery = GetMenuItemCount (hMenu);
-		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuQuery, isEnglish ? L"Query..." : L"查询 (Query)...");
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuQuery, isEnglish ? L"Query..." : L"查询...");
 		bmpQuery = createMenuIcon (L"\uE721", RGB (55, 65, 81));
 		setMenuItemIconByPos (hMenu, posQuery, bmpQuery);
 	} else {
@@ -822,18 +822,18 @@ static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
 	// 9. Select All (全选)
-	AppendMenuW (hMenu, MF_STRING, CMD_SELECT_ALL, isEnglish ? L"Select all" : L"全选 (Select All)");
+	AppendMenuW (hMenu, MF_STRING, CMD_SELECT_ALL, isEnglish ? L"Select all" : L"全选");
 
 	// 10. Deselect All (取消全选)
 	if (hasSelection) {
-		AppendMenuW (hMenu, MF_STRING, CMD_DESELECT_ALL, isEnglish ? L"Deselect all" : L"取消全选 (Deselect All)");
+		AppendMenuW (hMenu, MF_STRING, CMD_DESELECT_ALL, isEnglish ? L"Deselect all" : L"取消全选");
 	}
 
 	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
 
 	// 11. Remove (删除)
 	UINT flagRemove = (canRemove ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
-	AppendMenuW (hMenu, flagRemove, CMD_REMOVE, isEnglish ? L"Remove" : L"删除 (Remove)");
+	AppendMenuW (hMenu, flagRemove, CMD_REMOVE, isEnglish ? L"Remove" : L"删除");
 
 	// Set Menu Icons
 	HBITMAP bmpViewEdit   = createMenuIcon (L"\uE70F", canViewEdit ? RGB (0, 103, 192) : RGB (156, 163, 175));
@@ -1410,7 +1410,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 	Melder_sprint (line2Text, 200, praat_translate (U"Do you still want to quit "), Melder_upperCaseAppName(), U"?");
 
 	if (! theQuitDialog) {
-		const int dialogWidth = 550;
+		const int dialogWidth = 500;
 		const int dialogHeight = 135;
 		theQuitDialog = GuiDialog_create (theCurrentPraatApplication -> topShell,
 			150, 70, dialogWidth, dialogHeight,
@@ -1442,7 +1442,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 		// Right-aligned buttons: Cancel, Save Project (.praat), Quit
 		const int cancelWidth = 80;
 		const int saveWidth = 180;
-		const int quitWidth = 140;
+		const int quitWidth = 95;
 		const int spacing = 10;
 
 		int x = dialogWidth - Gui_RIGHT_DIALOG_SPACING - quitWidth - spacing - saveWidth - spacing - cancelWidth;
@@ -1465,7 +1465,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 		GuiButton_createShown (theQuitDialog,
 			x, x + quitWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
-			U"Quit Application", gui_button_cb_directQuit, nullptr, GuiButton_DEFAULT);
+			(g_language_choice == 0 ? U"Quit" : U"Quit Application"), gui_button_cb_directQuit, nullptr, GuiButton_DEFAULT);
 	} else {
 		GuiLabel_setText (theQuitLabel1, line1Text);
 		GuiLabel_setText (theQuitLabel2, line2Text);
