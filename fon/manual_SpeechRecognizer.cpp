@@ -26,151 +26,74 @@ MAN_PAGES_BEGIN R"~~~(
 "Speech recognition"
 © Anastasia Shchupak 2026-06-01
 
-There are two speech recognition tools available in Praat: automatic transcription (turning speech
-into text) and automatic speaker diarization (finding out who speaks when). This tutorial
-describes how you can use these tools in Praat. It assumes that you are familiar with the @Intro,
-especially with @@Intro 7. Annotation@.
+Praat 中提供了两套语音识别工具：自动语音转写（将语音转换为文字）与自动说话人分离/日志（识别谁在何时说话）。本教程将介绍如何在 Praat 中使用这些工具。阅读前假定您已熟悉 @Intro，尤其是 @@Intro 7. Annotation|Intro 7. 标注@。
 
-Transcription is performed with @@whisper.cpp@ and it requires at least one external model
-installed on your computer; speaker diarization is performed with an adapted @@pyannote.audio@
-diarization pipeline and it works without any external models. Diarization can also be performed
-together with transcription, so that transcribed text is divided among the detected speakers.
+转写功能通过 @@whisper.cpp@ 实现，需要计算机中至少安装一个外部模型；说话人分离功能则基于改编的 @@pyannote.audio@ 分离流水线，内置集成，无需任何外部模型。说话人分离还可以与转写协同运行，将转写出的文字自动归属划分至检测到的各个说话人。
 
-After you have read the chapters ##1. Automatic transcription# and ##2. Automatic speaker
-diarization#, you might be interested in what can be done to improve the performance of these
-tools in Praat; you can find this information in ##3. Performance#.
+在阅读完 ##1. 自动转写# 和 ##2. 自动说话人分离# 两章后，如果您希望提升这些工具在 Praat 中的运行性能，可以在 ##3. 性能优化# 中找到详尽建议。
 
-1. Automatic transcription
-==========================
-Transcription in Praat turns speech in a @Sound object into written text. Usually you might want
-this text to be placed into a @TextGrid, aligning it with the Sound (this is described in ##1.2.
-Transcribing into a TextGrid#). But you can also obtain it as plain text (see ##1.3. Transcribing
-into plain text#). Either way, you first need a Whisper model installed, and how to do that is
-explained in ##1.1. Installing Whisper models#.
+1. 自动转写
+==========
+Praat 中的转写可以将 @Sound 对象中的语音转换为文本。通常您可能希望将转写文字填入 @TextGrid 中，使其与声音在时间轴上精确对齐（参见 ##1.2. 转写到 TextGrid#）。但您也可以直接获取纯文本结果（参见 ##1.3. 转写为纯文本#）。无论哪种方式，首先都需要安装 Whisper 模型，具体方法见 ##1.1. 安装 Whisper 模型#。
 
-1.1. Installing Whisper models
-==============================
-To transcribe, you need at least one Whisper model installed. In this case, installation
-means downloading a model and placing it into a specific folder on your computer, where Praat
-can later find it. In your Praat @@preferences folder@, create a folder called `models`, and
-inside it another one called `whispercpp`. If you are on Windows, you will now have a folder called
-something like `C:\Users\Your Name\Praat\models\whispercpp`.
+1.1. 安装 Whisper 模型
+======================
+要进行语音转写，计算机中必须至少安装一个 Whisper 模型。这里的“安装”，是指下载模型文件并将其放入特定的文件夹中，以便 Praat 能够找到它。
 
-Models can be downloaded from `https://huggingface.co/ggerganov/whisper.cpp`. This
-page contains Whisper models in ggml format (files with extension `.bin`), which is what
-whisper.cpp uses. Note that the original Whisper models, by OpenAI, are distributed in PyTorch format
-(files with extension `.pt`) and cannot be used in Praat directly: they first need to be
-converted to ggml format. The files on the page above are results of such conversions.
+在 Praat 中有两种放置模型的方式：
+1. @@preferences folder|首选项文件夹@：在此文件夹中创建名为 `models` 的子文件夹，并在其内创建名为 `whispercpp` 的文件夹。在 Windows 上，该路径通常形如：
+`C:\Users\您的用户名\Praat\models\whispercpp`
+2. 便携模式推荐：直接在 Praat 程序同级目录下创建 `models\whispercpp` 文件夹（即 `<Praat程序目录>\models\whispercpp\`），解压缩即用。
+在 Praat 中，您还可以随时通过菜单 ##对象 -> 新建 -> 下载 Whisper 模型...# 打开向导，一键直达模型文件夹或下载推荐模型。
 
-The list of available models is quite long, and you might wonder how to choose one. You will
-probably want to experiment with different models to find a good balance between speed and
-accuracy for your specific task, but below you can read a brief overview which can help you get
-started.
+模型可以从官方源 `https://huggingface.co/ggerganov/whisper.cpp` 下载（国内用户亦可使用镜像源 `https://hf-mirror.com/ggerganov/whisper.cpp`）。该页面提供了 whisper.cpp 所需的 ggml 格式模型文件（扩展名为 `.bin`）。请注意，OpenAI 官方发布的原始 Whisper 模型为 PyTorch 格式（`.pt` 文件），无法在 Praat 中直接使用，必须转换为 ggml 格式；上述页面中的文件即为转换好的模型。
 
-A model is English-only if its name contains `.en` (e.g. `ggml-small.en.bin`); all other models are
-multilingual. Size-wise, the models range from `tiny` (about 75 MB) through `base`, `small` and
-`medium` to `large` (about 2.9 GB). The large models have three different versions: `large-v1`,
-`large-v2` and `large-v3`. The later versions are improvements over the earlier ones. Generally
-speaking, larger models tend to be more accurate but use more disk space and memory, and take
-longer to transcribe. So, `base` or `small` can be good starting points.
+可用模型列表很长，您可能会困惑该如何选择。建议针对具体的任务在速度与准确率之间进行权衡尝试，以下是快速选型概览：
 
-Models whose names end in `-q5_0`, `-q5_1` or `-q8_0` are %quantized: their weights are stored with
-fewer bits (5 or 8 instead of 16), so they take less disk space and memory, and run faster than the
-normal (non-quantized) models with the corresponding names. There is also `large-v3-turbo`,
-a reduced version of `large-v3` that has fewer decoder layers: it is about half the size and thus
-faster than the original `large-v3`. These optimized model variants were created to offer better
-speed at the cost of reduced accuracy.
+模型名称中带有 `.en` 的为纯英文模型（例如 `ggml-small.en.bin`）；其他所有模型均为多语言模型（包括中文）。
+在尺寸上，模型涵盖了从 `tiny`（约 75 MB）、`base`（约 142 MB）、`small`（约 466 MB）、`medium`（约 1.5 GB）到 `large`（约 2.9 GB）。其中 large 模型有三个不同版本：`large-v1`、`large-v2` 和 `large-v3`，后续版本在前序版本基础上有所改进。总体而言，模型越大准确率越高，但占用磁盘和内存更多，转写耗时也更长。对于中文日常使用，`base` 或 `small` 是非常理想的起点。
 
-Once you have decided which model you want, download its `.bin` file and place it in your newly
-created `whispercpp` folder. Any `.bin` file placed in this folder will be found by Praat.
-In fact, if you want to experiment with different models, you can download
-as many of them as you like; Praat will let you select one before you start transcription.
+名称以 `-q5_0`、`-q5_1` 或 `-q8_0` 结尾的模型属于%量化模型%：其权重使用更少的位数存储（5 位或 8 位，而非标准的 16 位），占用磁盘与内存更小，运行速度比同名未量化模型更快。此外还有 `large-v3-turbo`，这是 `large-v3` 的精简版，减少了解码器层数，尺寸约为原版的一半，速度明显更快。这些优化变体模型旨在以轻微牺牲准确率为代价换取更高的运行速度。
 
-1.2. Transcribing into a TextGrid
-=================================
-1.2.1. How to start
-===================
-You need a @Sound and a @TextGrid for this Sound (transcription modifies an existing TextGrid;
-it does not create one). The TextGrid should have at least one interval tier: transcription is
-run on one selected interval, so you need an interval tier to contain this interval. To
-transcribe the whole Sound, you can use an interval tier without internal boundaries and thus
-consisting of only one interval spanning the whole Sound (interval 1).
+确定所需的模型后，下载其 `.bin` 文件并放入 `whispercpp` 文件夹中。放置在该文件夹内的任何 `.bin` 文件都会被 Praat 自动扫描并加载。如果您想对比不同模型的效果，可以下载多个模型，Praat 在每次执行转写前都会提供下拉菜单供您选用。
 
-There are two ways to start transcription into a TextGrid:
-1. from the @TextGridEditor, via the ##Transcribe interval# command in the #Interval menu; you can
-get into the TextGridEditor by selecting the TextGrid and the Sound together in the @@Objects
-window@ and choosing ##View & Edit# from the @@Dynamic menu@;
-2. from the Objects window itself, when you select the TextGrid and the Sound together and choose
-@@TextGrid & Sound: Transcribe interval...@.
-
-These two ways achieve exactly the same result, and which one you use is a matter of preference.
-They differ only in how you select the interval you want to transcribe (see ##1.2.4. Transcribe!#),
-and whether the configured transcription settings are persistent across Praat sessions (see the
-next two paragraphs).
-
-To perform transcription from the TextGridEditor, you first need to adjust the settings via
-the separate command ##Transcription settings...# (in the #Interval menu). These settings are
-preserved across transcription runs and across Praat sessions, so you can skip this step later
-when you want to reuse the settings from the last time you transcribed. Note that the settings in
-the ##Diarization...# block can also be configured via ##Diarization settings...# (also in the
-#Interval menu), which is used by standalone diarization (see ##2. Automatic speaker diarization#).
-This means that a change in diarization settings made in either place affects both
-transcription-with-diarization and standalone diarization.
-
-If you are running transcription from the Objects window, all the transcription settings appear
-in the ##Transcribe interval...# command window. In this window, settings are preserved across
-transcription runs but not across Praat sessions.
-
-1.2.2. How to configure settings
-================================
-There are three blocks of settings: ##Transcription...#, ##Non-speech detection...# and
-##Diarization...#. The last two configure optional steps in the transcription process; each
-step can be switched on and off by the first setting in its block.
-
-The ##Transcription...# block has three settings: ##Whisper model#, #Language and ##Include words#.
-
-##Whisper model# lists all the models you installed in ##1.1. Installing Whisper models#; now is
-the time to choose the model that you want to use. If you find yourself at this step with an empty
-model list, this means something went wrong at the installation step. You can go back to
-##1.1. Installing Whisper models# to check that the downloaded model(s) are placed in the proper
-folder. After that, reopen ##Transcription settings...#; your installed model(s) will appear in
-the list.
-
-#Language is the language you want to recognize; you can select it from the list of all
-available languages or keep the default ##Autodetect language# (note that for an English-only model
-you are not allowed to select a language other than #English or the default ##Autodetect
-language#).
-
-The third transcription setting is ##Include words#. If this setting is on, an extra tier is
-added to the TextGrid below the sentence tier, with one interval per word. If diarization is also
-included (described below), each speaker gets their own word tier. Examples 2 and 4 below show the
-resulting TextGrids when ##Include words# is on without and with diarization respectively.
-
-##Non-speech detection...# is switched on and off by its first setting ##Detect non-speech#: when
-it is on, the non-speech parts are first removed from the Sound, before it is passed to a Whisper
-model. This both speeds up transcription and prevents the model from inventing text in the
-non-speech parts. Another benefit of using non-speech detection is that it makes sentence and
-word boundaries more precise; without it, the text might be stretched over the silent parts of
-the Sound. See @@speech activity detection with Silero VAD@ for the description of the
-settings influencing non-speech detection.
-
-##Diarization...# is switched on and off by its first setting ##Include diarization#: when it is
-on, diarization is also run on the Sound (independently of transcription). The results from both
-transcription and diarization are then combined: transcribed text is divided among the detected
-speakers. See @@speaker diarization with adapted pyannote.audio@ and ##2.2 How to configure
-settings# for the description of the diarization settings.
-
-1.2.3. Examples
+1.2. 转写到 TextGrid
+====================
+1.2.1. 如何开始
 ===============
-The structure of the resulting TextGrid depends on the combination of ##Include words# and
-##Include diarization# settings. Four examples below show the different TextGrid outcomes for
-different combinations of these two settings when the interval selected for transcription spans
-the whole tier “Mary”.
+您需要一个 @Sound 和与该声音相配的 @TextGrid（转写会修改已有的 TextGrid，而不是创建新的）。该 TextGrid 应当至少包含一个区间层（interval tier）：转写针对选定的一个区间运行，因此需要一个区间层来承载该区间。如果要对整段声音进行转写，可以使用一个没有任何内部边界的层（即仅包含一个跨越整个声音时长的区间 1）。
 
-##Example 1#: both ##Include words# and ##Include diarization# are off. The interval selected for
-transcription is split into many intervals: one interval for each sentence containing the sentence
-text, with empty intervals for non-speech parts. Sentence boundaries are defined by the punctuation
-that whisper.cpp returns. No new tiers are inserted.
+启动转写到 TextGrid 有两种途径：
+1. 在 @TextGridEditor 编辑窗口中：在 #Interval（区间）菜单中选择 ##Transcribe interval#（转写区间）；您可以在 @@Objects window|对象窗口@ 中同时选定 TextGrid 和 Sound，然后点击 @@Dynamic menu|动态菜单@ 中的 ##View & Edit# 进入 TextGridEditor；
+2. 直接在对象窗口中：同时选定 TextGrid 和 Sound，然后点击 @@TextGrid & Sound: Transcribe interval...|TextGrid & Sound: 转写区间...@。
+
+这两种途径的效果完全一致，选用哪一种取决于个人操作习惯。区别仅在于选择转写区间的方式（参见 ##1.2.4. 开始转写！#），以及所配置的转写设置是否跨 Praat 会话保持（详见下文两段）。
+
+从 TextGridEditor 执行转写时，首先需要通过独立的 ##Transcription settings...#（转写设置...，在 #Interval 菜单中）调整参数。这些设置在多次转写及不同的 Praat 会话之间均会持久保存，因此后续再次转写时若沿用上次设置可直接跳过此步。注意，其中的 ##Diarization...#（说话人分离）设置块也可以通过 ##Diarization settings...#（同样位于 #Interval 菜单中）进行配置，供独立说话人分离使用（参见 ##2. 自动说话人分离#）。这意味着在任一处修改说话人分离设置，都会同时影响带分离的转写和独立分离。
+
+如果直接在对象窗口运行转写，所有的转写设置都会显示在 ##Transcribe interval...# 弹出的命令窗口中。在此窗口中，设置会在单次 Praat 运行期间跨转写保留，但退出 Praat 后不会持久保存。
+
+1.2.2. 如何配置设置
+===================
+设置包含三个模块：##Transcription...#（转写）、##Non-speech detection...#（非语音检测）和 ##Diarization...#（说话人分离）。后两项是转写流程中的可选步骤，均可通过各自模块中的第一个复选框开关。
+
+##Transcription...# 模块有三个设置项：##Whisper model#（Whisper 模型）、#Language（语言）和 ##Include words#（包含词级对齐）。
+
+##Whisper model# 列出了您在 ##1.1. 安装 Whisper 模型# 中安装的所有模型；此时请选择要使用的模型。如果您在此步骤发现模型列表为空，说明模型安装未成功，请返回 ##1.1. 安装 Whisper 模型# 检查下载的模型文件是否放置在正确的文件夹中。确认无误后重新打开设置窗口，模型便会出现在列表中。
+
+#Language 是待识别的语言；您可以从全部支持的语言列表中选择，或保留默认的 ##Autodetect language#（自动检测语言）。注意：纯英文模型只能选择 #English 或默认的自动检测。
+
+第三项转写设置是 ##Include words#。勾选此项后，TextGrid 中将在句子层下方额外添加一个词层（word tier），每个词单独对应一个区间。如果同时启用了说话人分离（如下所述），每个说话人还将拥有各自独立的词层。下方的示例 2 和示例 4 分别展示了未启用与启用说话人分离时勾选 ##Include words# 生成的 TextGrid。
+
+##Non-speech detection...# 通过首项 ##Detect non-speech#（检测非语音）控制开关：开启后，声音在送入 Whisper 模型前会先剔除非语音静音部分。这不仅能大幅加快转写速度，还能防止模型在无声或纯噪声段“幻觉”捏造文字。使用非语音检测的另一个好处是使句子和词的边界更加精准；若不开启，文字可能会不自然地拉伸覆盖整个静音段。影响非语音检测的各项参数详见 @@speech activity detection with Silero VAD@。
+
+##Diarization...# 通过首项 ##Include diarization#（包含说话人分离）控制开关：开启后，系统在转写的同时对声音执行说话人分离（独立于转写运行），随后将转写与分离结果合并：转写文本将按检测到的说话人分别归入各自专属的层。说话人分离的具体参数说明见 @@speaker diarization with adapted pyannote.audio@ 及 ##2.2. 如何配置设置#。
+
+1.2.3. 示例
+===========
+生成的 TextGrid 结构取决于 ##Include words# 和 ##Include diarization# 设置的组合。以下四个示例展示了当转写所选区间跨越整个 “Mary” 层时，这两种设置的不同组合产生的 TextGrid 结果。
+
+##示例 1#：同时关闭 ##Include words# 和 ##Include diarization#。选定的转写区间被切分为若干区间：每个句子对应一个包含句子文本的区间，非语音段为空白区间。句子边界由 whisper.cpp 返回的标点符号决定。不插入任何新层。
 {- 6.0x3.0
 	tierName$ = "Mary"
 	textgrid = Create TextGrid: 0, 11, tierName$, ""
@@ -187,9 +110,7 @@ that whisper.cpp returns. No new tiers are inserted.
 	Remove
 }
 
-##Example 2#: ##Include words# is on and ##Include diarization# is off. The original interval
-is split into sentences as in ##Example 1#, plus a tier called “Mary/word” is added just below
-“Mary”, with one interval per word.
+##示例 2#：开启 ##Include words#，关闭 ##Include diarization#。原始区间如同##示例 1#一样被划分为句子，此外在 “Mary” 下方紧邻添加名为 “Mary/word” 的词层，每个词对应一个区间。
 {- 6.0x3.0
 	tier1Name$ = "Mary"
 	tier2Name$ = "Mary/word"
@@ -232,12 +153,7 @@ is split into sentences as in ##Example 1#, plus a tier called “Mary/word” i
 	Remove
 }
 
-##Example 3#: ##Include words# is off and ##Include diarization# is on (and diarization detects
- at least two speakers). Tier “Mary” is renamed to “Mary/sp1” and additional tiers “Mary/sp2”,
-“Mary/sp3”, ... are added, one tier per detected speaker. Each speaker’s tier contains the
-intervals with the sentences spoken by that speaker. It is possible that a sentence is started by
-one speaker and finished by another one. In this case the sentence is split between these
-speakers’ tiers.
+##示例 3#：关闭 ##Include words#，开启 ##Include diarization#（且检测到至少两位说话人）。原层 “Mary” 被重命名为 “Mary/sp1”，并追加 “Mary/sp2”、“Mary/sp3” 等层，每个检测到的说话人各占一层。每个说话人的层包含该说话人所讲句子的区间。如果一个句子由一位说话人开始、另一位接续说完，该句子将被拆分分布在不同的说话人层中。
 {- 6.0x3.0
 	tier1Name$ = "Mary/sp1"
 	tier2Name$ = "Mary/sp2"
@@ -259,9 +175,7 @@ speakers’ tiers.
 	Remove
 }
 
-##Example 4#: both ##Include words# and ##Include diarization# are on. In addition to a
-sentence tier, each speaker also gets a word tier (“Mary/sp1/w” for speaker 1, “Mary/sp2/w” for
-speaker 2, ...), which is inserted directly after their sentence tier.
+##示例 4#：同时开启 ##Include words# 和 ##Include diarization#。除了句子层外，每个说话人还会获得一个紧随在其句子层下方的词层（说话人 1 对应 “Mary/sp1/w”，说话人 2 对应 “Mary/sp2/w”，以此类推）。
 {- 6.0x3.0
 	tier1Name$ = "Mary/sp1"
 	tier2Name$ = "Mary/sp1/w"
@@ -311,122 +225,64 @@ speaker 2, ...), which is inserted directly after their sentence tier.
 	Remove
 }
 
-1.2.4. Transcribe!
-==================
-With the transcription settings configured, you are now ready to start the transcription.
-
-If you are transcribing from the TextGridEditor, select the interval you want to transcribe by
-clicking on it and choose ##Transcribe interval# from the #Interval menu.
-
-If you are transcribing from the Objects window, use the settings ##Tier number# and ##Interval
-number# at the top of the ##Transcribe interval...# command window to specify the interval you
-want to transcribe.
-
-In either case, note that you cannot transcribe an interval belonging to a tier whose name already
-contains a slash. This is to prevent endlessly growing names of the derived tiers.
-
-Running transcription takes some time; how long it takes depends on the length of the selected
-interval, the Whisper model, and whether diarization is included. Please read ##3. Performance#
-if you would like to make transcription run faster.
-
-1.3. Transcribing into plain text
-=================================
-You can also transcribe a whole @Sound into plain text. For this you need a @SpeechRecognizer
-object. You can create one by choosing @@Create SpeechRecognizer...@ from the @@New menu@
-in the @@Objects window@. A command window will appear containing two settings: ##Whisper model#
-and #Language, both of which are described in ##1.2.2. How to configure settings#. After you
-click #OK, you will find a new #SpeechRecognizer object in the object list.
-
-To transcribe, select the SpeechRecognizer object and the Sound object together and choose
-##SpeechRecognizer & Sound: Transcribe# from the @@Dynamic menu@. The result of transcription will
-be written to the @@Info window@. Note that the ##Detect non-speech# setting is not available here:
-@@speech activity detection with Silero VAD|Silero VAD@ is always on, with default settings.
-
-2. Automatic speaker diarization
-================================
-Diarization in Praat detects different speakers in a @Sound. For each detected speaker, it
-identifies %%speech segments%, which are time intervals during which this speaker is active.
-Diarization can be done as part of transcription or standalone. In either case, it modifies an
-existing @TextGrid, producing one interval tier for each detected speaker.
-
-Diarization settings (see ##2.2. How to configure settings#) are shared between standalone
-diarization and diarization as part of transcription. Everything else in this chapter is specific
-to standalone diarization; the transcription-with-diarization case is described in ##1.2.
-Transcribing into a TextGrid#.
-
-2.1. How to start
+1.2.4. 开始转写！
 =================
-To perform diarization, you need a @Sound and a @TextGrid for this Sound (diarization modifies an
-existing TextGrid; it does not create one). The TextGrid should have at least one interval tier:
-diarization is run on one selected interval, so you need an interval tier to contain this
-interval. To diarize the whole Sound, you can use an interval tier without internal boundaries
-and thus consisting of only one interval spanning the whole Sound (interval 1).
+完成转写设置后，即可开始转写。
 
-There are two ways to start diarization:
-1. from the @TextGridEditor, via the ##Diarize interval# command in the #Interval menu; you can
-get into the TextGridEditor by selecting the TextGrid and the Sound together in the @@Objects
-window@ and choosing ##View & Edit# from the @@Dynamic menu@;
-2. from the Objects window itself, when you select the TextGrid and the Sound together and choose
-@@TextGrid & Sound: Diarize interval...@.
+如果在 TextGridEditor 中转写，点击要转写的区间以选中它，然后在 #Interval 菜单中选择 ##Transcribe interval#。
 
-These two ways achieve exactly the same result, and which one you use is a matter of preference.
-They differ only in how you select the interval you want to diarize (see ##2.4. Diarize!#),
-and whether the configured diarization settings are persistent across Praat sessions (see the
-next two paragraphs).
+如果在对象窗口中转写，在 ##Transcribe interval...# 命令窗口顶部的 ##Tier number#（层编号）和 ##Interval number#（区间编号）中指定要转写的区间。
 
-To perform diarization from the TextGridEditor, you first need to adjust the settings via
-the separate command ##Diarization settings...# (in the #Interval menu). These settings are
-preserved across diarization runs and across Praat sessions, so you can skip this step later
-when you want to reuse the settings from your last diarization run. Note that the diarization
-settings are shared between standalone diarization and transcription-with-diarization. So if you
-last changed them via ##Transcription settings...#, it is worth checking them before you run
-diarization.
+无论哪种情况，请注意：无法对名称中已包含斜杠（/）的层上的区间执行转写，以防止派生层名称无限嵌套增长。
 
-If you are running diarization from the Objects window, all the diarization settings appear
-in the ##Diarize interval...# command window. In this window, settings are preserved across
-diarization runs but not across Praat sessions.
+执行转写需要一定时间，具体耗时取决于所选区间的时长、使用的 Whisper 模型以及是否启用了说话人分离。如果您希望提高转写运行速度，请阅读 ##3. 性能优化#。
 
-2.2. How to configure settings
-==============================
-##Non-speech interval label# and ##Speech interval label# are the labels in the resulting TextGrid
-assigned to intervals classified as non-speech and speech respectively. These two settings only
-influence the visual appearance of the result of diarization but not the result itself.
+1.3. 转写为纯文本
+=================
+您还可以将整段 @Sound 直接转写为纯文本。为此您需要一个 @SpeechRecognizer 对象。在 @@Objects window|对象窗口@ 的 @@New menu|新建菜单@ 中选择 @@Create SpeechRecognizer...@ 即可创建一个。此时弹出的命令窗口包含两项设置：##Whisper model# 和 #Language，两者的说明详见 ##1.2.2. 如何配置设置#。点击 #确定 后，对象列表中将出现新的 #SpeechRecognizer 对象。
 
-##Max. number of speakers (≥ 2)# and ##Clustering threshold (0-2)# both influence how many
-speakers diarization detects. ##Max. number of speakers (≥ 2)# defines an upper limit on the number
-of detected speakers, and while there is no equivalent setting for the lower limit, ##Clustering
-threshold (0-2)# can be used to push this number up. These two settings can be used to improve the
-quality of diarization if you know exactly how many speakers are in your Sound. If this is
-the case, you might find the following recipe useful:
-1. set the ##Max. number of speakers (≥ 2)# to the number of active speakers;
-2. do a test diarization run on (a part of) your Sound;
-3. if fewer speakers were detected than are active in the Sound, then try lowering the
-##Clustering threshold (0-2)#, perhaps making it 0.1 lower than it is now.
+要执行转写，请同时选中该 SpeechRecognizer 对象和 Sound 对象，然后在 @@Dynamic menu|动态菜单@ 中选择 ##SpeechRecognizer & Sound: Transcribe#。转写结果将输出至 @@Info window|信息窗口@。注意：此处无法关闭非语音检测设置，@@speech activity detection with Silero VAD|Silero VAD@ 始终以默认参数保持开启。
 
-Repeat steps 2 and 3 until diarization detects the correct number of speakers.
+2. 自动说话人分离
+=================
+Praat 中的说话人分离（Diarization）用于检测 @Sound 中的不同说话人。对于每一位检测到的说话人，它会识别出%%语音片段（speech segments）%，即该说话人发声的时间区间。说话人分离可以作为转写流程的一部分协同运行，也可以单独运行。无论何种方式，它都会修改现有的 @TextGrid，并为每个检测到的说话人生成一个单独的区间层。
 
-Tweaking the ##Clustering threshold (0-2)# might especially help when the voices of the speakers
-are similar, or when recording is done in a noisy environment. If you would like to know the
-details of what clustering threshold is and why it works this way, please read the #Algorithm
-section of @@speaker diarization with adapted pyannote.audio@, specifically the part about
-#Clustering.
+说话人分离设置（参见 ##2.2. 如何配置设置#）在独立分离与转写协同分离之间通用。本章其余内容专门针对独立分离；协同转写的情况已在 ##1.2. 转写到 TextGrid# 中介绍。
 
-The ##Allow speakers to overlap# setting does what its name suggests: if it is on, diarization
-can detect when two speakers are speaking at the same time. Note that diarization does not detect
-overlap of three or more speakers.
+2.1. 如何开始
+=============
+要执行说话人分离，需要一个 @Sound 和与该声音相配的 @TextGrid（分离操作修改现有 TextGrid，不新建 TextGrid）。TextGrid 应至少包含一个区间层：分离针对选定的单一区间运行，因此需要区间层承载该区间。若要对整段声音进行分离，可以使用一个没有内部边界、仅由跨越整个声音的区间 1 构成的层。
 
-The last setting, ##Segmentation step (0-1)#, can be used to find a balance between speed and
-accuracy. You can read more about it in ##3. Performance#. To start with, you can keep its
-standard value of 0.1.
+启动说话人分离有两种途径：
+1. 在 @TextGridEditor 编辑窗口中：在 #Interval（区间）菜单中选择 ##Diarize interval#（分离区间说话人）；在对象窗口中同时选中 TextGrid 和 Sound 并点击动态菜单的 ##View & Edit# 即可打开编辑器；
+2. 直接在对象窗口中：同时选定 TextGrid 和 Sound，然后选择 @@TextGrid & Sound: Diarize interval...|TextGrid & Sound: 分离区间说话人...@。
 
-2.3. Example
-============
-This example shows the result of a standalone diarization run on the same Sound as in ##1.2.3.
-Examples#; the interval selected for diarization spans the whole tier “Mary”. Diarization detects
-two speakers, so tier “Mary” is renamed to “Mary/sp1”, and the second tier “Mary/sp2” is added.
-Each speaker’s tier contains alternating intervals: non-speech and speech intervals labelled with
-the configured ##Non-speech interval label# (blank in this case) and ##Speech interval label#
-(“speech” in this case), respectively.
+这两种途径的效果完全相同，选择哪种全凭个人喜好。区别仅在于选择目标区间的方式（参见 ##2.4. 开始分离说话人！#），以及设置是否跨 Praat 会话持久保留。
+
+在 TextGridEditor 中运行时，首先需通过独立的 ##Diarization settings...# 命令（在 #Interval 菜单中）调整参数。这些参数在多次运行与跨会话间均会保留。由于这些设置与协同转写共享，因此如果您上次是在 ##Transcription settings...# 中修改的，运行前值得核对一下。
+
+如果在对象窗口中运行，所有设置均在 ##Diarize interval...# 命令窗口中呈现，在当前 Praat 运行期间跨任务保留，但退出后不保存。
+
+2.2. 如何配置设置
+=================
+##Non-speech interval label#（非语音区间标签）和 ##Speech interval label#（语音区间标签）分别指定输出 TextGrid 中分类为非语音和语音的区间文字标签。这两项仅影响视觉显示，不影响分离算法本身。
+
+##Max. number of speakers (≥ 2)#（最大说话人数）与 ##Clustering threshold (0-2)#（聚类阈值）共同影响算法最终检测到的说话人数量。##Max. number of speakers (≥ 2)# 设定了说话人数量的上限；虽然没有对应的下限设置，但可以通过调低 ##Clustering threshold (0-2)# 来推高识别出的说话人数。如果您确切知道声音中有多少位说话人，可以按照以下建议提升分离质量：
+1. 将 ##Max. number of speakers (≥ 2)# 设定为实际说话人数；
+2. 在声音的局部片段上进行测试分离；
+3. 如果检测出的说话人数少于实际人数，尝试降低 ##Clustering threshold (0-2)#（例如每次下调 0.1）。
+
+重复步骤 2 和 3，直到算法检测出正确的说话人数。
+
+当说话人的音色较为接近，或者录音环境噪声较大时，微调 ##Clustering threshold (0-2)# 尤为有效。如果您想了解聚类阈值的原理和作用机制，请阅读 @@speaker diarization with adapted pyannote.audio@ 的#算法 章节，特别是#聚类 部分。
+
+##Allow speakers to overlap#（允许说话人重叠）：开启后，算法能够检测两位说话人同时发声的情况。注意：算法目前最多支持两位说话人重叠，不支持三人或以上同时重叠。
+
+最后一项 ##Segmentation step (0-1)#（分割步长）用于在速度与准确率之间取得平衡，详见 ##3. 性能优化#。初次使用建议保持默认值 0.1。
+
+2.3. 示例
+=========
+本示例展示了在与 ##1.2.3. 示例# 相同的声音上独立运行说话人分离的结果；选定的区间跨越整个 “Mary” 层。分离算法检测到两位说话人，因此 “Mary” 层被重命名为 “Mary/sp1”，并新增了第二层 “Mary/sp2”。每个说话人的层包含交替出现的非语音与语音区间，并分别标记为配置的标签（本例中非语音为空白，语音为 “speech”）。
 {- 6.0x3.0
 	tier1Name$ = "Mary/sp1"
 	tier2Name$ = "Mary/sp2"
@@ -448,421 +304,247 @@ the configured ##Non-speech interval label# (blank in this case) and ##Speech in
 	Remove
 }
 
-2.4. Diarize!
-=============
-With the diarization settings configured, you are now ready to start the diarization.
+2.4. 开始分离说话人！
+=====================
+配置好设置后即可开始分离。
 
-If you are diarizing from the TextGridEditor, select the interval you want to diarize by
-clicking on it and choose ##Diarize interval# from the #Interval menu.
+在 TextGridEditor 中：点击选中目标区间，在 #Interval 菜单中选择 ##Diarize interval#。
 
-If you are diarizing from the Objects window, use the settings ##Tier number# and ##Interval
-number# at the top of the ##Diarize interval...# command window to specify the interval you
-want to diarize.
+在对象窗口中：在 ##Diarize interval...# 命令窗口顶部的 ##Tier number# 和 ##Interval number# 中指定目标区间。
 
-In either case, note that you cannot diarize an interval belonging to a tier whose name already
-contains a slash. This is to prevent endlessly growing names of the derived tiers.
+同样地，请注意：不能对名称中已带有斜杠的层执行分离，以防止派生层名称无节制增长。
 
-Running diarization takes some time; how long it takes depends on the length of the selected
-interval and on the diarization settings. Please read ##3. Performance# if you would like to make
-diarization run faster.
+说话人分离需要一定运行时间，取决于选定区间的长度及参数设置。如需加速，请参阅 ##3. 性能优化#。
 
-3. Performance
-==============
-Speech recognition tools in Praat rely on neural models, which consume a lot of computational
-resources. So the time spent on transcription and diarization might become an obstacle to using
-them, especially if you need to analyse a corpus or a large set of recordings. This chapter offers
-some advice on how you can try to make speech recognition tools run faster.
+3. 性能优化
+===========
+Praat 中的语音识别工具依赖神经网络模型，需要消耗大量计算资源。因此在处理大型语料库或长录音时，转写与分离的耗时可能成为瓶颈。本章提供了一些提升语音识别工具运行速度的实用建议。
 
-3.1. AI settings
-================
-Most modern computers have several %%physical processors%. Each physical processor can process one
-or two threads that run computations in parallel. The number of threads that a computer can run
-in parallel is the number of its %%logical processors%.
+3.1. AI 设置与线程数优化
+========================
+绝大多数现代计算机都配备了多个%%物理处理器（核心）%。每个物理核心可以处理一个或两个并发计算线程。计算机能够并发运行的最大线程总数即为其%%逻辑处理器%数量。
 
-A reasonable assumption would be that transcription and diarization run fastest when Praat uses as
-many threads as the computer has logical processors. However, in practice, using that many threads
-can cause a dramatic slowdown on some computers. The question is then: exactly how many threads
-is best to use? Unfortunately, the answer depends on the computer’s hardware architecture in ways
-that are difficult to predict in advance. But it appears from our tests that half of the
-available logical processors is a safe starting point that avoids the worst slowdowns, so this is
-the default Praat uses for both transcription and diarization. If you suspect that this default
-is not optimal for your computer, or if you would like to experiment, you can change it in ##AI
-settings...#, which you can find in the #Settings submenu of the @@Praat menu@. But keep in mind
-that it is probably better not to use more threads than the number of logical processors your
-computer has.
+按常理推断，当 Praat 使用与计算机逻辑处理器相同数量的线程时速度最快。但在实际测试中，使用全部逻辑处理器线程在某些架构的电脑上反而会导致严重的性能下降（拥堵减速）。那么，究竟设置多少线程最佳？答案因各家处理器的硬件缓存与架构特性而异，难以预先定论。不过多方测试表明，使用可用逻辑处理器数量的**一半**是一个最稳妥的起点，既能充分发挥多核性能，又能避免极端拥堵，因此 Praat 将其作为转写与说话人分离的默认并发线程数。如果您希望进一步挖掘电脑性能，可以在 @@Praat menu|Praat 菜单@ 的 #Settings（设置）子菜单下的 ##AI settings...#（AI 设置...）中进行调整。但请记住：设置的线程数最好不要超过计算机物理拥有的逻辑处理器总数。
 
-The optimal number of threads can differ between transcription and diarization, because they use
-different models and parallelize their work in different ways. So it is better to tune them
-separately:
-- to tune transcription, change its ##Max. number of threads# and measure the time spent on
-transcription %without diarization;
-- to tune diarization, change its ##Max. number of threads# and measure the time spent on
-standalone diarization.
+由于转写与说话人分离采用不同的模型架构，二者的并行化方式亦不同，因此最优线程数可能各不相同。建议分别进行调优测试：
+- 调优转写：调整其 ##Max. number of threads#，并在**不包含**说话人分离的情况下测量转写耗时；
+- 调优说话人分离：调整其 ##Max. number of threads#，并在独立运行分离时测量耗时。
 
-3.2. Other ways to make transcription faster
-============================================
-The choice of Whisper model has a strong influence on how long transcription takes. If your
-transcription is too slow, you can try to switch to a smaller or a quantized model. You can read
-more about available models in ##1.1. Installing Whisper models#.
+3.2. 加快转写速度的其他方法
+============================
+Whisper 模型的选择对转写耗时有决定性影响。如果转写过慢，可以尝试切换到更小的模型或量化模型，各类模型的对比详见 ##1.1. 安装 Whisper 模型#。
 
-Switching on ##Detect non-speech# (see ##1.2.2. How to configure settings#) also speeds up
-transcription, especially on a Sound that contains a lot of parts without speech. This is because
-non-speech parts are removed before the Sound is passed to a Whisper model, making the sound that
-is actually analysed shorter. This is the setting which you may want to have always on, because
-it also improves accuracy of the detected word and sentence boundaries.
+开启 ##Detect non-speech#（非语音检测，见 ##1.2.2. 如何配置设置#）也能显著加速转写，尤其是对于包含较多静音停顿的声音文件。因为非语音段在送入 Whisper 前已被剔除，大幅缩短了模型实际推理的音频长度。强烈建议始终开启此项，因为它同时能提高词界与句界的对齐精度。
 
-If you use transcription with diarization (##Include diarization# setting is on), then the
-overall time also depends on how fast diarization is.
+如果启用了转写协同说话人分离（勾选了 ##Include diarization#），总耗时还将受到说话人分离速度的影响。
 
-3.3. Other ways to make diarization faster
-==========================================
-The ##Segmentation step (0-1)# setting (described in detail in @@speaker diarization with adapted
-pyannote.audio@) controls the overlap between successive 10-second analysis windows and therefore
-the overall number of analysis windows that the segmentation model processes. The segmentation
-step itself is a distance between the starts of two consecutive windows as a fraction of the
-window length, but the smaller this distance, the bigger the overlap.
+3.3. 加快说话人分离速度的其他方法
+==================================
+##Segmentation step (0-1)#（分割步长，在 @@speaker diarization with adapted pyannote.audio@ 中有详细说明）控制连续 10 秒分析窗口之间的重叠程度，进而决定了分割模型需要处理的窗口总数。分割步长是两个相邻窗口起始点间距占窗口长度的比例，间距越小，重叠度越高。
 
-For example, a segmentation step of 0.1 makes this distance 1 second, so that two consecutive
-windows have a 90\%  overlap. Doubling the step value to 0.2 reduces the overlap to 80\%  and
-halves the overall number of analysis windows the model has to process; as a result
-diarization runs roughly twice as fast. Increasing the step value to 0.5 further reduces
-the analysis window overlap, making diarization run approximately five times faster.
+例如，步长 0.1 对应的起始间距为 1 秒，两个相邻窗口有 90\% 的重叠。若将步长翻倍至 0.2，重叠率降至 80\%，模型所需处理的分析窗口总数减半，分离速度约提升一倍。若将步长增至 0.5，重叠率进一步降低，分离速度可加快约五倍。
 
-But the price for this speedup is reduced accuracy. After processing all analysis windows, the
-diarization algorithm reconstructs the result for the whole Sound by averaging the model’s
-predictions across the all the analysis windows. Less window overlap
-means averaging across fewer windows, which produces less accurate results.
+然而速度提升的代价是准确率降低。在处理完全部分析窗口后，分离算法通过对所有覆盖窗口的模型预测结果取平均来重构全局结果。窗口重叠越少，参与平均的窗口数量越少，结果的准确率也随之降低。
 
-If you want to speed up your diarization, you may experiment with increasing this value. But
-perhaps it’s best to keep it below 0.5 so that every moment in the sound is analysed at least in
-two analysis windows.
+如果您希望加快分离速度，可以尝试适当调大该值。但建议不要超过 0.5，以确保声音中的每个时刻至少落在两个分析窗口的覆盖范围内。
 
 ################################################################################
 "speech activity detection with Silero VAD"
 © Anastasia Shchupak 2026-06-01
 
-Praat uses the @@whisper.cpp@ implementation of the @@Silero VAD@ speech activity detector.
-The pre-trained Silero VAD model weights have been converted to ggml format and compiled into Praat,
-so no external model files are required. The sound is automatically resampled to 16 kHz
-(the sampling frequency expected by the Silero VAD model) before being processed by the model.
+Praat 使用了 @@whisper.cpp@ 对 @@Silero VAD@ 语音活动检测器的移植实现。
+预训练的 Silero VAD 模型权重已转换为 ggml 格式并内置编译进 Praat 中，因此无需下载任何外部模型文件。声音在送入模型前会自动重采样至 16 kHz（Silero VAD 模型所要求的采样频率）。
 
-Purpose
-=======
-to detect which parts of a sound contain speech. The output is a list of speech segments,
-each defined by a start and an end time.
+用途
+====
+检测声音中哪些部分包含语音。输出为一个语音片段列表，每个片段由起始时间和结束时间定义。
 
-Algorithm
-=========
-The Silero VAD model processes the sound in fixed frames of 512 samples (32 ms, since the sound
-is resampled to 16 kHz). For each frame, it outputs a probability that the frame contains speech.
-Based on this output, the list of speech segments is constructed as described below. This
-description reflects the whisper.cpp implementation, which differs slightly from Silero’s
-original implementation.
+算法
+====
+Silero VAD 模型以 512 个采样点（在 16 kHz 采样率下对应 32 毫秒）的固定帧长连续处理声音。对于每一帧，模型输出该帧包含语音的概率。基于该输出，按以下规则构建语音片段列表（此描述对应 whisper.cpp 中的实现，与 Silero 原生实现略有差异）：
 
-A speech segment begins at the first frame whose speech probability exceeds the ##Speech probability
-threshold#. The segment continues as long as the speech probability stays above a lower threshold
-(called the “negative threshold” in the Silero source code, equal to the speech probability
-threshold minus 0.15). The segment ends only when the probability stays below the negative
-threshold for at least ##Min. gap between speech segments#. When a segment ends, it is kept only
-if it is longer than ##Min. speech segment#.
+当某一帧的语音概率超过 ##Speech probability threshold#（语音概率阈值）时，语音片段开始。只要语音概率保持在负阈值（Silero 源码中称为“negative threshold”，等于语音概率阈值减去 0.15）之上，片段就持续延伸。只有当概率持续低于负阈值达到 ##Min. gap between speech segments#（语音片段最小间隔）时，当前片段才告结束。片段结束时，唯有时长超过 ##Min. speech segment#（最小语音片段时长）的片段才会被保留，过短片段将被丢弃。
 
-After all segments have been formed, segments separated by a gap shorter than 0.2 s are merged
-(this is hardcoded in whisper.cpp and not configurable). After that, padding is applied: each
-segment is extended on both sides by ##Padding around speech segments#. If padding would cause
-two segments to overlap, they instead meet at the midpoint of the gap between them.
+所有片段初建完成后，间隔小于 0.2 秒的相邻片段将被自动合并（此项固化在 whisper.cpp 内部，不可配置）。随后进行边界扩展填充：每个片段在首尾两侧各延伸 ##Padding around speech segments#（填充时长）。若填充导致两个片段重叠，则它们在中间点相接而不交叉。
 
-The result is a list of speech segments.
+最终输出整齐的语音片段列表。
 
-Settings
-========
-##Speech probability threshold (0-1)# (standard value: 0.5)
-:   determines the sensitivity of the speech detector. Higher values make the detector less
-	sensitive, meaning that a frame requires a higher speech probability to be considered part of
-	a speech segment. This reduces false positives (non-speech incorrectly classified as speech),
-	but may cause some speech to be missed. Lower values make the detector more sensitive. The
-	default of 0.5 works well for most use cases.
+设置
+====
+##Speech probability threshold (0-1)#（标准值：0.5）
+:   决定语音检测器的灵敏度。数值越高，检测器越严格（灵敏度越低），即某一帧需要具备更高的语音概率才会被认定为语音片段，这能减少将非语音误报为语音的假阳性，但可能漏检弱语音；数值越低则越敏感。默认值 0.5 适合绝大多数应用场景。
 
-##Min. gap between speech segments (s)# (standard value: 0.1)
-:   the minimum duration of a gap between two speech segments. You might want to increase this value
-	if short silences within speech (e.g. plosive closures) are splitting speech into multiple
-	segments. Note that gaps shorter than 0.2 s are removed from the output (with their adjacent
-	speech segments merged), regardless of this setting.
+##Min. gap between speech segments (s)#（标准值：0.1）
+:   两个语音片段之间的最小间隔时长。如果语音内部的短暂停顿（如塞音闭塞段）导致语音被切碎成过多碎段，可适度调大此值。请注意：无论此项设为多少，间隔短于 0.2 秒的片段都会被自动合并。
 
-##Min. speech segment (s)# (standard value: 0.25)
-:   the minimum duration of a speech segment. Shorter segments are discarded.
+##Min. speech segment (s)#（标准值：0.25）
+:   语音片段的最小持续时长，短于该值的零碎片段将被丢弃。
 
-##Padding around speech segments (s)# (standard value: 0.0)
-:   extends each detected speech segment by this amount on both sides. You might want to increase
-	this value if speech onsets and offsets are being clipped.
+##Padding around speech segments (s)#（标准值：0.0）
+:   在每个检测到的语音片段前后两侧各延伸扩展的时长。如果发现语音的开头起音或末尾收音存在轻微被截断的情况，可适当增大此值。
 
-Availability in Praat
-=====================
-Silero VAD speech activity detection is available in Praat:
-- as part of transcription, running just before it to remove non-speech regions from the
-  analysed sound (see @@transcription with whisper.cpp@);
-- standalone, producing a new @TextGrid with non-speech and speech intervals (see @@Sound: To
-  TextGrid (speech activity, Silero)...@).
+在 Praat 中的可用性
+===================
+Silero VAD 语音活动检测在 Praat 中有两种使用方式：
+- 作为转写的一部分协同运行：在转写前先行检测并剔除静音非语音区域（参见 @@transcription with whisper.cpp@）；
+- 独立运行：直接为选定声音生成带有非语音和语音区间的全新 @TextGrid（参见 @@Sound: To TextGrid (speech activity, Silero)...@）。
 
 ################################################################################
 "Sound: To TextGrid (speech activity, Silero)..."
 © Anastasia Shchupak 2026-06-01
 
-A command that creates a @TextGrid with one interval tier from every selected @Sound object.
-The interval tier contains non-speech and speech intervals with boundaries determined by the
-Silero VAD model (for the algorithm and settings, see @@speech activity detection with Silero VAD@).
-The labels of the intervals are specified by the settings ##Non-speech interval label# and ##Speech
-interval label#.
+此命令为每个选定的 @Sound 对象创建一个包含单个区间层的 @TextGrid。
+该区间层包含非语音和语音区间，其边界由 Silero VAD 模型判定（算法与设置详见 @@speech activity detection with Silero VAD@）。区间的文字标签由 ##Non-speech interval label# 和 ##Speech interval label# 设定。
 
-Settings
-========
-##Speech probability threshold (0-1)# (standard value: 0.5)
-:	see @@speech activity detection with Silero VAD@.
+设置
+====
+##Speech probability threshold (0-1)#（标准值：0.5）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Min. gap between speech segments (s)# (standard value: 0.1)
-:	see @@speech activity detection with Silero VAD@.
+##Min. gap between speech segments (s)#（标准值：0.1）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Min. speech segment (s)# (standard value: 0.25)
-:	see @@speech activity detection with Silero VAD@.
+##Min. speech segment (s)#（标准值：0.25）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Padding around speech segments (s)# (standard value: 0.0)
-:	see @@speech activity detection with Silero VAD@.
+##Padding around speech segments (s)#（标准值：0.0）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Non-speech interval label# (standard value: “”)
-:	the label assigned to intervals classified as non-speech in the resulting TextGrid.
+##Non-speech interval label#（标准值：“”）
+:	生成 TextGrid 中归类为非语音的区间的文字标签。
 
-##Speech interval label# (standard value: “speech”)
-:	the label assigned to intervals classified as speech in the resulting TextGrid.
+##Speech interval label#（标准值：“speech”）
+:	生成 TextGrid 中归类为语音的区间的文字标签。
 
 ################################################################################
 "transcription with whisper.cpp"
 © Anastasia Shchupak 2026-06-01
 
-Praat can perform automatic transcription of a sound using @@whisper.cpp@. To do this, at least
-one Whisper model must be installed on your computer. You can find the details about how to
-install models and how to use transcription in the @@Speech recognition@ tutorial. The sound is
-automatically resampled to 16 kHz (the sampling frequency expected by whisper.cpp) before being
-transcribed. This page documents the transcription settings.
+Praat 可以使用 @@whisper.cpp@ 对声音进行自动语音转写。使用此功能前，计算机中必须安装至少一个 Whisper 模型。有关如何安装模型以及如何进行转写的详细信息，请参阅 @@Speech recognition@ 教程。声音在送入 whisper.cpp 转写前会自动重采样至 16 kHz（该模型期望的采样频率）。本页专门记录各项转写参数设置。
 
-Behaviour
-=========
-When transcription is run on a @TextGrid interval, it modifies the TextGrid: intervals are split,
-tiers may be added or renamed. The exact resulting TextGrid structure depends on the combination
-of the ##Include words# and ##Include diarization# settings. See the @@Speech recognition@ tutorial
-for the details of the transcription output under different combinations of these settings.
+行为
+====
+当对 @TextGrid 的某个区间运行转写时，它会就地修改该 TextGrid：原有区间被切分，可能会新增或重命名层。具体的 TextGrid 结果结构取决于 ##Include words# 和 ##Include diarization# 的组合。关于不同设置组合下的详细输出格式，请参阅 @@Speech recognition@ 教程。
 
-Settings
-========
+设置
+====
 ##Whisper model#
-:	determines which Whisper model is used.
-	The list is populated with the `.bin` files found in the `whispercpp` subfolder of the
-	`models` folder in the Praat preferences folder. See the @@Speech recognition@ tutorial for
-	details on how to install models.
+:	选择要使用的 Whisper 模型。
+	列表中包含在 Praat 便携目录（程序同级 `models\whispercpp`）或 @@preferences folder|首选项文件夹@ `models\whispercpp` 子文件夹中找到的所有 `.bin` 格式模型文件。模型安装详情请参阅 @@Speech recognition@ 教程。
 
-##Language# (standard value: ##Autodetect language#)
-:	determines the language to be used for transcription.
-	Choose ##Autodetect language# to let the model detect the language automatically. If you know
-	the language you want to use for transcription, selecting it explicitly may improve
-	transcription accuracy. Note that English-only models (those with ##.en# in the name) can only
-	be used with ##Autodetect language# or ##English#.
+##Language#（标准值：##Autodetect language#）
+:	指定用于转写的语言。
+	选择 ##Autodetect language# 让模型自动侦测语言；若已知说话语言，明确指定语言可显著提升识别准确率与抗噪能力。注意纯英文模型（文件名带 ##.en#）只能搭配 ##Autodetect language# 或 ##English# 使用。
 
-##Include words# (standard: on)
-:	if on, each transcribed word is given a start and an end time, computed using whisper.cpp’s
-	internal dynamic time warping (DTW) algorithm.
+##Include words#（标准：开启）
+:	开启后，每个识别出的词都会获得起始和结束时间戳，使用 whisper.cpp 内置的动态时间规整（DTW）算法计算得到。
 
-##Detect non-speech# (standard: on)
-:	if on, @@speech activity detection with Silero VAD@ runs before transcription to identify
-	speech regions. Only those regions are then passed to the Whisper model. This generally
-	improves both speed and accuracy of transcription. Speed is improved by reducing the length of
-	the sound sent to the model, and accuracy by preventing the model from hallucinating text for
-	silent regions.
+##Detect non-speech#（标准：开启）
+:	开启后，在转写前先运行 @@speech activity detection with Silero VAD@ 识别语音区域，仅将有效语音区域送入 Whisper 模型。这不仅大幅加快转写速度（缩短实际送入模型的音频长度），还能有效防止模型在无声或背景噪声段“幻觉”虚构文字。
 
-##Speech probability threshold (0-1)# (standard value: 0.5)
-:	see @@speech activity detection with Silero VAD@.
+##Speech probability threshold (0-1)#（标准值：0.5）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Min. gap between speech segments (s)# (standard value: 0.1)
-:	see @@speech activity detection with Silero VAD@.
+##Min. gap between speech segments (s)#（标准值：0.1）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Min. speech segment (s)# (standard value: 0.25)
-:	see @@speech activity detection with Silero VAD@.
+##Min. speech segment (s)#（标准值：0.25）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Padding around speech segments (s)# (standard value: 0.0)
-:	see @@speech activity detection with Silero VAD@.
+##Padding around speech segments (s)#（标准值：0.0）
+:	参见 @@speech activity detection with Silero VAD@。
 
-##Include diarization# (standard: off)
-:	if on, speaker diarization is run alongside transcription (see @@speaker diarization with
-	adapted pyannote.audio@). The results of both are later combined to attribute portions of
-	transcribed speech to different speakers.
+##Include diarization#（标准：关闭）
+:	开启后，在转写的同时执行说话人分离（参见 @@speaker diarization with adapted pyannote.audio@）。随后将两者的结果融合，将转写的语音文本精确归属到各个说话人。
 
-##Max. number of speakers (≥ 2)# (standard value: 2)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Max. number of speakers (≥ 2)#（标准值：2）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-##Allow speakers to overlap# (standard: on)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Allow speakers to overlap#（标准：开启）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-##Clustering threshold (0-2)# (standard value: 0.7)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Clustering threshold (0-2)#（标准值：0.7）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-##Segmentation step (0-1)# (standard value: 0.1)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Segmentation step (0-1)#（标准值：0.1）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-Availability in Praat
-=====================
-Transcription with whisper.cpp is available in two ways in Praat:
-- if you select a @Sound together with its @TextGrid and choose
-  @@TextGrid & Sound: Transcribe interval...|Transcribe interval...@;
-- via ##Transcribe interval# from the #Interval menu in the @TextGridEditor.
-  The settings for this command are set via ##Transcription settings...# in the same menu
-  and are remembered across Praat sessions.
+在 Praat 中的可用性
+===================
+在 Praat 中使用 whisper.cpp 转写有两种方式：
+- 同时选定 @Sound 与相对应的 @TextGrid，并选择 @@TextGrid & Sound: Transcribe interval...|转写区间...@；
+- 在 @TextGridEditor 编辑窗口的 #Interval（区间）菜单中选择 ##Transcribe interval#。该命令的参数通过同菜单下的 ##Transcription settings...# 设置，并会在不同 Praat 会话间持久记忆。
 
 ################################################################################
 "TextGrid & Sound: Transcribe interval..."
 © Anastasia Shchupak 2026-06-01
 
-This command takes a specified interval of the @TextGrid, transcribes the corresponding part
-of the @Sound, and writes the result back into the TextGrid.
+此命令获取 @TextGrid 中指定的区间，对 @Sound 中相对应的音频片段进行语音转写，并将转写结果写回 TextGrid 中。
 
-Settings
-========
+设置
+====
 ##Tier number
-:	the number of the tier containing the interval to be transcribed.
+:	包含待转写区间的层编号。
 
 ##Interval number
-:	the number of the interval to be transcribed.
+:	待转写的区间编号。
 
-The remaining settings in this dialog control the transcription itself; see @@transcription with
-whisper.cpp@ for their meaning.
+此对话框中的其余设置用于控制转写过程本身，其具体含义请参见 @@transcription with whisper.cpp@。
 
 ################################################################################
 "speaker diarization with adapted pyannote.audio"
 © Anastasia Shchupak 2026-06-01
 
-Speaker diarization detects which parts of a sound contain speech, and attributes each
-part to one or more speakers. The output is a list of segments, each segment defined by a start
-time, an end time and a speaker identifier. Speaker identifiers are natural numbers (1, 2, 3, ...);
-they are arbitrary labels that roughly follow the order in which the speakers first appear in the
-sound.
+说话人分离（Speaker diarization）用于检测声音中哪些部分包含语音，并将每个语音部分归属到一个或多个说话人。其输出为一个片段列表，每个片段由起始时间、结束时间和说话人标识符定义。说话人标识符为自然数（1, 2, 3, ...），大致按照说话人在声音中首次出现的先后顺序编号。
 
-Diarization in Praat always modifies an existing TextGrid by producing one tier per detected
-speaker. It can be done as part of transcription (so that the transcribed text is split among the
-speaker tiers) or standalone (so that each speaker tier contains the intervals labelled as
-non-speech or speech). See @@Speech recognition@ tutorial for details on how to use it.
+Praat 中的说话人分离始终通过为每个检测到的说话人生成一个单独的区间层来修改现有 TextGrid。它既可以作为转写的一部分协同运行（将转写文本分配到各说话人层），也可以独立运行（使每个说话人层包含标记为非语音或语音的区间）。详见 @@Speech recognition@ 教程。
 
-Praat performs speaker diarization using a C++/ggml adaptation of @@pyannote.audio@’s
-`pyannote/speaker-diarization-3.1` pipeline. The two neural models used by the pipeline,
-`pyannote/segmentation-3.0` (for segmentation) and `wespeaker-voxceleb-resnet34-LM` (for
-speaker embedding, see @@WeSpeaker@), have been converted to ggml format and compiled into Praat,
-so no external model files are required. The sound is automatically resampled to 16 kHz
-(the sampling frequency expected by both models) before being processed.
+Praat 使用 @@pyannote.audio@ 的 `pyannote/speaker-diarization-3.1` 流水线的 C++/ggml 改编版本执行说话人分离。该流水线采用的两个神经网络模型：`pyannote/segmentation-3.0`（用于语音分割）和 `wespeaker-voxceleb-resnet34-LM`（用于提取说话人嵌入向量，参见 @@WeSpeaker@）均已转换为 ggml 格式并内置编译于 Praat 中，无需下载外部模型文件。声音在处理前会自动重采样至 16 kHz（两模型所要求的采样频率）。
 
-Settings
-========
-##Max. number of speakers (≥ 2)# (standard value: 2)
-:	an upper bound on the number of speakers the algorithm may produce. Must be at least 2. There
-	is no matching “minimum number of speakers” setting; if you want to push the algorithm towards
-	distinguishing more speakers, you might try lowering the ##Clustering threshold#.
+设置
+====
+##Max. number of speakers (≥ 2)#（标准值：2）
+:	算法可输出的说话人数量上限，必须至少为 2。没有相对应的“最小说话人数”设置；如果希望促使算法区分出更多说话人，可以尝试调低 ##Clustering threshold#。
 
-##Allow speakers to overlap# (standard: on)
-:   if on, at most two speakers may be active at the same moment. If off, every moment is
-	attributed to a single speaker, the one most active at that moment.
+##Allow speakers to overlap#（标准：开启）
+:   若开启，允许在同一时刻至多有两位说话人同时处于发声状态；若关闭，则每个时刻均严格归属于单一说话人（即根据分割模型在该时刻发声最活跃的那一位）。
 
-##Clustering threshold (0-2)# (standard value: 0.7)
-:	controls the number of detected speakers. Lower thresholds produce more speakers (but anyway
-	up to ##Max. number of speakers (≥ 2)#); higher thresholds produce fewer speakers. This is
-	the setting that can push the number of detected speakers up, so consider lowering its value
-	if fewer speakers are detected than are actually present in your sound.
+##Clustering threshold (0-2)#（标准值：0.7）
+:	控制算法检测出的说话人数量。阈值越低产生的说话人越多（但无论如何不超过 ##Max. number of speakers (≥ 2)#）；阈值越高产生的说话人越少。此设置是调高检测说话人数的关键旋钮，若检测出的说话人数少于实际人数，可考虑降低此值。
 
-##Segmentation step (0-1)# (standard value: 0.1)
-:   the distance between the starts of consecutive overlapping analysis windows, as a fraction of
-	the analysis window’s length. The sound is analysed in 10-second overlapping segments called
-	%%analysis windows%; because of the overlap, each moment in time is covered by several
-	analysis windows. A smaller segmentation step ensures more analysis windows with more overlap,
-	which is generally more accurate but takes longer. A larger segmentation step ensures fewer
-	windows with less overlap, which is faster but generally less accurate. You may try
-	increasing this value if you want diarization to run faster, but it’s best to keep it below 0.5
-	so that every moment in the sound is covered by at least two analysis windows.
+##Segmentation step (0-1)#（标准值：0.1）
+:   相邻重叠分析窗口起始点之间的间距，以分析窗口长度的比例表示。声音被切分为时长 10 秒的重叠片段（称为%%分析窗口%）；由于存在重叠，时间轴上的每个时刻都会被多个分析窗口覆盖。较小的分割步长意味着更多重叠分析窗口，通常更精确但耗时更长；较大的分割步长使得分析窗口更少、重叠度更低，速度更快但精度会有所下降。若希望加快分离速度可适度增大该值，但建议保持在 0.5 以下，确保每个时刻至少被两个分析窗口覆盖。
 
-Algorithm
-=========
-The algorithm is a port of @@pyannote.audio@’s `pyannote/speaker-diarization-3.1` pipeline (see
-@@Bredin (2023)@) with some adaptations. It has four stages.
+算法
+====
+该算法是 @@pyannote.audio@ 的 `pyannote/speaker-diarization-3.1` 流水线（参见 @@Bredin (2023)@）经过改编的 C++/ggml 移植版，分为四个阶段：
 
-##1. Segmentation#. The sound is divided into overlapping 10-second %%analysis windows%. The
-distance between the starts of two consecutive windows is defined by the ##Segmentation step
-(0-1)# as a fraction of the window length. For example, a segmentation step of 0.1 makes this
-distance 1 second, so that consecutive windows have a 90\%  overlap.
+##1. 分割（Segmentation）#。声音被切分为相互重叠的 10 秒%%分析窗口%。两个连续窗口起始点之间的间距由 ##Segmentation step (0-1)#（以窗口长度的比例）决定。例如，步长 0.1 对应间距 1 秒，相邻窗口有 90\% 的重叠。
 
-The sound from each analysis window is then sent to the %%segmentation model%, which divides it
-into 589 frames (each frame spanning approximately 17 milliseconds) and assigns a label to each
-frame in the following way:
-- the model assumes that there are at most three speakers in one analysis window, of whom at most
-two can be active in each frame;
-- for every frame, the model computes a 7-dimensional vector of probabilities for the following
-combinations of active speakers: {}, {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3};
-- the most probable combination is then taken as that frame’s label.
+每个分析窗口中的音频被送入%%分割模型%，该模型将其划分为 589 帧（每帧约 17 毫秒），并按如下方式为每帧标注标签：
+- 模型假定在一个分析窗口中至多有三位说话人，且每帧中至多两位同时发声；
+- 对每一帧，模型计算活跃说话人下列组合的 7 维概率向量：{}、{1}、{2}、{3}、{1, 2}、{1, 3}、{2, 3}；
+- 取概率最高的组合作为该帧的标签。
 
-The speaker numbers 1, 2 and 3 are local to each analysis window: speaker 1 in one window is not
-necessarily the same person as speaker 1 in another. Mapping the window-local speakers to the
-global ones is the task of stages 2 and 3.
+说话人编号 1、2、3 仅在当前分析窗口局部有效：一个窗口中的说话人 1 与另一个窗口中的说话人 1 不一定是同一人。将窗口局部的说话人映射到全局说话人正是阶段 2 和阶段 3 的任务。
 
-##2. Speaker embeddings#. %Embedding is a term used in the field of machine learning which inherited
-it from mathematics. In machine learning, an %embedding is a specific kind of representation of an
-object as a vector in a space of many dimensions (or, in other words, a point in that space),
-chosen in such a way that vectors representing similar objects end up close to each other. The object
-is thus %embedded into a multidimensional space, and the resulting vector is itself called an
-%embedding. What is an “object” and what counts as “similar” depends on the task; here an object is
-a sound, and two sounds are considered similar if the same person is speaking in them.
+##2. 说话人嵌入向量（Speaker embeddings）#。%嵌入（Embedding）%是机器学习中借用自数学的术语。在机器学习中，%嵌入%是将某个对象表示为高维空间中的一个向量（或空间中的一个点），其映射规则使得相似对象在空间中彼此靠近。对象因此被“嵌入”到了高维空间中，所得向量本身亦称为%嵌入向量%。什么是“对象”以及何为“相似”取决于具体任务；在说话人分离中，对象是声音片段，若两段声音是由同一位说话人讲的，则视它们为相似。
 
-The previous stage determined which speaker is active in which frame (for every analysis window).
-Now, for each window and each local speaker in this window (1, 2 or 3), the frames are found where
-this speaker is active. For example, speaker 1 is active in the frames where at least one of the
-combinations {1}, {1, 2} or {1, 3} from stage 1 had non-zero probability. Then, for each window and
-each speaker active somewhere in it, the frames where this speaker is active are glued together into
-a single sound, which is then sent to the %%embedding model%. For every such sound, this model
-produces an %embedding: a 256-dimensional vector representing one particular speaker in one
-particular analysis window. The embeddings of the same speaker (from different analysis windows)
-tend to be closer to each other than the embeddings of different speakers. This makes the next
-stage possible.
+上一阶段确定了每个分析窗口中哪位说话人在哪些帧中发声。现在，针对每个窗口中的每位局部说话人（1、2 或 3），找出该说话人发声的所有帧。例如，阶段 1 中组合 {1}、{1, 2} 或 {1, 3} 中至少有一项概率非零的帧即为说话人 1 活跃的帧。随后，对窗口中发声的每位说话人，将其活跃的所有帧拼接成一段音频并送入%%嵌入模型%。该模型为每段音频生成一个 256 维的%嵌入向量%，代表该特定分析窗口中的该位特定说话人。来自不同分析窗口但属于同一说话人的嵌入向量在高维空间中往往彼此更近，从而为下一步的聚类奠定了基础。
 
-##3. Clustering#. The previous stage produces one embedding for each active speaker in each
-analysis window (so, up to three embeddings per window). The embeddings that are backed by
-enough non-overlapping speech are considered to be “reliable” and are used in the clustering
-process; the others are set aside for now.
+##3. 聚类（Clustering）#。上一阶段为每个分析窗口中的每位活跃说话人生成了一个嵌入向量（每个窗口最多 3 个）。拥有足够多无重叠语音支撑的嵌入向量被视为“可靠向量”并参与聚类，其他向量暂时搁置。
 
-The reliable embeddings from all analysis windows are first L2-normalized so that they are all
-located on a 256-dimensional unit hypersphere. They are then grouped using %%agglomerative
-hierarchical clustering with centroid linkage%. Grouping starts with each embedding forming its
-own group (with the centre of the group being the embedding itself). At each step, the two groups
-whose centres are the closest (as measured by Euclidean distance between them) are merged, and
-the centre of the newly formed group is the mean of all the embeddings in this group. This centre
-is not L2-normalized, therefore the centres of merged groups lie inside the 256-dimensional
-hypersphere and become slightly shorter with every merge. This process stops when the distance
-between the next two closest groups is larger than the ##Clustering threshold (0-2)#.
+来自所有分析窗口的可靠嵌入向量首先经过 L2 归一化，使其全部位于 256 维单位超球面上。随后使用%%质心链接的层次凝聚聚类（agglomerative hierarchical clustering with centroid linkage）%进行分组。初始时每个嵌入向量各自成一组（质心即为该向量本身）。在每一步中，质心距离最近的两组（以欧氏距离度量）被合并，新组的质心为该组内所有嵌入向量的均值。由于新质心未经 L2 归一化，合并组的质心会落在 256 维超球面的内部，每次合并后模长都会略微缩小。当接下来两个最近组之间的距离超过 ##Clustering threshold (0-2)# 时，聚类过程终止。
 
-Because the embeddings are L2-normalized, the distance between any two of them lies between 0
-(identical) and 2 (opposite), which explains the range of possible values for the clustering
-threshold.
+因为原始向量已作 L2 归一化，任意两个向量间的距离都在 0（完全相同）到 2（完全相反）之间，这正是聚类阈值取值范围的由来。
 
-Each final group represents one speaker; if after reaching the threshold there are still more groups
-than ##Max. number of speakers (≥ 2)#, the merging continues until the resulting number of groups
-does not exceed that maximum.
+最终形成的每一个组对应一位全局说话人；如果达到阈值后组数仍然多于 ##Max. number of speakers (≥ 2)#，合并将继续进行，直至组数不超过该最大值。
 
-Finally, the unreliable embeddings (those not used to form the groups) are attached to their
-nearest groups. In this way, each window-local speaker is assigned to a global speaker.
+最后，先前搁置的不可靠嵌入向量被分配至距离其最近的组中。至此，每个窗口局部的说话人都成功映射到了全局说话人。
 
-The two figures below show an example of the clustering process for four embeddings in a
-two-dimensional space. Each group centre is drawn as a solid arrow surrounded by a grey circle whose
-radius is the clustering threshold (here 0.7, the default). Two groups can be merged only if
-both their centres lie inside each other’s grey circles (or, in other words, if they are closer
-than the clustering threshold).
+下方的两幅示意图展示了二维空间中四个嵌入向量的聚类过程示例。每个组的质心绘制为实线箭头，外围环绕灰色圆圈，圆圈半径即为聚类阈值（此处为默认值 0.7）。两组能够合并的充要条件是它们的质心彼此落入对方的灰色圆圈内（即间距小于聚类阈值）。
 
-The ##left figure# shows the initial four group centres (the same as the four embeddings). The
-closest two group centres are drawn in red; these groups are merged first. The next merge
-involves the groups with the next two closest centres (those drawn in blue). The ##right figure#
-shows the state after the two merges: the solid arrows are the centres of the two newly formed
-groups; the dotted arrows are the original embeddings making up each group. Now, neither of the
-two group centres lies inside the grey circle surrounding the other one. So the two groups are
-further apart than the clustering threshold; therefore, the clustering process stops, leaving
-these two groups as the final result.
+##左图#展示了初始的四个组质心（即四个原始嵌入向量）。间距最近的两个质心以红色绘制，它们最先合并。接下来合并次近的两个质心（以蓝色绘制）。##右图#展示了两次合并后的状态：实线箭头是新生成的两个组的质心；虚线箭头是构成各组的原始嵌入向量。此时，两个新组的质心均未落入对方的灰色圆圈内（间距已超过聚类阈值），因此聚类停止，最终确定为两个说话人组。
 
 {- 5.5x3
 	b1 = 35
@@ -977,179 +659,131 @@ these two groups as the final result.
 	Draw arrow: 0.0, 0.0, r3x, r3y
 }
 
-##4. Reconstruction#. At stage 1, each analysis window was divided into 589 frames of
-approximately 17 milliseconds, and each window-frame received a 7-dimensional vector with
-probabilities of different combinations of local speakers being active. Because the analysis
-windows overlap, each frame on the global timeline is covered by several windows. The goal of
-the current stage is to combine the window-frame information across all covering windows, using the
-local-to-global speaker mapping established at stage 3.
+##4. 重建（Reconstruction）#。在阶段 1 中，每个分析窗口被划分为 589 帧（每帧约 17 毫秒），每帧获得一个关于局部说话人活跃状态的 7 维概率向量。由于分析窗口相互重叠，全局时间轴上的每一帧都会被多个窗口同时覆盖。本阶段的目标是利用阶段 3 建立的局部到全局映射，将所有覆盖窗口的帧信息融合成全局结果。
 
-Using the 7-dimensional vectors from stage 1, for each speaker in each window-frame, %%soft
-activations% are computed, by adding together the probabilities of all combinations in which that
-speaker is active. This is a number between 0 and 1 (where 0 means definitely silent and 1 means
-definitely active). These local speakers’ soft activations are then attributed to the global
-speakers using the mapping from stage 3. After that they are averaged across all the covering
-windows, to produce an %%average activation% for each global speaker in each global frame.
+利用阶段 1 的 7 维概率向量，针对每个窗口帧中的每位说话人，将其发声的所有可能组合的概率累加，计算出%%软激活度（soft activation）%（0 到 1 之间的数值，0 表示绝对静音，1 表示绝对活跃）。接着利用阶段 3 的映射将局部软激活度归属到全局说话人，并在所有覆盖该帧的窗口间取平均值，得到每个全局说话人在每个全局帧上的%%平均激活度%。
 
-Separately, the number of simultaneously active speakers in each global frame is found in a
-similar way. Each window-frame had a winning combination of active speakers (the frame label from
-stage 1), containing 0, 1 or 2 speakers. For each global frame, this number is averaged across
-all covering windows, rounded, and capped at 1 when ##Allow speakers to overlap# is off. The
-resulting number determines how many speakers (those with the highest average activations) are
-marked active in this frame.
+同时，以类似方式确定全局每一帧中同时活跃的说话人数。每个窗口帧都有一个发声胜出组合（阶段 1 的帧标签），包含 0、1 或 2 位说话人。在全局各帧上对所有覆盖窗口的说话人数取平均并四舍五入；若关闭了 ##Allow speakers to overlap#，则上限截断为 1。该数字决定了在该帧中将激活度最高的前几位说话人标记为活跃状态。
 
-Finally, for each speaker, every uninterrupted sequence of frames in which that speaker is active
-becomes one %segment. The result is a list of segments, where each segment is attributed to one
-speaker.
+最后，将每位说话人所有连续活跃的帧序列聚合为一个%片段（segment）%。最终输出片段列表，每个片段归属于一位具体的说话人。
 
-Availability in Praat
-=====================
-For diarization as part of transcription, see @@transcription with whisper.cpp@.
+在 Praat 中的可用性
+===================
+说话人分离作为转写流程的一部分协同使用，参见 @@transcription with whisper.cpp@。
 
-Standalone diarization is available in two ways:
-- if you select a @Sound together with its @TextGrid and choose
-  @@TextGrid & Sound: Diarize interval...|Diarize interval...@;
-- via ##Diarize interval# from the #Interval menu in the @TextGridEditor. The settings for this
-  command are set via ##Diarization settings...# in the same menu and are remembered across Praat
-  sessions.
+独立说话人分离在 Praat 中有两种使用方式：
+- 同时选定 @Sound 与相对应的 @TextGrid，并选择 @@TextGrid & Sound: Diarize interval...|分离区间说话人...@；
+- 在 @TextGridEditor 编辑窗口的 #Interval（区间）菜单中选择 ##Diarize interval#。该命令的参数通过同菜单下的 ##Diarization settings...# 设置，并会在不同 Praat 会话间持久保存。
 
 ################################################################################
 "TextGrid & Sound: Diarize interval..."
 © Anastasia Shchupak 2026-06-01
 
-This command takes a specified interval of the @TextGrid, runs diarization on the corresponding part
-of the @Sound, and writes the result back into the TextGrid. The labels of the intervals are
-specified by the settings ##Non-speech interval label# and ##Speech interval label#.
+此命令获取 @TextGrid 中指定的区间，对 @Sound 中相对应的音频片段执行说话人分离，并将分离结果写回 TextGrid 中。区间的文字标签由 ##Non-speech interval label# 和 ##Speech interval label# 设定。
 
-Settings
-========
+设置
+====
 ##Tier number
-:	the number of the tier containing the interval to be diarized.
+:	包含待分离区间的层编号。
 
 ##Interval number
-:	the number of the interval to be diarized.
+:	待分离的区间编号。
 
-##Max. number of speakers (≥ 2)# (standard value: 2)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Max. number of speakers (≥ 2)#（标准值：2）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-##Allow speakers to overlap# (standard: on)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Allow speakers to overlap#（标准：开启）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-##Clustering threshold (0-2)# (standard value: 0.7)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Clustering threshold (0-2)#（标准值：0.7）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-##Segmentation step (0-1)# (standard value: 0.1)
-:	see @@speaker diarization with adapted pyannote.audio@.
+##Segmentation step (0-1)#（标准值：0.1）
+:	参见 @@speaker diarization with adapted pyannote.audio@。
 
-##Non-speech interval label# (standard value: “”)
-:	the label assigned to intervals classified as non-speech in the resulting TextGrid.
+##Non-speech interval label#（标准值：“”）
+:	生成 TextGrid 中归类为非语音的区间的文字标签。
 
-##Speech interval label# (standard value: “speech”)
-:	the label assigned to intervals classified as speech in the resulting TextGrid.
+##Speech interval label#（标准值：“speech”）
+:	生成 TextGrid 中归类为语音的区间的文字标签。
 
 ################################################################################
 "SpeechRecognizer"
 © Anastasia Shchupak 2026-03-15
 
-One of the @@types of objects@ in Praat. It performs @@transcription with whisper.cpp@ on a
-@Sound object. If you are new to speech recognition in Praat, see the @@Speech recognition@
-tutorial first.
+Praat 中的 @@types of objects|对象类型@ 之一。它能对 @Sound 对象执行 @@transcription with whisper.cpp|基于 whisper.cpp 的语音转写@。如果您初次接触 Praat 的语音识别功能，请先参阅 @@Speech recognition|语音识别@ 教程。
 
-Commands
-========
+命令
+====
 
-Creation:
+创建：
 ,	@@Create SpeechRecognizer...@
 
-Transcription:
+转写：
 ,	@@SpeechRecognizer & Sound: Transcribe@
 
 ################################################################################
 "Create SpeechRecognizer..."
 © Anastasia Shchupak 2026-03-15
 
-Creates the @SpeechRecognizer object.
-If you are new to speech recognition in Praat, see the @@Speech recognition@ tutorial first.
+创建 @SpeechRecognizer 语音识别器对象。
+如果您初次接触 Praat 的语音识别功能，请先参阅 @@Speech recognition|语音识别@ 教程。
 
-Settings
-========
+设置
+====
 ##Whisper model
 ##Language
-:	for both settings see @@transcription with whisper.cpp@.
+:	两项设置的详细说明请参见 @@transcription with whisper.cpp@。
 
 ################################################################################
 "SpeechRecognizer & Sound: Transcribe"
 © Anastasia Shchupak 2026-03-15
 
-@@transcription with whisper.cpp|Transcribes@ selected @Sound using selected @SpeechRecognizer
-object and writes the result of transcription to the @@Info window@.
+使用选定的 @SpeechRecognizer 对象对选定的 @Sound 对象执行 @@transcription with whisper.cpp|转写@，并将转写文本结果输出到 @@Info window|信息窗口@。
 
-The sound is automatically resampled to 16 kHz (the sampling frequency expected by @@whisper.cpp@)
-before being processed.
+音频在处理前会自动重采样至 16 kHz（@@whisper.cpp@ 所要求的采样频率）。
 
-The transcription uses the @@speech activity detection with Silero VAD@ built into @@whisper.cpp@
-to skip non-speech parts of the sound, which improves both speed and accuracy.
+转写过程中会使用 @@whisper.cpp@ 内置的 @@speech activity detection with Silero VAD@ 跳过声音中的非语音部分，从而兼具更快的转写速度与更高的识别准确率。
 
-The result is a flat text string containing the full transcription.
+转写结果为一个包含完整文本的字符串。
 
 ################################################################################
 "Silero VAD"
 © Anastasia Shchupak 2026-06-01
 
-Silero VAD is a pre-trained speech activity detector created by Silero Team; see
-@@Silero Team (2024)@ for the model and documentation. VAD stands for “voice activity detection”,
-but we use “speech activity detection” instead, because Silero VAD detects unvoiced parts of speech
-as well as voiced parts. The Silero VAD model is compiled into Praat (see @Acknowledgments).
+Silero VAD 是由 Silero 团队研发的预训练语音活动检测器；模型与文档可参见 @@Silero Team (2024)@。VAD 代表“语音活动检测（Voice Activity Detection）”，但我们通常称其为“speech activity detection”，因为 Silero VAD 既能检测浊音语音，也能可靠检测清音语音。Silero VAD 模型已内置编译进 Praat 中（参见 @Acknowledgments）。
 
-For how Silero VAD is used in Praat, as well as its algorithm and settings, see @@speech activity
-detection with Silero VAD@.
+有关 Silero VAD 在 Praat 中的具体用法、算法及设置，请参阅 @@speech activity detection with Silero VAD@。
 
 ################################################################################
 "whisper.cpp"
 © Anastasia Shchupak 2026-06-01
 
-Whisper is an automatic speech recognition (ASR) system by OpenAI for transcribing speech
-into text; see @@Radford et al. (2022)@ for the model architecture, training and evaluation.
-OpenAI’s Whisper implementation is in Python (PyTorch).
+Whisper 是 OpenAI 开发的用于将语音转写为文字的自动语音识别（ASR）系统；有关模型架构、训练与评测可参见 @@Radford et al. (2022)@。OpenAI 官方的 Whisper 实现基于 Python (PyTorch)。
 
-Praat uses whisper.cpp, a lightweight C/C++ port of Whisper built on top of the ggml tensor library
-for machine learning, developed by Georgi Gerganov and many other contributors (see
-@Acknowledgments). The original OpenAI Whisper models must be converted to ggml format for use with
-whisper.cpp.
+Praat 采用了 whisper.cpp，这是由 Georgi Gerganov 及众多贡献者基于机器学习张量库 ggml 开发的轻量级 C/C++ 移植版本（参见 @Acknowledgments）。OpenAI 原生的 Whisper 模型必须转换为 ggml 格式后方可供 whisper.cpp 使用。
 
-For how transcription is used in Praat, see the @@Speech recognition@ tutorial.
-For the transcription settings, see @@transcription with whisper.cpp@.
+有关转写在 Praat 中的完整用法，请参阅 @@Speech recognition@ 教程。
+有关转写参数设置的详细说明，请参阅 @@transcription with whisper.cpp@。
 
 ################################################################################
 "pyannote.audio"
 © Anastasia Shchupak 2026-06-01
 
-pyannote.audio is an automatic speaker diarization toolkit developed by Hervé Bredin and
-collaborators (see @@Plaquet & Bredin (2023)@ and @@Bredin (2023)@).
+pyannote.audio 是由 Hervé Bredin 及其合作者开发的自动说话人分离开源工具包（参见 @@Plaquet & Bredin (2023)@ 及 @@Bredin (2023)@）。
 
-Praat contains a C++/ggml adaptation of its `pyannote/speaker-diarization-3.1` pipeline.
-The pipeline uses two neural models: `pyannote/segmentation-3.0` by pyannote.audio for segmentation
-and `wespeaker-voxceleb-resnet34-LM` by @@WeSpeaker@ for speaker embedding.
-The `pyannote/segmentation-3.0` weights have been converted to ggml format
-and embedded into Praat (see @Acknowledgments).
+Praat 内置了其 `pyannote/speaker-diarization-3.1` 流水线的 C++/ggml 改编版本。该流水线包含两个神经网络模型：用于语音分割的 pyannote.audio `pyannote/segmentation-3.0`，以及用于提取说话人嵌入向量的 @@WeSpeaker@ `wespeaker-voxceleb-resnet34-LM`。`pyannote/segmentation-3.0` 的权重已转换为 ggml 格式并内置于 Praat 中（参见 @Acknowledgments）。
 
-For how speaker diarization is used in Praat, see the @@Speech recognition@ tutorial.
-For the diarization settings, see @@speaker diarization with adapted pyannote.audio@.
+有关说话人分离在 Praat 中的具体用法，请参阅 @@Speech recognition@ 教程。
+有关说话人分离设置的详细说明，请参阅 @@speaker diarization with adapted pyannote.audio@。
 
 ################################################################################
 "WeSpeaker"
 © Anastasia Shchupak 2026-06-01
 
-WeSpeaker is a speaker embedding learning toolkit developed by WeNet Community
-(see @@Wang et al. (2023)@ and @@Wang et al. (2024)@). Praat uses one of its pretrained models,
-the `wespeaker-voxceleb-resnet34-LM` embedding model, as part of @@pyannote.audio@’s
-`pyannote/speaker-diarization-3.1` pipeline.
+WeSpeaker 是由 WeNet 社区开发的面向学术研究与工业落地的说话人嵌入学习工具包（参见 @@Wang et al. (2023)@ 及 @@Wang et al. (2024)@）。Praat 将其预训练的 `wespeaker-voxceleb-resnet34-LM` 嵌入模型用作 @@pyannote.audio@ 的 `pyannote/speaker-diarization-3.1` 流水线的重要组成部分。
 
-`wespeaker-voxceleb-resnet34-LM` was trained on the VoxCeleb2 dataset
-(see @@Chung, Nagrani & Zisserman (2018)@ and @@Nagrani, Chung & Zisserman (2017)@).
-The model weights have been converted to ggml format and embedded into Praat (see @Acknowledgments).
-Praat contains a C++/ggml port of WeSpeaker’s ResNet34 architecture with TSTP pooling,
-used for inference on this model.
+`wespeaker-voxceleb-resnet34-LM` 在 VoxCeleb2 数据集上训练完成（参见 @@Chung, Nagrani & Zisserman (2018)@ 及 @@Nagrani, Chung & Zisserman (2017)@）。模型权重已转换为 ggml 格式并内置于 Praat 中（参见 @Acknowledgments）。Praat 包含了针对该模型进行推理的带有 TSTP 池化的 WeSpeaker ResNet34 架构的 C++/ggml 移植版本。
 
 ################################################################################
 "Silero Team (2024)"

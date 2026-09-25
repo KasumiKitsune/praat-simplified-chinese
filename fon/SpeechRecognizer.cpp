@@ -24,6 +24,9 @@
 #include "ggml-memory-pool.h"
 #include "ggml-silero-vad-model-data.h"
 #include "Preferences.h"
+#if defined (_WIN32)
+	#include <windows.h>
+#endif
 
 #include "oo_DESTROY.h"
 #include "SpeechRecognizer_def.h"
@@ -129,6 +132,7 @@ static void supressGgmlLogging () {
 }
 
 static conststring32 theWhisperModelsFolder ();
+static conststring32 theModelFilePath (conststring32 modelName);
 
 autoSpeechRecognizer SpeechRecognizer_create (const conststring32 modelName, const conststring32 languageName) {
 	try {
@@ -186,7 +190,7 @@ autoSpeechRecognizer SpeechRecognizer_create (const conststring32 modelName, con
 		else
 			contextParams. dtw_aheads_preset = WHISPER_AHEADS_N_TOP_MOST;
 
-		const conststring32 modelPath = Melder_cat (theWhisperModelsFolder(), U"/", modelName);
+		const conststring32 modelPath = theModelFilePath (modelName);
 		const conststring8 utf8ModelPath = Melder_peek32to8 (modelPath);
 
 		/*
@@ -929,6 +933,72 @@ autovector <autovector <SpeechSegment>> doDiarization (constSound sound,
 	}
 }
 
+static conststring32 theWhisperModelsFolder ();
+
+#if defined (_WIN32)
+static conststring32 thePortableWhisperModelsFolder () {
+	static autostring32 portableFolderPath;
+	if (! portableFolderPath) {
+		wchar_t exePath [MAX_PATH];
+		DWORD len = GetModuleFileNameW (nullptr, exePath, MAX_PATH);
+		if (len > 0) {
+			wchar_t *lastSlash = wcsrchr (exePath, L'\\');
+			if (lastSlash) {
+				*lastSlash = L'\0';
+				conststring32 exeDir = Melder_peekWto32 (exePath);
+				conststring32 modelsDir = Melder_cat (exeDir, U"\\models");
+				conststring32 whisperDir = Melder_cat (modelsDir, U"\\whispercpp");
+				try {
+					structMelderFolder f { };
+					Melder_pathToFolder (modelsDir, & f);
+					if (! MelderFolder_exists (& f))
+						MelderFolder_create (& f);
+					structMelderFolder f2 { };
+					Melder_pathToFolder (whisperDir, & f2);
+					if (! MelderFolder_exists (& f2))
+						MelderFolder_create (& f2);
+					portableFolderPath = Melder_dup (whisperDir);
+				} catch (MelderError) {
+					Melder_clearError ();
+				}
+			}
+		}
+	}
+	return portableFolderPath.get();
+}
+#endif
+
+conststring32 thePrimaryWhisperModelsFolder () {
+#if defined (_WIN32)
+	conststring32 portableFolder = thePortableWhisperModelsFolder ();
+	if (portableFolder && portableFolder [0] != U'\0')
+		return portableFolder;
+#endif
+	return theWhisperModelsFolder ();
+}
+
+static conststring32 theModelFilePath (conststring32 modelName) {
+#if defined (_WIN32)
+	conststring32 portableFolder = thePortableWhisperModelsFolder ();
+	if (portableFolder && portableFolder [0] != U'\0') {
+		conststring32 path1 = Melder_cat (portableFolder, U"\\", modelName);
+		structMelderFile f1 { };
+		Melder_pathToFile (path1, & f1);
+		if (MelderFile_exists (& f1))
+			return path1;
+	}
+#endif
+	conststring32 prefsFolder = theWhisperModelsFolder ();
+	if (prefsFolder && prefsFolder [0] != U'\0') {
+		conststring32 path2 = Melder_cat (prefsFolder, U"\\", modelName);
+		structMelderFile f2 { };
+		Melder_pathToFile (path2, & f2);
+		if (MelderFile_exists (& f2))
+			return path2;
+	}
+	return Melder_cat (theWhisperModelsFolder(), U"\\", modelName);
+}
+
 static conststring32 theWhisperModelsFolder () {
 	static autostring32 whisperModelFolderPath;
 	if (! whisperModelFolderPath) {
@@ -954,7 +1024,31 @@ static conststring32 theWhisperModelsFolder () {
 constSTRVEC theCurrentSpeechRecognizerModelNames () {
 	static autoSTRVEC whisperModelNames;
 	try {
-		whisperModelNames = fileNames_STRVEC (Melder_cat (theWhisperModelsFolder (), U"/*.bin"));
+		whisperModelNames.reset();
+		#if defined (_WIN32)
+		conststring32 portableFolder = thePortableWhisperModelsFolder ();
+		if (portableFolder && portableFolder [0] != U'\0') {
+			autoSTRVEC portables = fileNames_STRVEC (Melder_cat (portableFolder, U"/*.bin"));
+			for (integer i = 1; i <= portables.size; i ++) {
+				whisperModelNames.append (portables [i].get());
+			}
+		}
+		#endif
+		conststring32 prefsFolder = theWhisperModelsFolder ();
+		if (prefsFolder && prefsFolder [0] != U'\0') {
+			autoSTRVEC prefsModels = fileNames_STRVEC (Melder_cat (prefsFolder, U"/*.bin"));
+			for (integer i = 1; i <= prefsModels.size; i ++) {
+				bool found = false;
+				for (integer j = 1; j <= whisperModelNames.size; j ++) {
+					if (str32equ (whisperModelNames [j].get(), prefsModels [i].get())) {
+						found = true;
+						break;
+					}
+				}
+				if (! found)
+					whisperModelNames.append (prefsModels [i].get());
+			}
+		}
 	} catch (MelderError) {
 		Melder_clearError ();
 	}

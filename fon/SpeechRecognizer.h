@@ -150,6 +150,8 @@ inline std::set <structSpeechRecognizer *> theLivingSpeechRecognizers;
 */
 constSTRVEC theCurrentSpeechRecognizerModelNames ();
 constSTRVEC theSpeechRecognizerLanguageNames ();
+conststring32 thePrimaryWhisperModelsFolder ();
+void SpeechRecognizer_showModelGuideDialog ();
 
 /*
 	Class SpeechRecognizer functions.

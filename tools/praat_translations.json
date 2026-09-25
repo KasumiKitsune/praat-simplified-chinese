@@ -1,4 +1,11 @@
 {
+  "Download Whisper models...": "下载 Whisper 模型...",
+  "Whisper Speech Recognition Models Setup": "Whisper 模型下载与配置向导",
+  "Open Model Folder": "打开模型文件夹",
+  "Download base model": "下载 base 模型",
+  "Browse all models...": "浏览所有模型...",
+  "No Whisper Speech Recognition Models Found (.bin)": "未检测到 Whisper 语音识别模型 (.bin)",
+  "Get Whisper model name": "获取 Whisper 模型名称",
   "- Modify tier:": "- 修改层：",
   "- Extract to list of objects:": "- 提取至对象列表：",
   "New tier:": "新建层：",
