@@ -207,6 +207,7 @@ static void closePortAudioStream (SoundRecorder me) {
 		} catch (...) { }
 		my portaudioStream = nullptr;
 	}
+	my monitorSamples = 0;
 }
 
 static void stopRecording (SoundRecorder me) {	
@@ -733,12 +734,12 @@ static int portaudioStreamCallback (
 	return paContinue;
 }
 
-static void ensurePortAudioStream (SoundRecorder me) {
+static void ensurePortAudioStream (SoundRecorder me, bool quiet = false, integer precomputedDevIndex = -2) {
 	std::lock_guard <std::mutex> lock (my portAudioMutex);
 	if (my portaudioStream)
 		return;
 	PaStreamParameters streamParameters = { };
-	integer preferredDevIndex = MelderAudio_getInputDeviceIndex ();
+	integer preferredDevIndex = (precomputedDevIndex != -2) ? precomputedDevIndex : (quiet ? -1 : MelderAudio_getInputDeviceIndex ());
 	if (preferredDevIndex >= 0 && preferredDevIndex < Pa_GetDeviceCount ()) {
 		streamParameters. device = (PaDeviceIndex) preferredDevIndex;
 		const PaDeviceInfo *devInfo = Pa_GetDeviceInfo (streamParameters. device);
@@ -765,13 +766,16 @@ static void ensurePortAudioStream (SoundRecorder me) {
 		macCoreStreamInfo. flags = paMacCoreChangeDeviceParameters | paMacCoreFailIfConversionRequired;
 		streamParameters. hostApiSpecificStreamInfo = & macCoreStreamInfo;
 	#endif
-	if (Melder_debug == 20)
+	if (! quiet && Melder_debug == 20)
 		Melder_casual (U"Before Pa_OpenStream");
 	PaError err = Pa_OpenStream (& my portaudioStream, & streamParameters, nullptr,
 		theControlPanel. sampleRate, 0, paNoFlag, portaudioStreamCallback, (void *) me);
-	if (Melder_debug == 20)
+	if (! quiet && Melder_debug == 20)
 		Melder_casual (U"Pa_OpenStream returns ", (int) err);
 	if (err) {
+		my portaudioStream = nullptr;
+		if (quiet)
+			return;
 		conststring32 errorText = Melder_peek8to32_u (Pa_GetErrorText (err));
 		if (Melder_equ (errorText, U"Invalid number of channels")) {
 			if (my numberOfChannels == 1)
@@ -783,10 +787,15 @@ static void ensurePortAudioStream (SoundRecorder me) {
 		}
 	}
 	err = Pa_StartStream (my portaudioStream);
-	if (Melder_debug == 20)
+	if (! quiet && Melder_debug == 20)
 		Melder_casual (U"Pa_StartStream returns ", (int) err);
-	if (err)
+	if (err) {
+		Pa_CloseStream (my portaudioStream);
+		my portaudioStream = nullptr;
+		if (quiet)
+			return;
 		Melder_throw (U"Error starting audio input stream: ", Melder_peek8to32_u (Pa_GetErrorText (err)), U".");
+	}
 }
 
 static void stopSoundRecorderPlayback (SoundRecorder me);
@@ -885,9 +894,9 @@ static void addCurrentRecordingToTakes (SoundRecorder me) {
 }
 
 #if defined (_WIN32)
-static WNDPROC g_originalHoldRecordWndProc = nullptr;
-static LRESULT CALLBACK holdRecordWndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	SoundRecorder me = (SoundRecorder) GetWindowLongPtr (hwnd, GWLP_USERDATA);
+#include <commctrl.h>
+static LRESULT CALLBACK holdRecordSubclassProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+	SoundRecorder me = (SoundRecorder) dwRefData;
 	if (me) {
 		if (msg == WM_LBUTTONDOWN) {
 			my isHoldingRecord = true;
@@ -905,7 +914,9 @@ static LRESULT CALLBACK holdRecordWndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 			}
 		}
 	}
-	return CallWindowProc (g_originalHoldRecordWndProc, hwnd, msg, wParam, lParam);
+	if (msg == WM_NCDESTROY)
+		RemoveWindowSubclass (hwnd, holdRecordSubclassProc, uIdSubclass);
+	return DefSubclassProc (hwnd, msg, wParam, lParam);
 }
 #endif
 
@@ -1165,6 +1176,8 @@ static void gui_button_cb_takeDelete (SoundRecorder me, GuiButtonEvent /* event 
 		Sound sound = my recordedSounds.at [newSelect];
 		if (sound && my soundName)
 			GuiText_setString (my soundName, Thing_getName (sound));
+	} else {
+		my nsamp = 0;
 	}
 	if (! my recording && my graphics) {
 		showMeter (me, nullptr, 0);
@@ -1454,6 +1467,7 @@ static void gui_radiobutton_cb_input (SoundRecorder me, GuiRadioButtonEvent even
 	/* Set system's input source. */
 	if (my inputUsesPortAudio) {
 		closePortAudioStream (me);
+		ensurePortAudioStream (me, true);
 	} else {
 		#if defined (_WIN32)
 			// deferred to the start of recording
@@ -1508,6 +1522,7 @@ static void gui_radiobutton_cb_fsamp (SoundRecorder me, GuiRadioButtonEvent even
 		*/
 		if (my inputUsesPortAudio) {
 			closePortAudioStream (me);
+			ensurePortAudioStream (me, true);
 		} else {
 			#if defined (_WIN32)
 				// deferred to the start of recording
@@ -1532,11 +1547,11 @@ static void gui_radiobutton_cb_channels (SoundRecorder me, GuiRadioButtonEvent e
 		if (requestedChannels == my numberOfChannels)
 			return;
 
-		my numberOfChannels = requestedChannels;
-
 		if (my inputUsesPortAudio) {
 			closePortAudioStream (me);
-		} else {
+		}
+		my numberOfChannels = requestedChannels;
+		if (! my inputUsesPortAudio) {
 			#if defined (_WIN32)
 				// deferred to the start of recording
 			#elif defined (macintosh)
@@ -1571,6 +1586,11 @@ static void gui_radiobutton_cb_channels (SoundRecorder me, GuiRadioButtonEvent e
 			my recordBuffer = newvectorzero <short> (my nmax * my numberOfChannels);
 		} catch (MelderError) {
 			Melder_clearError ();
+			my nmax = my recordBuffer.size / my numberOfChannels;
+		}
+
+		if (my inputUsesPortAudio) {
+			ensurePortAudioStream (me, true);
 		}
 
 		showMeter (me, nullptr, 0);
@@ -1695,10 +1715,8 @@ void structSoundRecorder :: v_createChildren ()
 	#if defined (_WIN32)
 		if (our holdRecordButton && our holdRecordButton -> d_widget) {
 			HWND hwnd = our holdRecordButton -> d_widget -> window;
-			if (hwnd) {
-				SetWindowLongPtr (hwnd, GWLP_USERDATA, (LONG_PTR) this);
-				g_originalHoldRecordWndProc = (WNDPROC) SetWindowLongPtr (hwnd, GWLP_WNDPROC, (LONG_PTR) holdRecordWndProc);
-			}
+			if (hwnd)
+				SetWindowSubclass (hwnd, holdRecordSubclassProc, 2, (DWORD_PTR) this);
 		}
 	#endif
 	if (inputUsesPortAudio) {
@@ -1729,8 +1747,18 @@ void structSoundRecorder :: v_createChildren ()
 
 static void writeAudioFile (SoundRecorder me, MelderFile file, int audioFileType) {
 	try {
-		MelderFile_writeAudioFile (file, audioFileType, my recordBuffer.asArgumentToFunctionThatExpectsZeroBasedArray(),
-				Melder_iround (theControlPanel. sampleRate), my nsamp, my numberOfChannels, 16);
+		integer index = getSelectedTakeIndex (me);
+		Sound sound = nullptr;
+		if (index >= 1 && index <= my recordedSounds.size)
+			sound = my recordedSounds.at [index];
+		else if (my recordedSounds.size > 0)
+			sound = my recordedSounds.at [my recordedSounds.size];
+		if (sound) {
+			Sound_saveAsAudioFile (sound, file, audioFileType, 16);
+		} else {
+			MelderFile_writeAudioFile (file, audioFileType, my recordBuffer.asArgumentToFunctionThatExpectsZeroBasedArray(),
+					Melder_iround (theControlPanel. sampleRate), my nsamp, my numberOfChannels, 16);
+		}
 	} catch (MelderError) {
 		Melder_throw (U"Audio file not written.");
 	}
@@ -2025,12 +2053,9 @@ gui_drawingarea_cb_resize (me.get(), & event);
 		#endif
 		updateMenus (me.get());
 		if (my inputUsesPortAudio) {
-			my portaudioInitThread = std::thread ([me_ptr = me.get()] () {
-				try {
-					ensurePortAudioStream (me_ptr);
-				} catch (MelderError) {
-					Melder_clearError ();
-				}
+			integer prefDevIndex = MelderAudio_getInputDeviceIndex ();
+			my portaudioInitThread = std::thread ([me_ptr = me.get(), prefDevIndex] () {
+				ensurePortAudioStream (me_ptr, true, prefDevIndex);
 			});
 		}
 		return me;

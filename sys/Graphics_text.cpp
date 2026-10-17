@@ -1194,6 +1194,9 @@ static void drawOneCell (Graphics me, int xDC, int yDC, _Graphics_widechar lc []
 						// Hopeless situation: no spaces. For CJK/Chinese text, wrap at character level.
 						_Graphics_widechar *wrapLc = overflowLc;
 						_Graphics_widechar *boundary = ( lastlc == lc ? lastlc : lastlc + 1 );
+						// Avoid breaking inside a hyperlink if possible
+						while (wrapLc > boundary && wrapLc -> link)
+							wrapLc --;
 						if (wrapLc > boundary) {
 							// Shift elements right by 1 to make room for U'\n'
 							_Graphics_widechar *end = wrapLc;

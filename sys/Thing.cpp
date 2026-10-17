@@ -23,10 +23,10 @@
 std::atomic <integer> theTotalNumberOfThings;
 
 void structThing :: v1_info () {
-	MelderInfo_writeLine (U"对象类型: ", Thing_className (this));
-	MelderInfo_writeLine (U"对象名称: ", this -> name ? this -> name.get() : U"<无名称>");
+	MelderInfo_writeLine (U"Object type: ", Thing_className (this));
+	MelderInfo_writeLine (U"Object name: ", this -> name ? this -> name.get() : U"<untitled>");
 	time_t today = time (nullptr);
-	MelderInfo_writeLine (U"日期: ", Melder_peek8to32_u (ctime (& today)));   // includes a newline
+	MelderInfo_writeLine (U"Date: ", Melder_peek8to32_u (ctime (& today)));   // includes a newline
 }
 
 /*
@@ -175,9 +175,9 @@ void Thing_infoWithIdAndFile (Thing me, integer id, MelderFile file) {
 	Melder_clearInfo ();
 	MelderInfo_open ();
 	if (id != 0)
-		MelderInfo_writeLine (U"对象 ID: ", id);
+		MelderInfo_writeLine (U"Object ID: ", id);
 	if (! MelderFile_isNull (file))
-		MelderInfo_writeLine (U"关联文件: ", MelderFile_peekPath (file));
+		MelderInfo_writeLine (U"Associated file: ", MelderFile_peekPath (file));
 	my v1_info ();
 	MelderInfo_close ();
 }

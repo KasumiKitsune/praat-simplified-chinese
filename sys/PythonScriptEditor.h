@@ -8,6 +8,8 @@
 #include "TextEditor.h"
 
 Thing_define (PythonScriptEditor, TextEditor) {
+	void v9_destroy () noexcept
+		override;
 	void v_nameChanged ()
 		override;
 	bool v_scriptable ()
@@ -19,6 +21,8 @@ Thing_define (PythonScriptEditor, TextEditor) {
 	conststring32 v_extension () const
 		override { return U".py"; }
 };
+
+bool PythonScriptEditors_dirty ();
 
 void PythonScriptEditor_init (PythonScriptEditor me,
 	conststring32 initialText

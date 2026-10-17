@@ -1346,6 +1346,11 @@ void praat_sound_updatePlayButtonIfActive () {
 		if (praat_numberOfSelected (classSound) == 1 && praat_idOfSelected (classSound, 1) == s_soundPlayId) {
 			updatePlayButtonUi (s_soundCurrentTime, s_soundTotalDuration, s_soundIsPlaying ? 1 : 2);
 		} else {
+			if (s_soundIsPlaying && MelderAudio_isPlaying) {
+				s_soundIsReplaying = true;
+				MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
+				s_soundIsReplaying = false;
+			}
 			s_soundIsPaused = false;
 			s_soundIsPlaying = false;
 			s_soundPausedTime = 0.0;
@@ -1357,7 +1362,7 @@ void praat_sound_updatePlayButtonIfActive () {
 }
 
 DIRECT (PLAY_EACH__Sound_play) {
-	if (MelderAudio_isPlaying) {
+	if (s_soundIsPlaying && MelderAudio_isPlaying) {
 		// Currently playing -> pause!
 		s_soundIsPaused = true;
 		s_soundIsPlaying = false;

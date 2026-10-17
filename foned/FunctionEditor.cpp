@@ -1423,7 +1423,7 @@ static void gui_drawingarea_cb_mouse (FunctionEditor me, GuiDrawingArea_MouseEve
 	double x_pxlt, y_pxlt;
 	Graphics_DCtoWC (my graphics.get(), event -> x, event -> y, & x_pxlt, & y_pxlt);
 	if (event -> isClick()) {
-		if (my v_hasSelectionViewer() || my instancePref_showSelectionViewer()) {
+		if (my v_hasSelectionViewer()) {
 			const double left = my width_pxlt - my space + 9.0, right = my width_pxlt - 3.0;
 			const double bottom = my height_pxlt - my space + 5.0, top = my height_pxlt - 5.0;
 			if (x_pxlt > left && x_pxlt < right && y_pxlt > bottom && y_pxlt < top) {
@@ -1436,7 +1436,7 @@ static void gui_drawingarea_cb_mouse (FunctionEditor me, GuiDrawingArea_MouseEve
 		my clickWasModifiedByShiftKey = event -> shiftKeyPressed;
 		my clickWasModifiedByOptionKey = event -> optionKeyPressed;
 		my clickWasModifiedByCommandKey = event -> commandKeyPressed;
-		my anchorIsInSelectionViewer = my isInSelectionViewer (x_pxlt);
+		my anchorIsInSelectionViewer = my v_hasSelectionViewer() && my instancePref_showSelectionViewer() && my isInSelectionViewer (x_pxlt);
 		my anchorIsInWideDataView = ( y_pxlt > my dataBottom_pxlt() && y_pxlt < my dataTop_pxlt() );
 	}
 	if (my anchorIsInSelectionViewer) {

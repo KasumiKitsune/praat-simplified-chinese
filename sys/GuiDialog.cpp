@@ -215,8 +215,8 @@ integer GuiDialog_run (GuiDialog me) {
 					trace (U"dialog message ", event. message);
 				} else if (event. message == WM_PAINT) {
 					trace (U"paint ", event. message);
-					//TranslateMessage (& event);
-					//DispatchMessage (& event);
+					TranslateMessage (& event);
+					DispatchMessage (& event);
 				}
 			}
 		} while (my clickedButtonId == -1);

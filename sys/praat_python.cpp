@@ -505,7 +505,7 @@ static void ensure_helper_module (const std::filesystem::path& tempDir) {
 		       "        f.write(script_text.strip() + '\\n')\n\n"
 		       "def call(command_name, *args):\n"
 		       "    \"\"\"Calls any native Praat command (e.g. To Pitch, To Formant, Filter, Rename, Draw).\"\"\"\n"
-		       "    cmd_clean = command_name.rstrip('.')\n"
+		       "    cmd_clean = command_name[:-3] if command_name.endswith('...') else command_name\n"
 		       "    if args:\n"
 		       "        arg_strs = []\n"
 		       "        for arg in args:\n"
@@ -561,12 +561,15 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			std::filesystem::remove (commandsPath);
 	} catch (...) {}
 
-	// Record currently selected objects
+	// Record currently selected objects (list indices for iteration, unique IDs for Praat commands)
+	std::vector<integer> selectedIndices;
 	std::vector<integer> selectedIds;
 	if (theCurrentPraatObjects && theCurrentPraatObjects -> totalSelection > 0) {
 		for (integer iobj = 1; iobj <= theCurrentPraatObjects -> n; iobj ++) {
-			if (theCurrentPraatObjects -> list [iobj]. isSelected)
-				selectedIds.push_back (iobj);
+			if (theCurrentPraatObjects -> list [iobj]. isSelected) {
+				selectedIndices.push_back (iobj);
+				selectedIds.push_back (theCurrentPraatObjects -> list [iobj]. id);
+			}
 		}
 	}
 
@@ -576,15 +579,20 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 	if (jsonOfs.is_open()) {
 		jsonOfs << "{\n  \"selected_objects\": [\n";
 		bool first = true;
-		for (integer iobj : selectedIds) {
+		for (integer iobj : selectedIndices) {
 			Daata object = theCurrentPraatObjects -> list [iobj]. object;
 			if (! object) continue;
+			integer objId = theCurrentPraatObjects -> list [iobj]. id;
+			conststring32 pureName = (object -> name && object -> name [0] != U'\0')
+				? object -> name.get()
+				: theCurrentPraatObjects -> list [iobj]. name.get();
 
 			if (! first) jsonOfs << ",\n";
 			first = false;
 
 			char32 sanitizedBaseName [128];
-			str32cpy (sanitizedBaseName, theCurrentPraatObjects -> list [iobj]. name.get());
+			str32ncpy (sanitizedBaseName, pureName ? pureName : U"object", 127);
+			sanitizedBaseName [127] = U'\0';
 			for (char32 *p = sanitizedBaseName; *p != U'\0'; p ++) {
 				if (*p == U' ' || *p == U'\\' || *p == U'/' || *p == U':' || *p == U'*' || *p == U'?' || *p == U'"' || *p == U'<' || *p == U'>' || *p == U'|')
 					*p = U'_';
@@ -597,7 +605,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			const char32 *ext = isSound ? U".wav" : (isTextGrid ? U".TextGrid" : U".ooTextFile");
 
 			autoMelderString objFileName;
-			MelderString_append (& objFileName, iobj, U"_", sanitizedBaseName, ext);
+			MelderString_append (& objFileName, objId, U"_", sanitizedBaseName, ext);
 			autostring8 objFileName8 = Melder_32to8 (objFileName.string);
 			std::filesystem::path objPath = tempDir / (objFileName8 ? objFileName8.get() : "obj");
 			std::string objPathStr = path_to_utf8 (objPath);
@@ -615,14 +623,12 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 							MelderString_appendCharacter (& escapedObjPath, *p);
 					}
 				}
-				MelderString_append (& saveCmd, U"selectObject: ", iobj, U"\nSave as WAV file: \"", escapedObjPath.string, U"\"\n");
+				MelderString_append (& saveCmd, U"selectObject: ", objId, U"\nSave as WAV file: \"", escapedObjPath.string, U"\"\n");
 				try {
 					praat_executeScriptFromText_withFullTrust (saveCmd.string);
-				} catch (...) {
-					structMelderFile objMelderFile { };
-					Melder_pathToFile (objPath32.get(), & objMelderFile);
-					try { Data_writeToTextFile (object, & objMelderFile); } catch (...) {}
-				}
+				} catch (MelderError) {
+					Melder_clearError ();
+				} catch (...) {}
 			} else {
 				structMelderFile objMelderFile { };
 				autostring32 objPath32 = Melder_8to32_e (objPathStr.c_str());
@@ -632,11 +638,11 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 				} catch (...) {}
 			}
 
-			autostring8 utf8Name = Melder_32to8 (theCurrentPraatObjects -> list [iobj]. name.get());
+			autostring8 utf8Name = Melder_32to8 (pureName ? pureName : U"");
 			autostring8 utf8Class = Melder_32to8 (className);
 
 			jsonOfs << "    {\n"
-			        << "      \"id\": " << iobj << ",\n"
+			        << "      \"id\": " << objId << ",\n"
 			        << "      \"name\": \"" << escape_json_string (utf8Name ? utf8Name.get() : "") << "\",\n"
 			        << "      \"class\": \"" << escape_json_string (utf8Class ? utf8Class.get() : "") << "\",\n"
 			        << "      \"file\": \"" << escape_json_string (objPathStr) << "\"\n"
@@ -819,6 +825,29 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 		std::string safePyExec = pyExec8 ? pyExec8.get() : "python3";
 		std::string safeFilePath = filePath8 ? filePath8.get() : "";
 
+		std::string cwdStr;
+		if (optionalWorkingDir && optionalWorkingDir [0] != U'\0') {
+			autostring8 optCwd8 = Melder_32to8 (optionalWorkingDir);
+			if (optCwd8 && optCwd8.get() [0] != '\0') {
+				std::filesystem::path p = optCwd8.get();
+				if (std::filesystem::is_directory (p))
+					cwdStr = p.string();
+				else if (p.has_parent_path())
+					cwdStr = p.parent_path().string();
+			}
+		}
+		if (cwdStr.empty()) {
+			std::filesystem::path scriptDirPath = std::filesystem::path (safeFilePath).parent_path();
+			if (! scriptDirPath.empty())
+				cwdStr = scriptDirPath.string();
+		}
+
+		std::string escapedCwd;
+		for (char c : cwdStr) {
+			if (c == '\'') escapedCwd += "'\\''";
+			else escapedCwd += c;
+		}
+
 		std::string escapedPyExec;
 		for (char c : safePyExec) {
 			if (c == '\'') escapedPyExec += "'\\''";
@@ -830,7 +859,10 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			else escapedFilePath += c;
 		}
 
-		std::string cmd = "'" + escapedPyExec + "' '" + escapedFilePath + "' 2>&1";
+		std::string cmd;
+		if (! escapedCwd.empty())
+			cmd = "cd '" + escapedCwd + "' && ";
+		cmd += "'" + escapedPyExec + "' '" + escapedFilePath + "' 2>&1";
 
 		std::string outputAccum;
 		FILE *pipe = popen (cmd.c_str(), "r");
@@ -893,7 +925,7 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			std::vector<std::filesystem::path> filesToImport;
 			for (const auto& entry : std::filesystem::directory_iterator (outputDir)) {
 				if (entry.is_regular_file()) {
-					std::string fname = entry.path().filename().string();
+					std::string fname = path_to_utf8 (entry.path().filename());
 					if (! fname.empty() && fname[0] != '.') {
 						filesToImport.push_back (entry.path());
 					}
@@ -1028,11 +1060,14 @@ autostring32 praat_python_generateAgentPrompt () {
 			}
 
 			Daata object = theCurrentPraatObjects -> list [iobj]. object;
-			conststring32 name = theCurrentPraatObjects -> list [iobj]. name.get();
+			integer objId = theCurrentPraatObjects -> list [iobj]. id;
+			conststring32 name = (object && object -> name && object -> name [0] != U'\0')
+				? object -> name.get()
+				: theCurrentPraatObjects -> list [iobj]. name.get();
 			conststring32 className = (object ? Thing_className (object) : U"Unknown");
 			bool isSelected = theCurrentPraatObjects -> list [iobj]. isSelected;
 
-			MelderString_append (& prompt, U"  ", (isSelected ? U"▶" : U"•"), U" [ID ", iobj, U"] ", className, U" \"", (name ? name : U""), U"\"");
+			MelderString_append (& prompt, U"  ", (isSelected ? U"▶" : U"•"), U" [ID ", objId, U"] ", className, U" \"", (name ? name : U""), U"\"");
 
 			if (object) {
 				if (str32equ (className, U"Sound")) {

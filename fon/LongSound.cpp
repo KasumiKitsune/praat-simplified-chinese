@@ -677,7 +677,25 @@ void LongSound_playPart (LongSound me, double startTime, double endTime, Sound_P
 			}
 			if (thy playCallback)
 				thy playCallback (thy playBoss, 1, startTime, endTime, startTime);
-			MelderAudio_play16 (resampledBuffer, newSampleRate, silenceBefore + newN + silenceAfter, my numberOfChannels, melderPlayCallback, thee);
+			if (fabs (thy speed - 1.0) > 0.01) {
+				integer stretchedN = 0;
+				autovector <int16> stretched = Sound_wsolaStretch (
+					resampledBuffer + silenceBefore * my numberOfChannels,
+					newN,
+					my numberOfChannels,
+					newSampleRate,
+					thy speed,
+					& stretchedN
+				);
+				Melder_free (thy resampledBuffer);
+				thy resampledBuffer = Melder_calloc (int16, (silenceBefore + stretchedN + silenceAfter) * my numberOfChannels);
+				memcpy (thy resampledBuffer + silenceBefore * my numberOfChannels,
+						stretched.asArgumentToFunctionThatExpectsZeroBasedArray(),
+						stretchedN * sizeof (int16) * my numberOfChannels);
+				MelderAudio_play16 (thy resampledBuffer, newSampleRate, silenceBefore + stretchedN + silenceAfter, my numberOfChannels, melderPlayCallback, thee);
+			} else {
+				MelderAudio_play16 (resampledBuffer, newSampleRate, silenceBefore + newN + silenceAfter, my numberOfChannels, melderPlayCallback, thee);
+			}
 		}
 		//Melder_free (thy resampledBuffer);   // cannot do that, because MelderAudio_play16 isn't necessarily synchronous
 	} catch (MelderError) {

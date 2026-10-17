@@ -981,7 +981,7 @@ static conststring32 theModelFilePath (conststring32 modelName) {
 #if defined (_WIN32)
 	conststring32 portableFolder = thePortableWhisperModelsFolder ();
 	if (portableFolder && portableFolder [0] != U'\0') {
-		conststring32 path1 = Melder_cat (portableFolder, U"\\", modelName);
+		conststring32 path1 = Melder_cat (portableFolder, Melder_DIRECTORY_SEPARATOR, modelName);
 		structMelderFile f1 { };
 		Melder_pathToFile (path1, & f1);
 		if (MelderFile_exists (& f1))
@@ -990,13 +990,13 @@ static conststring32 theModelFilePath (conststring32 modelName) {
 #endif
 	conststring32 prefsFolder = theWhisperModelsFolder ();
 	if (prefsFolder && prefsFolder [0] != U'\0') {
-		conststring32 path2 = Melder_cat (prefsFolder, U"\\", modelName);
+		conststring32 path2 = Melder_cat (prefsFolder, Melder_DIRECTORY_SEPARATOR, modelName);
 		structMelderFile f2 { };
 		Melder_pathToFile (path2, & f2);
 		if (MelderFile_exists (& f2))
 			return path2;
 	}
-	return Melder_cat (theWhisperModelsFolder(), U"\\", modelName);
+	return Melder_cat (theWhisperModelsFolder(), Melder_DIRECTORY_SEPARATOR, modelName);
 }
 
 static conststring32 theWhisperModelsFolder () {

@@ -42,6 +42,7 @@
 #include "Printer.h"
 #include "ScriptEditor.h"
 #include "NotebookEditor.h"
+#include "PythonScriptEditor.h"
 #include "Strings_.h"
 #include "praat_python.h"
 #include "../kar/UnicodeData.h"
@@ -929,7 +930,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* isModified */, void * /* buttonClosure */, Editor /* optionalEditor */)
 {
 	const bool youHaveObjectsInYourList = ( theCurrentPraatObjects -> n > 0 );
-	const bool youHaveUnsavedScriptsOrNotebooks = ( ScriptEditors_dirty () || NotebookEditors_dirty () );
+	const bool youHaveUnsavedScriptsOrNotebooks = ( ScriptEditors_dirty () || NotebookEditors_dirty () || PythonScriptEditors_dirty () );
 	if ((! youHaveObjectsInYourList && ! youHaveUnsavedScriptsOrNotebooks) || theCurrentPraatApplication -> batch) {
 		praat_exit (0);
 		return;

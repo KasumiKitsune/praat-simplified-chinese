@@ -8429,6 +8429,7 @@ static const char32* praat_translate_internal (const char32* text, const char* c
 	}
 	std::u32string key(text);
 	if (g_language_choice == 0) {
+		std::lock_guard<std::mutex> lock(g_cache_mutex);
 		ensure_reverse_translation_map ();
 		auto it_reverse = g_reverse_translation_map.find(key);
 		if (it_reverse != g_reverse_translation_map.end()) {
@@ -8439,6 +8440,11 @@ static const char32* praat_translate_internal (const char32* text, const char* c
 
 	{
 		std::lock_guard<std::mutex> lock(g_cache_mutex);
+		static int s_cached_language = -1;
+		if (s_cached_language != g_language_choice) {
+			g_dynamic_cache.clear();
+			s_cached_language = g_language_choice;
+		}
 		auto it_cache = g_dynamic_cache.find(key);
 		if (it_cache != g_dynamic_cache.end()) {
 			return it_cache->second.c_str();
