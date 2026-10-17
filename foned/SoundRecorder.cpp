@@ -396,16 +396,24 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 					double yBottom = y1w + (y2w - y1w) * (double)(numRows - 1 - row) / numRows;
 					double yTop = y1w + (y2w - y1w) * (double)(numRows - row) / numRows;
 					Graphics_setViewport (my graphics.get(), x1w, x2w, yBottom, yTop);
-					Sound_draw (sound, my graphics.get(), tmin, tmax, 0.0, 0.0, true, U"curve");
+					Sound_draw (sound, my graphics.get(), tmin, tmax, 0.0, 0.0, false, U"curve");
 				}
 			}
 
+			Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
+			Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
+			Graphics_setTextAlignment (my graphics.get(), Graphics_LEFT, Graphics_TOP);
+			Graphics_setFont (my graphics.get(), kGraphics_font::HELVETICA);
+			Graphics_setFontSize (my graphics.get(), 9.0);
+			Graphics_setColour (my graphics.get(), MelderColour (0.392, 0.455, 0.545));
+			Graphics_text (my graphics.get(), 0.02, 0.98, Melder_cat (praat_translate (U"Take "), Melder_integer (sel), U": ", Thing_getName (sound)));
+			Graphics_setTextAlignment (my graphics.get(), Graphics_RIGHT, Graphics_TOP);
 			if (totalDuration > 30.0) {
-				Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
-				Graphics_setWindow (my graphics.get(), 0.0, 1.0, 0.0, 1.0);
-				Graphics_setTextAlignment (my graphics.get(), Graphics_RIGHT, Graphics_TOP);
 				Graphics_setColour (my graphics.get(), Melder_RED);
 				Graphics_text (my graphics.get(), 0.98, 0.98, Melder_cat (U"(前30秒预览 / 总长 ", Melder_fixed (totalDuration, 1), U"s)"));
+			} else {
+				Graphics_setColour (my graphics.get(), MelderColour (0.392, 0.455, 0.545));
+				Graphics_text (my graphics.get(), 0.98, 0.98, Melder_cat (praat_translate (U"Duration: "), Melder_fixed (totalDuration, 2), U" s  [点击切换电平表]"));
 			}
 
 			Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
@@ -658,7 +666,17 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 				my firstSample = my lastSample - 3000;
 				Melder_clipLeft (0_integer, & my firstSample);
 				GuiScale_setValue (my progressScale, 1000.0 * ((double) my lastSample / (double) my nmax));
-				Graphics_updateWs (my graphics.get());
+				my monitorTick ++;
+				if ((my monitorTick % 2 == 0) && my graphics) {
+					if (my inputUsesPortAudio && my monitorSamples > 0) {
+						showMeter (me, my monitorBuffer, my monitorSamples);
+					} else {
+						integer nsamp = my lastSample - my firstSample;
+						if (nsamp > 0)
+							showMeter (me, & my recordBuffer [1 + my firstSample * my numberOfChannels], nsamp);
+					}
+					Graphics_updateWs (my graphics.get());
+				}
 			} else {
 				#if defined (_WIN32)
 					if (my inputUsesPortAudio) {
@@ -806,7 +824,11 @@ static void startRecording (SoundRecorder me) {
 			return;
 		if (my isPlayingSound || my isPausedSound)
 			stopSoundRecorderPlayback (me);
+		if (my takeList)
+			GuiList_deselectAllItems (my takeList);
 		my nsamp = 0;
+		my firstSample = 0;
+		my lastSample = 0;
 		my lastLeftMaximum = 0;
 		my lastRightMaximum = 0;
 		if (! my synchronous) {
@@ -1607,7 +1629,15 @@ static void gui_drawingarea_cb_expose (SoundRecorder me, GuiDrawingArea_ExposeEv
 	if (! my graphics)
 		return;   // could be the case in the very beginning
 	if (my recording) {
-		showMeter (me, & my recordBuffer [1 + my firstSample * my numberOfChannels], my lastSample - my firstSample);
+		if (my inputUsesPortAudio && my monitorSamples > 0)
+			showMeter (me, my monitorBuffer, my monitorSamples);
+		else {
+			integer nsamp = my lastSample - my firstSample;
+			if (nsamp > 0)
+				showMeter (me, & my recordBuffer [1 + my firstSample * my numberOfChannels], nsamp);
+			else
+				showMeter (me, nullptr, 0);
+		}
 	} else {
 		integer sel = getSelectedTakeIndex (me);
 		if (sel >= 1 && sel <= my recordedSounds.size)
@@ -1616,6 +1646,25 @@ static void gui_drawingarea_cb_expose (SoundRecorder me, GuiDrawingArea_ExposeEv
 			showMeter (me, my monitorBuffer, my monitorSamples);
 		else
 			showMeter (me, nullptr, 0);
+	}
+}
+
+static void gui_drawingarea_cb_mouse (SoundRecorder me, GuiDrawingArea_MouseEvent event) {
+	if (event -> isClick()) {
+		if (my recording)
+			return;
+		integer sel = getSelectedTakeIndex (me);
+		if (sel > 0) {
+			if (my takeList)
+				GuiList_deselectAllItems (my takeList);
+		} else if (my recordedSounds.size > 0) {
+			if (my takeList)
+				GuiList_selectItem (my takeList, my recordedSounds.size);
+		}
+		if (my graphics) {
+			showMeter (me, nullptr, 0);
+			Graphics_updateWs (my graphics.get());
+		}
 	}
 }
 
@@ -1657,7 +1706,7 @@ void structSoundRecorder :: v_createChildren ()
 	*/
 	GuiLabel_createShown (our windowForm, 230, -170, y, y + Gui_LABEL_HEIGHT, U"Meter", GuiLabel_CENTRE);
 	our meter = GuiDrawingArea_createShown (our windowForm, 230, -170, y + Gui_LABEL_HEIGHT + 2, -145,
-		gui_drawingarea_cb_expose, nullptr,
+		gui_drawingarea_cb_expose, gui_drawingarea_cb_mouse,
 		nullptr, gui_drawingarea_cb_resize, nullptr, this, 0
 	);
 
