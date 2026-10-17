@@ -31,11 +31,10 @@
   <link rel="icon" type="image/png" sizes="48x48" href="https://kasumikitsune.github.io/praat-simplified-chinese/pictures/icon-48.png">
   <link rel="apple-touch-icon" sizes="180x180" href="https://kasumikitsune.github.io/praat-simplified-chinese/pictures/apple-touch-icon.png">
 
-  <!-- Web Icons & Fonts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;700;900&family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
 
   <!-- Structured Data / JSON-LD -->
   <script type="application/ld+json">
@@ -83,975 +82,2121 @@
 
   <style>
     :root {
-      --paper: #f5f2ea;
-      --card: #fffdf8;
-      --ink: #17161a;
-      --ink-2: #4a4750;
-      --ink-3: #85818a;
-      --line: #ddd7c8;
+      /* Swiss Archival / Acoustic Instrument Palette */
+      --bg: #f3f1ec;
+      --surface: #faf9f5;
+      --surface-alt: #eae6dd;
+      --ink: #141413;
+      --ink-2: #464440;
+      --ink-3: #78746d;
+      --rule: #d5d0c5;
+      --rule-strong: #141413;
 
-      /* Praat analysis colours: pitch / formant / intensity */
-      --blue: #2b59ff;
-      --red: #e5484d;
-      --yellow: #f7c948;
+      /* Signal Vermilion (Formant / Acoustic Marker) */
+      --signal: #c43b27;
+      --signal-bg: rgba(196, 59, 39, 0.07);
 
-      --scroll-thumb: #b8b2a3;
-      --scroll-thumb-hover: var(--blue);
-      --scroll-thumb-active: var(--red);
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Segoe UI", sans-serif;
+      --font-serif: "Noto Serif SC", "Songti SC", serif;
+      --font-mono: "IBM Plex Mono", Consolas, monospace;
 
-      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      --font-display: "Noto Serif SC", "Spectral", "Songti SC", serif;
-      --font-mono: "IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
-      --topbar: 60px;
+      --header-h: 56px;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    ::selection { background: var(--yellow); color: var(--ink); }
-
-    /* ============ Custom Styled Scrollbars ============ */
-    /* Modern standard (Firefox, Chrome/Edge 121+, Safari 18+) */
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: var(--scroll-thumb) var(--paper);
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    /* WebKit & Chromium-based browsers */
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--paper);
-      border-left: 1px solid var(--line);
-    }
-
-    ::-webkit-scrollbar-track:horizontal {
-      border-left: none;
-      border-top: 1px solid var(--line);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background-color: var(--scroll-thumb);
-      border-radius: 99px;
-      border: 2.5px solid transparent;
-      background-clip: padding-box;
-      transition: background-color .15s ease;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background-color: var(--scroll-thumb-hover);
-    }
-
-    ::-webkit-scrollbar-thumb:active {
-      background-color: var(--scroll-thumb-active);
-    }
-
-    ::-webkit-scrollbar-corner {
-      background: var(--paper);
-    }
-
-    ::-webkit-scrollbar-button {
-      display: none;
-      width: 0;
-      height: 0;
-    }
-
-    body {
-      font-family: var(--font-ui);
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
       font-size: 15px;
       line-height: 1.65;
-      color: var(--ink);
-      background-color: var(--paper);
-      /* graph-paper grid */
-      background-image:
-        linear-gradient(rgba(23,22,26,.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(23,22,26,.045) 1px, transparent 1px);
-      background-size: 28px 28px;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    a { color: inherit; text-decoration: none; }
-    button { font-family: inherit; cursor: pointer; }
-    img { max-width: 100%; }
-    :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    ::selection {
+      background: var(--ink);
+      color: var(--bg);
+    }
 
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-    section { scroll-margin-top: calc(var(--topbar) + 8px); }
+    /* Minimal Architectural Scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink-3) var(--bg);
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--ink-3); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ink); }
 
-    /* ============ Top bar with TextGrid-style tier nav ============ */
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    section {
+      scroll-margin-top: var(--header-h);
+    }
+
+    /* ============ Structural Grid Frame ============ */
+    .sheet {
+      max-width: 1240px;
+      margin: 0 auto;
+      border-left: 1px solid var(--rule);
+      border-right: 1px solid var(--rule);
+      background: var(--bg);
+    }
+
+    /* ============ Top Navigation Bar ============ */
     .topbar {
-      position: sticky; top: 0; z-index: 60;
-      height: var(--topbar);
-      background: rgba(245, 242, 234, .92);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1.5px solid var(--ink);
-    }
-    .topbar-in {
-      max-width: 1180px; height: 100%; margin: 0 auto; padding: 0 24px;
-      display: flex; align-items: center; gap: 24px;
-    }
-    .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 900; font-size: 17px; white-space: nowrap; }
-    .brand img { width: 30px; height: 30px; object-fit: contain; }
-
-    .tier {
-      position: relative; flex: 1; max-width: 540px; margin-left: auto;
-      display: flex; height: 38px;
-      border: 1.5px solid var(--ink); background: var(--card);
-    }
-    .tier a {
-      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
-      font-size: 13px; font-weight: 600; color: var(--ink-2);
-      border-left: 1px solid var(--ink);
-      transition: background .15s, color .15s;
-    }
-    .tier a:first-child { border-left: none; }
-    .tier a:hover { background: rgba(247, 201, 72, .35); color: var(--ink); }
-    .tier a.active { background: var(--yellow); color: var(--ink); }
-    .tier a i { font-size: 11px; opacity: .7; }
-    .playhead {
-      position: absolute; top: -6px; bottom: -6px; left: 0; width: 2px;
-      background: var(--red); pointer-events: none; z-index: 2;
-    }
-    .playhead::before {
-      content: ""; position: absolute; top: -1px; left: -4px;
-      border: 5px solid transparent; border-top: 7px solid var(--red); border-bottom: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--header-h);
+      background: rgba(243, 241, 236, 0.94);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--rule-strong);
     }
 
-    .top-actions { display: flex; gap: 8px; }
-    .icon-btn {
-      width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
-      border: 1.5px solid var(--ink); border-radius: 50%; background: var(--card); color: var(--ink);
-      font-size: 15px; transition: transform .15s, background .15s;
-    }
-    .icon-btn:hover { background: var(--yellow); transform: rotate(-8deg); }
-
-    /* ============ Buttons ============ */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 11px 20px; font-size: 14px; font-weight: 700;
-      border: 1.5px solid var(--ink); border-radius: 8px;
-      background: var(--card); color: var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
-      transition: transform .12s, box-shadow .12s, background .15s;
-    }
-    .btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
-    .btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
-    .btn.primary { background: var(--ink); color: #fff; box-shadow: 3px 3px 0 var(--blue); }
-    .btn.primary:hover { box-shadow: 5px 5px 0 var(--blue); }
-    .btn.primary:active { box-shadow: 0 0 0 var(--blue); }
-    .btn.block { width: 100%; }
-    .btn.small { padding: 9px 14px; font-size: 13px; }
-
-    /* ============ Hero with live spectrogram ============ */
-    .hero { position: relative; overflow: hidden; border-bottom: 1.5px solid var(--ink); }
-    #spec { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: .5; }
-    .hero::after {
-      content: ""; position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(90deg, var(--paper) 0%, rgba(245,242,234,.85) 38%, transparent 75%);
-    }
-    .hero-inner { position: relative; z-index: 2; padding: 84px 0 96px; display: grid; gap: 22px; max-width: 640px; }
-    .hero-logo { width: 88px; height: 88px; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(23,22,26,.18)); }
-    .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
-    .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: blink 1.4s infinite; }
-    @keyframes blink { 50% { opacity: .25; } }
-    .hero h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(46px, 9vw, 92px); line-height: 1.05; letter-spacing: -.01em; }
-    .hero h1 mark { background: linear-gradient(transparent 58%, var(--yellow) 58%); color: inherit; padding: 0 .06em; }
-    .hero p.lead { font-size: 16.5px; color: var(--ink-2); max-width: 540px; }
-    .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
-    .hero-hint {
-      position: absolute; z-index: 2; right: 24px; bottom: 16px;
-      font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);
+    .topbar-inner {
+      max-width: 1240px;
+      height: 100%;
+      margin: 0 auto;
+      border-left: 1px solid var(--rule);
+      border-right: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: stretch;
     }
 
-    /* ============ Section headings ============ */
-    .sec { padding: 76px 0 8px; }
-    .sec-head { display: grid; gap: 10px; margin-bottom: 14px; }
-    .sec-no { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; color: var(--blue); }
-    .sec-head h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(26px, 4vw, 38px); line-height: 1.25; display: flex; align-items: center; gap: 14px; }
-    .sec-head h2 i { font-size: .6em; color: var(--red); }
-    .sec-head p { color: var(--ink-2); max-width: 680px; }
-    .ruler {
-      height: 14px; margin-bottom: 34px;
-      background:
-        repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 80px) 0 0 / 100% 14px no-repeat,
-        repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 16px) 0 100% / 100% 7px no-repeat;
-      border-top: 1.5px solid var(--ink); opacity: .55;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      border-right: 1px solid var(--rule);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.02em;
     }
 
-    /* ============ Features ============ */
-    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding-top: 56px; }
-    .feat {
-      --c: var(--blue);
-      position: relative; padding: 22px 20px 20px;
-      background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px;
-      transition: transform .18s, box-shadow .18s;
+    .brand img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
     }
-    .feat:nth-child(3n+2) { --c: var(--red); }
-    .feat:nth-child(3n) { --c: var(--yellow); }
-    .feat:hover { transform: translate(-2px, -3px); box-shadow: 5px 6px 0 var(--c); }
-    .feat-no {
-      position: absolute; top: -11px; left: 16px; padding: 1px 9px;
-      font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .1em;
-      background: var(--c); color: var(--ink); border: 1.5px solid var(--ink); border-radius: 99px;
-    }
-    .feat:nth-child(3n+1) .feat-no, .feat:nth-child(3n+2) .feat-no { color: #fff; }
-    .feat h3 { font-size: 15.5px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 9px; }
-    .feat h3 i { font-size: 14px; color: var(--ink-2); }
-    .feat p { font-size: 13.5px; color: var(--ink-2); line-height: 1.7; }
-    .feat.wide { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr; gap: 6px 26px; align-items: center; }
-    .feat.wide h3 { margin: 0; font-size: 17px; }
-    .feat.wide .bars { display: none; }
 
-    /* mini equaliser on hover */
-    .bars { display: flex; align-items: flex-end; gap: 3px; height: 16px; margin-top: 14px; }
-    .bars span { width: 3px; height: 4px; background: var(--c); border-radius: 2px; transition: height .2s; }
-    .feat:hover .bars span { animation: eq .7s ease-in-out infinite alternate; }
-    .bars span:nth-child(2n) { animation-delay: .12s !important; }
-    .bars span:nth-child(3n) { animation-delay: .27s !important; }
-    @keyframes eq { from { height: 3px; } to { height: 16px; } }
+    .brand-ver {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-3);
+      padding-left: 8px;
+      border-left: 1px solid var(--rule);
+    }
 
-    /* ============ Screenshot frames ============ */
-    .shot { border: 1.5px solid var(--ink); border-radius: 12px; overflow: hidden; background: var(--card); box-shadow: 6px 6px 0 rgba(23,22,26,.9); margin-bottom: 40px; }
-    .shot-bar { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--paper); border-bottom: 1.5px solid var(--ink); }
-    .dots { display: flex; gap: 6px; }
-    .dots i { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--ink); }
-    .dots i:nth-child(1) { background: var(--red); }
-    .dots i:nth-child(2) { background: var(--yellow); }
-    .dots i:nth-child(3) { background: var(--blue); }
-    .shot-name { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .shot-body { position: relative; display: block; padding: 14px; text-align: center; cursor: zoom-in; background:
-      repeating-conic-gradient(#f0ece0 0 25%, #f8f5ec 0 50%) 0 0 / 18px 18px; }
-    .shot-body img { max-height: 440px; border: 1px solid var(--line); border-radius: 6px; background: #fff; transition: transform .25s; }
-    .shot-body:hover img { transform: scale(1.012); }
-    .zoom-badge {
-      position: absolute; right: 22px; bottom: 22px; display: flex; align-items: center; gap: 6px;
-      padding: 5px 12px; font-size: 12px; font-weight: 600; color: #fff;
-      background: var(--ink); border-radius: 99px; pointer-events: none; transition: transform .2s;
+    .nav-links {
+      display: flex;
+      align-items: stretch;
+      padding-left: 8px;
     }
-    .shot-body:hover .zoom-badge { transform: scale(1.06); }
 
-    /* ============ Download ============ */
-    .notice {
-      display: flex; gap: 14px; align-items: center; padding: 14px 18px; margin-bottom: 26px;
-      border: 1.5px dashed var(--blue); border-radius: 10px; background: rgba(43, 89, 255, .06);
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-size: 13.5px;
+      color: var(--ink-2);
+      position: relative;
+      transition: color 0.15s;
     }
-    .notice > i { font-size: 22px; color: var(--blue); }
-    .notice b.t { display: block; font-size: 14px; color: var(--blue); }
-    .notice span { font-size: 13px; color: var(--ink-2); }
 
-    .dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .dl {
-      position: relative; display: flex; flex-direction: column; padding: 22px;
-      background: var(--card); border: 1.5px solid var(--ink); border-radius: 12px;
-      transition: transform .18s, box-shadow .18s;
+    .nav-links a .idx {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--ink-3);
+      margin-right: 6px;
     }
-    .dl:hover { transform: translate(-2px, -3px); box-shadow: 5px 6px 0 var(--ink); }
-    .dl.featured { box-shadow: 6px 6px 0 var(--blue); }
-    .dl.featured:hover { box-shadow: 8px 9px 0 var(--blue); }
-    .dl.featured::after {
-      content: "推荐"; position: absolute; top: -12px; right: 18px; padding: 2px 12px;
-      font-size: 12px; font-weight: 700; background: var(--yellow); border: 1.5px solid var(--ink); border-radius: 99px;
-    }
-    .dl-head { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 800; }
-    .dl-head i { font-size: 22px; }
-    .dl-meta { display: flex; align-items: center; gap: 8px; margin: 6px 0 12px; font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-3); }
-    .dl-meta i { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-3); }
-    .dl-desc { font-size: 13.5px; color: var(--ink-2); margin-bottom: 18px; flex: 1; }
-    .dl-btns { display: grid; gap: 10px; }
-    .pan-row { display: flex; gap: 8px; }
-    .pan-row .btn { flex: 1; box-shadow: none; font-weight: 600; }
-    .pan-row .btn:hover { box-shadow: 3px 3px 0 var(--ink); }
-    .copy-code {
-      display: inline-flex; align-items: center; gap: 7px; padding: 0 14px;
-      font-size: 12px; color: var(--ink-2); background: var(--paper);
-      border: 1.5px dashed var(--ink); border-radius: 8px; transition: all .15s;
-    }
-    .copy-code code { font-family: var(--font-mono); font-weight: 600; color: var(--blue); font-size: 13px; }
-    .copy-code:hover { background: var(--yellow); }
-    .copy-code.copied { background: #d6f5dd; border-style: solid; }
-    .copy-code.copied code { color: #16663a; }
 
-    .tips { margin-top: 34px; padding: 24px 26px; background: var(--card); border: 1.5px solid var(--ink); border-radius: 12px; }
-    .tips-head { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; margin-bottom: 16px; }
-    .tips-head i { color: var(--red); }
-    .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 32px; }
-    .tip { font-size: 13.5px; color: var(--ink-2); }
-    .tip strong { display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: var(--ink); margin-bottom: 4px; }
-    .tip.full { grid-column: 1 / -1; padding-top: 16px; border-top: 1.5px dashed var(--line); }
-    .tip code { font-family: var(--font-mono); font-size: 12px; padding: 1px 6px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; color: var(--ink); }
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--ink);
+      font-weight: 600;
+    }
 
-    /* ============ Split layouts (manual / recorder) ============ */
-    .split { display: grid; grid-template-columns: 320px 1fr; gap: 40px; align-items: start; }
-    .split .lead { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.8; margin-bottom: 22px; }
-    .outline { padding: 18px 20px; background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; counter-reset: ol; }
-    .outline-title { font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; letter-spacing: .12em; color: var(--blue); margin-bottom: 12px; }
-    .outline ul { list-style: none; display: grid; gap: 10px; }
-    .outline li { display: flex; gap: 10px; font-size: 13.5px; color: var(--ink-2); counter-increment: ol; line-height: 1.5; }
-    .outline li::before { content: counter(ol, decimal-leading-zero); font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; color: var(--red); padding-top: 1px; }
+    .nav-links a.active::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 0;
+      height: 2px;
+      background: var(--signal);
+    }
 
-    /* Recorder demo */
-    .rec-demo { margin-top: 22px; padding: 18px; background: var(--ink); color: #fff; border-radius: 12px; }
-    .rec-btn {
-      width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 13px; font-size: 14px; font-weight: 700; color: #fff; background: transparent;
-      border: 1.5px solid rgba(255,255,255,.4); border-radius: 8px; user-select: none; touch-action: none;
-      transition: background .15s, border-color .15s;
+    .topbar-meta {
+      display: flex;
+      align-items: stretch;
     }
-    .rec-btn:hover { border-color: #fff; }
-    .rec-btn.on { background: var(--red); border-color: var(--red); }
-    .rec-btn.on i { animation: blink .6s infinite; }
-    .rec-bars { display: flex; align-items: center; justify-content: space-between; height: 40px; margin: 14px 0 6px; }
-    .rec-bars span { width: 3px; height: 3px; border-radius: 2px; background: var(--yellow); transition: height .08s; }
-    .rec-list {
-      list-style: none; display: grid; gap: 4px; max-height: 120px; overflow-y: auto;
-      font-family: var(--font-mono); font-size: 12px;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,.28) transparent;
-    }
-    .rec-list::-webkit-scrollbar { width: 6px; }
-    .rec-list::-webkit-scrollbar-track { background: transparent; border: none; }
-    .rec-list::-webkit-scrollbar-thumb {
-      background-color: rgba(255,255,255,.25);
-      border-radius: 99px;
-      border: 1px solid transparent;
-      background-clip: padding-box;
-    }
-    .rec-list::-webkit-scrollbar-thumb:hover { background-color: var(--yellow); }
-    .rec-list li { display: flex; justify-content: space-between; padding: 5px 8px; background: rgba(255,255,255,.08); border-radius: 5px; animation: pop .25s ease; }
-    .rec-list li span:last-child { color: var(--yellow); }
-    @keyframes pop { from { opacity: 0; transform: translateY(-6px); } }
 
-    /* ============ Terms ============ */
-    .term-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-    .term-search { position: relative; flex: 1; }
-    .term-search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 13px; }
-    .term-search input {
-      width: 100%; padding: 11px 14px 11px 38px; font: inherit; font-size: 14px;
-      background: var(--card); color: var(--ink); border: 1.5px solid var(--ink); border-radius: 8px; outline: none;
-      transition: box-shadow .15s;
+    .topbar-link {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-left: 1px solid var(--rule);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-2);
+      transition: background 0.15s, color 0.15s;
     }
-    .term-search input:focus { box-shadow: 3px 3px 0 var(--blue); }
-    #term-count { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 
-    .term-wrap {
-      border: 1.5px solid var(--ink); border-radius: 12px; background: var(--card);
-      overflow: auto; max-height: 70vh;
-      scrollbar-width: thin;
-      scrollbar-color: var(--scroll-thumb) var(--card);
+    .topbar-link:hover {
+      background: var(--surface-alt);
+      color: var(--ink);
     }
-    .term-wrap::-webkit-scrollbar-track {
-      background: var(--card);
-      border-left: 1px solid var(--line);
-      border-top: 1px solid var(--line);
+
+    .topbar-cta {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      background: var(--ink);
+      color: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      transition: background 0.15s;
     }
-    .term-wrap::-webkit-scrollbar-corner { background: var(--card); }
-    .term-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 620px; }
-    .term-table th {
-      position: sticky; top: 0; z-index: 3; padding: 10px 16px; text-align: left; white-space: nowrap;
-      font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; letter-spacing: .1em;
-      background: var(--ink); color: #fff;
+
+    .topbar-cta:hover {
+      background: var(--signal);
     }
+
+    /* ============ Section Header Architecture ============ */
+    .sec-band {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      border-bottom: 1px solid var(--rule);
+      background: var(--surface);
+    }
+
+    .sec-index {
+      padding: 28px 24px;
+      border-right: 1px solid var(--rule);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      letter-spacing: 0.08em;
+    }
+
+    .sec-index strong {
+      color: var(--signal);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .sec-heading {
+      padding: 28px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .sec-heading h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(22px, 2.6vw, 30px);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    .sec-heading p {
+      color: var(--ink-2);
+      font-size: 14.5px;
+      max-width: 720px;
+    }
+
+    /* ============ 01. Hero & Interface Inspection Stage ============ */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .hero-main {
+      padding: 56px 40px 52px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-kicker {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      letter-spacing: 0.1em;
+      color: var(--signal);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-kicker::before {
+      content: "";
+      width: 24px;
+      height: 1px;
+      background: var(--signal);
+    }
+
+    .hero-title-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .hero-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .hero-main h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(40px, 5.5vw, 68px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-lead {
+      font-size: 16.5px;
+      color: var(--ink-2);
+      max-width: 660px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      padding-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 28px;
+      background: var(--ink);
+      color: var(--bg);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      transition: background 0.15s;
+    }
+
+    .action-primary:hover {
+      background: var(--signal);
+    }
+
+    .action-primary .arrow {
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .action-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-2);
+      border-bottom: 1px solid var(--ink-3);
+      padding-bottom: 2px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .action-text:hover {
+      color: var(--signal);
+      border-color: var(--signal);
+    }
+
+    /* Right Technical Spec Column in Hero */
+    .hero-specs {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .spec-list {
+      list-style: none;
+    }
+
+    .spec-list li {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .spec-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      color: var(--ink-3);
+      text-transform: uppercase;
+    }
+
+    .spec-val {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .spec-acoustic-wave {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .spec-acoustic-wave svg {
+      width: 100%;
+      height: 44px;
+      display: block;
+    }
+
+    /* Interface Inspection Stage (Dual Screenshot Switcher) */
+    .stage-bar {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--rule);
+      background: var(--surface);
+      flex-wrap: wrap;
+    }
+
+    .stage-tabs {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .stage-tab {
+      padding: 14px 28px;
+      border-right: 1px solid var(--rule);
+      font-size: 13.5px;
+      color: var(--ink-3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .stage-tab .num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .stage-tab:hover {
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    .stage-tab.active {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--bg);
+    }
+
+    .stage-tab.active .num {
+      color: var(--signal);
+    }
+
+    .stage-tab.active::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--signal);
+    }
+
+    .stage-caption-bar {
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+
+    .stage-viewport {
+      padding: 36px 40px;
+      border-bottom: 1px solid var(--rule-strong);
+      background-color: var(--bg);
+      background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+      background-size: 18px 18px;
+      text-align: center;
+      position: relative;
+    }
+
+    .stage-pane {
+      display: none;
+    }
+
+    .stage-pane.active {
+      display: block;
+    }
+
+    .figure-frame {
+      display: inline-block;
+      border: 1px solid var(--rule-strong);
+      background: #fff;
+      padding: 6px;
+      cursor: zoom-in;
+      position: relative;
+      transition: border-color 0.15s;
+    }
+
+    .figure-frame:hover {
+      border-color: var(--signal);
+    }
+
+    .figure-frame img {
+      max-height: 490px;
+      width: auto;
+      margin: 0 auto;
+    }
+
+    .figure-meta {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-2);
+      max-width: 880px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 4px;
+    }
+
+    .figure-zoom-hint {
+      color: var(--ink-3);
+      border-bottom: 1px dotted var(--ink-3);
+    }
+
+    .figure-frame:hover + .figure-meta .figure-zoom-hint {
+      color: var(--signal);
+      border-color: var(--signal);
+    }
+
+    /* ============ 02. Features Architectural Grid (7 Items) ============ */
+    .feat-matrix {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .feat-cell {
+      padding: 28px 24px 30px;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: background 0.15s;
+    }
+
+    .feat-cell:hover {
+      background: var(--surface);
+    }
+
+    .feat-cell:nth-child(4n) {
+      border-right: none;
+    }
+
+    .feat-cell.span-2 {
+      grid-column: span 2;
+      border-right: none;
+      background: var(--surface);
+    }
+
+    .feat-cell.no-bottom {
+      border-bottom: none;
+    }
+
+    .feat-idx {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--signal);
+      letter-spacing: 0.08em;
+    }
+
+    .feat-cell h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .feat-cell p {
+      font-size: 13.5px;
+      color: var(--ink-2);
+      line-height: 1.65;
+    }
+
+    /* ============ 03. Release & Distribution Matrix (Zero Button Hell) ============ */
+    .mirror-banner {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      border-bottom: 1px solid var(--rule);
+      background: var(--signal-bg);
+    }
+
+    .mirror-banner-tag {
+      padding: 14px 24px;
+      border-right: 1px solid var(--rule);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--signal);
+      display: flex;
+      align-items: center;
+    }
+
+    .mirror-banner-body {
+      padding: 14px 36px;
+      font-size: 13.5px;
+      color: var(--ink-2);
+    }
+
+    .mirror-banner-body b {
+      color: var(--ink);
+    }
+
+    /* Release Table Rows */
+    .release-matrix {
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .release-row {
+      display: grid;
+      grid-template-columns: 280px 1fr 220px 250px;
+      border-bottom: 1px solid var(--rule);
+      align-items: stretch;
+      transition: background 0.15s;
+    }
+
+    .release-row:last-child {
+      border-bottom: none;
+    }
+
+    .release-row:hover {
+      background: var(--surface);
+    }
+
+    .release-row.recommended {
+      background: var(--surface);
+    }
+
+    .rel-col-title {
+      padding: 24px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .rel-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .rel-badge {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--signal);
+      border: 1px solid var(--signal);
+      padding: 1px 6px;
+      letter-spacing: 0.06em;
+    }
+
+    .rel-spec {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+
+    .rel-col-desc {
+      padding: 24px 32px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--ink-2);
+    }
+
+    .rel-col-primary {
+      padding: 20px 24px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+    }
+
+    .dl-block-link {
+      width: 100%;
+      padding: 11px 16px;
+      background: var(--ink);
+      color: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s;
+    }
+
+    .dl-block-link:hover {
+      background: var(--signal);
+    }
+
+    .dl-block-link .ext {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      opacity: 0.85;
+    }
+
+    .rel-col-mirror {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .pan-link {
+      font-weight: 600;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-bottom: 1px solid var(--ink-3);
+      align-self: flex-start;
+      padding-bottom: 1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .pan-link:hover {
+      color: var(--signal);
+      border-color: var(--signal);
+    }
+
+    .pan-code-line {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .code-trigger {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      border-bottom: 1px dashed var(--ink-2);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .code-trigger:hover {
+      color: var(--signal);
+      border-color: var(--signal);
+    }
+
+    .code-trigger.copied {
+      color: var(--signal);
+      border-bottom-style: solid;
+    }
+
+    /* Setup & Troubleshooting 4-Cell Grid */
+    .tips-header-bar {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--rule);
+      background: var(--surface-alt);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+    }
+
+    .tips-matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .tip-cell {
+      padding: 24px 28px;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .tip-cell:nth-child(2n) {
+      border-right: none;
+    }
+
+    .tip-cell:nth-child(n+3) {
+      border-bottom: none;
+    }
+
+    .tip-cell strong {
+      display: block;
+      font-size: 14.5px;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .tip-cell p {
+      font-size: 13.5px;
+      color: var(--ink-2);
+      line-height: 1.65;
+    }
+
+    .tip-cell code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--surface-alt);
+      padding: 1px 5px;
+      color: var(--ink);
+    }
+
+    /* ============ 04. Manual & Recorder Deep Dive ============ */
+    .deep-split {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .deep-info {
+      padding: 36px 32px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .deep-lead {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+
+    .spec-idx-block {
+      border-top: 1px solid var(--rule-strong);
+    }
+
+    .spec-idx-title {
+      padding: 12px 0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--signal);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .spec-idx-list {
+      list-style: none;
+      counter-reset: item;
+    }
+
+    .spec-idx-list li {
+      counter-increment: item;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 13.5px;
+      color: var(--ink-2);
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .spec-idx-list li::before {
+      content: counter(item, decimal-leading-zero);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      flex-shrink: 0;
+    }
+
+    .deep-figure {
+      padding: 36px;
+      background-color: var(--surface);
+      background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+      background-size: 18px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .deep-figure .figure-frame img {
+      max-height: 400px;
+    }
+
+    .deep-figure .figure-meta {
+      width: 100%;
+    }
+
+    /* ============ 05. Terminology Index ============ */
+    .term-toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      border-bottom: 1px solid var(--rule-strong);
+      background: var(--surface);
+      align-items: stretch;
+    }
+
+    .term-search-cell {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-right: 1px solid var(--rule);
+    }
+
+    .term-search-prefix {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--signal);
+      margin-right: 12px;
+      white-space: nowrap;
+    }
+
+    .term-search-cell input {
+      width: 100%;
+      padding: 15px 0;
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .term-search-cell input::placeholder {
+      color: var(--ink-3);
+    }
+
+    .term-filter-strip {
+      display: flex;
+      align-items: stretch;
+      border-right: 1px solid var(--rule);
+    }
+
+    .term-filter-btn {
+      padding: 0 16px;
+      font-size: 12.5px;
+      color: var(--ink-3);
+      border-right: 1px solid var(--rule);
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .term-filter-btn:last-child {
+      border-right: none;
+    }
+
+    .term-filter-btn:hover {
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    .term-filter-btn.active {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--bg);
+      box-shadow: inset 0 -2px 0 var(--signal);
+    }
+
+    .term-count-cell {
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-3);
+      white-space: nowrap;
+    }
+
+    .term-scroll-box {
+      max-height: 640px;
+      overflow-y: auto;
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .term-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: var(--ink);
+      color: var(--bg);
+      padding: 11px 20px;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+
     .term-group td {
-      position: sticky; top: 38px; z-index: 2; padding: 8px 16px;
-      font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; letter-spacing: .14em;
-      background: var(--yellow); border-bottom: 1.5px solid var(--ink); border-top: 1.5px solid var(--ink);
+      position: sticky;
+      top: 39px;
+      z-index: 2;
+      background: var(--surface-alt);
+      padding: 8px 20px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
     }
-    .term-table td { padding: 11px 16px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; }
-    .term-table td strong { color: var(--ink); }
-    .term-table td:nth-child(2) { font-family: var(--font-mono); font-size: 12.5px; color: var(--blue); cursor: copy; }
-    .term-table td:nth-child(2):hover { text-decoration: underline dotted; }
-    .tag { display: inline-block; padding: 1px 9px; font-family: var(--font-mono); font-size: 11px; white-space: nowrap; border: 1px solid var(--ink); border-radius: 99px; background: var(--paper); color: var(--ink); }
-    .term-table tr:not(.term-group):hover td { background: rgba(247, 201, 72, .16); }
-    .term-table tr:last-child td { border-bottom: none; }
 
-    /* ============ Footer ============ */
-    footer { margin-top: 90px; background: var(--ink); color: #d9d6cf; }
-    .foot-in { max-width: 1080px; margin: 0 auto; padding: 34px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; }
-    .foot-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 900; color: #fff; }
-    .foot-brand img { width: 26px; height: 26px; object-fit: contain; }
-    .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px; }
-    .foot-links a { display: inline-flex; align-items: center; gap: 7px; transition: color .15s; }
-    .foot-links a:hover { color: var(--yellow); }
-    .foot-wave { height: 10px; background: repeating-linear-gradient(90deg, var(--blue) 0 24px, var(--red) 24px 48px, var(--yellow) 48px 72px); }
-
-    /* ============ Modal / Lightbox / Toast ============ */
-    .overlay { display: none; position: fixed; inset: 0; z-index: 200; align-items: center; justify-content: center; padding: 20px; background: rgba(23,22,26,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-    .overlay.open { display: flex; }
-    .dialog { width: 440px; max-width: 100%; background: var(--card); border: 1.5px solid var(--ink); border-radius: 14px; box-shadow: 8px 8px 0 var(--blue); overflow: hidden; animation: zoomIn .22s cubic-bezier(.16,1,.3,1); }
-    @keyframes zoomIn { from { transform: scale(.94); opacity: 0; } }
-    .dialog-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-weight: 700; font-size: 13px; background: var(--yellow); border-bottom: 1.5px solid var(--ink); }
-    .dialog-head > div { display: flex; align-items: center; gap: 8px; }
-    .dialog-close { width: 14px; height: 14px; border-radius: 50%; background: var(--red); border: 1.5px solid var(--ink); }
-    .dialog-close:hover { transform: scale(1.2); }
-    .dialog-body { padding: 22px; font-size: 13.5px; color: var(--ink-2); }
-    .dialog-body p { margin-bottom: 10px; }
-    .dialog-body strong { color: var(--ink); }
-    .license { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-2); background: var(--paper); border: 1px dashed var(--ink); padding: 8px 10px; border-radius: 6px; }
-    .dialog-foot { padding: 12px 16px; display: flex; justify-content: flex-end; border-top: 1.5px solid var(--ink); }
-
-    .lightbox { z-index: 300; cursor: zoom-out; }
-    .lb-content { position: relative; display: flex; flex-direction: column; align-items: center; max-width: 95vw; max-height: 94vh; cursor: default; animation: zoomIn .22s cubic-bezier(.16,1,.3,1); }
-    .lb-content img { max-width: 100%; max-height: 82vh; object-fit: contain; border-radius: 10px; border: 2px solid #fff; background: #fff; }
-    .lb-cap { color: #fff; font-size: 13.5px; margin-top: 12px; text-align: center; }
-    .lb-close { position: absolute; top: -16px; right: -16px; width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--ink); background: var(--yellow); color: var(--ink); font-size: 15px; display: flex; align-items: center; justify-content: center; }
-    .lb-close:hover { background: var(--red); color: #fff; }
-
-    .toast { position: fixed; left: 50%; bottom: 28px; z-index: 400; transform: translate(-50%, 30px); opacity: 0; pointer-events: none; padding: 9px 18px; font-size: 13px; font-weight: 600; color: #fff; background: var(--ink); border-radius: 99px; transition: all .25s; }
-    .toast.show { transform: translate(-50%, 0); opacity: 1; }
-
-    /* ============ Responsive ============ */
-    @media (max-width: 880px) {
-      :root { --topbar: 104px; }
-      .topbar-in { flex-wrap: wrap; align-content: center; gap: 8px 12px; padding: 8px 16px; }
-      .brand { order: 1; flex: 1; }
-      .top-actions { order: 2; }
-      .tier { order: 3; flex: 0 0 100%; max-width: none; margin: 0; }
-      .tier a i { display: none; }
-      .wrap { padding: 0 16px; }
-      .hero-inner { padding: 48px 0 64px; }
-      .hero::after { background: linear-gradient(180deg, rgba(245,242,234,.7), rgba(245,242,234,.9)); }
-      .hero-hint { display: none; }
-      .features { grid-template-columns: 1fr; }
-      .feat.wide { grid-template-columns: 1fr; }
-      .dl-grid, .tips-grid { grid-template-columns: 1fr; }
-      .split { grid-template-columns: 1fr; gap: 24px; }
-      .sec { padding-top: 56px; }
-
-      .term-bar { flex-wrap: wrap; gap: 8px; }
-      #term-count { width: 100%; text-align: right; }
-      .term-wrap { border: none; background: transparent; overflow: visible; max-height: none; }
-      .term-table { display: block; min-width: 0; }
-      .term-table thead { display: none; }
-      .term-table tbody { display: flex; flex-direction: column; gap: 10px; }
-      .term-table tr { display: flex; flex-direction: column; padding: 12px 14px; background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; }
-      .term-table tr.term-group { padding: 6px 12px; background: var(--yellow); border-radius: 6px; margin-top: 8px; }
-      .term-group td { position: static; padding: 0; border: none; }
-      .term-table td { display: block; padding: 2px 0; border: none; }
-      .term-table td:nth-child(1) { font-size: 15px; }
-      .term-table td:nth-child(3) { margin: 4px 0; }
-      .term-table td:nth-child(4) { margin-top: 4px; padding-top: 6px; border-top: 1px dashed var(--line); }
+    .term-table tbody td {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+      color: var(--ink-2);
     }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; } }
+
+    .term-table tbody tr:not(.term-group):hover td {
+      background: var(--surface);
+    }
+
+    .term-table tbody td:nth-child(1) strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .term-table tbody td:nth-child(2) {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--signal);
+      cursor: pointer;
+    }
+
+    .term-table tbody td:nth-child(2):hover {
+      text-decoration: underline;
+    }
+
+    .term-table tbody td:nth-child(3) {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-3);
+      white-space: nowrap;
+    }
+
+    /* ============ Footer & Colophon ============ */
+    .colophon {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      background: var(--surface);
+    }
+
+    .colophon-about {
+      padding: 40px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .colophon-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .colophon-brand img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .colophon-about p {
+      font-size: 13.5px;
+      color: var(--ink-2);
+      max-width: 560px;
+    }
+
+    .colophon-license {
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+
+    .colophon-nav {
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .colophon-links {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .colophon-links a {
+      font-size: 13.5px;
+      color: var(--ink-2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule);
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .colophon-links a:hover {
+      color: var(--signal);
+      border-color: var(--signal);
+    }
+
+    .colophon-links a span:last-child {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+
+    /* ============ Modal & Lightbox (Sharp Architectural) ============ */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(20, 20, 19, 0.72);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 480px;
+      max-width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--rule-strong);
+    }
+
+    .modal-bar {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--rule-strong);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-2);
+      padding: 2px 6px;
+    }
+
+    .modal-close:hover {
+      color: var(--signal);
+    }
+
+    .modal-content {
+      padding: 28px 24px;
+      font-size: 14px;
+      color: var(--ink-2);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-content strong {
+      color: var(--ink);
+    }
+
+    .modal-foot {
+      padding: 12px 20px;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .modal-foot button {
+      padding: 8px 20px;
+      background: var(--ink);
+      color: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .modal-foot button:hover {
+      background: var(--signal);
+    }
+
+    .lb-box {
+      max-width: 94vw;
+      max-height: 92vh;
+      background: var(--bg);
+      border: 1px solid var(--rule-strong);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lb-body {
+      padding: 12px;
+      background: #fff;
+      overflow: auto;
+    }
+
+    .lb-body img {
+      max-width: 100%;
+      max-height: 78vh;
+      object-fit: contain;
+      margin: 0 auto;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 600;
+      padding: 10px 18px;
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      border-left: 3px solid var(--signal);
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ============ Responsive (< 960px) ============ */
+    @media (max-width: 960px) {
+      .topbar-inner {
+        grid-template-columns: 1fr auto;
+      }
+      .nav-links {
+        display: none;
+      }
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero-main {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+        padding: 36px 20px;
+      }
+      .spec-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .spec-list li:nth-child(odd) {
+        border-right: 1px solid var(--rule);
+      }
+      .sec-band,
+      .mirror-banner {
+        grid-template-columns: 1fr;
+      }
+      .sec-index,
+      .mirror-banner-tag {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+        padding: 14px 20px;
+        flex-direction: row;
+        align-items: center;
+      }
+      .sec-heading,
+      .mirror-banner-body {
+        padding: 22px 20px;
+      }
+      .stage-viewport {
+        padding: 20px 14px;
+      }
+      .feat-matrix {
+        grid-template-columns: 1fr;
+      }
+      .feat-cell,
+      .feat-cell.span-2 {
+        grid-column: span 1;
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+      .release-row {
+        grid-template-columns: 1fr;
+      }
+      .rel-col-title,
+      .rel-col-desc,
+      .rel-col-primary,
+      .rel-col-mirror {
+        border-right: none;
+        padding: 14px 20px;
+      }
+      .rel-col-desc {
+        padding-top: 0;
+      }
+      .rel-col-primary {
+        padding-top: 4px;
+      }
+      .rel-col-mirror {
+        padding-top: 4px;
+        padding-bottom: 20px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .tips-matrix,
+      .deep-split,
+      .colophon {
+        grid-template-columns: 1fr;
+      }
+      .tip-cell {
+        border-right: none;
+        border-bottom: 1px solid var(--rule) !important;
+      }
+      .deep-info,
+      .colophon-about {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+        padding: 28px 20px;
+      }
+      .deep-figure,
+      .colophon-nav {
+        padding: 24px 20px;
+      }
+      .term-toolbar {
+        grid-template-columns: 1fr;
+      }
+      .term-search-cell,
+      .term-filter-strip {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+      .term-filter-strip {
+        overflow-x: auto;
+      }
+      .term-filter-btn {
+        padding: 10px 14px;
+      }
+      .term-count-cell {
+        padding: 8px 20px;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- ============ Top bar ============ -->
+  <!-- ============ Top Architectural Bar ============ -->
   <header class="topbar">
-    <div class="topbar-in">
-      <a class="brand" href="#features">
+    <div class="topbar-inner">
+      <a class="brand" href="#overview">
         <img src="pictures/icon.png" alt="Praat 汉化版 Logo">
         <span>Praat 汉化版</span>
+        <span class="brand-ver">v7.0-zh.4</span>
       </a>
 
-      <!-- TextGrid-style tier navigation with a scroll playhead -->
-      <nav class="tier" id="tier" aria-label="页面导航">
-        <a href="#features" data-sec="features"><i class="fa-solid fa-volume-high"></i>特性</a>
-        <a href="#download" data-sec="download"><i class="fa-solid fa-box-archive"></i>下载</a>
-        <a href="#manual" data-sec="manual"><i class="fa-solid fa-book-open"></i>手册</a>
-        <a href="#terms" data-sec="terms"><i class="fa-solid fa-table-list"></i>术语</a>
-        <a href="#recorder" data-sec="recorder"><i class="fa-solid fa-microphone"></i>录音</a>
-        <span class="playhead" id="playhead"></span>
+      <nav class="nav-links" aria-label="页面主导航">
+        <a href="#overview" data-sec="overview" class="active"><span class="idx">01</span>特性与预览</a>
+        <a href="#download" data-sec="download"><span class="idx">02</span>版本下载</a>
+        <a href="#manual" data-sec="manual"><span class="idx">03</span>帮助手册</a>
+        <a href="#recorder" data-sec="recorder"><span class="idx">04</span>录音增强</a>
+        <a href="#terms" data-sec="terms"><span class="idx">05</span>术语对照表</a>
       </nav>
 
-      <div class="top-actions">
-        <a class="icon-btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener" title="GitHub"><i class="fa-brands fa-github"></i></a>
-        <button class="icon-btn" onclick="openModal('about-modal')" title="关于"><i class="fa-solid fa-circle-info"></i></button>
+      <div class="topbar-meta">
+        <button class="topbar-link" type="button" onclick="openModal('about-modal')">关于</button>
+        <a class="topbar-link" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener">GitHub ↗</a>
+        <a class="topbar-cta" href="#download">下载软件 ↓</a>
       </div>
     </div>
   </header>
 
-  <main>
-    <!-- ============ 01 Features / Hero ============ -->
-    <section id="features">
-      <div class="hero">
-        <canvas id="spec" aria-hidden="true"></canvas>
-        <div class="wrap">
-          <div class="hero-inner">
+  <main class="sheet">
+
+    <!-- ============ 01. Hero & Interface Inspection Stage ============ -->
+    <section id="overview">
+      <div class="hero-grid">
+        <div class="hero-main">
+          <div class="hero-kicker">Praat 7.0 汉化版 · 软件特性与功能总览</div>
+
+          <div class="hero-title-row">
             <img class="hero-logo" src="pictures/icon.png" alt="Praat 汉化版 Logo">
-            <div class="eyebrow">Praat 7.0 汉化版 · 软件特性与功能总览</div>
-            <h1>Praat <mark>汉化版</mark></h1>
-            <p class="lead">基于 Praat 官方内核构建，提供完整中文界面与帮助手册。针对中文排版、拖拽打开、录音暂存与多对象批量操作深度优化。</p>
-            <div class="hero-cta">
-              <a class="btn primary" href="#download"><i class="fa-solid fa-download"></i> 下载软件</a>
-              <a class="btn" href="#terms"><i class="fa-solid fa-table-list"></i> 对照表</a>
-              <a class="btn" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> GitHub</a>
-            </div>
+            <h1>Praat 汉化版</h1>
+          </div>
+
+          <p class="hero-lead">
+            基于 Praat 官方内核构建，提供完整中文界面与帮助手册。针对中文排版、拖拽打开、录音暂存与多对象批量操作深度优化。
+          </p>
+
+          <div class="hero-actions">
+            <a class="action-primary" href="#download">
+              <span>获取发行版本</span>
+              <span class="arrow">↓</span>
+            </a>
+            <a class="action-text" href="#terms">查阅中英术语对照表</a>
+            <a class="action-text" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener">GitHub 源码仓库 ↗</a>
           </div>
         </div>
-        <div class="hero-hint"><i class="fa-solid fa-computer-mouse"></i> move → F0</div>
+
+        <aside class="hero-specs" aria-label="构建技术规格">
+          <ul class="spec-list">
+            <li>
+              <span class="spec-label">上游内核版本 / KERNEL</span>
+              <span class="spec-val">Praat 7.0 Official</span>
+            </li>
+            <li>
+              <span class="spec-label">最新发行版 / RELEASE</span>
+              <span class="spec-val" id="spec-version">v7.0-zh.4</span>
+            </li>
+            <li>
+              <span class="spec-label">支持系统 / PLATFORMS</span>
+              <span class="spec-val">Windows x64 / macOS / Linux</span>
+            </li>
+            <li>
+              <span class="spec-label">开源许可 / LICENSE</span>
+              <span class="spec-val">GNU GPL v3.0</span>
+            </li>
+          </ul>
+
+          <div class="spec-acoustic-wave" aria-hidden="true">
+            <span class="spec-label">ACOUSTIC CONTOUR // F0 &amp; FORMANTS</span>
+            <svg viewBox="0 0 280 44" fill="none">
+              <line x1="0" y1="22" x2="280" y2="22" stroke="#d5d0c5" stroke-dasharray="2 2"/>
+              <path d="M0 32 Q35 10, 70 26 T140 16 T210 28 T280 12" stroke="#141413" stroke-width="1.5" fill="none"/>
+              <path d="M0 38 Q45 24, 90 34 T180 22 T280 30" stroke="#c43b27" stroke-width="1.2" stroke-dasharray="3 3" fill="none"/>
+            </svg>
+          </div>
+        </aside>
       </div>
 
-      <div class="wrap">
-        <div class="features">
-          <div class="feat">
-            <span class="feat-no">01</span>
-            <h3><i class="fa-solid fa-language"></i> 完整界面汉化</h3>
-            <p>菜单栏、参数对话框及设置面板全量汉化，支持中英文自由切换，偏好自动保存。</p>
-            <div class="bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          </div>
-          <div class="feat">
-            <span class="feat-no">02</span>
-            <h3><i class="fa-solid fa-book"></i> 帮助手册汉化</h3>
-            <p>内置帮助手册主要页面全量翻译为中文，排版与滚动自适应优化。</p>
-            <div class="bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          </div>
-          <div class="feat">
-            <span class="feat-no">03</span>
-            <h3><i class="fa-solid fa-table-list"></i> 术语对照表</h3>
-            <p>主窗口常驻对照表按钮，随时核对语音学专业名词中英原词。</p>
-            <div class="bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          </div>
-          <div class="feat">
-            <span class="feat-no">04</span>
-            <h3><i class="fa-solid fa-file-import"></i> 文件拖拽打开</h3>
-            <p>Windows 下支持音频（.wav）、标注（.TextGrid）直接拖入载入。</p>
-            <div class="bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          </div>
-          <div class="feat">
-            <span class="feat-no">05</span>
-            <h3><i class="fa-solid fa-microphone"></i> 录音窗口增强</h3>
-            <p>按住录音模式、暂存列表自动递增编号与分层波形预览。</p>
-            <div class="bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          </div>
-          <div class="feat">
-            <span class="feat-no">06</span>
-            <h3><i class="fa-solid fa-i-cursor"></i> 多对象批量重命名</h3>
-            <p>选中多个对象时自动显示批量重命名工具，支持统一前后缀与序号递增。</p>
-            <div class="bars"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          </div>
-          <div class="feat wide">
-            <span class="feat-no">07</span>
-            <h3><i class="fa-solid fa-shapes"></i> 现代化交互与右键菜单</h3>
-            <p>Fluent 矢量图标、列表平滑悬停、右键快捷菜单与二级子菜单、顶部常用工具栏及播放暂停断点续播。</p>
-          </div>
+      <!-- Dual-Edition Interface Switcher -->
+      <div class="stage-bar">
+        <div class="stage-tabs" role="tablist" aria-label="界面版本预览切换">
+          <button type="button" class="stage-tab active" role="tab" aria-selected="true" onclick="switchStage(0, this)">
+            <span class="num">01</span>
+            <span>现代化分支 (Modern Edition) 界面预览</span>
+          </button>
+          <button type="button" class="stage-tab" role="tab" aria-selected="false" onclick="switchStage(1, this)">
+            <span class="num">02</span>
+            <span>主窗口与常用操作（经典版）</span>
+          </button>
         </div>
+        <div class="stage-caption-bar">
+          <span id="stage-file-indicator">FIG 1.1 // praat-zh-modern-ui.png</span>
+        </div>
+      </div>
 
-        <div style="height: 56px"></div>
-
-        <div class="shot">
-          <div class="shot-bar">
-            <span class="dots"><i></i><i></i><i></i></span>
-            <span class="shot-name">praat-zh-modern-ui.png · 现代化分支 (Modern Edition) 界面预览</span>
-          </div>
-          <div class="shot-body" onclick="openLightbox('pictures/praat-zh-modern-ui.png', 'Praat 汉化现代化分支界面（Fluent 矢量图标、顶部快捷栏、右键上下文菜单及二级子菜单）')">
+      <div class="stage-viewport">
+        <!-- Pane 0: Modern UI -->
+        <div class="stage-pane active" id="stage-pane-0">
+          <div class="figure-frame" onclick="openLightbox('pictures/praat-zh-modern-ui.png', 'Praat 汉化现代化分支界面（Fluent 矢量图标、顶部快捷栏、右键上下文菜单及二级子菜单）')">
             <img src="pictures/praat-zh-modern-ui.png" alt="Praat 汉化现代化版本界面预览">
-            <div class="zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
+          </div>
+          <div class="figure-meta">
+            <span>Praat 汉化现代化分支界面（Fluent 矢量图标、顶部快捷栏、右键上下文菜单及二级子菜单）</span>
+            <span class="figure-zoom-hint">点击检视高清原图 [+]</span>
           </div>
         </div>
 
-        <div class="shot" style="margin-bottom: 0">
-          <div class="shot-bar">
-            <span class="dots"><i></i><i></i><i></i></span>
-            <span class="shot-name">praat-zh-main-window.png · 主窗口与常用操作（经典版）</span>
-          </div>
-          <div class="shot-body" onclick="openLightbox('pictures/praat-zh-main-window.png', 'Praat 汉化版主窗口与常用固定操作区')">
+        <!-- Pane 1: Classic UI -->
+        <div class="stage-pane" id="stage-pane-1">
+          <div class="figure-frame" onclick="openLightbox('pictures/praat-zh-main-window.png', 'Praat 汉化版主窗口与常用固定操作区')">
             <img src="pictures/praat-zh-main-window.png" alt="Praat 汉化版主窗口预览">
-            <div class="zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
           </div>
+          <div class="figure-meta">
+            <span>Praat 汉化版主窗口与常用固定操作区</span>
+            <span class="figure-zoom-hint">点击检视高清原图 [+]</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7 Core Enhancements Matrix -->
+      <div class="feat-matrix">
+        <div class="feat-cell">
+          <span class="feat-idx">01 // LOCALIZATION</span>
+          <h3>完整界面汉化</h3>
+          <p>菜单栏、参数对话框及设置面板全量汉化，支持中英文自由切换，偏好自动保存。</p>
+        </div>
+        <div class="feat-cell">
+          <span class="feat-idx">02 // DOCUMENTATION</span>
+          <h3>帮助手册汉化</h3>
+          <p>内置帮助手册主要页面全量翻译为中文，排版与滚动自适应优化。</p>
+        </div>
+        <div class="feat-cell">
+          <span class="feat-idx">03 // GLOSSARY</span>
+          <h3>术语对照表</h3>
+          <p>主窗口常驻对照表按钮，随时核对语音学专业名词中英原词。</p>
+        </div>
+        <div class="feat-cell">
+          <span class="feat-idx">04 // WORKFLOW</span>
+          <h3>文件拖拽打开</h3>
+          <p>Windows 下支持音频（.wav）、标注（.TextGrid）直接拖入载入。</p>
+        </div>
+        <div class="feat-cell no-bottom">
+          <span class="feat-idx">05 // ACQUISITION</span>
+          <h3>录音窗口增强</h3>
+          <p>按住录音模式、暂存列表自动递增编号与分层波形预览。</p>
+        </div>
+        <div class="feat-cell no-bottom">
+          <span class="feat-idx">06 // BATCH OPS</span>
+          <h3>多对象批量重命名</h3>
+          <p>选中多个对象时自动显示批量重命名工具，支持统一前后缀与序号递增。</p>
+        </div>
+        <div class="feat-cell span-2 no-bottom">
+          <span class="feat-idx">07 // MODERN EDITION</span>
+          <h3>现代化交互与右键菜单</h3>
+          <p>Fluent 矢量图标、列表平滑悬停、右键快捷菜单与二级子菜单、顶部常用工具栏及播放暂停断点续播。</p>
         </div>
       </div>
     </section>
 
-    <!-- ============ 02 Download ============ -->
-    <section id="download" class="sec">
-      <div class="wrap">
-        <header class="sec-head">
-          <span class="sec-no">02 / DOWNLOAD</span>
-          <h2><i class="fa-solid fa-download"></i> 下载 Praat 汉化版</h2>
+    <!-- ============ 02. Download & Release Matrix ============ -->
+    <section id="download">
+      <div class="sec-band">
+        <div class="sec-index">
+          <strong>SEC. 02</strong>
+          <span>DISTRIBUTION</span>
+        </div>
+        <div class="sec-heading">
+          <h2>下载 Praat 汉化版</h2>
           <p>绿色免安装，解压即用。基于官方稳定内核构建。</p>
-        </header>
-        <div class="ruler"></div>
-
-        <div class="notice">
-          <i class="fa-solid fa-cloud"></i>
-          <div>
-            <b class="t">国内网盘下载通道</b>
-            <span>若无法正常访问 GitHub 或下载中断，可使用下方各版本卡片中提供的<b>「百度网盘」</b>链接进行下载。</span>
-          </div>
         </div>
+      </div>
 
-        <div class="dl-grid">
-          <!-- Windows Modern -->
-          <div class="dl featured" data-os="win">
-            <div class="dl-head"><i class="fa-brands fa-windows" style="color:#0078d4"></i><span>Windows (x64) · 现代版</span></div>
-            <div class="dl-meta"><span>Modern</span><i></i><span>.zip · Fluent 图标 / 快捷栏</span></div>
-            <div class="dl-desc">引入 Fluent 矢量图标、列表悬停与右键菜单、顶部常用快捷栏及播放暂停断点续播。</div>
-            <div class="dl-btns">
-              <a id="dl-win-modern-btn" class="btn primary block" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-Modern-Windows-x64.zip">
-                <i class="fa-brands fa-github"></i><span>GitHub 直接下载 (.zip)</span>
-              </a>
-              <div class="pan-row">
-                <a class="btn small" href="https://pan.baidu.com/s/1IfZBFzx9CKMi1pP7EJQpqg?pwd=71ux" target="_blank" rel="noopener noreferrer" title="点击打开百度网盘下载页面">
-                  <i class="fa-solid fa-cloud-arrow-down" style="color:var(--blue)"></i><span>百度网盘下载</span>
-                </a>
-                <button type="button" class="copy-code" onclick="copyPanCode('71ux', this)" title="点击复制提取码 71ux"><code>71ux</code><i class="fa-regular fa-copy"></i></button>
-              </div>
+      <div class="mirror-banner">
+        <div class="mirror-banner-tag">国内网盘下载通道</div>
+        <div class="mirror-banner-body">
+          若无法正常访问 GitHub 或下载中断，可使用下方各版本行右侧提供的<b>「百度网盘」</b>链接进行下载（点击提取码即可直接复制）。
+        </div>
+      </div>
+
+      <div class="release-matrix">
+        <!-- Row 1: Windows Modern -->
+        <div class="release-row recommended" data-os="win">
+          <div class="rel-col-title">
+            <div class="rel-name">
+              <span>Windows (x64) · 现代版</span>
+              <span class="rel-badge">推荐</span>
             </div>
+            <div class="rel-spec">Modern · .zip · Fluent 图标 / 快捷栏</div>
           </div>
-
-          <!-- Windows Classic -->
-          <div class="dl" data-os="win-classic">
-            <div class="dl-head"><i class="fa-brands fa-windows" style="color:#0078d4"></i><span>Windows (x64) · 经典原版</span></div>
-            <div class="dl-meta"><span>Classic</span><i></i><span>.zip · 原生官方外观</span></div>
-            <div class="dl-desc">保持 Praat 原生经典 Motif 界面风格，纯简体中文本地化。</div>
-            <div class="dl-btns">
-              <a id="dl-win-btn" class="btn primary block" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-Windows-x64.zip">
-                <i class="fa-brands fa-github"></i><span>GitHub 直接下载 (.zip)</span>
-              </a>
-              <div class="pan-row">
-                <a class="btn small" href="https://pan.baidu.com/s/1pdgEPOhF3N4Av4bx9W4fkQ?pwd=b2k3" target="_blank" rel="noopener noreferrer" title="点击打开百度网盘下载页面">
-                  <i class="fa-solid fa-cloud-arrow-down" style="color:var(--blue)"></i><span>百度网盘下载</span>
-                </a>
-                <button type="button" class="copy-code" onclick="copyPanCode('b2k3', this)" title="点击复制提取码 b2k3"><code>b2k3</code><i class="fa-regular fa-copy"></i></button>
-              </div>
-            </div>
+          <div class="rel-col-desc">
+            引入 Fluent 矢量图标、列表悬停与右键菜单、顶部常用快捷栏及播放暂停断点续播。
           </div>
-
-          <!-- macOS -->
-          <div class="dl" data-os="mac">
-            <div class="dl-head"><i class="fa-brands fa-apple"></i><span>macOS (Universal)</span></div>
-            <div class="dl-meta"><span>v7.0-zh.4</span><i></i><span>.dmg · 通用二进制</span></div>
-            <div class="dl-desc">支持 Apple Silicon (M系列) 与 Intel 处理器的 Mac (macOS 11+)。</div>
-            <div class="dl-btns">
-              <a id="dl-mac-btn" class="btn primary block" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-macOS-universal.dmg">
-                <i class="fa-brands fa-github"></i><span>GitHub 直接下载 (.dmg)</span>
-              </a>
-              <div class="pan-row">
-                <a class="btn small" href="https://pan.baidu.com/s/17KhVEZ-OEcwM8uc1GicPSA?pwd=5gqa" target="_blank" rel="noopener noreferrer" title="点击打开百度网盘下载页面">
-                  <i class="fa-solid fa-cloud-arrow-down" style="color:var(--blue)"></i><span>百度网盘下载</span>
-                </a>
-                <button type="button" class="copy-code" onclick="copyPanCode('5gqa', this)" title="点击复制提取码 5gqa"><code>5gqa</code><i class="fa-regular fa-copy"></i></button>
-              </div>
-            </div>
+          <div class="rel-col-primary">
+            <a id="dl-win-modern-btn" class="dl-block-link" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-Modern-Windows-x64.zip">
+              <span>直接下载</span>
+              <span class="ext">.zip ↓</span>
+            </a>
           </div>
-
-          <!-- Linux / Source -->
-          <div class="dl" data-os="linux">
-            <div class="dl-head"><i class="fa-brands fa-linux"></i><span>Linux / 源码</span></div>
-            <div class="dl-meta"><span>源码构建</span><i></i><span>GPL v3 开源</span></div>
-            <div class="dl-desc">适用于 Ubuntu、Debian 等 Linux 发行版，或直接获取完整源码。</div>
-            <div class="dl-btns">
-              <a class="btn primary block" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener noreferrer">
-                <i class="fa-brands fa-github"></i><span>查看 GitHub 源码仓库</span>
-              </a>
+          <div class="rel-col-mirror">
+            <a class="pan-link" href="https://pan.baidu.com/s/1IfZBFzx9CKMi1pP7EJQpqg?pwd=71ux" target="_blank" rel="noopener noreferrer">
+              百度网盘下载 ↗
+            </a>
+            <div class="pan-code-line">
+              <span>提取码:</span>
+              <button type="button" class="code-trigger" onclick="copyPanCode('71ux', this)" title="点击复制提取码 71ux">71ux [复制]</button>
             </div>
           </div>
         </div>
 
-        <div class="tips">
-          <div class="tips-head"><i class="fa-solid fa-circle-question"></i><span>如何选择与运行适合你的版本？</span></div>
-          <div class="tips-grid">
-            <div class="tip">
-              <strong><i class="fa-brands fa-windows" style="color:#0078d4"></i> Windows 用户</strong>
-              <p>推荐直接下载 <code>.zip</code> 压缩包。解压到任意文件夹后，双击 <code>Praat.exe</code> 即可直接运行，完全绿色免安装，也可以放在 U 盘里随身携带。</p>
+        <!-- Row 2: Windows Classic -->
+        <div class="release-row" data-os="win-classic">
+          <div class="rel-col-title">
+            <div class="rel-name">
+              <span>Windows (x64) · 经典原版</span>
             </div>
-            <div class="tip">
-              <strong><i class="fa-brands fa-apple"></i> Mac 用户</strong>
-              <p>下载 <code>.dmg</code> 镜像文件，双击打开后把 Praat 图标拖入「应用程序」即可（通用版已同时支持 M 系列芯片与 Intel 芯片机型）。</p>
-            </div>
-            <div class="tip full">
-              <strong><i class="fa-solid fa-cloud-arrow-down" style="color:var(--blue)"></i> 国内网盘下载</strong>
-              <p>国内网络访问 GitHub Releases 若遇到连接失败或下载中断，可使用上方卡片中的<b>百度网盘</b>下载。链接内已包含提取码，也可点击提取码复制。</p>
-            </div>
-            <div class="tip full">
-              <strong><i class="fa-solid fa-shield-halved" style="color:var(--ink-3)"></i> 首次打开提示安全拦截？</strong>
-              <p>若 macOS 提示“无法打开，因为无法验证开发者”，前往系统「设置」→「隐私与安全性」，在页面下方找到 Praat 并点击「仍要打开」即可正常启动。</p>
+            <div class="rel-spec">Classic · .zip · 原生官方外观</div>
+          </div>
+          <div class="rel-col-desc">
+            保持 Praat 原生经典 Motif 界面风格，纯简体中文本地化。
+          </div>
+          <div class="rel-col-primary">
+            <a id="dl-win-btn" class="dl-block-link" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-Windows-x64.zip">
+              <span>直接下载</span>
+              <span class="ext">.zip ↓</span>
+            </a>
+          </div>
+          <div class="rel-col-mirror">
+            <a class="pan-link" href="https://pan.baidu.com/s/1pdgEPOhF3N4Av4bx9W4fkQ?pwd=b2k3" target="_blank" rel="noopener noreferrer">
+              百度网盘下载 ↗
+            </a>
+            <div class="pan-code-line">
+              <span>提取码:</span>
+              <button type="button" class="code-trigger" onclick="copyPanCode('b2k3', this)" title="点击复制提取码 b2k3">b2k3 [复制]</button>
             </div>
           </div>
+        </div>
+
+        <!-- Row 3: macOS -->
+        <div class="release-row" data-os="mac">
+          <div class="rel-col-title">
+            <div class="rel-name">
+              <span>macOS (Universal)</span>
+            </div>
+            <div class="rel-spec">v7.0-zh.4 · .dmg · 通用二进制</div>
+          </div>
+          <div class="rel-col-desc">
+            支持 Apple Silicon (M系列) 与 Intel 处理器的 Mac (macOS 11+)。
+          </div>
+          <div class="rel-col-primary">
+            <a id="dl-mac-btn" class="dl-block-link" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-macOS-universal.dmg">
+              <span>直接下载</span>
+              <span class="ext">.dmg ↓</span>
+            </a>
+          </div>
+          <div class="rel-col-mirror">
+            <a class="pan-link" href="https://pan.baidu.com/s/17KhVEZ-OEcwM8uc1GicPSA?pwd=5gqa" target="_blank" rel="noopener noreferrer">
+              百度网盘下载 ↗
+            </a>
+            <div class="pan-code-line">
+              <span>提取码:</span>
+              <button type="button" class="code-trigger" onclick="copyPanCode('5gqa', this)" title="点击复制提取码 5gqa">5gqa [复制]</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 4: Linux / Source -->
+        <div class="release-row" data-os="linux">
+          <div class="rel-col-title">
+            <div class="rel-name">
+              <span>Linux / 源码</span>
+            </div>
+            <div class="rel-spec">源码构建 · GPL v3 开源</div>
+          </div>
+          <div class="rel-col-desc">
+            适用于 Ubuntu、Debian 等 Linux 发行版，或直接获取完整源码。
+          </div>
+          <div class="rel-col-primary">
+            <a class="dl-block-link" href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener noreferrer">
+              <span>查看源码仓库</span>
+              <span class="ext">↗</span>
+            </a>
+          </div>
+          <div class="rel-col-mirror">
+            <a class="pan-link" href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank" rel="noopener noreferrer">
+              所有历史版本 (Releases) ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Setup & Troubleshooting Guide -->
+      <div class="tips-header-bar">如何选择与运行适合你的版本？</div>
+      <div class="tips-matrix">
+        <div class="tip-cell">
+          <strong>Windows 用户</strong>
+          <p>推荐直接下载 <code>.zip</code> 压缩包。解压到任意文件夹后，双击 <code>Praat.exe</code> 即可直接运行，完全绿色免安装，也可以放在 U 盘里随身携带。</p>
+        </div>
+        <div class="tip-cell">
+          <strong>Mac 用户</strong>
+          <p>下载 <code>.dmg</code> 镜像文件，双击打开后把 Praat 图标拖入「应用程序」即可（通用版已同时支持 M 系列芯片与 Intel 芯片机型）。</p>
+        </div>
+        <div class="tip-cell">
+          <strong>国内网盘下载</strong>
+          <p>国内网络访问 GitHub Releases 若遇到连接失败或下载中断，可使用上方列表中的<b>百度网盘</b>下载。链接内已包含提取码，也可点击提取码复制。</p>
+        </div>
+        <div class="tip-cell">
+          <strong>首次打开提示安全拦截？</strong>
+          <p>若 macOS 提示“无法打开，因为无法验证开发者”，前往系统「设置」→「隐私与安全性」，在页面下方找到 Praat 并点击「仍要打开」即可正常启动。</p>
         </div>
       </div>
     </section>
 
-    <!-- ============ 03 Manual ============ -->
-    <section id="manual" class="sec">
-      <div class="wrap">
-        <header class="sec-head">
-          <span class="sec-no">03 / MANUAL</span>
-          <h2><i class="fa-solid fa-book"></i> 帮助手册汉化与排版优化</h2>
+    <!-- ============ 03. Built-in Manual ============ -->
+    <section id="manual">
+      <div class="sec-band">
+        <div class="sec-index">
+          <strong>SEC. 03</strong>
+          <span>DOCUMENTATION</span>
+        </div>
+        <div class="sec-heading">
+          <h2>帮助手册汉化与排版优化</h2>
           <p>内置帮助手册主要页面已全量翻译为中文，图文教程在不同窗口尺寸下均能自适应流式呈现，方便查阅与学习。</p>
-        </header>
-        <div class="ruler"></div>
+        </div>
+      </div>
 
-        <div class="split">
-          <div>
-            <p class="lead">全面翻译常用核心章节，支持中英双向检索与跳转，助你快速掌握语音分析流程。</p>
-            <div class="outline">
-              <div class="outline-title">核心查阅章节</div>
-              <ul>
-                <li><span>初学者语音学快速上手指南</span></li>
-                <li><span>语图（Spectrogram）参数与分析</span></li>
-                <li><span>音高提取（Pitch）与共振峰跟踪</span></li>
-                <li><span>TextGrid 分层切分与标注规范</span></li>
-                <li><span>Praat 自动化批处理脚本编写</span></li>
-              </ul>
-            </div>
+      <div class="deep-split">
+        <div class="deep-info">
+          <p class="deep-lead">
+            全面翻译常用核心章节，支持中英双向检索与跳转，助你快速掌握语音分析流程。
+          </p>
+          <div class="spec-idx-block">
+            <div class="spec-idx-title">核心查阅章节 // MANUAL CHAPTERS</div>
+            <ul class="spec-idx-list">
+              <li><span>初学者语音学快速上手指南</span></li>
+              <li><span>语图（Spectrogram）参数与分析</span></li>
+              <li><span>音高提取（Pitch）与共振峰跟踪</span></li>
+              <li><span>TextGrid 分层切分与标注规范</span></li>
+              <li><span>Praat 自动化批处理脚本编写</span></li>
+            </ul>
           </div>
-          <div>
-            <div class="shot" style="margin-bottom:0">
-              <div class="shot-bar">
-                <span class="dots"><i></i><i></i><i></i></span>
-                <span class="shot-name">praat-zh-manuel.png · 帮助手册界面</span>
-              </div>
-              <div class="shot-body" onclick="openLightbox('pictures/praat-zh-manuel.png', '内置帮助手册实际运行效果')">
-                <img src="pictures/praat-zh-manuel.png" alt="Praat 汉化版帮助手册界面">
-                <div class="zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
-              </div>
-            </div>
+        </div>
+        <div class="deep-figure">
+          <div class="figure-frame" onclick="openLightbox('pictures/praat-zh-manuel.png', '内置帮助手册实际运行效果')">
+            <img src="pictures/praat-zh-manuel.png" alt="Praat 汉化版帮助手册界面">
+          </div>
+          <div class="figure-meta">
+            <span>FIG 3.1 // praat-zh-manuel.png · 帮助手册界面</span>
+            <span class="figure-zoom-hint">点击放大检视 [+]</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============ 04 Terms ============ -->
-    <section id="terms" class="sec">
-      <div class="wrap">
-        <header class="sec-head">
-          <span class="sec-no">04 / GLOSSARY</span>
-          <h2><i class="fa-solid fa-table-list"></i> 常用语音学与 Praat 术语中英对照表</h2>
-          <p>按模块分组收录核心语音学、数据结构、信号处理与合成算法的标准中英文对照，方便文献阅读与脚本编写。</p>
-        </header>
-        <div class="ruler"></div>
-
-        <div class="term-bar">
-          <div class="term-search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="term-search" placeholder="搜索中文或英文术语（如 Pitch, 共振峰, 标注, LPC）..." oninput="filterTerms(this.value)">
-          </div>
-          <span id="term-count">共 34 条术语</span>
+    <!-- ============ 04. SoundRecorder Enhancements ============ -->
+    <section id="recorder">
+      <div class="sec-band">
+        <div class="sec-index">
+          <strong>SEC. 04</strong>
+          <span>SOUND RECORDER</span>
         </div>
-
-        <div class="term-wrap">
-          <table class="term-table" id="glossary-table">
-            <thead>
-              <tr><th>中文术语</th><th>英文原词</th><th>分类</th><th>说明</th></tr>
-            </thead>
-            <tbody>
-              <tr class="term-group"><td colspan="4">01 · 核心声学与语音特征</td></tr>
-              <tr><td><strong>基频 / 音高</strong></td><td>Pitch / F0</td><td><span class="tag">核心声学</span></td><td>声带振动的基频频率，单位为赫兹 (Hz)</td></tr>
-              <tr><td><strong>音高上限 / 下限</strong></td><td>Pitch ceiling / floor</td><td><span class="tag">参数设置</span></td><td>音高分析算法搜索的最高与最低频率限制范围</td></tr>
-              <tr><td><strong>共振峰</strong></td><td>Formant (F1, F2...)</td><td><span class="tag">核心声学</span></td><td>声道共鸣腔产生的特定共振频率峰值与带宽</td></tr>
-              <tr><td><strong>音强 / 振幅</strong></td><td>Intensity / Amplitude</td><td><span class="tag">核心声学</span></td><td>声音的能量强度 (dB) 与振幅波形包络</td></tr>
-              <tr><td><strong>语图 / 声谱图</strong></td><td>Spectrogram</td><td><span class="tag">信号显示</span></td><td>呈现时间、频率和能量三维关系的经典分析谱图</td></tr>
-              <tr><td><strong>频谱 / 频谱切片</strong></td><td>Spectrum / Spectral slice</td><td><span class="tag">频域分析</span></td><td>特定时间点上的瞬时频域能量分布切片</td></tr>
-              <tr><td><strong>脉冲 / 声门脉冲</strong></td><td>Pulses / Glottal pulses</td><td><span class="tag">声门活动</span></td><td>对应声带振动周期的离散脉冲时间点序列</td></tr>
-              <tr><td><strong>谐噪比</strong></td><td>Harmonicity / HNR</td><td><span class="tag">音质分析</span></td><td>声音信号中周期谐波成分与非周期噪声成分的比值 (dB)</td></tr>
-              <tr><td><strong>音高微扰 / 振幅微扰</strong></td><td>Jitter / Shimmer</td><td><span class="tag">音质分析</span></td><td>周期与振幅的微小随机波动，用于嗓音病理评估</td></tr>
-              <tr><td><strong>浊音 / 清音</strong></td><td>Voiced / Voiceless</td><td><span class="tag">发音学</span></td><td>发音时声带参与振动的状态 / 声带不振动</td></tr>
-              <tr><td><strong>摩擦 / 送气 / 气声</strong></td><td>Frication / Aspiration / Breathiness</td><td><span class="tag">发音与音质</span></td><td>声道狭窄湍流噪音 / 释放后呼出气流 / 声带微开产生的气化音</td></tr>
-              <tr><td><strong>声道</strong></td><td>Vocal Tract</td><td><span class="tag">生理声学</span></td><td>从声带至唇齿的发音共鸣通道（咽腔、口腔、鼻腔）</td></tr>
-
-              <tr class="term-group"><td colspan="4">02 · 数据结构与标注体系</td></tr>
-              <tr><td><strong>声音对象 / 长声音</strong></td><td>Sound / LongSound</td><td><span class="tag">核心数据</span></td><td>普通内存音频对象 / 超长流式读取音频对象</td></tr>
-              <tr><td><strong>文本标注格</strong></td><td>TextGrid</td><td><span class="tag">标注结构</span></td><td>Praat 用于分层标注语音时间段与点事件的标准格式</td></tr>
-              <tr><td><strong>层 / 标注轨</strong></td><td>Tier</td><td><span class="tag">标注层级</span></td><td>在时间轴上相互独立平行的分层标注轨道</td></tr>
-              <tr><td><strong>区间层 / 点层</strong></td><td>Interval Tier / Point Tier</td><td><span class="tag">标注层级</span></td><td>包含起止时间的区间标注轨 / 单个离散时间点的标记轨</td></tr>
-              <tr><td><strong>区间 / 边界</strong></td><td>Interval / Boundary</td><td><span class="tag">标注元素</span></td><td>区间层中的单个时间段 / 切分音段的起止时间标记点</td></tr>
-              <tr><td><strong>点过程</strong></td><td>PointProcess</td><td><span class="tag">数据结构</span></td><td>记录离散时间点序列（如基频脉冲）的底层对象</td></tr>
-              <tr><td><strong>操控对象</strong></td><td>Manipulation</td><td><span class="tag">操纵结构</span></td><td>结合基频层与时长层、用于重合成与变形修改的对象</td></tr>
-              <tr><td><strong>音高层 / 音强层</strong></td><td>PitchTier / IntensityTier</td><td><span class="tag">层级对象</span></td><td>独立的音高变化曲线层 / 独立的音强包络层</td></tr>
-              <tr><td><strong>时长层 / 振幅层</strong></td><td>DurationTier / AmplitudeTier</td><td><span class="tag">层级对象</span></td><td>用于局部变速的时长因子层 / 振幅缩放控制层</td></tr>
-              <tr><td><strong>字符串列表 / 实数表</strong></td><td>Strings / TableOfReal</td><td><span class="tag">统计数据</span></td><td>文本与文件名列表对象 / 多维数值统计矩阵对象</td></tr>
-
-              <tr class="term-group"><td colspan="4">03 · 信号处理与分析算法</td></tr>
-              <tr><td><strong>自相关 / 互相关</strong></td><td>Autocorrelation / Cross-correlation</td><td><span class="tag">周期算法</span></td><td>音高提取经典算法，计算信号自身的周期重复性</td></tr>
-              <tr><td><strong>线性预测编码</strong></td><td>LPC (Burg / Autocorrelation)</td><td><span class="tag">谱估计算法</span></td><td>用于分离声道共鸣与提取共振峰频率/带宽的核心算法</td></tr>
-              <tr><td><strong>预加重 / 去加重</strong></td><td>Pre-emphasis / De-emphasis</td><td><span class="tag">滤波预处理</span></td><td>提升高频能量以补偿声门辐射滚降 / 还原原始频响</td></tr>
-              <tr><td><strong>谱重心 / 频谱倾斜</strong></td><td>Centre of gravity / Spectral tilt</td><td><span class="tag">频域特征</span></td><td>频谱能量分布的加权中心频率 / 频谱高低频滚降斜率</td></tr>
-              <tr><td><strong>长期平均谱</strong></td><td>LTAS (Long-term average spectrum)</td><td><span class="tag">频域统计</span></td><td>较长语音段平均频域能量分布，反映发音特质</td></tr>
-              <tr><td><strong>梅尔倒谱系数</strong></td><td>MFCC</td><td><span class="tag">特征工程</span></td><td>模拟人耳听觉梅尔尺度的倒谱特征系数</td></tr>
-              <tr><td><strong>动态时间规整</strong></td><td>DTW</td><td><span class="tag">模式匹配</span></td><td>用于非线性对齐不同语速语音发音的动态时间算法</td></tr>
-
-              <tr class="term-group"><td colspan="4">04 · 语音合成与高级分析</td></tr>
-              <tr><td><strong>PSOLA 语音操纵</strong></td><td>PSOLA (Pitch-Synchronous Overlap-Add)</td><td><span class="tag">语音变换</span></td><td>基频同步重叠相加，改变语速与音调而不改变音色</td></tr>
-              <tr><td><strong>声源-滤波器合成</strong></td><td>Source-filter synthesis</td><td><span class="tag">语音合成</span></td><td>结合声门波源与声道滤波器模型生成人工语音</td></tr>
-              <tr><td><strong>发音合成</strong></td><td>Articulatory synthesis</td><td><span class="tag">语音合成</span></td><td>模拟发音器官生理结构与肌肉运动生成发音</td></tr>
-              <tr><td><strong>Klatt 声学合成网格</strong></td><td>KlattGrid</td><td><span class="tag">语音合成</span></td><td>经典级联/并联多共振峰声学参数合成模型</td></tr>
-              <tr><td><strong>耳蜗图 / 倒谱图</strong></td><td>Cochleagram / PowerCepstrogram</td><td><span class="tag">高级谱图</span></td><td>内耳基底膜响应听觉图 / 倒频域声门声道分离图</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ 05 Recorder ============ -->
-    <section id="recorder" class="sec">
-      <div class="wrap">
-        <header class="sec-head">
-          <span class="sec-no">05 / RECORDER</span>
-          <h2><i class="fa-solid fa-microphone"></i> 录音窗口增强</h2>
+        <div class="sec-heading">
+          <h2>录音窗口增强</h2>
           <p>新增按住录音模式（松开即存）、暂存列表自动递增编号，音频超过 10 秒自适应分层显示。</p>
-        </header>
-        <div class="ruler"></div>
+        </div>
+      </div>
 
-        <div class="split">
-          <div>
-            <p class="lead">专为语音实验录音与语料采集设计，优化交互响应与长音频波形渲染。</p>
-            <div class="outline">
-              <div class="outline-title">录音增强特性</div>
-              <ul>
-                <li><span>按住录音模式 · 松开即自动存入列表</span></li>
-                <li><span>临时列表自动递增编号保存</span></li>
-                <li><span>超过 10 秒长音频自适应双层显示</span></li>
-                <li><span>支持立体声 / 单声道采样率快捷设定</span></li>
-              </ul>
-            </div>
-
-            <!-- Playful hold-to-record demo (simulated, no microphone used) -->
-            <div class="rec-demo">
-              <button class="rec-btn" id="rec-btn" type="button"><i class="fa-solid fa-microphone"></i><span>按住录音</span></button>
-              <div class="rec-bars" id="rec-bars"></div>
-              <ul class="rec-list" id="rec-list"></ul>
-            </div>
+      <div class="deep-split">
+        <div class="deep-info">
+          <p class="deep-lead">
+            专为语音实验录音与语料采集设计，优化交互响应与长音频波形渲染。
+          </p>
+          <div class="spec-idx-block">
+            <div class="spec-idx-title">录音增强特性 // RECORDER SPECS</div>
+            <ul class="spec-idx-list">
+              <li><span>按住录音模式 · 松开即自动存入列表</span></li>
+              <li><span>临时列表自动递增编号保存</span></li>
+              <li><span>超过 10 秒长音频自适应双层显示</span></li>
+              <li><span>支持立体声 / 单声道采样率快捷设定</span></li>
+            </ul>
           </div>
-          <div>
-            <div class="shot" style="margin-bottom:0">
-              <div class="shot-bar">
-                <span class="dots"><i></i><i></i><i></i></span>
-                <span class="shot-name">praat-zh-sound-recorder.png · 录音窗口界面</span>
-              </div>
-              <div class="shot-body" onclick="openLightbox('pictures/praat-zh-sound-recorder.png', 'Praat 录音窗口增强界面')">
-                <img src="pictures/praat-zh-sound-recorder.png" alt="Praat 录音窗口增强界面">
-                <div class="zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> 点击放大查看</div>
-              </div>
-            </div>
+        </div>
+        <div class="deep-figure">
+          <div class="figure-frame" onclick="openLightbox('pictures/praat-zh-sound-recorder.png', 'Praat 录音窗口增强界面')">
+            <img src="pictures/praat-zh-sound-recorder.png" alt="Praat 录音窗口增强界面">
+          </div>
+          <div class="figure-meta">
+            <span>FIG 4.1 // praat-zh-sound-recorder.png · 录音窗口界面</span>
+            <span class="figure-zoom-hint">点击放大检视 [+]</span>
           </div>
         </div>
       </div>
     </section>
-  </main>
 
-  <!-- ============ Footer ============ -->
-  <footer>
-    <div class="foot-wave"></div>
-    <div class="foot-in">
-      <div class="foot-brand"><img src="pictures/icon.png" alt=""><span>Praat 汉化版</span></div>
-      <div class="foot-links">
-        <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i>GitHub 源码仓库</a>
-        <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank" rel="noopener"><i class="fa-solid fa-clock-rotate-left"></i>所有历史版本 (GitHub)</a>
-        <a href="manual/Phonetic_symbols.html" target="_blank"><i class="fa-solid fa-font"></i>国际音标字符表</a>
-        <a href="https://praat.org" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i>praat.org 官方主页</a>
+    <!-- ============ 05. Bilingual Terminology Index ============ -->
+    <section id="terms">
+      <div class="sec-band">
+        <div class="sec-index">
+          <strong>SEC. 05</strong>
+          <span>TERMINOLOGY</span>
+        </div>
+        <div class="sec-heading">
+          <h2>常用语音学与 Praat 术语中英对照表</h2>
+          <p>按模块分组收录核心语音学、数据结构、信号处理与合成算法的标准中英文对照，方便文献阅读与脚本编写。</p>
+        </div>
       </div>
-    </div>
-  </footer>
 
-  <!-- About modal -->
-  <div id="about-modal" class="overlay" onclick="if(event.target===this)closeModal('about-modal')">
-    <div class="dialog">
-      <div class="dialog-head">
-        <div><img src="pictures/icon.png" width="18" height="18" alt="" style="object-fit:contain"><span>关于 Praat 汉化版</span></div>
-        <div class="dialog-close" onclick="closeModal('about-modal')" role="button" aria-label="关闭"></div>
+      <div class="term-toolbar">
+        <div class="term-search-cell">
+          <span class="term-search-prefix">FILTER //</span>
+          <input type="text" id="term-search" placeholder="输入中文或英文术语检索（如 Pitch, 共振峰, TextGrid, LPC）..." oninput="applyTermFilters()">
+        </div>
+        <div class="term-filter-strip" role="tablist" aria-label="术语分组过滤">
+          <button type="button" class="term-filter-btn active" onclick="setTermGroup('all', this)">全部</button>
+          <button type="button" class="term-filter-btn" onclick="setTermGroup('g1', this)">01 核心声学</button>
+          <button type="button" class="term-filter-btn" onclick="setTermGroup('g2', this)">02 数据与标注</button>
+          <button type="button" class="term-filter-btn" onclick="setTermGroup('g3', this)">03 信号处理</button>
+          <button type="button" class="term-filter-btn" onclick="setTermGroup('g4', this)">04 语音合成</button>
+        </div>
+        <div class="term-count-cell" id="term-count">共 34 条术语</div>
       </div>
-      <div class="dialog-body">
-        <div style="text-align:center;margin-bottom:14px">
-          <img src="pictures/icon.png" width="76" height="76" alt="Praat 汉化版" style="object-fit:contain">
-          <h3 style="font-family:var(--font-display);font-size:19px;font-weight:900;color:var(--ink);margin-top:8px">Praat 汉化版</h3>
-          <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);margin-top:2px">基于官方内核构建 · 语音学分析与处理软件</div>
+
+      <div class="term-scroll-box">
+        <table class="term-table" id="glossary-table">
+          <thead>
+            <tr>
+              <th>中文术语</th>
+              <th>英文原词 (点击复制)</th>
+              <th>分类</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="term-group" data-group="g1"><td colspan="4">01 · 核心声学与语音特征</td></tr>
+            <tr data-group="g1"><td><strong>基频 / 音高</strong></td><td>Pitch / F0</td><td>核心声学</td><td>声带振动的基频频率，单位为赫兹 (Hz)</td></tr>
+            <tr data-group="g1"><td><strong>音高上限 / 下限</strong></td><td>Pitch ceiling / floor</td><td>参数设置</td><td>音高分析算法搜索的最高与最低频率限制范围</td></tr>
+            <tr data-group="g1"><td><strong>共振峰</strong></td><td>Formant (F1, F2...)</td><td>核心声学</td><td>声道共鸣腔产生的特定共振频率峰值与带宽</td></tr>
+            <tr data-group="g1"><td><strong>音强 / 振幅</strong></td><td>Intensity / Amplitude</td><td>核心声学</td><td>声音的能量强度 (dB) 与振幅波形包络</td></tr>
+            <tr data-group="g1"><td><strong>语图 / 声谱图</strong></td><td>Spectrogram</td><td>信号显示</td><td>呈现时间、频率和能量三维关系的经典分析谱图</td></tr>
+            <tr data-group="g1"><td><strong>频谱 / 频谱切片</strong></td><td>Spectrum / Spectral slice</td><td>频域分析</td><td>特定时间点上的瞬时频域能量分布切片</td></tr>
+            <tr data-group="g1"><td><strong>脉冲 / 声门脉冲</strong></td><td>Pulses / Glottal pulses</td><td>声门活动</td><td>对应声带振动周期的离散脉冲时间点序列</td></tr>
+            <tr data-group="g1"><td><strong>谐噪比</strong></td><td>Harmonicity / HNR</td><td>音质分析</td><td>声音信号中周期谐波成分与非周期噪声成分的比值 (dB)</td></tr>
+            <tr data-group="g1"><td><strong>音高微扰 / 振幅微扰</strong></td><td>Jitter / Shimmer</td><td>音质分析</td><td>周期与振幅的微小随机波动，用于嗓音病理评估</td></tr>
+            <tr data-group="g1"><td><strong>浊音 / 清音</strong></td><td>Voiced / Voiceless</td><td>发音学</td><td>发音时声带参与振动的状态 / 声带不振动</td></tr>
+            <tr data-group="g1"><td><strong>摩擦 / 送气 / 气声</strong></td><td>Frication / Aspiration / Breathiness</td><td>发音与音质</td><td>声道狭窄湍流噪音 / 释放后呼出气流 / 声带微开产生的气化音</td></tr>
+            <tr data-group="g1"><td><strong>声道</strong></td><td>Vocal Tract</td><td>生理声学</td><td>从声带至唇齿的发音共鸣通道（咽腔、口腔、鼻腔）</td></tr>
+
+            <tr class="term-group" data-group="g2"><td colspan="4">02 · 数据结构与标注体系</td></tr>
+            <tr data-group="g2"><td><strong>声音对象 / 长声音</strong></td><td>Sound / LongSound</td><td>核心数据</td><td>普通内存音频对象 / 超长流式读取音频对象</td></tr>
+            <tr data-group="g2"><td><strong>文本标注格</strong></td><td>TextGrid</td><td>标注结构</td><td>Praat 用于分层标注语音时间段与点事件的标准格式</td></tr>
+            <tr data-group="g2"><td><strong>层 / 标注轨</strong></td><td>Tier</td><td>标注层级</td><td>在时间轴上相互独立平行的分层标注轨道</td></tr>
+            <tr data-group="g2"><td><strong>区间层 / 点层</strong></td><td>Interval Tier / Point Tier</td><td>标注层级</td><td>包含起止时间的区间标注轨 / 单个离散时间点的标记轨</td></tr>
+            <tr data-group="g2"><td><strong>区间 / 边界</strong></td><td>Interval / Boundary</td><td>标注元素</td><td>区间层中的单个时间段 / 切分音段的起止时间标记点</td></tr>
+            <tr data-group="g2"><td><strong>点过程</strong></td><td>PointProcess</td><td>数据结构</td><td>记录离散时间点序列（如基频脉冲）的底层对象</td></tr>
+            <tr data-group="g2"><td><strong>操控对象</strong></td><td>Manipulation</td><td>操纵结构</td><td>结合基频层与时长层、用于重合成与变形修改的对象</td></tr>
+            <tr data-group="g2"><td><strong>音高层 / 音强层</strong></td><td>PitchTier / IntensityTier</td><td>层级对象</td><td>独立的音高变化曲线层 / 独立的音强包络层</td></tr>
+            <tr data-group="g2"><td><strong>时长层 / 振幅层</strong></td><td>DurationTier / AmplitudeTier</td><td>层级对象</td><td>用于局部变速的时长因子层 / 振幅缩放控制层</td></tr>
+            <tr data-group="g2"><td><strong>字符串列表 / 实数表</strong></td><td>Strings / TableOfReal</td><td>统计数据</td><td>文本与文件名列表对象 / 多维数值统计矩阵对象</td></tr>
+
+            <tr class="term-group" data-group="g3"><td colspan="4">03 · 信号处理与分析算法</td></tr>
+            <tr data-group="g3"><td><strong>自相关 / 互相关</strong></td><td>Autocorrelation / Cross-correlation</td><td>周期算法</td><td>音高提取经典算法，计算信号自身的周期重复性</td></tr>
+            <tr data-group="g3"><td><strong>线性预测编码</strong></td><td>LPC (Burg / Autocorrelation)</td><td>谱估计算法</td><td>用于分离声道共鸣与提取共振峰频率/带宽的核心算法</td></tr>
+            <tr data-group="g3"><td><strong>预加重 / 去加重</strong></td><td>Pre-emphasis / De-emphasis</td><td>滤波预处理</td><td>提升高频能量以补偿声门辐射滚降 / 还原原始频响</td></tr>
+            <tr data-group="g3"><td><strong>谱重心 / 频谱倾斜</strong></td><td>Centre of gravity / Spectral tilt</td><td>频域特征</td><td>频谱能量分布的加权中心频率 / 频谱高低频滚降斜率</td></tr>
+            <tr data-group="g3"><td><strong>长期平均谱</strong></td><td>LTAS (Long-term average spectrum)</td><td>频域统计</td><td>较长语音段平均频域能量分布，反映发音特质</td></tr>
+            <tr data-group="g3"><td><strong>梅尔倒谱系数</strong></td><td>MFCC</td><td>特征工程</td><td>模拟人耳听觉梅尔尺度的倒谱特征系数</td></tr>
+            <tr data-group="g3"><td><strong>动态时间规整</strong></td><td>DTW</td><td>模式匹配</td><td>用于非线性对齐不同语速语音发音的动态时间算法</td></tr>
+
+            <tr class="term-group" data-group="g4"><td colspan="4">04 · 语音合成与高级分析</td></tr>
+            <tr data-group="g4"><td><strong>PSOLA 语音操纵</strong></td><td>PSOLA (Pitch-Synchronous Overlap-Add)</td><td>语音变换</td><td>基频同步重叠相加，改变语速与音调而不改变音色</td></tr>
+            <tr data-group="g4"><td><strong>声源-滤波器合成</strong></td><td>Source-filter synthesis</td><td>语音合成</td><td>结合声门波源与声道滤波器模型生成人工语音</td></tr>
+            <tr data-group="g4"><td><strong>发音合成</strong></td><td>Articulatory synthesis</td><td>语音合成</td><td>模拟发音器官生理结构与肌肉运动生成发音</td></tr>
+            <tr data-group="g4"><td><strong>Klatt 声学合成网格</strong></td><td>KlattGrid</td><td>语音合成</td><td>经典级联/并联多共振峰声学参数合成模型</td></tr>
+            <tr data-group="g4"><td><strong>耳蜗图 / 倒谱图</strong></td><td>Cochleagram / PowerCepstrogram</td><td>高级谱图</td><td>内耳基底膜响应听觉图 / 倒频域声门声道分离图</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ Footer / Colophon ============ -->
+    <footer class="colophon">
+      <div class="colophon-about">
+        <div class="colophon-brand">
+          <img src="pictures/icon.png" alt="">
+          <span>Praat 汉化版</span>
         </div>
         <p>Praat 官方原版由荷兰阿姆斯特丹大学语音科学研究所的 <strong>Paul Boersma</strong> 与 <strong>David Weenink</strong> 教授开发。</p>
         <p>本汉化版本由 <strong>KasumiKitsune</strong> 维护，旨在为中文语音学与声学研究者提供更流畅的本土化体验。</p>
-        <div class="license">开源许可证：GNU General Public License v3 (GPL v3)</div>
+        <div class="colophon-license">开源许可证：GNU General Public License v3 (GPL v3)</div>
       </div>
-      <div class="dialog-foot"><button class="btn small primary" onclick="closeModal('about-modal')">确定</button></div>
+
+      <div class="colophon-nav">
+        <ul class="colophon-links">
+          <li>
+            <a href="https://github.com/KasumiKitsune/praat-simplified-chinese" target="_blank" rel="noopener">
+              <span>GitHub 源码仓库</span>
+              <span>REPOSITORY ↗</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases" target="_blank" rel="noopener">
+              <span>所有历史版本 (GitHub)</span>
+              <span>RELEASES ↗</span>
+            </a>
+          </li>
+          <li>
+            <a href="manual/Phonetic_symbols.html" target="_blank">
+              <span>国际音标字符表</span>
+              <span>IPA SYMBOLS ↗</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://praat.org" target="_blank" rel="noopener">
+              <span>praat.org 官方主页</span>
+              <span>UPSTREAM ↗</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- About Modal -->
+  <div id="about-modal" class="overlay" onclick="if(event.target===this)closeModal('about-modal')">
+    <div class="modal-box">
+      <div class="modal-bar">
+        <span>ABOUT // 关于 Praat 汉化版</span>
+        <button type="button" class="modal-close" onclick="closeModal('about-modal')">[ESC 关闭]</button>
+      </div>
+      <div class="modal-content">
+        <p><strong>Praat 汉化版</strong> · 基于官方内核构建的语音学分析与处理软件</p>
+        <p>Praat 官方原版由荷兰阿姆斯特丹大学语音科学研究所的 <strong>Paul Boersma</strong> 与 <strong>David Weenink</strong> 教授开发。</p>
+        <p>本汉化版本由 <strong>KasumiKitsune</strong> 维护，旨在为中文语音学与声学研究者提供更流畅的本土化体验。</p>
+        <p style="font-family:var(--font-mono);font-size:12px;color:var(--ink-3);padding-top:4px;">开源许可证：GNU General Public License v3 (GPL v3)</p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" onclick="closeModal('about-modal')">确定</button>
+      </div>
     </div>
   </div>
 
-  <!-- Lightbox -->
-  <div id="lightbox" class="overlay lightbox" onclick="closeLightbox()">
-    <div class="lb-content" onclick="event.stopPropagation()">
-      <button class="lb-close" onclick="closeLightbox()" title="关闭 (Esc)"><i class="fa-solid fa-xmark"></i></button>
-      <img id="lb-img" src="" alt="放大预览">
-      <div id="lb-cap" class="lb-cap"></div>
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="overlay" onclick="closeLightbox()">
+    <div class="lb-box" onclick="event.stopPropagation()">
+      <div class="modal-bar">
+        <span id="lb-cap">IMAGE INSPECTION</span>
+        <button type="button" class="modal-close" onclick="closeLightbox()">[ESC 关闭]</button>
+      </div>
+      <div class="lb-body">
+        <img id="lb-img" src="" alt="放大预览">
+      </div>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script>
-    /* ---------- Helpers ---------- */
+    /* ---------- Toast & Clipboard ---------- */
     function toast(msg) {
       const t = document.getElementById('toast');
-      t.textContent = msg; t.classList.add('show');
-      clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1600);
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => t.classList.remove('show'), 1800);
     }
+
     function copyText(text, cb) {
       const done = () => cb && cb();
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(() => fallback());
-      } else fallback();
+        navigator.clipboard.writeText(text).then(done).catch(fallback);
+      } else {
+        fallback();
+      }
       function fallback() {
         const ta = document.createElement('textarea');
-        ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
-        document.body.appendChild(ta); ta.select();
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
         try { document.execCommand('copy'); done(); } catch (e) {}
         document.body.removeChild(ta);
       }
     }
 
-    /* ---------- Modal / Lightbox ---------- */
-    function openModal(id) { document.getElementById(id)?.classList.add('open'); }
-    function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
-    function openLightbox(src, cap) {
-      document.getElementById('lb-img').src = src;
-      document.getElementById('lb-cap').textContent = cap || '';
-      document.getElementById('lightbox').classList.add('open');
-    }
-    function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeLightbox(); closeModal('about-modal'); }
-    });
+    /* ---------- Hero Stage Switcher ---------- */
+    function switchStage(index, btn) {
+      document.querySelectorAll('.stage-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
 
-    /* ---------- Copy Baidu code ---------- */
+      document.querySelectorAll('.stage-pane').forEach((p, i) => {
+        p.classList.toggle('active', i === index);
+      });
+
+      const fileMap = [
+        'FIG 1.1 // praat-zh-modern-ui.png',
+        'FIG 1.2 // praat-zh-main-window.png'
+      ];
+      document.getElementById('stage-file-indicator').textContent = fileMap[index] || '';
+    }
+
+    /* ---------- Baidu Netdisk Code Copy ---------- */
     function copyPanCode(code, btn) {
       copyText(code, () => {
-        const orig = btn.innerHTML;
+        const orig = btn.textContent;
         btn.classList.add('copied');
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>已复制</span>';
-        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 1800);
+        btn.textContent = code + ' [已复制]';
+        toast('已复制提取码: ' + code);
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = orig;
+        }, 1800);
       });
     }
 
-    /* ---------- Terms: filter + click English to copy ---------- */
-    function filterTerms(query) {
-      const q = (query || '').trim().toLowerCase();
+    /* ---------- Terminology Filter & Copy ---------- */
+    let currentTermGroup = 'all';
+
+    function setTermGroup(group, btn) {
+      currentTermGroup = group;
+      document.querySelectorAll('.term-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyTermFilters();
+    }
+
+    function applyTermFilters() {
+      const q = (document.getElementById('term-search').value || '').trim().toLowerCase();
       const rows = Array.from(document.querySelectorAll('#glossary-table tbody tr'));
-      let visible = 0, group = null, groupHit = false;
-      const flush = () => { if (group) group.style.display = (!q || groupHit) ? '' : 'none'; };
+      let visibleCount = 0;
+      let activeGroupHeader = null;
+      let groupHasMatch = false;
+
+      const flushGroupHeader = () => {
+        if (activeGroupHeader) {
+          activeGroupHeader.style.display = groupHasMatch ? '' : 'none';
+        }
+      };
+
       rows.forEach(row => {
+        const rowGroup = row.getAttribute('data-group');
+        const groupMatch = currentTermGroup === 'all' || rowGroup === currentTermGroup;
+
         if (row.classList.contains('term-group')) {
-          flush(); group = row; groupHit = false; row.style.display = '';
+          flushGroupHeader();
+          activeGroupHeader = row;
+          groupHasMatch = false;
         } else {
-          const hit = !q || row.textContent.toLowerCase().includes(q);
-          row.style.display = hit ? '' : 'none';
-          if (hit) { visible++; groupHit = true; }
+          const textMatch = !q || row.textContent.toLowerCase().includes(q);
+          const show = groupMatch && textMatch;
+          row.style.display = show ? '' : 'none';
+          if (show) {
+            visibleCount++;
+            groupHasMatch = true;
+          }
         }
       });
-      flush();
-      document.getElementById('term-count').textContent = q ? `找到 ${visible} 条结果` : `共 34 条术语`;
+      flushGroupHeader();
+
+      document.getElementById('term-count').textContent =
+        (q || currentTermGroup !== 'all') ? `筛选出 ${visibleCount} 条术语` : '共 34 条术语';
     }
-    document.querySelectorAll('#glossary-table tr:not(.term-group) td:nth-child(2)').forEach(td => {
+
+    document.querySelectorAll('#glossary-table tbody tr:not(.term-group) td:nth-child(2)').forEach(td => {
       td.title = '点击复制英文原词';
-      td.addEventListener('click', () => copyText(td.textContent.trim(), () => toast('已复制：' + td.textContent.trim())));
+      td.addEventListener('click', () => {
+        const txt = td.textContent.trim();
+        copyText(txt, () => toast('已复制术语: ' + txt));
+      });
     });
 
-    /* ---------- OS detect: mark recommended download ---------- */
-    (function () {
-      const ua = navigator.userAgent;
-      const key = /Mac OS X|Macintosh/.test(ua) ? 'mac' : /Linux/.test(ua) && !/Android/.test(ua) ? 'linux' : 'win';
-      if (key !== 'win') {
-        document.querySelectorAll('.dl.featured').forEach(c => c.classList.remove('featured'));
-        document.querySelector(`.dl[data-os="${key}"]`)?.classList.add('featured');
+    /* ---------- Modal & Lightbox ---------- */
+    function openModal(id) {
+      document.getElementById(id)?.classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id)?.classList.remove('open');
+    }
+    function openLightbox(src, cap) {
+      document.getElementById('lb-img').src = src;
+      document.getElementById('lb-cap').textContent = cap || 'IMAGE INSPECTION';
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeModal('about-modal');
       }
+    });
+
+    /* ---------- Scroll Spy Navigation ---------- */
+    (function () {
+      const ids = ['overview', 'download', 'manual', 'recorder', 'terms'];
+      const links = document.querySelectorAll('.nav-links a');
+      function onScroll() {
+        let cur = ids[0];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.getBoundingClientRect().top <= 140) cur = id;
+        });
+        links.forEach(a => a.classList.toggle('active', a.dataset.sec === cur));
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
     })();
 
-    /* ---------- Latest release links ---------- */
+    /* ---------- Auto-Fetch Latest GitHub Release Assets ---------- */
     (function () {
       fetch('https://api.github.com/repos/KasumiKitsune/praat-simplified-chinese/releases/latest')
         .then(r => r.json())
         .then(data => {
-          if (!data || !data.assets || !data.assets.length) return;
+          if (!data) return;
+          if (data.tag_name) {
+            const verEl = document.getElementById('spec-version');
+            if (verEl) verEl.textContent = data.tag_name;
+          }
+          if (!data.assets || !data.assets.length) return;
           const modern = data.assets.find(a => a.name.endsWith('.zip') && a.name.includes('Modern'));
           const win = data.assets.find(a => a.name.endsWith('.zip') && a.name.includes('Windows') && !a.name.includes('Modern'));
           const mac = data.assets.find(a => a.name.endsWith('.dmg') && a.name.includes('macOS'));
@@ -1060,151 +2205,6 @@
           if (mac) document.getElementById('dl-mac-btn').href = mac.browser_download_url;
         })
         .catch(() => {});
-    })();
-
-    /* ---------- TextGrid nav: active interval + scroll playhead ---------- */
-    (function () {
-      const ids = ['features', 'download', 'manual', 'terms', 'recorder'];
-      const links = document.querySelectorAll('#tier a');
-      const head = document.getElementById('playhead');
-      const tier = document.getElementById('tier');
-      function update() {
-        const max = document.documentElement.scrollHeight - innerHeight;
-        const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
-        head.style.left = `calc(${p * 100}% - ${p * 2}px)`;
-        let cur = ids[0];
-        ids.forEach(id => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= innerHeight * 0.35) cur = id; });
-        if (max - scrollY < 8) cur = ids[ids.length - 1];
-        links.forEach(a => a.classList.toggle('active', a.dataset.sec === cur));
-      }
-      addEventListener('scroll', update, { passive: true });
-      addEventListener('resize', update);
-      update();
-    })();
-
-    /* ---------- Hero: live spectrogram + mouse-drawn F0 contour ---------- */
-    (function () {
-      const cv = document.getElementById('spec');
-      const hero = cv.parentElement;
-      const ctx = cv.getContext('2d');
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const W = 720, H = 140, TAU = Math.PI * 2;
-
-      // formant tracks (fraction of height from bottom), periodic in W for seamless tiling
-      const base = [0.13, 0.30, 0.47, 0.66], amp = [0.05, 0.07, 0.05, 0.04];
-      const fk = (k, xw) => base[k] + amp[k] * Math.sin(TAU * (k + 2) * xw / W + k * 1.7);
-
-      // pre-render a wideband-style spectrogram tile
-      const off = document.createElement('canvas'); off.width = W; off.height = H;
-      const octx = off.getContext('2d');
-      const img = octx.createImageData(W, H);
-      for (let x = 0; x < W; x++) {
-        const env = Math.max(0, Math.sin(TAU * 4 * x / W) * 1.2 - 0.1);          // syllable-like energy bursts
-        const pulse = 0.55 + 0.45 * Math.cos(TAU * 96 * x / W);                  // glottal striations
-        for (let y = 0; y < H; y++) {
-          const f = 1 - y / H;
-          let e = 0;
-          for (let k = 0; k < 4; k++) { const d = (f - fk(k, x)) / (0.035 + k * 0.006); e += (0.95 - k * 0.16) * Math.exp(-d * d / 2); }
-          const v = Math.min(1, env * e * (0.35 + 0.65 * pulse) + Math.random() * 0.06 * env + (f < 0.08 ? 0.12 * env : 0));
-          const i = (y * W + x) * 4;
-          img.data[i] = 23; img.data[i + 1] = 22; img.data[i + 2] = 26; img.data[i + 3] = v * 255;
-        }
-      }
-      octx.putImageData(img, 0, 0);
-
-      let cw = 0, ch = 0, dpr = 1, visible = true, mouse = null;
-      const hist = []; let cur = 0.5, t0 = performance.now();
-      function resize() {
-        dpr = Math.min(devicePixelRatio || 1, 2);
-        cw = hero.clientWidth; ch = hero.clientHeight;
-        cv.width = cw * dpr; cv.height = ch * dpr;
-      }
-      resize(); addEventListener('resize', resize);
-      hero.addEventListener('pointermove', e => { const r = hero.getBoundingClientRect(); mouse = (e.clientY - r.top) / r.height; });
-      hero.addEventListener('pointerleave', () => { mouse = null; });
-      new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(hero);
-
-      function frame(now) {
-        if (visible) draw((now - t0) / 1000);
-        if (!reduce) requestAnimationFrame(frame);
-      }
-      function draw(t) {
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, cw, ch);
-        const s = ch / H, tileW = W * s, scroll = reduce ? 0 : (t * 26) % W;
-
-        // tiled, scrolling spectrogram
-        const ox = -scroll * s;
-        for (let x = ox; x < cw; x += tileW) ctx.drawImage(off, x, 0, tileW + 1, ch);
-
-        // formant dots (F1–F4)
-        ctx.fillStyle = '#e5484d';
-        for (let k = 0; k < 4; k++) {
-          for (let x = 0; x < cw; x += 7) {
-            const xw = x / s + scroll;
-            const env = Math.max(0, Math.sin(TAU * 4 * xw / W) * 1.2 - 0.1);
-            if (env < 0.25) continue;
-            ctx.beginPath(); ctx.arc(x, (1 - fk(k, xw)) * ch, 1.7, 0, TAU); ctx.fill();
-          }
-        }
-
-        // F0 contour: follows the pointer, otherwise wanders on its own
-        const auto = 0.5 + 0.2 * Math.sin(t * 0.9) + 0.08 * Math.sin(t * 2.6);
-        const target = mouse == null ? auto : mouse;
-        cur += (target - cur) * 0.14;
-        hist.push(cur);
-        const step = 4, n = Math.ceil(cw / step);
-        while (hist.length > n) hist.shift();
-        ctx.strokeStyle = '#2b59ff'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-        ctx.beginPath();
-        hist.forEach((v, i) => { const x = cw - (hist.length - 1 - i) * step, y = v * ch; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
-        ctx.stroke();
-
-        // live readout at the head of the line (75–500 Hz, log scale)
-        const hz = Math.round(500 * Math.pow(75 / 500, cur));
-        const hx = cw - 8, hy = cur * ch;
-        ctx.fillStyle = '#2b59ff'; ctx.beginPath(); ctx.arc(cw - 1, hy, 5, 0, TAU); ctx.fill();
-        ctx.font = '600 12px "IBM Plex Mono", monospace';
-        const label = `F0 ${hz} Hz`, tw = ctx.measureText(label).width + 14;
-        const bx = Math.max(8, hx - tw - 6), by = Math.min(Math.max(hy - 28, 8), ch - 30);
-        ctx.fillStyle = '#17161a'; ctx.fillRect(bx, by, tw, 22);
-        ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(label, bx + 7, by + 11);
-      }
-      reduce ? draw(2) : requestAnimationFrame(frame);
-    })();
-
-    /* ---------- Recorder demo: hold to record, release to save ---------- */
-    (function () {
-      const btn = document.getElementById('rec-btn');
-      const barsBox = document.getElementById('rec-bars');
-      const list = document.getElementById('rec-list');
-      const label = btn.querySelector('span');
-      for (let i = 0; i < 48; i++) barsBox.appendChild(document.createElement('span'));
-      const bars = Array.from(barsBox.children);
-      let timer = null, start = 0, count = 0;
-
-      function begin(e) {
-        e.preventDefault();
-        if (timer) return;
-        start = performance.now();
-        btn.classList.add('on'); label.textContent = '录音中…';
-        timer = setInterval(() => bars.forEach(b => { b.style.height = (3 + Math.random() * 34) + 'px'; }), 90);
-      }
-      function end() {
-        if (!timer) return;
-        clearInterval(timer); timer = null;
-        btn.classList.remove('on'); label.textContent = '按住录音';
-        bars.forEach(b => b.style.height = '3px');
-        const sec = ((performance.now() - start) / 1000).toFixed(1);
-        count++;
-        const li = document.createElement('li');
-        li.innerHTML = `<span>sound_${String(count).padStart(3, '0')}</span><span>${sec} s</span>`;
-        list.prepend(li);
-      }
-      btn.addEventListener('pointerdown', begin);
-      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, end));
-      btn.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') begin(e); });
-      btn.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') end(); });
     })();
   </script>
 </body>
