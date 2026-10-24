@@ -4,16 +4,16 @@
   <p>语音学分析与语音信号处理软件 · 中文本地化版本</p>
 
   <p>
-    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-Modern-Windows-x64.zip" title="下载 Praat v7 Windows 现代版 (64位)"><img src="docs/pictures/download-v7-win-modern.svg" alt="v7 Windows 现代版" height="42" /></a>
+    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.5/Praat-v7.0-zh.5-Modern-Windows-x64.zip" title="下载 Praat v7 Windows 现代版 (64位)"><img src="docs/pictures/download-v7-win-modern.svg" alt="v7 Windows 现代版" height="42" /></a>
     &nbsp;&nbsp;
-    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-Windows-x64.zip" title="下载 Praat v7 Windows 经典版 (64位)"><img src="docs/pictures/download-v7-win-classic.svg" alt="v7 Windows 经典版" height="42" /></a>
+    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.5/Praat-v7.0-zh.5-Windows-x64.zip" title="下载 Praat v7 Windows 经典版 (64位)"><img src="docs/pictures/download-v7-win-classic.svg" alt="v7 Windows 经典版" height="42" /></a>
     &nbsp;&nbsp;
-    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v7.0-zh.4-macOS-universal.dmg" title="下载 Praat v7 macOS 经典版 (Universal DMG)"><img src="docs/pictures/download-v7-mac-classic.svg" alt="v7 macOS 经典版" height="42" /></a>
+    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.5/Praat-v7.0-zh.5-macOS-universal.dmg" title="下载 Praat v7 macOS 经典版 (Universal DMG)"><img src="docs/pictures/download-v7-mac-classic.svg" alt="v7 macOS 经典版" height="42" /></a>
   </p>
   <p>
-    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v6.4.62-zh-Windows-x64.zip" title="下载 Praat v6.4 Windows 经典版 (小体积 64位)"><img src="docs/pictures/download-v64-win-classic.svg" alt="v6.4 Windows 经典版" height="42" /></a>
+    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.5/Praat-v6.4.62-zh-Windows-x64.zip" title="下载 Praat v6.4 Windows 经典版 (小体积 64位)"><img src="docs/pictures/download-v64-win-classic.svg" alt="v6.4 Windows 经典版" height="42" /></a>
     &nbsp;&nbsp;
-    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.4/Praat-v6.4.62-zh-macOS-universal.dmg" title="下载 Praat v6.4 macOS 经典版 (小体积 Universal DMG)"><img src="docs/pictures/download-v64-mac-classic.svg" alt="v6.4 macOS 经典版" height="42" /></a>
+    <a href="https://github.com/KasumiKitsune/praat-simplified-chinese/releases/download/v7.0-zh.5/Praat-v6.4.62-zh-macOS-universal.dmg" title="下载 Praat v6.4 macOS 经典版 (小体积 Universal DMG)"><img src="docs/pictures/download-v64-mac-classic.svg" alt="v6.4 macOS 经典版" height="42" /></a>
   </p>
 </div>
 
