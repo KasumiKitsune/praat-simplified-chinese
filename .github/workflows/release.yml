@@ -156,12 +156,13 @@ jobs:
               ("sys/praat_python.cpp", "sys/praat_python.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "21"),
               ("sys/PythonScriptEditor.cpp", "sys/PythonScriptEditor.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "31"),
               ("sys/PreferencesDialog.cpp", "sys/PreferencesDialog.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "41"),
+              ("dwtools/Corpus_extensions.cpp", "", "236DE6F1139EA59B00EC42BA", "236DE6F2139EA59B00EC42BA", "", "51"),
           ]
 
           for cpp_path, h_path, anchor_grp, anchor_src, anchor_hdr, pfx in files_to_add:
               import os
               cpp_name = os.path.basename(cpp_path)
-              h_name = os.path.basename(h_path)
+              h_name = os.path.basename(h_path) if h_path else ""
               if cpp_name in project:
                   print(f"{cpp_name} is already present in the Xcode project.")
                   continue
@@ -171,24 +172,22 @@ jobs:
               header_ref = f"CDFE000000000000000000{pfx}3"
               header_build = f"CDFE000000000000000000{pfx}4"
 
+              build_block = f"\t\t{build_file_cpp} /* {cpp_name} in Sources */ = {{isa = PBXBuildFile; fileRef = {file_ref_cpp} /* {cpp_name} */; }};\n"
+              if h_name:
+                  build_block += f"\t\t{header_build} /* {h_name} in Headers */ = {{isa = PBXBuildFile; fileRef = {header_ref} /* {h_name} */; }};\n"
+
+              ref_block = f"\t\t{file_ref_cpp} /* {cpp_name} */ = {{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = {cpp_name}; path = {cpp_path}; sourceTree = \"<group>\"; }};\n"
+              if h_name:
+                  ref_block += f"\t\t{header_ref} /* {h_name} */ = {{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = {h_name}; path = {h_path}; sourceTree = \"<group>\"; }};\n"
+
               project = project.replace(
                   "/* Begin PBXBuildFile section */\n",
-                  "/* Begin PBXBuildFile section */\n"
-                  f"\t\t{build_file_cpp} /* {cpp_name} in Sources */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {file_ref_cpp} /* {cpp_name} */; }};\n"
-                  f"\t\t{header_build} /* {h_name} in Headers */ = "
-                  f"{{isa = PBXBuildFile; fileRef = {header_ref} /* {h_name} */; }};\n",
+                  "/* Begin PBXBuildFile section */\n" + build_block,
                   1,
               )
               project = project.replace(
                   "/* Begin PBXFileReference section */\n",
-                  "/* Begin PBXFileReference section */\n"
-                  f"\t\t{file_ref_cpp} /* {cpp_name} */ = "
-                  f"{{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; "
-                  f"name = {cpp_name}; path = {cpp_path}; sourceTree = \"<group>\"; }};\n"
-                  f"\t\t{header_ref} /* {h_name} */ = "
-                  f"{{isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; "
-                  f"name = {h_name}; path = {h_path}; sourceTree = \"<group>\"; }};\n",
+                  "/* Begin PBXFileReference section */\n" + ref_block,
                   1,
               )
 
@@ -197,7 +196,10 @@ jobs:
               idx = project.find(grp_anchor)
               if idx != -1:
                   end_line = project.find("\n", idx) + 1
-                  project = project[:end_line] + f"\t\t\t\t{file_ref_cpp} /* {cpp_name} */,\n\t\t\t\t{header_ref} /* {h_name} */,\n" + project[end_line:]
+                  grp_entry = f"\t\t\t\t{file_ref_cpp} /* {cpp_name} */,\n"
+                  if h_name:
+                      grp_entry += f"\t\t\t\t{header_ref} /* {h_name} */,\n"
+                  project = project[:end_line] + grp_entry + project[end_line:]
 
               # Sources anchor
               src_anchor = f"\t\t\t\t{anchor_src} /*"
@@ -207,13 +209,14 @@ jobs:
                   project = project[:end_line] + f"\t\t\t\t{build_file_cpp} /* {cpp_name} in Sources */,\n" + project[end_line:]
 
               # Headers anchor
-              hdr_anchor = f"\t\t\t\t{anchor_hdr} /*"
-              idx = project.find(hdr_anchor)
-              if idx != -1:
-                  end_line = project.find("\n", idx) + 1
-                  project = project[:end_line] + f"\t\t\t\t{header_build} /* {h_name} in Headers */,\n" + project[end_line:]
+              if anchor_hdr and h_name:
+                  hdr_anchor = f"\t\t\t\t{anchor_hdr} /*"
+                  idx = project.find(hdr_anchor)
+                  if idx != -1:
+                      end_line = project.find("\n", idx) + 1
+                      project = project[:end_line] + f"\t\t\t\t{header_build} /* {h_name} in Headers */,\n" + project[end_line:]
 
-              print(f"Added {cpp_path} and {h_path} to praat_mac Xcode target.")
+              print(f"Added {cpp_path} to praat_mac Xcode target.")
 
           project_path.write_text(project, encoding="utf-8")
           print("All missing files patched into Xcode project successfully.")
