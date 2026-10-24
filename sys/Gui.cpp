@@ -17,6 +17,7 @@
  */
 
 #include "GuiP.h"
+#include <string>
 #include "machine.h"
 #include <locale.h>
 

@@ -17,6 +17,8 @@
  */
 
 #include "Spectrogram.h"
+#include <vector>
+#include <utility>
 #include "enums_getText.h"
 #include "Spectrogram_enums.h"
 #include "enums_getValue.h"
