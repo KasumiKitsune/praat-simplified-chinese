@@ -22,6 +22,7 @@
 
 /* Anyone who uses Thing can also use: */
 	#include "melder.h"
+#include <unordered_map>
 	/* The macros for struct and class definitions: */
 		#include "oo.h"
 

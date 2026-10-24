@@ -17,6 +17,7 @@
  */
 
 #include "PreferencesDialog.h"
+#include <vector>
 #include "GuiP.h"
 #include "praatP.h"
 #include "praatM.h"
