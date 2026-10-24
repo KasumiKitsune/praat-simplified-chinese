@@ -17,6 +17,7 @@
  */
 
 #include "GuiP.h"
+#include <vector>
 
 Thing_implement (GuiDialog, GuiShell, 0);
 
