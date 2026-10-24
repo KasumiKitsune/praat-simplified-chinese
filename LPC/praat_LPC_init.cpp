@@ -163,7 +163,7 @@ DO
 
 DIRECT (CONVERT_ONE_AND_ONE_TO_ONE__CPP_Pitch_markUnvoiced) {
 	CONVERT_ONE_AND_ONE_TO_ONE (CPP, Pitch)
-		autoCPP result = CPP_and_Pitch_to_CPP_markUnvoiced (me, you);
+		autoCPP result = CPP_and_Pitch_to_CPP_markVoicing (me, you);
 	CONVERT_ONE_AND_ONE_TO_ONE_END (my name.get(), U"_uv")
 }
 
@@ -1808,7 +1808,7 @@ void praat_uvafon_LPC_init () {
 		praat_addAction1 (classCPP, 0, U"Formula...",
 			nullptr, 0, MODIFY_CPP_formula);
 
-	praat_addAction2 (classCPP, 1, classPitch, 1, U"Mark unvoiced frames", nullptr, 0, 
+	praat_addAction2 (classCPP, 1, classPitch, 1, U"Mark unvoiced CPP frames", nullptr, 0, 
 			CONVERT_ONE_AND_ONE_TO_ONE__CPP_Pitch_markUnvoiced);
 		
 	praat_addAction1 (classCepstrumc, 0, U"Analyse", nullptr, 0, nullptr);

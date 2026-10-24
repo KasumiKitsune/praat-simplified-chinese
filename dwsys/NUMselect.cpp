@@ -22,7 +22,7 @@
 void timeMedian () {
     try {
         Melder_clearInfo ();
-        autoINTVEC numberOfElements {11_integer, 101_integer, 1001_integer, 10001_integer, 100001_integer};
+        autoINTVEC numberOfElements {11_integer, 101_integer, 501, 1001_integer, 10001_integer, 100001_integer};
 		MelderInfo_writeLine (U"Old: O(n log(n)); sort, NUMquantile(0.5)\n"
 			"New: Alexandrescu (2017) O(n)\n"
 		);

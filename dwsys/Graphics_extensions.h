@@ -125,7 +125,7 @@ struct structLineSegmentClipper {
 		for (int i = 1; i <= 4; i ++)
 			if (in (& p, & corners [i]) >= 0)
 				c |= 1 << (i - 1);
-		c += 1;// we count from 1
+		c += 1;	// we count from 1 instead of 0!
 		if (c == 1 || c == 16) // case 6, Fig 5:
 			return false;
 		Melder_assert (c % 5 != 1);
@@ -148,6 +148,24 @@ struct structLineSegmentClipper {
 		}
 		return true;
 	}
+	
+	void init_common () {
+		edges = newvectorzero<structHPoint> (4);
+		for (integer i = 1; i <= 4; i ++) {
+			const integer ip1 = i % 4 + 1;
+			cross (& corners [i], & corners[ip1], & edges[i]);
+		}
+		/*
+			Table 1 in Skala (2005) for indices 0,1,2,3
+			tab1 = {-1, 0, 0, 1, 1, -2, 0, 2, 2, 0, -2, 1, 1, 0, 0, -1};
+			tab2 = {-1, 3, 1, 3, 2, -2, 2, 3, 3, 2, -2, 2, 3, 1, 3, -1};
+			Our indices are 1,2,3,4 so we add 1 to these tables.
+		*/
+		tab1 = {-1, 1, 1, 2, 2, -2, 1, 3, 3, 1, -2, 2, 2, 1, 1, -1}; // count from 1
+		tab2 = {-1, 4, 2, 4, 3, -2, 3, 4, 4, 3, -2, 3, 4, 2, 4, -1};  // count from 1
+		mask = {-1, 4, 4, 2, 2, -2, 4, 8, 8, 4, -2, 2, 2, 4, 4, -1};
+	}
+
 public:
 
 	/*
@@ -164,29 +182,56 @@ public:
 			std::swap (y1, y2);
 		//            BL             BR               TR            TL
 		corners = {{x1, y1, 1.0}, {x2, y1, 1.0}, {x2, y2, 1.0}, {x1, y2, 1.0}};
-		edges = newvectorzero<structHPoint> (4);
-		for (integer i = 1; i <= 4; i ++) {
-			const integer ip1 = i % 4 + 1;
-			cross (& corners [i], & corners[ip1], & edges[i]);
-		}
-		/*
-			Table 1 in Skala (2005) for indices 0,1,2,3
-			tab1 = {-1, 0, 0, 1, 1, -2, 0, 2, 2, 0, -2, 1, 1, 0, 0, -1};
-			tab2 = {-1, 3, 1, 3, 2, -2, 2, 3, 3, 2, -2, 2, 3, 1, 3, -1};
-			Our indices are 1,2,3,4 so we add 1 to these tables.
-		*/
-		tab1 = {-1, 1, 1, 2, 2, -2, 1, 3, 3, 1, -2, 2, 2, 1, 1, -1}; // count from 1
-		tab2 = {-1, 4, 2, 4, 3, -2, 3, 4, 4, 3, -2, 3, 4, 2, 4, -1};  // count from 1
-		mask = {-1, 4, 4, 2, 2, -2, 4, 8, 8, 4, -2, 2, 2, 4, 4, -1};
+		init_common ();
 	}
 	
+	/*
+		For a clipping window that consists of 4 points that define a convex quadrilateral.
+		Precondition:
+			The four points need to form a counter clockwise convex quadrilateral
+			No three points on a line.
+	*/
+	void init4 (VEC const& x, VEC const& y) {
+		Melder_assert (x.size == 4 && y.size == 4);
+		/*
+			Check convexity.
+		*/
+		integer cpm1;
+		for (integer i = 1; i <= 4; i ++) {
+			const integer im1 = (i + 2) % 4 + 1;
+			const integer ip1 = i % 4 + 1;
+			const double cp = x [im1] * (y [ip1] - y [i]) - x [i] * (y [ip1] - y [im1]) + x [ip1] * (y [i] - y [im1]);
+			if (i > 1) {
+				Melder_assert ((cp > 0 && cpm1 > 0) || (cp < 0 && cpm1 < 0));
+			}
+			cpm1 = cp;
+		}
+		for (integer i = 1; i <= 4; i ++) {
+			corners [i] = {x [i], y [i], 1.0};
+		}
+		init_common ();
+	}
+	
+	/*
+		Check if line from (x1,y1) to (x2,y2) needs to be clipped.
+		if yes, return true and the line to be drawn;
+		E.g if the clipping quadrilateral is given by the four corners ( 0,0), (1,0), (1,1), (0,1):
+			line from (-0.5,0.5) to ( 0.5, 0.5) we return (0.0,0.5) to (0.5,0.5);
+			line from (-0.5,0.5) to ( 1.5, 0.5) we return (0.0,0.5) to (1.0,0.5);
+			line from ( 1.5,0.5) to (-0.5, 0.5) we return (1.0,0.5) to (0.0,0.5);
+			line from ( 0.5,1.5) to ( 0.5, 0.5) we return (0.5,1.0) to (0.5,0.5);
+						 x1 y1         x2 y2                x1 y1        x2 y2
+		if no, return false and arguments are not changed.
+	*/
 	bool clip (double& x1, double& y1, double& x2, double& y2) {
 		bool result = false;
 		from = { x1, y1, 1.0 };
 		to   = { x2, y2, 1.0 };
 		if (clipLine ()) {
-			x1 = from.x / from.w; y1 = from.y / from.w;
-			x2 = to.x / to.w;     y2 = to.y / to.w;
+			x1 = from.x / from.w;
+			y1 = from.y / from.w;
+			x2 =   to.x / to.w;
+			y2 =   to.y / to.w;
 			result = true;
 		}
 		return result;

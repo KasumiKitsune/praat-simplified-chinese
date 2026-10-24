@@ -565,9 +565,9 @@ static void praat_exit (int exit_code) {
 		trace (U"save the preferences");
 		Melder_assert (str32equ (Melder_double (1.5), U"1.5"));   // refuse to write the preferences if the locale is wrong (even if tracing is on)
 		Preferences_write_i (& prefsFile7);
-		if (Melder_appVersion() < 8000) {   // allow the concurrent use of Praat 6 and 7, until Praat 8
+		if (Melder_appVersion() >= 8000) {   // allow the concurrent use of Praat 6 and 7, until Praat 8
 			if (MelderFile_readable (& prefsFile7))   // If successful in writing the modern (Praat 7/8) settings file...
-				MelderFile_delete (& prefsFile5);   // ... then delete the obsolete (Praat 6) settings file.
+				MelderFile_delete (& prefsFile5);   // ... then delete the obsolete (Praat 5/6) settings file.
 		}
 
 		trace (U"save the script buttons");
@@ -583,9 +583,9 @@ static void praat_exit (int exit_code) {
 				praat_saveAddedActions (& buffer);
 				praat_saveToggledActions (& buffer);
 				MelderFile_writeText_i (& buttonsFile7, buffer.string, kMelder_textOutputEncoding::ASCII_THEN_UTF16);
-				if (Melder_appVersion() < 8000) {   // allow the concurrent use of Praat 6 and 7, until Praat 8
+				if (Melder_appVersion() >= 8000) {   // allow the concurrent use of Praat 6 and 7, until Praat 8
 					if (MelderFile_readable (& buttonsFile7))   // If successful in writing the modern (Praat 7/8) buttons file...
-						MelderFile_delete (& buttonsFile5);   // ... then delete the obsolete (Praat 6) buttons file.
+						MelderFile_delete (& buttonsFile5);   // ... then delete the obsolete (Praat 5/6) buttons file.
 				}
 			} catch (MelderError) {
 				Melder_clearError ();
