@@ -385,8 +385,8 @@ void structScriptEditor :: v_createMenus () {
 	Editor_addCommand (this, U"Run", U"Run", 'R', menu_cb_run);
 	Editor_addCommand (this, U"Run", U"Run selection", 'T', menu_cb_runSelection);
 	Editor_addCommand (this, U"Run", U"-- run with full trust --", 0, nullptr);
-	Editor_addCommand (this, U"Run", U"Run with FULL TRUST", 0, menu_cb_runWithFullTrust);
-	Editor_addCommand (this, U"Run", U"Run selection with FULL TRUST", 0, menu_cb_runSelectionWithFullTrust);
+	Editor_addCommand (this, U"Run", U"Run with FULL TRUST", GuiMenu_COMMAND_EXTRA | 'R', menu_cb_runWithFullTrust);
+	Editor_addCommand (this, U"Run", U"Run selection with FULL TRUST", GuiMenu_COMMAND_EXTRA | 'T', menu_cb_runSelectionWithFullTrust);
 }
 
 void structScriptEditor :: v_createMenuItems_help (EditorMenu menu) {

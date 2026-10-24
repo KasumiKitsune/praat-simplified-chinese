@@ -260,7 +260,7 @@ void structPowerCepstrumWorkspace :: initWorkspace (constPowerCepstrum me, doubl
 {
 	powerCepstrum = me;
 	Function_unidirectionalAutowindow (powerCepstrum, & qminFit, & qmaxFit);
-	Melder_require (qminFit >= powerCepstrum ->xmin && qmaxFit <= powerCepstrum ->xmax,
+	Melder_require (qminFit >= powerCepstrum -> xmin && qmaxFit <= powerCepstrum -> xmax,
 		U"Your quefrency range is outside the domain.");
 	(void) Matrix_getWindowSamplesX (powerCepstrum, qminFit, qmaxFit, & imin, & imax);
 	Melder_clipLeft (2_integer, & imin); // never use q=0 in fitting
@@ -276,7 +276,7 @@ void structPowerCepstrumWorkspace :: initWorkspace (constPowerCepstrum me, doubl
 			powerCepstrum -> ymin, powerCepstrum -> ymax, powerCepstrum -> ny, powerCepstrum -> dy, powerCepstrum ->y1);
 	maximumNumberOfRhamonics = 15;
 	rhamonics = raw_MAT (maximumNumberOfRhamonics, 5_integer);
-	slopeSelector = SlopeSelector_create (x.get(), y.get()); // only reference to the x and y vectors
+	slopeSelector = SlopeSelector_create (x.get(), y.get()); // argumenys are references to the x and y vectors
 	newData (powerCepstrum); // new xp and yp reference
 }
 
@@ -333,14 +333,22 @@ void PowerCepstrum_drawTrendLine (PowerCepstrum me, Graphics g, double qmin, dou
 	double qstartFit, double qendFit, kCepstrum_trendType lineType, kCepstrum_trendFit fitMethod)
 {
 	Function_unidirectionalAutowindow (me, & qmin, & qmax);
-	Function_intersectRangeWithDomain (me, & qstartFit, & qendFit);
+	Melder_require (Function_intersectRangeWithDomain (me, & qstartFit, & qendFit),
+		U"The fit region should be within the domain.");
+	const double qminLine = std::max (std::max (qmin, qstartFit), 0.1 * my dx);
+	const integer i1Line = Sampled_xToHighIndex (me, qminLine);
+	const double qmaxLine = std::min (qmax, qendFit);
+	const integer i2Line = Sampled_xToLowIndex (me, qmaxLine);
+	const integer numberOfQPoints = i2Line - i1Line;
+	if (numberOfQPoints < 1)
+		return; // nothing to do, interval too short
 	autoPowerCepstrumWorkspace workspace = PowerCepstrumWorkspace_create (me, qstartFit, qendFit, lineType, fitMethod);
 	workspace -> getSlopeAndIntercept ();
 
 	if (dBminimum >= dBmaximum) {   // autoscaling
 		MelderExtremaWithInit extrema_db;
 		for (integer i = workspace -> imin; i <= workspace -> imax; i ++)
-			extrema_db.update (workspace -> y[i]);
+			extrema_db.update (workspace -> y [i]);
 		dBmaximum = extrema_db.max;
 		dBminimum = extrema_db.min;
 	}
@@ -355,30 +363,24 @@ void PowerCepstrum_drawTrendLine (PowerCepstrum me, Graphics g, double qmin, dou
 	Graphics_setLineWidth (g, 2);
 	if (lineType == kCepstrum_trendType::EXPONENTIAL_DECAY ) {
 		integer n = 500;
-		const double dq = (qendFit - qstartFit) / (n + 1);
-		const double q1 = qstartFit;
-		if (qstartFit <= 0.0) {
-			qstartFit = 0.1 * dq;   // some small offset to avoid log(0)
-			n --;
-		}
+		const double dq = (qmaxLine - qminLine) / (n + 1);
 		autoVEC y = raw_VEC (n);
-		
 		for (integer i = 1; i <= n; i ++) {
-			const double q = q1 + (i - 1) * dq;
+			const double q = qminLine + (i - 1) * dq;
 			y [i] = slope * log (q) + intercept;
 		}
-		Graphics_function (g, y.asArgumentToFunctionThatExpectsOneBasedArray(), 1, n, qstartFit, qendFit);
+		Graphics_function (g, y.asArgumentToFunctionThatExpectsOneBasedArray(), 1, n, qminLine, qmaxLine);
 	} else {
-		const double y1 = slope * qstartFit + intercept;
-		const double y2 = slope * qendFit + intercept;
+		const double y1 = slope * qminLine + intercept;
+		const double y2 = slope * qmaxLine + intercept;
 		if (y1 >= dBminimum && y2 >= dBminimum) {
-			Graphics_line (g, qstartFit, y1, qendFit, y2);
+			Graphics_line (g, qminLine, y1, qmaxLine, y2);
 		} else if (y1 < dBminimum) {
-			qstartFit = (dBminimum - intercept) / slope;
-			Graphics_line (g, qstartFit, dBminimum, qendFit, y2);
+			const double qstart = (dBminimum - intercept) / slope;
+			Graphics_line (g, qstart, dBminimum, qmaxLine, y2);
 		} else if (y2 < dBminimum) {
-			qendFit = (dBminimum - intercept) / slope;
-			Graphics_line (g, qstartFit, y1, qendFit, dBminimum);
+			const double qend = (dBminimum - intercept) / slope;
+			Graphics_line (g, qminLine, y1, qend, dBminimum);
 		} else {
 			// don't draw anything below lower limit
 		}
@@ -424,7 +426,7 @@ static void PowerCepstrum_smooth_inplaceRectangular (mutablePowerCepstrum me, do
 			for (integer k = 1; k <= numberOfIterations; k ++) {
 				for (integer isamp = 1; isamp <= my nx; isamp ++) {
 					const double xmid = Sampled_indexToX (me, isamp);
-					qout [isamp] = Sampled_getMean (me, xmid - halfWindwow, xmid + halfWindwow, 1, 0, true);
+					qout [isamp] = Sampled_getMean (me, xmid - halfWindwow, xmid + halfWindwow, 1, 0, true); // smooth underlying values not dB's'
 				}
 				my z.row (1)  <<=  qout.all();
 			}

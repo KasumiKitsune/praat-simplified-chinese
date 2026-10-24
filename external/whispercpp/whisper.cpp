@@ -1872,6 +1872,10 @@ static bool whisper_model_load(struct whisper_model_loader * loader, whisper_con
             int32_t ttype;
 
             read_safe(loader, n_dims);
+            if (n_dims < 0 || n_dims > 4) {   // quick fix for issue #3348 (real fix is to update whisper.cpp)
+                WHISPER_LOG_ERROR("%s: invalid number of dimensions (should be between 0 and 4): %d\n", __func__, n_dims);
+                return false;
+            }
             read_safe(loader, length);
             read_safe(loader, ttype);
 

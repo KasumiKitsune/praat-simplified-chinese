@@ -9028,7 +9028,6 @@ void praat_David_generics_new_init () {
 void praat_David_init ();
 void praat_David_init () {
 
-	Data_recognizeFileType (TextGrid_TIMITLabelFileRecognizer);
 	Data_recognizeFileType (cmuAudioFileRecognizer);
 	Data_recognizeFileType (oggFileRecognizer);
 
