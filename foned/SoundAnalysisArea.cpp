@@ -998,10 +998,24 @@ static void menu_cb_spectrogramColourSettings (SoundAnalysisArea me, EDITOR_ARGS
 		SET_BOOLEAN (invertColours,                  my instancePref_spectrogram_invertColours())
 		SET_BOOLEAN (threeChannelsIsRGB,             my instancePref_spectrogram_threeChannelsIsRGB())
 	EDITOR_DO
+		const bool previousThreeChannelsIsRGB = my instancePref_spectrogram_threeChannelsIsRGB();
 		my setInstancePref_spectrogram_colourMap (colourMap);
 		my setInstancePref_spectrogram_invertColours (invertColours);
 		my setInstancePref_spectrogram_threeChannelsIsRGB (threeChannelsIsRGB);
-		my d_spectrogramList. reset();
+		{
+			/*
+				A colour map chosen here is the user's own decision, so the appearance scheme of the
+				window now follows that choice: one of the two new maps turns the whole scheme on,
+				any other map turns it off. The menu shows the state that is in effect.
+			*/
+			const kEditorAppearancePalette palette = kEditorAppearancePalette_fromColourMap (colourMap);
+			if (EditorAppearancePalette_isOverride (palette))
+				FunctionEditor_appearanceSetPalette (my functionEditor(), palette);
+			else
+				FunctionEditor_appearanceExitOverride (my functionEditor());
+		}
+		if (threeChannelsIsRGB != previousThreeChannelsIsRGB)
+			my d_spectrogramList. reset();
 		FunctionEditor_redraw (my functionEditor());
 	EDITOR_END
 }
@@ -1134,7 +1148,8 @@ static void menu_cb_paintVisibleSpectrogram (SoundAnalysisArea me, EDITOR_ARGS) 
 			my instancePref_spectrogram_maximum(), my instancePref_spectrogram_autoscaling(),
 			my instancePref_spectrogram_dynamicRange(), my instancePref_spectrogram_preemphasis(),
 			my instancePref_spectrogram_dynamicCompression(),
-			my instancePref_spectrogram_colourMap(), my instancePref_spectrogram_invertColours(),
+			EditorAppearance_colourMapForDrawing (my instancePref_spectrogram_colourMap (), my functionEditor () -> appearancePalette),
+			my instancePref_spectrogram_invertColours(),
 			garnish
 		);
 		FunctionArea_garnishPicture (me);
@@ -2623,12 +2638,17 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 	if (my instancePref_spectrogram_show())
 		tryToHaveSpectrogram (me);
 	if (my instancePref_spectrogram_show() && my d_spectrogramList) {
+		/*
+			The colour map of the window's own appearance scheme, if it has one; otherwise the user's
+			own choice, which is never overwritten by the appearance entry.
+		*/
 		SpectrogramList_paintInside (my d_spectrogramList.get(), my graphics(), my startWindow(), my endWindow(),
 			my instancePref_spectrogram_viewFrom(), my instancePref_spectrogram_viewTo(),
 			my instancePref_spectrogram_maximum(), my instancePref_spectrogram_autoscaling(),
 			my instancePref_spectrogram_dynamicRange(), my instancePref_spectrogram_preemphasis(),
 			my instancePref_spectrogram_dynamicCompression(),
-			my instancePref_spectrogram_colourMap(), my instancePref_spectrogram_invertColours()
+			EditorAppearance_colourMapForDrawing (my instancePref_spectrogram_colourMap (),
+					my functionEditor () -> appearancePalette), my instancePref_spectrogram_invertColours()
 		);
 		/*
 			Annotation.
@@ -2671,6 +2691,20 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 	static const MelderColour modernPitchText      = MelderColour (0.12, 0.25, 0.69); // #1E40AF Deep blue scale
 	static const MelderColour modernIntensityHalo  = MelderColour (0.43, 0.91, 0.72); // #6EE7B7 Soft mint green
 	static const MelderColour modernIntensityCore  = MelderColour (0.02, 0.59, 0.41); // #059669 Vibrant emerald green
+	/*
+		The marking of the appearance scheme of this window, or null if the window draws in the
+		original style. A contour is always a wider under-drawing in a contrasting colour with the
+		line on top of it; the scheme only changes which colours and which widths those two layers
+		have. Everything that is set here is set again by the caller afterwards, so no later drawing
+		inherits it.
+	*/
+	const EditorAppearanceMarking *marking = my functionEditor () -> appearanceMarking ();
+	const double resolution = my graphics () -> resolution;
+	const double pitchHaloWidth = marking ? EditorAppearance_lineWidth (resolution, marking -> pitchHaloWidth) : 3.0;
+	const double pitchCoreWidth = marking ? EditorAppearance_lineWidth (resolution, marking -> pitchCoreWidth) : 1.0;
+	const MelderColour pitchHaloColour = marking ? marking -> pitchHalo : modernPitchHalo;
+	const MelderColour pitchCoreColour = marking ? marking -> pitchCore : modernPitchCore;
+	const MelderColour pitchTextColour = marking ? marking -> pitchText : modernPitchText;
 
 	if (my instancePref_pitch_show())
 		tryToHavePitch (me);
@@ -2684,8 +2718,12 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 		);
 		const bool undersampled = ( timeStep > greatestNonUndersamplingTimeStep );
 		const integer numberOfVisiblePitchPoints = (integer) ((my endWindow() - my startWindow()) / timeStep);   // BUG: why round down?
-		Graphics_setColour (my graphics(), modernPitchHalo);
-		Graphics_setLineWidth (my graphics(), 3.0);
+		const double oldLineWidth = Graphics_inqLineWidth (my graphics ());
+		const double oldSpeckleSize = Graphics_inqSpeckleSize (my graphics ());
+		Graphics_setColour (my graphics(), pitchHaloColour);
+		Graphics_setLineWidth (my graphics(), pitchHaloWidth);
+		if (marking)
+			Graphics_setSpeckleSize (my graphics(), EditorAppearance_diameter (marking -> pitchHaloWidth));
 		const kSoundAnalysisArea_pitch_drawingMethod drawingMethod = my dynamic_instancePref_pitch_drawingMethod();
 		if ((drawingMethod == kSoundAnalysisArea_pitch_drawingMethod::AUTOMATIC && (undersampled || numberOfVisiblePitchPoints < 101)) ||
 		    drawingMethod == kSoundAnalysisArea_pitch_drawingMethod::SPECKLE)
@@ -2697,8 +2735,10 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 		{
 			Pitch_drawInside (my d_pitch.get(), my graphics(), my startWindow(), my endWindow(), pitchViewFrom_overt, pitchViewTo_overt, false, pitchUnit);
 		}
-		Graphics_setColour (my graphics(), modernPitchCore);
-		Graphics_setLineWidth (my graphics(), 1.0);
+		Graphics_setColour (my graphics(), pitchCoreColour);
+		Graphics_setLineWidth (my graphics(), pitchCoreWidth);
+		if (marking)
+			Graphics_setSpeckleSize (my graphics(), EditorAppearance_diameter (marking -> pitchCoreWidth));
 		if ((drawingMethod == kSoundAnalysisArea_pitch_drawingMethod::AUTOMATIC && (undersampled || numberOfVisiblePitchPoints < 101)) ||
 		    drawingMethod == kSoundAnalysisArea_pitch_drawingMethod::SPECKLE)
 		{
@@ -2709,19 +2749,37 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 		{
 			Pitch_drawInside (my d_pitch.get(), my graphics(), my startWindow(), my endWindow(), pitchViewFrom_overt, pitchViewTo_overt, false, pitchUnit);
 		}
+		Graphics_setLineWidth (my graphics(), oldLineWidth);
+		Graphics_setSpeckleSize (my graphics(), oldSpeckleSize);
 		Graphics_setColour (my graphics(), Melder_BLACK);
 	}
 	if (my instancePref_intensity_show())
 		tryToHaveIntensity (me);
 	if (my instancePref_intensity_show() && my d_intensity) {
-		Graphics_setColour (my graphics(), modernIntensityHalo);
-		Graphics_setLineWidth (my graphics(), 3.0);
-		Intensity_drawInside (my d_intensity.get(), my graphics(), my startWindow(), my endWindow(),
-				my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
-		Graphics_setColour (my graphics(), modernIntensityCore);
-		Graphics_setLineWidth (my graphics(), 1.0);
-		Intensity_drawInside (my d_intensity.get(), my graphics(), my startWindow(), my endWindow(),
-				my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
+		/*
+			With one of the appearance schemes the intensity is a thin dashed graphite line, which
+			distinguishes it from the solid pitch curve and the formant dots by shape as well as colour.
+			Line type and line width are therefore restored here, as every other caller draws solid.
+		*/
+		const double oldLineWidth = Graphics_inqLineWidth (my graphics ());
+		if (marking) {
+			Graphics_setColour (my graphics(), marking -> intensityCore);
+			Graphics_setLineWidth (my graphics(), EditorAppearance_lineWidth (resolution, marking -> intensityWidth));
+			Graphics_setLineType (my graphics(), Graphics_DASHED);
+			Intensity_drawInside (my d_intensity.get(), my graphics(), my startWindow(), my endWindow(),
+					my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
+			Graphics_setLineType (my graphics(), Graphics_DRAWN);
+		} else {
+			Graphics_setColour (my graphics(), modernIntensityHalo);
+			Graphics_setLineWidth (my graphics(), 3.0);
+			Intensity_drawInside (my d_intensity.get(), my graphics(), my startWindow(), my endWindow(),
+					my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
+			Graphics_setColour (my graphics(), modernIntensityCore);
+			Graphics_setLineWidth (my graphics(), 1.0);
+			Intensity_drawInside (my d_intensity.get(), my graphics(), my startWindow(), my endWindow(),
+					my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
+		}
+		Graphics_setLineWidth (my graphics(), oldLineWidth);
 		Graphics_setColour (my graphics(), Melder_BLACK);
 	}
 
@@ -2733,7 +2791,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 	if (my instancePref_pitch_show()) {
 		double pitchCursor_overt = undefined, pitchCursor_hidden = undefined;
 		Graphics_setWindow (my graphics(), my startWindow(), my endWindow(), pitchViewFrom_hidden, pitchViewTo_hidden);
-		Graphics_setColour (my graphics(), modernPitchText);
+		Graphics_setColour (my graphics(), pitchTextColour);
 		if (my d_pitch) {
 			if (my startSelection() == my endSelection())
 				pitchCursor_hidden = Pitch_getValueAtTime (my d_pitch.get(), my startSelection(), pitchUnit, 1);
@@ -2741,13 +2799,13 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 				pitchCursor_hidden = Pitch_getMean (my d_pitch.get(), my startSelection(), my endSelection(), pitchUnit);
 			pitchCursor_overt = Function_convertToNonlogarithmic (my d_pitch.get(), pitchCursor_hidden, Pitch_LEVEL_FREQUENCY, (int) pitchUnit);
 			if (isdefined (pitchCursor_hidden)) {
-				Graphics_setColour (my graphics(), MelderColour (0.6, 0.0, 0.4));
+				Graphics_setColour (my graphics(), marking ? marking -> pitchText : MelderColour (0.6, 0.0, 0.4));
 				Graphics_setTextAlignment (my graphics(), Graphics_LEFT, Graphics_HALF);
 				Graphics_text (my graphics(), my endWindow(), pitchCursor_hidden,
 					Melder_graphicalHalf (pitchCursor_overt), U" ",
 					Function_getUnitText (my d_pitch.get(), Pitch_LEVEL_FREQUENCY, (int) pitchUnit, Function_UNIT_TEXT_SHORT | Function_UNIT_TEXT_GRAPHICAL)
 				);
-				Graphics_setColour (my graphics(), modernPitchText);
+				Graphics_setColour (my graphics(), pitchTextColour);
 			}
 			if (isundef (pitchCursor_hidden) || Graphics_dyWCtoMM (my graphics(), pitchCursor_hidden - pitchViewFrom_hidden) > 4.0) {
 				Graphics_setTextAlignment (my graphics(), Graphics_LEFT, Graphics_HALF);
@@ -2794,6 +2852,8 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 			vert = -1;
 			y = my endWindow();
 		}
+		if (marking)
+			textColour = marking -> intensityText;   // the scale is read as the line it labels
 		if (my instancePref_intensity_viewTo() > my instancePref_intensity_viewFrom()) {
 			Graphics_setWindow (my graphics(), my startWindow(), my endWindow(), my instancePref_intensity_viewFrom(), my instancePref_intensity_viewTo());
 			if (my d_intensity) {
@@ -2834,7 +2894,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 			Range marks.
 		*/
 		Graphics_setLineType (my graphics(), Graphics_DRAWN);
-		Graphics_setColour (my graphics(), DataGuiColour_NONEDITABLE);
+		Graphics_setColour (my graphics(), marking ? marking -> coordinateText : DataGuiColour_NONEDITABLE);
 		if (! frequencyCursorVisible || Graphics_dyWCtoMM (my graphics(), my d_spectrogram_cursor - my instancePref_spectrogram_viewFrom()) > 5.0) {
 			Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
 			Graphics_text (my graphics(), my startWindow(), my instancePref_spectrogram_viewFrom() - Graphics_dyMMtoWC (my graphics(), 0.5),
@@ -2849,7 +2909,7 @@ static void SoundAnalysisArea_v_draw_analysis (SoundAnalysisArea me) {
 			Cursor lines.
 		*/
 		Graphics_setLineType (my graphics(), Graphics_DOTTED);
-		Graphics_setColour (my graphics(), DataGuiColour_NONEDITABLE_SELECTED);
+		Graphics_setColour (my graphics(), marking ? marking -> cursor : DataGuiColour_NONEDITABLE_SELECTED);
 		if (frequencyCursorVisible) {
 			const double x = my startWindow(), y = my d_spectrogram_cursor;
 			Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
@@ -2873,10 +2933,20 @@ void structSoundAnalysisArea :: v_draw_analysis_formants () {
 		tryToHaveFormants (this);
 	if (our instancePref_formant_show() && our d_formant) {
 		Graphics_setSpeckleSize (our graphics(), our instancePref_formant_dotSize());
-		Formant_drawSpeckles_inside (our d_formant.get(), our graphics(), our startWindow(), our endWindow(),
-			our instancePref_spectrogram_viewFrom(), our instancePref_spectrogram_viewTo(), our instancePref_formant_dynamicRange(),
-			MelderColour (0.88, 0.11, 0.28), MelderColour (0.99, 0.64, 0.69), true
-		);
+		const EditorAppearanceMarking *marking = our functionEditor () -> appearanceMarking ();
+		if (marking)
+			/*
+				One colour for every formant, dots on a white edge: the frequency position stays the only
+				cue for the formant number, and the dot stays the size that the user asked for.
+			*/
+			Formant_drawSpeckles_insideWithHalo (our d_formant.get(), our graphics(), our startWindow(), our endWindow(),
+				our instancePref_spectrogram_viewFrom(), our instancePref_spectrogram_viewTo(), our instancePref_formant_dynamicRange(),
+				marking -> formantCore, marking -> formantHalo, marking -> formantHaloDiameterRatio);
+		else
+			Formant_drawSpeckles_inside (our d_formant.get(), our graphics(), our startWindow(), our endWindow(),
+				our instancePref_spectrogram_viewFrom(), our instancePref_spectrogram_viewTo(), our instancePref_formant_dynamicRange(),
+				MelderColour (0.88, 0.11, 0.28), MelderColour (0.99, 0.64, 0.69), true
+			);
 		Graphics_setColour (our graphics(), Melder_BLACK);
 	}
 }
@@ -2887,12 +2957,31 @@ void structSoundAnalysisArea :: v_draw_analysis_pulses () {
 	if (our instancePref_pulses_show() && our endWindow() - our startWindow() <= our instancePref_longestAnalysis() && our d_pulses) {
 		PointProcess point = our d_pulses.get();
 		Graphics_setWindow (our graphics(), our startWindow(), our endWindow(), -1.0, 1.0);
-		Graphics_setColour (our graphics(), our editable() ? DataGuiColour_EDITABLE : Melder_SILVER);
-		Graphics_setLineWidth (our graphics(), 2.0);
-		if (point -> nt < 2000) for (integer i = 1; i <= point -> nt; i ++) {
-			const double t = point -> t [i];
-			if (t >= our startWindow() && t <= our endWindow())
-				Graphics_line (our graphics(), t, -0.9, t, 0.9);
+		const auto drawPulses = [this, point] {
+			if (point -> nt < 2000) for (integer i = 1; i <= point -> nt; i ++) {
+				const double t = point -> t [i];
+				if (t >= our startWindow() && t <= our endWindow())
+					Graphics_line (our graphics(), t, -0.9, t, 0.9);
+			}
+		};
+		const EditorAppearanceMarking *marking = our functionEditor () -> appearanceMarking ();
+		if (marking) {
+			/*
+				Two passes over exactly the same times: the wide white under-drawing first, then the
+				narrower core on top of it. No pulse is moved and none is left out to make the picture
+				look tidier; these are the pulses that the analysis found.
+			*/
+			const int resolution = our graphics () -> resolution;
+			Graphics_setColour (our graphics(), marking -> pulseHalo);
+			Graphics_setLineWidth (our graphics(), EditorAppearance_lineWidth (resolution, marking -> pulseHaloWidth));
+			drawPulses ();
+			Graphics_setColour (our graphics(), marking -> pulseCore);
+			Graphics_setLineWidth (our graphics(), EditorAppearance_lineWidth (resolution, marking -> pulseCoreWidth));
+			drawPulses ();
+		} else {
+			Graphics_setColour (our graphics(), our editable() ? DataGuiColour_EDITABLE : Melder_SILVER);
+			Graphics_setLineWidth (our graphics(), 2.0);
+			drawPulses ();
 		}
 		Graphics_setColour (our graphics(), Melder_BLACK);
 		Graphics_setLineWidth (our graphics(), 1.0);

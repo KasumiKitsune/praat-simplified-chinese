@@ -85,6 +85,12 @@ Thing_define (Editor, DataGui) {
 
 	virtual void v_goAway () { forget_nozero (this); }
 	virtual bool v_canFullScreen () { return false; }
+	virtual bool v_canBeTranslucentShell () { return false; }
+		/*
+			Purpose: the window shell is created with a class that supports whole-window translucency
+			(see GuiWindow_TRANSLUCENT_SHELL). Called before the shell exists, because the class of an
+			existing window cannot be changed.
+		*/
 	virtual bool v_scriptable () { return true; }
 
 	virtual bool v_hasMenuBar () { return true; }

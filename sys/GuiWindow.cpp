@@ -165,7 +165,8 @@ GuiWindow GuiWindow_create (int x, int y, int width, int height, int minimumWidt
 		gtk_window_get_position (my d_gtkWindow, & rootX, & rootY);
 		trace (rootX, U" root ", rootY);
 	#elif motif
-		my d_xmShell = XmCreateShell (nullptr, flags & GuiWindow_FULLSCREEN ? "Praatwulgfullscreen" : "Praatwulg", nullptr, 0);
+		my d_xmShell = XmCreateShell (nullptr, flags & GuiWindow_FULLSCREEN ? "Praatwulgfullscreen" :
+				flags & GuiWindow_TRANSLUCENT_SHELL ? "Praatwulgtranslucent" : "Praatwulg", nullptr, 0);
 		XtVaSetValues (my d_xmShell, XmNdeleteResponse, goAwayCallback ? XmDO_NOTHING : XmUNMAP, nullptr);
 		XtVaSetValues (my d_xmShell, XmNx, x, XmNy, y, XmNwidth, (Dimension) width, XmNheight, (Dimension) height, nullptr);
 		if (goAwayCallback)
@@ -230,6 +231,25 @@ void GuiWindow_addMenuBar (GuiWindow me) {
 		XtManageChild (my d_xmMenuBar);
 	#elif cocoa
 		(void) me;   // this is handled elsewhere
+	#endif
+}
+
+bool GuiWindow_setOpacity (GuiWindow me, integer percent) {
+	#if motif
+		return _GuiWinShell_setOpacity (my d_xmShell, percent);
+	#else
+		(void) me;
+		(void) percent;
+		return false;
+	#endif
+}
+
+integer GuiWindow_getOpacity (GuiWindow me) {
+	#if motif
+		return _GuiWinShell_getOpacity (my d_xmShell);
+	#else
+		(void) me;
+		return 100;
 	#endif
 }
 

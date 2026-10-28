@@ -47,16 +47,64 @@ void structSoundArea :: v1_info () {
 
 #pragma mark - SoundArea drawing
 
+void structSoundArea :: v_drawInside () {
+	SoundArea_draw (this);
+}
+
+/*
+	The colour of the waveform line of this window: the colour of the appearance scheme if the window
+	runs one of them, the usual foreground colour otherwise. This is decided here and not inside
+	DataGui_defaultForegroundColour, because that colour is shared by all editors in the program.
+*/
+static MelderColour SoundArea_waveformColour (SoundArea me) {
+	const EditorAppearanceMarking *marking = my functionEditor () -> appearanceMarking ();
+	if (marking)
+		return marking -> waveform;
+	return DataGui_defaultForegroundColour (me, false);
+}
+
+/*
+	The colour of the amplitude numbers at the left of a channel: neutral near-black in an appearance
+	scheme, so that the numbers never look like part of the data.
+*/
+static MelderColour SoundArea_coordinateColour (SoundArea me) {
+	const EditorAppearanceMarking *marking = my functionEditor () -> appearanceMarking ();
+	if (marking)
+		return marking -> coordinateText;
+	return DataGui_defaultForegroundColour (me, false);
+}
+
+/*
+	The colour of the zero line of a channel: the lightest necessary line in an appearance scheme.
+*/
+static MelderColour SoundArea_gridLineColour (SoundArea me) {
+	const EditorAppearanceMarking *marking = my functionEditor () -> appearanceMarking ();
+	if (marking)
+		return marking -> gridLine;
+	return MelderColour (0.75, 0.80, 0.86);
+}
+
+/*
+	The colour of the cursor hairline and of the amplitude value that hangs on it: neutral graphite
+	in an appearance scheme, so that the readout cannot be mistaken for a colour of the data.
+*/
+static MelderColour SoundArea_cursorColour (SoundArea me) {
+	const EditorAppearanceMarking *marking = my functionEditor () -> appearanceMarking ();
+	if (marking)
+		return marking -> cursor;
+	return DataGui_defaultForegroundColour (me, true);
+}
+
 static void SoundArea_drawCursorFunctionValue (SoundArea me, double yWC, conststring32 yWC_string, conststring32 units) {
-	Graphics_setColour (my graphics(), DataGui_defaultForegroundColour (me, true));
+	Graphics_setColour (my graphics(), SoundArea_cursorColour (me));
 	Graphics_line (my graphics(), my startWindow(), yWC, 0.99 * my startWindow() + 0.01 * my endWindow(), yWC);
 	Graphics_fillCircle_mm (my graphics(), 0.5 * (my startSelection() + my endSelection()), yWC, 1.5);
 	Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
 	Graphics_text (my graphics(), my startWindow(), yWC,   yWC_string, units);
 }
 
-void structSoundArea :: v_drawInside () {
-	SoundArea_draw (this);
+MelderColour SoundArea_legendColour (SoundArea me) {
+	return SoundArea_waveformColour (me);
 }
 
 void SoundArea_draw (SoundArea me) {
@@ -185,7 +233,7 @@ void SoundArea_draw (SoundArea me) {
 			maximum += 1.0;
 		}
 		Graphics_setWindow (my graphics(), my startWindow(), my endWindow(), minimum, maximum);
-		Graphics_setColour (my graphics(), DataGui_defaultForegroundColour (me, false));
+		Graphics_setColour (my graphics(), SoundArea_coordinateColour (me));
 		if (horizontal) {
 			Graphics_setTextAlignment (my graphics(), Graphics_RIGHT, Graphics_HALF);
 			const double mid = 0.5 * (minimum + maximum);
@@ -207,7 +255,7 @@ void SoundArea_draw (SoundArea me) {
 				Graphics_text (my graphics(), 0.0, 0.0, U"0");
 			}
 			Graphics_setLineType (my graphics(), Graphics_DOTTED);
-			Graphics_setColour (my graphics(), MelderColour (0.75, 0.80, 0.86));
+			Graphics_setColour (my graphics(), SoundArea_gridLineColour (me));
 			Graphics_line (my graphics(), 0.0, 0.0, 1.0, 0.0);
 			Graphics_setLineType (my graphics(), Graphics_DRAWN);
 			Graphics_setColour (my graphics(), Melder_BLACK);
@@ -247,12 +295,12 @@ void SoundArea_draw (SoundArea me) {
 			Graphics_setWindow (my graphics(), my startWindow(), my endWindow(), minimum, maximum);
 			if (cursorVisible && isdefined (cursorFunctionValue))
 				SoundArea_drawCursorFunctionValue (me, cursorFunctionValue, Melder_graphicalHalf (cursorFunctionValue), U"");
-			Graphics_setColour (my graphics(), DataGui_defaultForegroundColour (me, false));
+			Graphics_setColour (my graphics(), SoundArea_waveformColour (me));
 			Graphics_function (my graphics(), & my sound() -> z [ichan] [0], first, last,
 					Sampled_indexToX (my sound(), first), Sampled_indexToX (my sound(), last));
 		} else {
 			Graphics_setWindow (my graphics(), my startWindow(), my endWindow(), minimum * 32768, maximum * 32768);
-			Graphics_setColour (my graphics(), DataGui_defaultForegroundColour (me, false));
+			Graphics_setColour (my graphics(), SoundArea_waveformColour (me));
 			Graphics_function16 (my graphics(),
 				my longSound() -> buffer.asArgumentToFunctionThatExpectsZeroBasedArray() - my longSound() -> imin * numberOfChannels + (ichan - 1),
 				numberOfChannels, first, last, Sampled_indexToX (my longSound(), first), Sampled_indexToX (my longSound(), last)

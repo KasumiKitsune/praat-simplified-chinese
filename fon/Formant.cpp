@@ -206,6 +206,51 @@ void Formant_drawSpeckles_inside (Formant me, Graphics g, double tmin, double tm
 	Formant_drawSpeckles_inside (me, g, tmin, tmax, fmin, fmax, suppress_dB, Graphics_inqColour (g), Graphics_inqColour (g), false);
 }
 
+void Formant_drawSpeckles_insideWithHalo (Formant me, Graphics g, double tmin, double tmax, double fmin, double fmax,
+	double suppress_dB, MelderColour core, MelderColour halo, double haloDiameterRatio)
+{
+	/*
+		The same frames and the same dots as Formant_drawSpeckles_inside shows: the intensity threshold
+		and the visible frequency range decide which dots appear. Only the way a dot is painted differs,
+		so a dot stays a dot and never becomes part of a track.
+	*/
+	double maximumIntensity = 0.0, minimumIntensity;
+	Function_unidirectionalAutowindow (me, & tmin, & tmax);
+	integer itmin, itmax;
+	if (! Sampled_getWindowSamples (me, tmin, tmax, & itmin, & itmax))
+		return;
+	Graphics_setWindow (g, tmin, tmax, fmin, fmax);
+
+	for (integer iframe = itmin; iframe <= itmax; iframe ++) {
+		const Formant_Frame frame = & my frames [iframe];
+		if (frame -> intensity > maximumIntensity)
+			maximumIntensity = frame -> intensity;
+	}
+	if (maximumIntensity == 0.0 || suppress_dB <= 0.0)
+		minimumIntensity = 0.0;   // ignore
+	else
+		minimumIntensity = maximumIntensity / pow (10.0, suppress_dB / 10.0);
+
+	const double dotDiameter = Graphics_inqSpeckleSize (g);
+	const MelderColour oldColour = Graphics_inqColour (g);
+	for (integer iframe = itmin; iframe <= itmax; iframe ++) {
+		const Formant_Frame frame = & my frames [iframe];
+		const double x = Sampled_indexToX (me, iframe);
+		if (frame -> intensity < minimumIntensity)
+			continue;
+		for (integer iformant = 1; iformant <= frame -> numberOfFormants; iformant ++) {
+			const double frequency = frame -> formant [iformant]. frequency;
+			if (frequency >= fmin && frequency <= fmax) {
+				Graphics_setColour (g, halo);
+				Graphics_fillCircle_mm (g, x, frequency, dotDiameter * haloDiameterRatio);
+				Graphics_setColour (g, core);
+				Graphics_fillCircle_mm (g, x, frequency, dotDiameter);
+			}
+		}
+	}
+	Graphics_setColour (g, oldColour);
+}
+
 void Formant_drawSpeckles (Formant me, Graphics g, double tmin, double tmax, double fmax, double suppress_dB,
 	bool garnish)
 {

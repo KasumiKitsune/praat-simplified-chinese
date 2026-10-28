@@ -135,6 +135,9 @@ public:
 protected:
 	void v_drawInside ()
 		override;
+	bool v_appearanceSelectionFill () const override {
+		return true;   // the window's colour scheme paints the selected part of this pane
+	}
 public:
 	void v1_info ()
 		override;
@@ -157,6 +160,9 @@ public:
 };
 
 void SoundArea_draw (SoundArea me);
+
+MelderColour SoundArea_legendColour (SoundArea me);
+	/* The colour of the waveform legend of this area: the colour that the waveform is drawn in. */
 
 bool SoundArea_mouse (SoundArea me, GuiDrawingArea_MouseEvent event, double x_world, double globalY_fraction);
 

@@ -73,6 +73,14 @@ void Formant_drawSpeckles_inside (Formant me, Graphics graphics, double tmin, do
 	double suppress_dB, MelderColour oddColour, MelderColour evenColour, bool drawWithContrast);
 void Formant_drawSpeckles_inside (Formant me, Graphics graphics, double tmin, double tmax, double fmin, double fmax,
 	double suppress_dB);
+void Formant_drawSpeckles_insideWithHalo (Formant me, Graphics graphics, double tmin, double tmax, double fmin, double fmax,
+		double suppress_dB, MelderColour core, MelderColour halo, double haloDiameterRatio);
+	/*
+		Every formant in the same colour, so that the frequency position stays the only cue for the
+		formant number; each dot sits on a filled circle of the halo colour, whose diameter is
+		`haloDiameterRatio` times the dot diameter. The current speckle size of `graphics` is the dot
+		diameter and is not changed, so the user's own dot size decides how big the dots are.
+	*/
 void Formant_drawSpeckles (Formant me, Graphics graphics, double tmin, double tmax, double fmax,
 	double suppress_dB, bool garnish);
 void Formant_scatterPlot (Formant me, Graphics graphics, double tmin, double tmax,

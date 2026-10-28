@@ -58,6 +58,122 @@ namespace {
 	const MelderColour modernGridCyan   = MelderColour (0.75, 0.83, 0.90); // #CBD5E1 Light subtle grid
 }
 
+void FunctionEditor_appearanceSetPalette (FunctionEditor me, kEditorAppearancePalette palette) {
+	if (my appearancePalette == palette)
+		return;
+	my appearancePalette = palette;
+	/*
+		Only the colours change, so this is a drawing update: the spectrogram, pitch, formant and pulse
+		caches of the analysis areas stay valid and nothing is recomputed.
+	*/
+	FunctionEditor_redraw (me);
+}
+
+void FunctionEditor_appearanceExitOverride (FunctionEditor me) {
+	if (! EditorAppearancePalette_isOverride (my appearancePalette))
+		return;
+	my appearancePalette = kEditorAppearancePalette::ORIGINAL;
+	if (my appearancePanel) {
+		const EditorAppearancePanel_state state { my appearancePalette, my appearanceOpacityPercent };
+		EditorAppearancePanel_setState (my appearancePanel, & state);
+	}
+}
+
+void FunctionEditor_appearanceSetOpacity (FunctionEditor me, integer percent, bool commit) {
+	Melder_clip <integer> (20, & percent, 100);
+	const integer previously = GuiWindow_getOpacity (my windowForm);
+	if (GuiWindow_setOpacity (my windowForm, percent)) {
+		my appearanceOpacityPercent = GuiWindow_getOpacity (my windowForm);
+		return;
+	}
+	/*
+		The system refused the request, so the window keeps the value it had. That value is what the
+		panel shows; a percentage that is not in effect is never displayed.
+	*/
+	GuiWindow_setOpacity (my windowForm, previously);
+	my appearanceOpacityPercent = GuiWindow_getOpacity (my windowForm);
+	if (my appearancePanel) {
+		const EditorAppearancePanel_state state { my appearancePalette, my appearanceOpacityPercent };
+		EditorAppearancePanel_setState (my appearancePanel, & state);
+	}
+	if (commit)
+		Melder_flushError (U"无法把本窗口的不透明度设为 ", percent, U"%；当前不透明度是 ",
+				my appearanceOpacityPercent, U"%。");
+}
+
+namespace {
+	void appearancePanelChangePalette (void *boss, kEditorAppearancePalette palette) {
+		FunctionEditor_appearanceSetPalette (static_cast <FunctionEditor> (boss), palette);
+	}
+	void appearancePanelPreviewOpacity (void *boss, integer percent) {
+		FunctionEditor_appearanceSetOpacity (static_cast <FunctionEditor> (boss), percent, false);
+	}
+	void appearancePanelCommitOpacity (void *boss, integer percent) {
+		FunctionEditor_appearanceSetOpacity (static_cast <FunctionEditor> (boss), percent, true);
+	}
+
+	void *appearanceOwnerWindow (FunctionEditor me) {
+		/*
+			The top-level window that owns the panel: the panel is destroyed with it, and its monitor
+			decides the DPI of the layout and the work area that the panel has to stay inside.
+		*/
+		#if gdi
+			const GraphicsScreen graphics = (GraphicsScreen) my graphics.get();
+			return GetAncestor (graphics -> d_winWindow, GA_ROOT);
+		#else
+			return nullptr;
+		#endif
+	}
+
+	void appearanceEntryClicked (void *boss) {
+		FunctionEditor me = static_cast <FunctionEditor> (boss);
+		if (! my appearancePanel)
+			return;
+		if (EditorAppearancePanel_isShowing (my appearancePanel)) {
+			EditorAppearancePanel_dismiss (my appearancePanel);
+			return;
+		}
+		if (EditorAppearancePanel_steppedAsideForAClick (my appearancePanel)) {
+			/*
+				This command is the second half of the click that already closed the panel by taking
+				its keyboard away. Opening it again would leave the entry unable to close the panel.
+			*/
+			return;
+		}
+		int left, top, width, height;
+		if (! GuiMenu_getRectOnScreen (my appearanceMenu, & left, & top, & width, & height)) {
+			Melder_flushError (U"无法确定「外观」菜单项的位置。");
+			return;
+		}
+		const EditorAppearancePanel_state state { my appearancePalette, my appearanceOpacityPercent };
+		if (! EditorAppearancePanel_show (my appearancePanel, appearanceOwnerWindow (me),
+				left, top, width, height, & state))
+			Melder_flushError (U"「外观」面板无法打开。");
+	}
+
+	void createAppearanceMenu (FunctionEditor me) {
+		/*
+			The entry is a menu-bar command of its own: clicking it opens the panel instead of a drop-down
+			list, because the panel has to stay readable while the window it belongs to is drawn at 20 %.
+		*/
+		GuiWindow window = static_cast <GuiWindow> (my windowForm -> d_shell);
+		my appearanceMenu = GuiMenu_createBarButtonInWindow (window, U"外观", 0, appearanceEntryClicked, me);
+		const EditorAppearancePanel_callbacks callbacks { me,
+				appearancePanelChangePalette, appearancePanelPreviewOpacity, appearancePanelCommitOpacity };
+		my appearancePanel = EditorAppearancePanel_create (& callbacks);
+		if (! my appearancePanel)
+			Melder_flushError (U"「外观」面板无法创建；本窗口的配色与不透明度保持原样。\n");
+	}
+
+	void destroyAppearancePanel (FunctionEditor me) {
+		if (my appearancePanel) {
+			/* The panel belongs to this one window, so it goes away with the window. */
+			EditorAppearancePanel_dispose (my appearancePanel);
+			my appearancePanel = nullptr;
+		}
+	}
+}
+
 static bool group_equalDomain (double tmin, double tmax) {
 	if (theGroupSize == 0)
 		return true;
@@ -131,6 +247,7 @@ static void drawBackgroundAndData (FunctionEditor me) {
 	const bool rightFromWindow = ( my endWindow < my tmax );
 	const bool cursorIsVisible = ( my startSelection == my endSelection && my startSelection >= my startWindow && my startSelection <= my endWindow );
 	const bool selectionIsNonempty = ( my endSelection > my startSelection );
+	const EditorAppearanceMarking *marking = my appearanceMarking ();
 
 	/*
 		Update selection.
@@ -249,7 +366,7 @@ static void drawBackgroundAndData (FunctionEditor me) {
 		Window background.
 	*/
 	my viewAllAsPixelettes ();
-	Graphics_setColour (my graphics.get(), DataGuiColour_WINDOW_BACKGROUND);
+	Graphics_setColour (my graphics.get(), marking ? marking -> canvas : DataGuiColour_WINDOW_BACKGROUND);
 	Graphics_fillRectangle (my graphics.get(), my _functionViewerLeft, my _selectionViewerRight, my BOTTOM_MARGIN, my height_pxlt);
 	Graphics_setColour (my graphics.get(), Melder_BLACK);
 
@@ -401,10 +518,8 @@ static void drawBackgroundAndData (FunctionEditor me) {
 
 	my viewTallDataAsWorldByPixelettes ();
 
-	/*
-		Red marker text.
-	*/
-	Graphics_setColour (my graphics.get(), modernMarkerRed);
+	/* Marker text. */
+	Graphics_setColour (my graphics.get(), marking ? marking -> coordinateText : modernMarkerRed);
 	if (cursorIsVisible) {
 		Graphics_setTextAlignment (my graphics.get(), Graphics_CENTRE, Graphics_BOTTOM);
 		Graphics_text (my graphics.get(), my startSelection, my height_pxlt - (my TOP_MARGIN + my space*0.9) - verticalCorrection * 7,
@@ -434,7 +549,7 @@ static void drawBackgroundAndData (FunctionEditor me) {
 		Red dotted marker lines.
 	*/
 	my viewDataAsWorldByFraction ();
-	Graphics_setColour (my graphics.get(), modernMarkerRed);
+	Graphics_setColour (my graphics.get(), marking ? marking -> cursor : modernMarkerRed);
 	Graphics_setLineType (my graphics.get(), Graphics_DOTTED);
 	if (cursorIsVisible)
 		Graphics_line (my graphics.get(), my startSelection, 0.0, my startSelection, 1.0);
@@ -449,6 +564,7 @@ static void drawBackgroundAndData (FunctionEditor me) {
 /********** METHODS **********/
 
 void structFunctionEditor :: v9_destroy () noexcept {
+	destroyAppearancePanel (this);
 	MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
 	if (our group) {   // undangle
 		integer i = 1;
@@ -1551,6 +1667,8 @@ void structFunctionEditor :: v_createMenus () {
 		if (area)
 			area -> v_createMenus ();
 	}
+	if (our v_hasAppearanceMenu ())
+		createAppearanceMenu (this);
 }
 
 void structFunctionEditor :: v_updateMenuItems () {
@@ -2256,6 +2374,10 @@ void FunctionEditor_init (FunctionEditor me, conststring32 title, Function data)
 		Melder_casual (Thing_messageNameAndAddress (me), U" init");
 	my tmin = function -> xmin;   // set before adding children (see group button)
 	my tmax = function -> xmax;
+	my appearancePalette = kEditorAppearancePalette::ORIGINAL;
+	my appearanceOpacityPercent = 100;
+	my appearancePanel = nullptr;
+	my appearanceMenu = nullptr;
 	Editor_init (me, 0, 0, my classPref_shellWidth(), my classPref_shellHeight(), title, function);
 
 	my startWindow = my tmin;
@@ -2344,7 +2466,8 @@ void FunctionEditor_drawRangeMark (FunctionEditor me, double yWC, conststring32 
 	static MelderString text;
 	MelderString_copy (& text, yWC_string, units);
 	double textWidth = Graphics_textWidth (my graphics.get(), text.string) + Graphics_dxMMtoWC (my graphics.get(), 0.5);
-	Graphics_setColour (my graphics.get(), modernMarkerBlue);
+	const EditorAppearanceMarking *marking = my appearanceMarking ();
+	Graphics_setColour (my graphics.get(), marking ? marking -> auxiliaryTick : modernMarkerBlue);
 	Graphics_line (my graphics.get(), my endWindow, yWC, my endWindow + textWidth, yWC);
 	Graphics_setTextAlignment (my graphics.get(), Graphics_LEFT, verticalAlignment);
 	if (verticalAlignment == Graphics_BOTTOM)
@@ -2358,7 +2481,8 @@ void FunctionEditor_insertCursorFunctionValue (FunctionEditor me, double yWC, co
 	const bool tooLow = ( Graphics_dyWCtoMM (my graphics.get(), textY - minimum) < 5.0 );
 	if (yWC < minimum || yWC > maximum)
 		return;
-	Graphics_setColour (my graphics.get(), modernMarkerCyan);
+	const EditorAppearanceMarking *marking = my appearanceMarking ();
+	Graphics_setColour (my graphics.get(), marking ? marking -> cursor : modernMarkerCyan);
 	Graphics_line (my graphics.get(), 0.99 * my endWindow + 0.01 * my startWindow, yWC, my endWindow, yWC);
 	Graphics_fillCircle_mm (my graphics.get(), 0.5 * (my startSelection + my endSelection), yWC, 1.5);
 	if (tooHigh) {
@@ -2373,20 +2497,22 @@ void FunctionEditor_insertCursorFunctionValue (FunctionEditor me, double yWC, co
 	MelderString_copy (& text, yWC_string, units);
 	double textWidth = Graphics_textWidth (my graphics.get(), text.string);
 	Graphics_fillCircle_mm (my graphics.get(), my endWindow + textWidth + Graphics_dxMMtoWC (my graphics.get(), 1.5), textY, 1.5);
-	Graphics_setColour (my graphics.get(), modernMarkerRed);
+	Graphics_setColour (my graphics.get(), marking ? marking -> cursor : modernMarkerRed);
 	Graphics_setTextAlignment (my graphics.get(), Graphics_LEFT, Graphics_HALF);
 	Graphics_text (my graphics.get(), textX, textY, text.string);
 }
 
 void FunctionEditor_drawHorizontalHair (FunctionEditor me, double yWC, conststring32 yWC_string, conststring32 units) {
-	Graphics_setColour (my graphics.get(), modernMarkerRed);
+	const EditorAppearanceMarking *marking = my appearanceMarking ();
+	Graphics_setColour (my graphics.get(), marking ? marking -> cursor : modernMarkerRed);
 	Graphics_line (my graphics.get(), my startWindow, yWC, my endWindow, yWC);
 	Graphics_setTextAlignment (my graphics.get(), Graphics_RIGHT, Graphics_HALF);
 	Graphics_text (my graphics.get(), my startWindow, yWC,   yWC_string, units);
 }
 
 void FunctionEditor_drawGridLine (FunctionEditor me, double yWC) {
-	Graphics_setColour (my graphics.get(), modernGridCyan);
+	const EditorAppearanceMarking *marking = my appearanceMarking ();
+	Graphics_setColour (my graphics.get(), marking ? marking -> gridLine : modernGridCyan);
 	Graphics_setLineType (my graphics.get(), Graphics_DOTTED);
 	Graphics_line (my graphics.get(), my startWindow, yWC, my endWindow, yWC);
 	Graphics_setLineType (my graphics.get(), Graphics_DRAWN);

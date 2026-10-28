@@ -64,6 +64,9 @@ protected:
 	void v_computeAuxiliaryData () override {
 		our v_reset_analysis ();
 	}
+	bool v_appearanceSelectionFill () const override {
+		return true;   // the window's colour scheme paints the selected part of this pane
+	}
 
 public:
 	void v_windowChanged () override {
@@ -117,13 +120,22 @@ void SoundAnalysisArea_haveVisiblePulses (SoundAnalysisArea me);
 bool SoundAnalysisArea_mouse (SoundAnalysisArea me, GuiDrawingArea_MouseEvent event, double x_world, double y_fraction);
 
 inline void SoundAnalysisArea_drawDefaultLegends (SoundAnalysisArea me) {
-	if (my hasContentToShow () && my endWindow() - my startWindow() <= my instancePref_longestAnalysis())
-		FunctionArea_drawLegend (me,
-			my instancePref_spectrogram_show() ? FunctionArea_legend_GREYS U" %%derived spectrogram" : U"", 1.2 * Melder_BLACK,
-			my instancePref_formant_show()     ? FunctionArea_legend_SPECKLES U" %%derived formants"    : U"", 1.2 * Melder_RED,
-			my instancePref_intensity_show()   ? FunctionArea_legend_LINES U" %%derived intensity"   : U"", 1.2 * Melder_GREEN,
-			my instancePref_pitch_show()       ? FunctionArea_legend_LINES_SPECKLES U" %%derived pitch"       : U"", 1.2 * Melder_BLUE
-		);
+	if (! (my hasContentToShow () && my endWindow () - my startWindow () <= my instancePref_longestAnalysis ()))
+		return;
+	/*
+		A legend colour is the colour that is actually drawn, so a window that runs one of the
+		appearance schemes names its marks with the colours of that scheme.
+	*/
+	const EditorAppearanceMarking *marking = my functionEditor () -> appearanceMarking ();
+	FunctionArea_drawLegend (me,
+		my instancePref_spectrogram_show() ? FunctionArea_legend_GREYS U" %%derived spectrogram" : U"", 1.2 * Melder_BLACK,
+		my instancePref_formant_show()     ? FunctionArea_legend_SPECKLES U" %%derived formants"    : U"",
+				marking ? marking -> formantCore : 1.2 * Melder_RED,
+		my instancePref_intensity_show()   ? FunctionArea_legend_LINES U" %%derived intensity"   : U"",
+				marking ? marking -> intensityCore : 1.2 * Melder_GREEN,
+		my instancePref_pitch_show()       ? FunctionArea_legend_LINES_SPECKLES U" %%derived pitch"       : U"",
+				marking ? marking -> pitchCore : 1.2 * Melder_BLUE
+	);
 }
 
 /* End of file SoundAnalysisArea.h */

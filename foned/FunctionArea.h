@@ -102,7 +102,8 @@ public:
 	}
 	friend void FunctionArea_eraseBackground (constFunctionArea me) {
 		Graphics_setWindow (my graphics(), 0.0, 1.0, 0.0, 1.0);
-		Graphics_setColour (my graphics(), DataGuiColour_AREA_BACKGROUND);
+		const EditorAppearanceMarking *marking = my functionEditor() -> appearanceMarking ();
+		Graphics_setColour (my graphics(), marking ? marking -> canvas : DataGuiColour_AREA_BACKGROUND);
 		Graphics_fillRectangle (my graphics(), 0.0, 1.0, 0.0, 1.0);
 		Graphics_setColour (my graphics(), DataGuiColour_NONEDITABLE);
 	}
@@ -113,7 +114,14 @@ public:
 		if (left < right && left < my endWindow() && right > my startWindow()) {
 			Melder_clipLeft (my startWindow(), & left);
 			Melder_clipRight (& right, my endWindow());
-			Graphics_highlight (my graphics(), left, right, 0.0, 1.0);
+			const EditorAppearanceMarking *marking = my functionEditor() -> appearanceMarking ();
+			if (marking && my v_appearanceSelectionFill ()) {
+				Graphics_setColour (my graphics(), marking -> selectionFill);
+				Graphics_fillRectangle (my graphics(), left, right, 0.0, 1.0);
+				Graphics_setColour (my graphics(), DataGuiColour_NONEDITABLE);
+			} else {
+				Graphics_highlight (my graphics(), left, right, 0.0, 1.0);
+			}
 		}
 	}
 	friend void FunctionArea_drawFrame (constFunctionArea me) {
@@ -139,6 +147,12 @@ public:
 
 private:
 	virtual void v_specializedHighlightBackground () const { }
+	/*
+		Whether the colour scheme of the window fills the selected part of this pane with its own
+		neutral grey instead of the standard highlight. Only the sound and analysis panes of an
+		editor with an appearance scheme do so; the tiers of a TextGrid editor keep their original look.
+	*/
+	virtual bool v_appearanceSelectionFill () const { return false; }
 protected:
 	virtual void v_drawInside () { }
 public:

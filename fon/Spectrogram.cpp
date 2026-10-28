@@ -17,6 +17,7 @@
  */
 
 #include "Spectrogram.h"
+#include <array>
 #include <vector>
 #include <utility>
 #include "enums_getText.h"
@@ -56,6 +57,14 @@ autoSpectrogram Spectrogram_create (double tmin, double tmax, integer nt, double
 	} catch (MelderError) {
 		Melder_throw (U"Spectrogram not created.");
 	}
+}
+
+MelderColour Spectrogram_monoColourMapDarkest (kSpectrogram_colourMap colourMap) {
+	if (colourMap == kSpectrogram_colourMap::MIST_BLUE_GREY)
+		return MelderColour (113.0 / 255.0, 136.0 / 255.0, 155.0 / 255.0);   // #71889B
+	if (colourMap == kSpectrogram_colourMap::CLAY_GREY)
+		return MelderColour (159.0 / 255.0, 126.0 / 255.0, 113.0 / 255.0);   // #9F7E71
+	return MelderColour (0.0, 0.0, 0.0);
 }
 
 void Spectrogram_paintInside (const constSpectrogram me, const Graphics g,
@@ -1221,6 +1230,38 @@ void Spectrogram_paintInside (const constSpectrogram me, const Graphics g,
 					colour.red = turbo[i][0] + frac * (turbo[i+1][0] - turbo[i][0]);
 					colour.green = turbo[i][1] + frac * (turbo[i+1][1] - turbo[i][1]);
 					colour.blue = turbo[i][2] + frac * (turbo[i+1][2] - turbo[i][2]);
+					break;
+				}
+				case kSpectrogram_colourMap::MIST_BLUE_GREY:
+				case kSpectrogram_colourMap::CLAY_GREY: {
+					/* Linear-light ramps share the existing normalized intensity, without a new contrast curve. */
+					static const auto ramps = [] {
+						std::array <std::array <MelderColour, 256>, 2> result;
+						for (int palette = 0; palette < 2; palette ++) {
+							const MelderColour darkest = Spectrogram_monoColourMapDarkest (palette == 0 ?
+									kSpectrogram_colourMap::MIST_BLUE_GREY : kSpectrogram_colourMap::CLAY_GREY);
+							auto linear = [] (double channel) {
+								return channel <= 0.04045 ? channel / 12.92 : std::pow ((channel + 0.055) / 1.055, 2.4);
+							};
+							const double red = linear (darkest.red), green = linear (darkest.green), blue = linear (darkest.blue);
+							for (int level = 0; level < 256; level ++) {
+								const double strength = level / 255.0;
+								auto channel = [strength] (double endpoint) {
+									const double value = 1.0 + strength * (endpoint - 1.0);
+									return value <= 0.0031308 ? 12.92 * value : 1.055 * std::pow (value, 1.0 / 2.4) - 0.055;
+								};
+								result [palette] [level] = MelderColour (channel (red), channel (green), channel (blue));
+							}
+						}
+						return result;
+					} ();
+					const auto &ramp = ramps [colourMap == kSpectrogram_colourMap::MIST_BLUE_GREY ? 0 : 1];
+					const double position = t * 255.0;
+					const int index = std::min ((int) position, 254);
+					const double fraction = position - index;
+					colour.red = ramp [index].red + fraction * (ramp [index + 1].red - ramp [index].red);
+					colour.green = ramp [index].green + fraction * (ramp [index + 1].green - ramp [index].green);
+					colour.blue = ramp [index].blue + fraction * (ramp [index + 1].blue - ramp [index].blue);
 					break;
 				}
 				default: {

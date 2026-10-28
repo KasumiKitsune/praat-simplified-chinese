@@ -96,10 +96,12 @@ class GuiControlBlockValueChangedCallbacks {
 
 		union {
 			struct { GuiObject horizontalBar, verticalBar, clipWindow, workWindow; } scrolledWindow;
-			struct { bool active, isDialog, canFullScreen;
+			struct { bool active, isDialog, canFullScreen, canBeLayered;
+				int opacityPercent;
 				uinteger lowAccelerators [8]; XtCallbackProc goAwayCallback; XtPointer goAwayClosure; } shell;
 			struct { unsigned char acceleratorChar; int acceleratorModifiers; } pushButton;
 			struct { int inBar; } cascadeButton;
+			struct { bool commandItem; } pulldownMenu;
 			struct { unsigned char acceleratorChar; int acceleratorModifiers; XtCallbackList valueChangedCallbacks; } toggleButton;
 			struct { XtCallbackList valueChangedCallbacks, dragCallbacks; } scrollBar;
 		} motiff;
@@ -148,6 +150,15 @@ class GuiControlBlockValueChangedCallbacks {
 	void _GuiNativeControl_hide (GuiObject me);
 	void _GuiNativeControl_setSensitive (GuiObject me);
 	char32 * _GuiWin_expandAmpersands (conststring32 title);
+
+	/********** Menu bar entries that open a panel instead of a dropdown **********/
+	void _GuiWinMenu_installAsBarCommand (GuiObject pulldown, XtCallbackProc activateCallback, XtPointer activateClosure);
+	bool _GuiWinMenu_getBarEntryRectOnScreen (GuiObject pulldown, int *left, int *top, int *width, int *height);
+		/* Screen rectangle of the entry that this pulldown menu has in the window's menu bar. */
+
+	/********** Whole-window opacity **********/
+	bool _GuiWinShell_setOpacity (GuiObject shell, integer percent);   // the shell has to be created with canBeLayered
+	integer _GuiWinShell_getOpacity (GuiObject shell);
 
 	/********** GuiButton.cpp **********/
 	void _GuiWinButton_destroy (GuiObject widget);

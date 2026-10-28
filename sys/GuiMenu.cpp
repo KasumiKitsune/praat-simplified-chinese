@@ -390,6 +390,8 @@ void GuiMenu_empty (GuiMenu me) {
 
 GuiMenu GuiMenu_createInWindow (GuiWindow window, conststring32 title, uint32 flags) {
 	autoGuiMenu me = Thing_new (GuiMenu);
+	my d_barButtonCallback = nullptr;
+	my d_barButtonBoss = nullptr;
 	my d_shell = window;
 	my d_parent = window;
 	conststring32 translatedTitle = praat_translate (title);
@@ -503,6 +505,39 @@ GuiMenu GuiMenu_createInWindow (GuiWindow window, conststring32 title, uint32 fl
 	#elif cocoa
 	#endif
 	return me.releaseToAmbiguousOwner();
+}
+
+#if motif
+	static void _GuiMotifMenu_barButtonActivated (GuiObject /* pulldown */, XtPointer boss, XtPointer /* callData */) {
+		const GuiMenu me = (GuiMenu) boss;
+		if (me && me -> d_barButtonCallback)
+			me -> d_barButtonCallback (me -> d_barButtonBoss);
+	}
+#endif
+
+GuiMenu GuiMenu_createBarButtonInWindow (GuiWindow window, conststring32 title, uint32 flags,
+		GuiMenu_BarButtonCallback callback, void *boss)
+{
+	/*
+		The entry looks like a menu in the bar, but clicking it opens a panel of its own instead of
+		dropping down a list. Elsewhere this is an ordinary menu, which keeps it usable.
+	*/
+	const GuiMenu me = GuiMenu_createInWindow (window, title, flags);
+	my d_barButtonCallback = callback;
+	my d_barButtonBoss = boss;
+	#if motif
+		_GuiWinMenu_installAsBarCommand (my d_widget, _GuiMotifMenu_barButtonActivated, me);
+	#endif
+	return me;
+}
+
+bool GuiMenu_getRectOnScreen (GuiMenu me, int *left, int *top, int *width, int *height) {
+	#if motif
+		return _GuiWinMenu_getBarEntryRectOnScreen (me -> d_widget, left, top, width, height);
+	#else
+		(void) me;  (void) left;  (void) top;  (void) width;  (void) height;
+		return false;
+	#endif
 }
 
 GuiMenu GuiMenu_createInMenu (GuiMenu supermenu, conststring32 title, uint32 flags) {

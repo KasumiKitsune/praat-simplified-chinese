@@ -76,6 +76,13 @@ Thing_define (TextGridEditor, FunctionEditor) {
 		FunctionArea_drawOne (our textGridArea().get());
 	}
 	bool v_hasText () override { return true; }
+	bool v_hasAppearanceMenu () override {
+		#if motif
+			return our soundArea().get() != nullptr;
+		#else
+			return false;
+		#endif
+	}
 	bool v_hasSelectionViewer () override { return true; }
 	void v_drawSelectionViewer () override {
 		TextGridArea_drawSelectionViewer (our textGridArea().get());
@@ -101,11 +108,12 @@ Thing_define (TextGridEditor, FunctionEditor) {
 		);
 		if (our soundArea()) {
 			const bool pulsesAreVisible = our soundAnalysisArea() -> hasPulsesToShow ();
+			const EditorAppearanceMarking *marking = our appearanceMarking ();
 			FunctionArea_drawLegend (our soundArea().get(),
 				FunctionArea_legend_WAVEFORM U" %%non-modifiable copy of sound",
-				DataGui_defaultForegroundColour (our soundArea().get(), false),
+				SoundArea_legendColour (our soundArea().get()),
 				pulsesAreVisible ? FunctionArea_legend_POLES U" %%derived pulses" : nullptr,
-				Melder_GREY
+				marking ? marking -> pulseCore : Melder_GREY
 			);
 			SoundAnalysisArea_drawDefaultLegends (our soundAnalysisArea().get());
 		}

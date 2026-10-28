@@ -114,6 +114,7 @@ void _Gui_callCallbacks (GuiObject w, XtCallbackList *callbacks, XtPointer call)
 #define MAXIMUM_NUMBER_OF_MENUS  4000
 static GuiObject theMenus [1+MAXIMUM_NUMBER_OF_MENUS];   // we can freely use and reuse these menu ids
 static char32 theWindowClassName [100], theDrawingAreaClassName [100], theApplicationClassName [100];
+static char32 theLayeredShellClassName [100];
 char32 * _GuiWin_getDrawingAreaClassName () { return theDrawingAreaClassName; }
 static int (*theUserMessageCallback) ();
 #define MINIMUM_MENU_ITEM_ID  (MAXIMUM_NUMBER_OF_MENUS + 1)
@@ -123,6 +124,7 @@ static short theMenuItems [1+MAXIMUM_MENU_ITEM_ID];   // we can freely use and r
 static GuiObject theApplicationShell;   // for global menus
 static int theBackground = False;   // set by suspend and resume events; used by Motif-style activation methods
 static int theDialogHint = False;   // should the shell that is currently being created, have dialog or document looks?
+static int theLayeredShellHint = False;   // should the shell that is currently being created, support whole-window translucency?
 integer numberOfWidgets = 0;
 integer Gui_getNumberOfMotifWidgets () { return numberOfWidgets; }
 
@@ -1106,13 +1108,19 @@ static void _GuiNativizeWidget (GuiObject me) {
 		} break;
 		case xmShellWidgetClass: {
 			static char32 *className { theApplicationClassName };   // only for first window
+			char32 *shellClassName = className;
+			className = theWindowClassName;   // all later windows
+			if (theLayeredShellHint)
+				shellClassName = theLayeredShellClassName;   // no CS_OWNDC: this shell can be translucent as a whole
+			conststringW nativeClassName = Melder_peek32toW (shellClassName);
 			my window = CreateWindowEx (theDialogHint ? WS_EX_DLGMODALFRAME /* | WS_EX_TOPMOST */ : 0,
-				Melder_peek32toW (className), Melder_peek32toW (className),
+				nativeClassName, nativeClassName,
 				theDialogHint ? WS_CAPTION | WS_SYSMENU : WS_OVERLAPPEDWINDOW,
 				CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, my parent ? my parent -> window : NULL, NULL, theGui.instance, NULL);
-			className = theWindowClassName;   // all later windows
 			SetWindowLongPtr (my window, GWLP_USERDATA, (LONG_PTR) me);
 			my motiff.shell.isDialog = theDialogHint;   // so we can maintain a single Shell class instead of two different
+			my motiff.shell.canBeLayered = theLayeredShellHint;
+			my motiff.shell.opacityPercent = 100;
 			DragAcceptFiles (my window, TRUE);   // enable drag-and-drop of files onto the window
 
 			#ifndef DWMWA_WINDOW_CORNER_PREFERENCE
@@ -2262,8 +2270,17 @@ void * GuiWin_initialize1 (conststring32 name)
 	Melder_sprint (theApplicationClassName,100, U"PraatShell", PRAAT_WINDOW_CLASS_NUMBER, U" ", name);
 	Melder_sprint (theWindowClassName,100, U"PraatChildWindow", PRAAT_WINDOW_CLASS_NUMBER, U" ", name);
 	trace (U"Window class name <<", theWindowClassName, U">>");
+	Melder_sprint (theLayeredShellClassName,100, U"PraatLayeredShell", PRAAT_WINDOW_CLASS_NUMBER, U" ", name);
 	Melder_sprint (theDrawingAreaClassName,100, U"PraatDrawingArea", PRAAT_WINDOW_CLASS_NUMBER, U" ", name);
-	HWND window = FindWindow (Melder_peek32toW (theWindowClassName), NULL);   // or theApplicationClassName?
+	HWND window = FindWindow (Melder_peek32toW (theApplicationClassName), NULL);
+	if (! window)
+		window = FindWindow (Melder_peek32toW (theWindowClassName), NULL);
+	if (! window)
+		/*
+			A top-level window that can be made translucent is of a class of its own;
+			a message for the running instance has to reach one of those as well.
+		*/
+		window = FindWindow (Melder_peek32toW (theLayeredShellClassName), NULL);
 	return window;
 }
 void GuiWin_initialize2 (unsigned int argc, char **argv)
@@ -2288,6 +2305,9 @@ void GuiWin_initialize2 (unsigned int argc, char **argv)
 	windowClass. lpszClassName = Melder_32toW (theDrawingAreaClassName).transfer();
 	RegisterClassEx (& windowClass);
 	windowClass. lpszClassName = Melder_32toW (theApplicationClassName).transfer();
+	RegisterClassEx (& windowClass);
+	windowClass. style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	windowClass. lpszClassName = Melder_32toW (theLayeredShellClassName).transfer();
 	RegisterClassEx (& windowClass);
 	INITCOMMONCONTROLSEX icex;
 	icex.dwSize = sizeof (INITCOMMONCONTROLSEX);
@@ -2512,6 +2532,54 @@ GuiObject XmCreatePulldownMenu (GuiObject parent, const char *name, ArgList dum1
 	return createWidget (xmPulldownMenuWidgetClass, parent, name);
 }
 
+void _GuiWinMenu_installAsBarCommand (GuiObject pulldown, XtCallbackProc activateCallback, XtPointer activateClosure) {
+	Melder_assert (MEMBER (pulldown, PulldownMenu));
+	pulldown -> motiff.pulldownMenu.commandItem = true;
+	pulldown -> activateCallback = activateCallback;
+	pulldown -> activateClosure = activateClosure;
+	const GuiObject bar = pulldown -> parent;
+	if (! MEMBER (bar, MenuBar) || ! bar -> nat.menu.handle)
+		return;
+	const HMENU menu = bar -> nat.menu.handle;
+	for (int position = 0; position < GetMenuItemCount (menu); position ++) {
+		if (GetSubMenu (menu, position) != pulldown -> nat.menu.handle)
+			continue;
+		/*
+			A bar entry without a submenu is a command: clicking it or pressing Enter on it
+			gives a WM_COMMAND with this menu's id, which is what an own panel needs.
+		*/
+		MENUITEMINFO info;
+		info. cbSize = sizeof (MENUITEMINFO);
+		info. fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_ID | MIIM_STATE;
+		info. fType = MFT_STRING;
+		info. fState = MFS_ENABLED;
+		info. dwTypeData = (mutablestringW) Melder_peek32toW (pulldown -> name.get());
+		info. hSubMenu = NULL;
+		info. wID = (UINT) pulldown -> nat.menu.id;
+		SetMenuItemInfo (menu, position, TRUE, & info);
+		DrawMenuBar (pulldown -> shell -> window);
+		return;
+	}
+}
+
+bool _GuiWinMenu_getBarEntryRectOnScreen (GuiObject pulldown, int *left, int *top, int *width, int *height) {
+	const GuiObject bar = pulldown -> parent;
+	if (! MEMBER (bar, MenuBar) || ! bar -> nat.menu.handle || ! pulldown -> shell -> window)
+		return false;
+	const HMENU menu = bar -> nat.menu.handle;
+	for (int position = 0; position < GetMenuItemCount (menu); position ++) {
+		if (GetMenuItemID (menu, position) != (int) pulldown -> nat.menu.id && GetSubMenu (menu, position) != pulldown -> nat.menu.handle)
+			continue;
+		RECT rect { };
+		if (! GetMenuItemRect (pulldown -> shell -> window, menu, (UINT) position, & rect))
+			return false;
+		*left = rect.left;   *top = rect.top;
+		*width = rect.right - rect.left;   *height = rect.bottom - rect.top;
+		return true;
+	}
+	return false;
+}
+
 GuiObject XmCreateRadioBox (GuiObject parent, const char *name, ArgList dum1, int dum2) {
 	GuiObject result = createWidget (xmRowColumnWidgetClass, parent, name);
 	(void) dum1;
@@ -2557,10 +2625,63 @@ GuiObject XmCreateSeparatorGadget (GuiObject parent, const char *name, ArgList d
 }
 
 GuiObject XmCreateShell (GuiObject parent, const char *name, ArgList dum1, int dum2) {
+	theLayeredShellHint = name && strcmp (name, "Praatwulgtranslucent") == 0;
 	GuiObject me = createWidget (xmShellWidgetClass, parent, name);
+	theLayeredShellHint = False;
 	(void) dum1;
 	(void) dum2;
 	return me;
+}
+
+bool _GuiWinShell_setOpacity (GuiObject shell, integer percent) {
+	Melder_assert (shell && shell -> widgetClass == xmShellWidgetClass);
+	if (! shell -> motiff.shell.canBeLayered)
+		return false;   // this shell belongs to the window class that keeps its own device context
+	const HWND window = shell -> window;
+	if (! IsWindow (window))
+		return false;
+	Melder_clip <integer> (0, & percent, 100);
+	const LONG_PTR previousExtendedStyle = GetWindowLongPtr (window, GWL_EXSTYLE);
+	const bool wasLayered = (previousExtendedStyle & WS_EX_LAYERED) != 0;
+	/*
+		Below 100 % the whole window composites with one alpha value; at 100 % we leave the
+		layered state that this function introduced. Nothing else changes: no colour key, no
+		mouse transparency, no always-on-top, and the position and size stay as they are.
+	*/
+	const LONG_PTR wantedExtendedStyle = percent >= 100 ?
+		previousExtendedStyle &~ (LONG_PTR) WS_EX_LAYERED : previousExtendedStyle | WS_EX_LAYERED;
+	const bool isLayered = (wantedExtendedStyle & WS_EX_LAYERED) != 0;
+	if (wantedExtendedStyle != previousExtendedStyle) {
+		SetWindowLongPtr (window, GWL_EXSTYLE, wantedExtendedStyle);
+		SetWindowPos (window, nullptr, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+	}
+	if (GetWindowLongPtr (window, GWL_EXSTYLE) != wantedExtendedStyle) {
+		SetWindowLongPtr (window, GWL_EXSTYLE, previousExtendedStyle);
+		return false;
+	}
+	if (percent < 100 && ! SetLayeredWindowAttributes (window, 0, (BYTE) (0.5 + 255.0 * percent / 100.0), LWA_ALPHA)) {
+		if (! wasLayered)
+			SetWindowLongPtr (window, GWL_EXSTYLE, previousExtendedStyle);
+		return false;
+	}
+	shell -> motiff.shell.opacityPercent = percent;
+	if (wasLayered != isLayered) {
+		/*
+			Entering or leaving the layered state reparents the way the window is composited, so the
+			contents have to be painted again. A change of the alpha value alone is a job for the
+			system: the window keeps what it has drawn, so no drawing area is asked to redraw and
+			nothing that depends on the data is computed again.
+		*/
+		RedrawWindow (window, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW | RDW_ALLCHILDREN);
+	}
+	return true;
+}
+
+integer _GuiWinShell_getOpacity (GuiObject shell) {
+	if (! shell || shell -> widgetClass != xmShellWidgetClass || ! shell -> motiff.shell.canBeLayered)
+		return 100;
+	return shell -> motiff.shell.opacityPercent;
 }
 
 GuiObject XmCreateToggleButtonGadget (GuiObject parent, const char *name, ArgList dum1, int dum2) {
@@ -3228,8 +3349,11 @@ static void on_command (HWND window, int id, HWND controlWindow, UINT codeNotify
 				menuBar = parent;
 			if (menuBar) {
 				GuiObject item = findItem (menuBar, id);
+				if (! item && id >= 1 && id <= MAXIMUM_NUMBER_OF_MENUS && theMenus [id] &&
+					theMenus [id] -> motiff.pulldownMenu.commandItem)
+					item = theMenus [id];   // a bar entry that opens a panel of its own
 				if (item) {
-					if (item -> widgetClass == xmPushButtonWidgetClass) {
+					if (item -> widgetClass == xmPushButtonWidgetClass || item -> widgetClass == xmPulldownMenuWidgetClass) {
 						if (item -> activateCallback)
 							item -> activateCallback (item, item -> activateClosure, 0);
 					} else if (item -> widgetClass == xmToggleButtonWidgetClass) {

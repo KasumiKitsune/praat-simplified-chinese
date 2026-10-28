@@ -85,6 +85,13 @@ void Spectrogram_paint (constSpectrogram me, Graphics g,
 			a boolean that determines if a box, ticks, numbers, and text are written in the margins.
 */
 
+MelderColour Spectrogram_monoColourMapDarkest (kSpectrogram_colourMap colourMap);
+/*
+	The deepest value of the white-based monochrome maps MIST_BLUE_GREY and CLAY_GREY:
+	weak energy starts at white and reaches this colour at the top of the intensity range.
+	Any other colour map has no single darkest colour, so the result is undefined.
+*/
+
 autoSpectrogram Matrix_to_Spectrogram (constMatrix me);
 /*
 	Create a Spectrogram from a Matrix,

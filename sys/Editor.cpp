@@ -621,7 +621,9 @@ void Editor_init (Editor me, int x, int y, int width, int height, conststring32 
 		bottom += Machine_getTitleBarHeight ();
 	#endif
 	my windowForm = GuiWindow_create (left, top, width, height, 450, 350, title,
-			gui_window_cb_goAway, me, my v_canFullScreen () ? GuiWindow_FULLSCREEN : 0);
+			gui_window_cb_goAway, me,
+			(my v_canFullScreen () ? GuiWindow_FULLSCREEN : 0) |
+			(my v_canBeTranslucentShell () ? GuiWindow_TRANSLUCENT_SHELL : 0));
 	Thing_setName (me, title);
 
 	/*

@@ -31,6 +31,8 @@ enums_begin (kSpectrogram_colourMap, 0)
 	enums_add (kSpectrogram_colourMap, 11, PINK, U"Pink")
 	enums_add (kSpectrogram_colourMap, 12, PARULA, U"Parula")
 	enums_add (kSpectrogram_colourMap, 13, TURBO, U"Turbo")
-enums_end (kSpectrogram_colourMap, 13, GREY)
+	enums_add (kSpectrogram_colourMap, 14, MIST_BLUE_GREY, U"MistBlueGrey")
+	enums_add (kSpectrogram_colourMap, 15, CLAY_GREY, U"ClayGrey")
+enums_end (kSpectrogram_colourMap, 15, GREY)
 
 /* End of file Spectrogram_enums.h */

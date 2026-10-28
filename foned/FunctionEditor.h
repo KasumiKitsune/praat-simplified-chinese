@@ -22,6 +22,8 @@
 #include "Graphics.h"
 #include "Function.h"
 #include "praat_translate.h"
+#include "EditorAppearance.h"
+#include "EditorAppearancePanel.h"
 
 struct FunctionEditor_picture {
 	/* KEEP IN SYNC WITH PREFS. */
@@ -82,6 +84,24 @@ Thing_define (FunctionEditor, Editor) {
 	bool isInSelectionViewer (double x_pxlt) const {
 		return x_pxlt > our _selectionViewerLeft;
 	}
+	/*
+		The appearance of this one window: the spectrogram colour scheme it draws with and how opaque
+		the whole window is. Both are instance fields. They are never written into a preference, never
+		inherited by a new window, never synchronised by Group and never sent to the analysis code.
+	*/
+	kEditorAppearancePalette appearancePalette;
+	integer appearanceOpacityPercent;   // 20 through 100
+	const EditorAppearanceMarking * appearanceMarking () const {
+		return EditorAppearance_marking (our appearancePalette);
+	}
+	/*
+		Null unless this window draws with one of the new schemes, in which case the caller uses the
+		colours and widths of that scheme instead of its own. The original state is not a colour scheme:
+		it simply means that nothing here is overridden.
+	*/
+	bool appearanceIsOverride () const {
+		return EditorAppearancePalette_isOverride (our appearancePalette);
+	}
 	void viewAllAsPixelettes () const {
 		Graphics_setViewport (our graphics.get(), 0.0, our width_pxlt, 0.0, our height_pxlt);
 		Graphics_setWindow (our graphics.get(), 0.0, our width_pxlt, 0.0, our height_pxlt);
@@ -137,6 +157,8 @@ Thing_define (FunctionEditor, Editor) {
 	GuiScrollBar scrollBar;
 	GuiCheckButton groupButton;
 	GuiObject bottomArea;
+	GuiMenu appearanceMenu;
+	EditorAppearancePanel appearancePanel;
 
 	/* Bottom analysis bar controls: */
 	GuiCheckButton bottomCheck_spectrogram;
@@ -187,6 +209,16 @@ Thing_define (FunctionEditor, Editor) {
 		override;
 
 	bool v_hasPlayMenu () override { return true; }
+	virtual bool v_hasAppearanceMenu () {
+		return false;
+		/*
+			Only the editors that show a spectrogram get the appearance entry; its panel also needs a
+			window shell that can be made translucent as a whole.
+		*/
+	}
+	bool v_canBeTranslucentShell () override {
+		return our v_hasAppearanceMenu ();
+	}
 	void v_createMenus ()
 		override;
 	void v_createMenuItems_prefs (EditorMenu)
@@ -321,6 +353,35 @@ void FunctionEditor_redraw (FunctionEditor me);
 		or after any of the data have changed. In the latter case, also call Editor_broadcastChange.
 	Behaviour:
 		we just call Graphics_updateWs (my graphics).
+*/
+
+void FunctionEditor_appearanceSetPalette (FunctionEditor me, kEditorAppearancePalette palette);
+/*
+	Function:
+		pick one of the appearance palettes for this window alone.
+	Usage:
+		call this from the appearance panel. The analysis settings, their results and their caches
+		are untouched; only the drawing is requested again.
+*/
+
+void FunctionEditor_appearanceExitOverride (FunctionEditor me);
+/*
+	Function:
+		go back to the original drawing style of this window, without resetting anything else.
+	Usage:
+		call this when the user chooses a colour map in the existing spectrogram-colours settings,
+		or chooses the restore entry of the appearance menu.
+*/
+
+void FunctionEditor_appearanceSetOpacity (FunctionEditor me, integer percent, bool commit);
+/*
+	Function:
+		set the opacity of this window to `percent`, a value between 20 and 100.
+	Preconditions:
+		`commit` is false while the slider is being dragged and true as soon as it is released.
+	Postconditions:
+		`my appearanceOpacityPercent` is the opacity that is actually in effect, so a request the
+		system refuses never leaves a percentage on show that the window does not have.
 */
 
 void FunctionEditor_enableUpdates (FunctionEditor me, bool enable);
