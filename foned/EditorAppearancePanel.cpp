@@ -544,14 +544,15 @@
 			const integer keep = me -> state. opacityPercent;
 			RECT thumb, channel;
 			SendMessageW (me -> slider, TBM_GETCHANNELRECT, 0, (LPARAM) & channel);
-			SendMessageW (me -> slider, TBM_SETPOS, FALSE, MINIMUM_OPACITY);
+			/* TRUE synchronizes the native thumb rectangle as well as the logical value, while hidden. */
+			SendMessageW (me -> slider, TBM_SETPOS, TRUE, MINIMUM_OPACITY);
 			SendMessageW (me -> slider, TBM_GETTHUMBRECT, 0, (LPARAM) & thumb);
 			const float width = (float) (thumb.right - thumb.left);
 			me -> travelLeft = (thumb.left + thumb.right) / 2.0f;
-			SendMessageW (me -> slider, TBM_SETPOS, FALSE, MAXIMUM_OPACITY);
+			SendMessageW (me -> slider, TBM_SETPOS, TRUE, MAXIMUM_OPACITY);
 			SendMessageW (me -> slider, TBM_GETTHUMBRECT, 0, (LPARAM) & thumb);
 			me -> travelRight = (thumb.left + thumb.right) / 2.0f;
-			SendMessageW (me -> slider, TBM_SETPOS, FALSE, keep);
+			SendMessageW (me -> slider, TBM_SETPOS, TRUE, keep);
 			if (me -> travelRight <= me -> travelLeft) {
 				/* The control gave no travel of its own: the groove with half a handle at each end. */
 				me -> travelLeft = channel.left + width / 2.0f;
