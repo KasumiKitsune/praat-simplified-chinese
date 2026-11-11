@@ -461,6 +461,7 @@ void structFunctionEditor :: v9_destroy () noexcept {
 	}
 	if (Melder_debug == 55)
 		Melder_casual (Thing_messageNameAndAddress (this), U" v9_destroy");
+	GuiOpacityPanel_dispose (& our opacityPanel);
 	FunctionEditor_Parent :: v9_destroy ();
 }
 
@@ -474,6 +475,8 @@ void structFunctionEditor :: v1_info () {
 	MelderInfo_writeLine (U"Selection end: ", our endSelection, U" ", v_format_units_long());
 	MelderInfo_writeLine (U"Arrow scroll step: ", our instancePref_arrowScrollStep(), U" ", v_format_units_long());
 	MelderInfo_writeLine (U"Group: ", group ? U"yes" : U"no");
+	if (our v_hasOpacityControl ())
+		MelderInfo_writeLine (U"Window opacity: ", our opacityPercent, U"%");
 	for (integer iarea = 1; iarea <= FunctionEditor_MAXIMUM_NUMBER_OF_FUNCTION_AREAS; iarea ++) {
 		FunctionArea area = static_cast <FunctionArea> (our functionAreas [iarea].get());
 		if (area)
@@ -1442,6 +1445,42 @@ static void HELP__intro (FunctionEditor /* me */, EDITOR_ARGS) {
 	HELP (U"Intro")
 }
 
+static void opacityPanelChanged (Thing boss, int opacityPercent) {
+	FunctionEditor me = static_cast <FunctionEditor> (boss);
+	if (! me || ! my windowForm)
+		return;
+	Melder_clip (20, & opacityPercent, 100);
+	if (! GuiWindow_setOpacity (my windowForm, opacityPercent)) {
+		if (my opacityPanel)
+			GuiOpacityPanel_setValue (my opacityPanel, my opacityPercent);
+		Melder_flushError (praat_translate (U"Cannot change window opacity."));
+		return;
+	}
+	my opacityPercent = GuiWindow_getOpacity (my windowForm);
+}
+
+static void opacityMenuClicked (FunctionEditor me, GuiMenuItemEvent /* event */) {
+	if (! me || ! my windowForm || ! my opacityMenu)
+		return;
+	if (my opacityPanel) {
+		if (GuiOpacityPanel_steppedAsideForAnchorClick (my opacityPanel))
+			return;
+		if (GuiOpacityPanel_isShowing (my opacityPanel)) {
+			GuiOpacityPanel_dismiss (my opacityPanel);
+			return;
+		}
+	} else {
+		my opacityPanel = GuiOpacityPanel_create (my windowForm, my opacityPercent, opacityPanelChanged, me);
+		if (! my opacityPanel)
+			return;
+	}
+	GuiOpacityPanel_setValue (my opacityPanel, my opacityPercent);
+	int left = 0, right = 0, top = 0, bottom = 0;
+	if (! GuiMenu_getRectOnScreen (my opacityMenu, & left, & right, & top, & bottom))
+		return;
+	GuiOpacityPanel_show (my opacityPanel, left, right, top, bottom);
+}
+
 void structFunctionEditor :: v_updateText () {
 	for (integer iarea = 1; iarea <= FunctionEditor_MAXIMUM_NUMBER_OF_FUNCTION_AREAS; iarea ++) {
 		FunctionArea area = static_cast <FunctionArea> (our functionAreas [iarea].get());
@@ -1551,6 +1590,9 @@ void structFunctionEditor :: v_createMenus () {
 		if (area)
 			area -> v_createMenus ();
 	}
+
+	if (our v_hasOpacityControl ())
+		our opacityMenu = GuiMenu_createBarButtonInWindow (our windowForm, U"Opacity", 0, opacityMenuClicked, this);
 }
 
 void structFunctionEditor :: v_updateMenuItems () {

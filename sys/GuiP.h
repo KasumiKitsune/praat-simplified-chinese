@@ -96,10 +96,11 @@ class GuiControlBlockValueChangedCallbacks {
 
 		union {
 			struct { GuiObject horizontalBar, verticalBar, clipWindow, workWindow; } scrolledWindow;
-			struct { bool active, isDialog, canFullScreen;
+			struct { bool active, isDialog, canFullScreen, canBeLayered; int opacityPercent;
 				uinteger lowAccelerators [8]; XtCallbackProc goAwayCallback; XtPointer goAwayClosure; } shell;
 			struct { unsigned char acceleratorChar; int acceleratorModifiers; } pushButton;
 			struct { int inBar; } cascadeButton;
+			struct { bool commandItem; } pulldownMenu;
 			struct { unsigned char acceleratorChar; int acceleratorModifiers; XtCallbackList valueChangedCallbacks; } toggleButton;
 			struct { XtCallbackList valueChangedCallbacks, dragCallbacks; } scrollBar;
 		} motiff;
@@ -181,6 +182,11 @@ class GuiControlBlockValueChangedCallbacks {
 
 	/********** GuiMenuItem.cpp **********/
 	void _GuiWinMenuItem_setText (GuiObject widget);
+	GuiObject XmCreateTranslucentShell (GuiObject parent, const char *name, ArgList arglist, int argcount);
+	bool _GuiWinShell_setOpacity (GuiObject widget, int opacityPercent);
+	int _GuiWinShell_getOpacity (GuiObject widget);
+	void _GuiWinMenu_installAsBarCommand (GuiObject menuBar, GuiObject pulldownMenu, GuiObject item);
+	bool _GuiWinMenu_getBarEntryRectOnScreen (GuiObject menuBar, GuiObject pulldownMenu, int *left, int *right, int *top, int *bottom);
 
 	/********** GuiRadioButton.cpp **********/
 	void _GuiWinRadioButton_destroy (GuiObject widget);

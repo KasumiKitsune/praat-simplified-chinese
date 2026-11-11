@@ -17,6 +17,7 @@
  */
 
 #include "GuiP.h"
+#include "praat_translate.h"
 #include "../kar/UnicodeData.h"
 #include "machine.h"
 #include <locale.h>
@@ -165,7 +166,8 @@ GuiWindow GuiWindow_create (int x, int y, int width, int height, int minimumWidt
 		gtk_window_get_position (my d_gtkWindow, & rootX, & rootY);
 		trace (rootX, U" root ", rootY);
 	#elif motif
-		my d_xmShell = XmCreateShell (nullptr, flags & GuiWindow_FULLSCREEN ? "Praatwulgfullscreen" : "Praatwulg", nullptr, 0);
+		my d_xmShell = (flags & GuiWindow_TRANSLUCENT_SHELL ? XmCreateTranslucentShell : XmCreateShell) (
+			nullptr, flags & GuiWindow_FULLSCREEN ? "Praatwulgfullscreen" : "Praatwulg", nullptr, 0);
 		XtVaSetValues (my d_xmShell, XmNdeleteResponse, goAwayCallback ? XmDO_NOTHING : XmUNMAP, nullptr);
 		XtVaSetValues (my d_xmShell, XmNx, x, XmNy, y, XmNwidth, (Dimension) width, XmNheight, (Dimension) height, nullptr);
 		if (goAwayCallback)
@@ -232,6 +234,637 @@ void GuiWindow_addMenuBar (GuiWindow me) {
 		(void) me;   // this is handled elsewhere
 	#endif
 }
+
+bool GuiWindow_setOpacity (GuiWindow me, int opacityPercent) {
+	if (! me)
+		return false;
+	#if motif
+		return _GuiWinShell_setOpacity (my d_xmShell, opacityPercent);
+	#else
+		(void) opacityPercent;
+		return false;
+	#endif
+}
+
+int GuiWindow_getOpacity (GuiWindow me) {
+	if (! me)
+		return 100;
+	#if motif
+		return _GuiWinShell_getOpacity (my d_xmShell);
+	#else
+		return 100;
+	#endif
+}
+
+#if motif
+
+namespace {
+
+constexpr int kMinOpacityPercent = 20;
+constexpr int kMaxOpacityPercent = 100;
+constexpr const wchar_t *kOpacityPanelClassName = L"PraatOpacityFlyout1";
+
+int queryWindowDpi (HWND hwnd) noexcept {
+	using GetDpiForWindowFn = UINT (WINAPI *) (HWND);
+	static bool resolved = false;
+	static GetDpiForWindowFn fn = nullptr;
+	if (! resolved) {
+		HMODULE user32 = GetModuleHandleW (L"user32.dll");
+		if (user32)
+			fn = reinterpret_cast <GetDpiForWindowFn> (GetProcAddress (user32, "GetDpiForWindow"));
+		resolved = true;
+	}
+	if (fn && hwnd) {
+		const UINT dpi = fn (hwnd);
+		if (dpi >= 72 && dpi <= 480)
+			return (int) dpi;
+	}
+	return 96;
+}
+
+inline int scaleDpi (int px, int dpi) noexcept {
+	return MulDiv (px, dpi, 96);
+}
+
+} // namespace
+
+struct structGuiOpacityPanel {
+	GuiWindow owner = nullptr;
+	HWND ownerHwnd = nullptr;
+	HWND hwnd = nullptr;
+	GuiOpacityPanel_ChangedCallback changedCallback = nullptr;
+	Thing boss = nullptr;
+	int value = 100;
+	int dpi = 96;
+	HFONT customNormalFont = nullptr;
+	HFONT customBoldFont = nullptr;
+	RECT anchorRect { };
+	RECT badgeRect { };
+	bool hasDwmRoundCorners = false;
+	bool isShowing = false;
+	bool isDragging = false;
+	bool hoverThumb = false;
+	bool hoverBadge = false;
+	bool trackingLeave = false;
+	bool closedByAnchorClick = false;
+	ULONGLONG closedByAnchorTick = 0;
+
+	void releaseCustomFonts () noexcept {
+		if (customNormalFont) {
+			DeleteObject (customNormalFont);
+			customNormalFont = nullptr;
+		}
+		if (customBoldFont) {
+			DeleteObject (customBoldFont);
+			customBoldFont = nullptr;
+		}
+	}
+
+	void ensureFontsForDpi (int targetDpi) noexcept {
+		if (targetDpi <= 0)
+			targetDpi = 96;
+		if (dpi == targetDpi && (targetDpi == 96 || (customNormalFont && customBoldFont)))
+			return;
+		releaseCustomFonts ();
+		dpi = targetDpi;
+		if (dpi != 96) {
+			customNormalFont = CreateFontW (-scaleDpi (13, dpi), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+				DEFAULT_PITCH | FF_DONTCARE, L"Microsoft YaHei UI");
+			customBoldFont = CreateFontW (-scaleDpi (13, dpi), 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE,
+				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+				DEFAULT_PITCH | FF_DONTCARE, L"Microsoft YaHei UI");
+		}
+	}
+
+	HFONT normalFont () const noexcept {
+		return customNormalFont ? customNormalFont : theWinGuiNormalLabelFont ();
+	}
+
+	HFONT boldFont () const noexcept {
+		return customBoldFont ? customBoldFont : theWinGuiBoldLabelFont ();
+	}
+
+	int cardWidth () const noexcept  { return scaleDpi (236, dpi); }
+	int cardHeight () const noexcept { return scaleDpi (78, dpi); }
+	int trackLeft () const noexcept  { return scaleDpi (18, dpi); }
+	int trackRight () const noexcept { return cardWidth () - scaleDpi (18, dpi); }
+	int trackY () const noexcept     { return scaleDpi (54, dpi); }
+	int thumbRadius () const noexcept { return scaleDpi (8, dpi); }
+
+	int thumbXFromValue () const noexcept {
+		const int left = trackLeft ();
+		const int span = trackRight () - left;
+		if (span <= 0)
+			return left;
+		return left + MulDiv (value - kMinOpacityPercent, span, kMaxOpacityPercent - kMinOpacityPercent);
+	}
+
+	int valueFromClientX (int x) const noexcept {
+		const int left = trackLeft ();
+		const int right = trackRight ();
+		if (x <= left)
+			return kMinOpacityPercent;
+		if (x >= right)
+			return kMaxOpacityPercent;
+		const int pct = kMinOpacityPercent + MulDiv (x - left, kMaxOpacityPercent - kMinOpacityPercent, right - left);
+		return pct < kMinOpacityPercent ? kMinOpacityPercent : (pct > kMaxOpacityPercent ? kMaxOpacityPercent : pct);
+	}
+
+	void applyUserValue (int newValue) {
+		Melder_clip (kMinOpacityPercent, & newValue, kMaxOpacityPercent);
+		if (newValue == value)
+			return;
+		value = newValue;
+		if (hwnd) {
+			InvalidateRect (hwnd, nullptr, FALSE);
+			UpdateWindow (hwnd);
+		}
+		if (changedCallback)
+			changedCallback (boss, value);
+	}
+};
+
+static void paintOpacityPanel (GuiOpacityPanel me, HDC targetDc) {
+	RECT rc { };
+	GetClientRect (my hwnd, & rc);
+	const int w = rc.right - rc.left;
+	const int h = rc.bottom - rc.top;
+	if (w <= 0 || h <= 0)
+		return;
+
+	HDC dc = CreateCompatibleDC (targetDc);
+	HBITMAP bmp = CreateCompatibleBitmap (targetDc, w, h);
+	HBITMAP oldBmp = (HBITMAP) SelectObject (dc, bmp);
+
+	// 1. Card background (and 1px border fallback when DWM rounded corners are unavailable on Win10)
+	HBRUSH bgBrush = CreateSolidBrush (RGB (252, 253, 255));
+	if (my hasDwmRoundCorners) {
+		FillRect (dc, & rc, bgBrush);
+	} else {
+		HPEN borderPen = CreatePen (PS_SOLID, 1, RGB (208, 213, 221));
+		HPEN oldPen = (HPEN) SelectObject (dc, borderPen);
+		HBRUSH oldBrush = (HBRUSH) SelectObject (dc, bgBrush);
+		Rectangle (dc, 0, 0, w, h);
+		SelectObject (dc, oldBrush);
+		SelectObject (dc, oldPen);
+		DeleteObject (borderPen);
+	}
+	DeleteObject (bgBrush);
+
+	SetBkMode (dc, TRANSPARENT);
+
+	// 2. Top row: title label + clickable percentage readout pill (click resets to 100%)
+	const int padX = scaleDpi (14, my dpi);
+	const int topY = scaleDpi (10, my dpi);
+	const int rowH = scaleDpi (24, my dpi);
+
+	wchar_t pctText [16];
+	swprintf (pctText, 16, L"%d%%", my value);
+
+	HFONT oldFont = (HFONT) SelectObject (dc, my boldFont ());
+	SIZE pctSize { };
+	GetTextExtentPoint32W (dc, pctText, (int) wcslen (pctText), & pctSize);
+	const int badgeW = (pctSize.cx + scaleDpi (16, my dpi) > scaleDpi (48, my dpi))
+		? (pctSize.cx + scaleDpi (16, my dpi))
+		: scaleDpi (48, my dpi);
+	SetRect (& my badgeRect, w - padX - badgeW, topY, w - padX, topY + rowH);
+
+	const bool badgeInteractive = (my value < 100);
+	const COLORREF badgeBg = (badgeInteractive && my hoverBadge) ? RGB (224, 238, 249) : RGB (241, 245, 249);
+	const COLORREF badgeBorder = (badgeInteractive && my hoverBadge) ? RGB (153, 209, 255) : RGB (226, 232, 240);
+	const COLORREF badgeFg = (badgeInteractive && my hoverBadge) ? RGB (0, 103, 192) : RGB (15, 23, 42);
+
+	{
+		HBRUSH pillBrush = CreateSolidBrush (badgeBg);
+		HPEN pillPen = CreatePen (PS_SOLID, 1, badgeBorder);
+		HBRUSH prevB = (HBRUSH) SelectObject (dc, pillBrush);
+		HPEN prevP = (HPEN) SelectObject (dc, pillPen);
+		const int pillRadius = scaleDpi (10, my dpi);
+		RoundRect (dc, my badgeRect.left, my badgeRect.top, my badgeRect.right, my badgeRect.bottom, pillRadius, pillRadius);
+		SelectObject (dc, prevB);
+		SelectObject (dc, prevP);
+		DeleteObject (pillBrush);
+		DeleteObject (pillPen);
+	}
+
+	SetTextColor (dc, badgeFg);
+	DrawTextW (dc, pctText, -1, & my badgeRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+
+	SelectObject (dc, my normalFont ());
+	SetTextColor (dc, RGB (31, 41, 55));
+	RECT titleRect { padX, topY, my badgeRect.left - scaleDpi (8, my dpi), topY + rowH };
+	conststring32 translatedLabel = praat_translate (U"Window opacity");
+	DrawTextW (dc, Melder_peek32toW (translatedLabel), -1, & titleRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+
+	// 3. Slider track (inactive + active Fluent Blue #0067C0)
+	const int tLeft = my trackLeft ();
+	const int tRight = my trackRight ();
+	const int tY = my trackY ();
+	const int halfTrack = scaleDpi (3, my dpi);
+	const int trackCorner = halfTrack * 2;
+	const int thumbX = my thumbXFromValue ();
+
+	{
+		HBRUSH trackBrush = CreateSolidBrush (RGB (226, 232, 240));
+		HPEN trackPen = CreatePen (PS_SOLID, 1, RGB (226, 232, 240));
+		HBRUSH prevB = (HBRUSH) SelectObject (dc, trackBrush);
+		HPEN prevP = (HPEN) SelectObject (dc, trackPen);
+		RoundRect (dc, tLeft, tY - halfTrack, tRight, tY + halfTrack, trackCorner, trackCorner);
+		SelectObject (dc, prevB);
+		SelectObject (dc, prevP);
+		DeleteObject (trackBrush);
+		DeleteObject (trackPen);
+	}
+
+	if (thumbX > tLeft) {
+		HBRUSH activeBrush = CreateSolidBrush (RGB (0, 103, 192));
+		HPEN activePen = CreatePen (PS_SOLID, 1, RGB (0, 103, 192));
+		HBRUSH prevB = (HBRUSH) SelectObject (dc, activeBrush);
+		HPEN prevP = (HPEN) SelectObject (dc, activePen);
+		RoundRect (dc, tLeft, tY - halfTrack, thumbX, tY + halfTrack, trackCorner, trackCorner);
+		SelectObject (dc, prevB);
+		SelectObject (dc, prevP);
+		DeleteObject (activeBrush);
+		DeleteObject (activePen);
+	}
+
+	// 4. Fluent circular thumb with inner white core
+	const int rOuter = my thumbRadius ();
+	const COLORREF outerCol = my isDragging ? RGB (0, 86, 163)
+		: (my hoverThumb ? RGB (16, 118, 210) : RGB (0, 103, 192));
+	{
+		HBRUSH thumbBrush = CreateSolidBrush (outerCol);
+		HPEN thumbPen = CreatePen (PS_SOLID, 1, outerCol);
+		HBRUSH prevB = (HBRUSH) SelectObject (dc, thumbBrush);
+		HPEN prevP = (HPEN) SelectObject (dc, thumbPen);
+		Ellipse (dc, thumbX - rOuter, tY - rOuter, thumbX + rOuter + 1, tY + rOuter + 1);
+		SelectObject (dc, prevB);
+		SelectObject (dc, prevP);
+		DeleteObject (thumbBrush);
+		DeleteObject (thumbPen);
+	}
+	{
+		const int rInner = my isDragging ? scaleDpi (3, my dpi)
+			: (my hoverThumb ? scaleDpi (5, my dpi) : scaleDpi (4, my dpi));
+		HBRUSH coreBrush = CreateSolidBrush (RGB (255, 255, 255));
+		HPEN corePen = CreatePen (PS_SOLID, 1, RGB (255, 255, 255));
+		HBRUSH prevB = (HBRUSH) SelectObject (dc, coreBrush);
+		HPEN prevP = (HPEN) SelectObject (dc, corePen);
+		Ellipse (dc, thumbX - rInner, tY - rInner, thumbX + rInner + 1, tY + rInner + 1);
+		SelectObject (dc, prevB);
+		SelectObject (dc, prevP);
+		DeleteObject (coreBrush);
+		DeleteObject (corePen);
+	}
+
+	SelectObject (dc, oldFont);
+
+	BitBlt (targetDc, 0, 0, w, h, dc, 0, 0, SRCCOPY);
+	SelectObject (dc, oldBmp);
+	DeleteObject (bmp);
+	DeleteDC (dc);
+}
+
+static LRESULT CALLBACK opacityPanelWndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	if (msg == WM_NCCREATE) {
+		CREATESTRUCTW *cs = reinterpret_cast <CREATESTRUCTW *> (lParam);
+		SetWindowLongPtrW (hwnd, GWLP_USERDATA, reinterpret_cast <LONG_PTR> (cs -> lpCreateParams));
+		return TRUE;
+	}
+	GuiOpacityPanel me = reinterpret_cast <GuiOpacityPanel> (GetWindowLongPtrW (hwnd, GWLP_USERDATA));
+	if (! me)
+		return DefWindowProcW (hwnd, msg, wParam, lParam);
+
+	switch (msg) {
+		case WM_ERASEBKGND:
+			return 1;
+
+		case WM_PAINT: {
+			PAINTSTRUCT ps { };
+			HDC hdc = BeginPaint (hwnd, & ps);
+			paintOpacityPanel (me, hdc);
+			EndPaint (hwnd, & ps);
+			return 0;
+		}
+
+		case WM_MOUSEMOVE: {
+			if (! my trackingLeave) {
+				TRACKMOUSEEVENT tme { sizeof (TRACKMOUSEEVENT), TME_LEAVE, hwnd, 0 };
+				if (TrackMouseEvent (& tme))
+					my trackingLeave = true;
+			}
+			const int x = GET_X_LPARAM (lParam);
+			const int y = GET_Y_LPARAM (lParam);
+			if (my isDragging) {
+				my applyUserValue (my valueFromClientX (x));
+				return 0;
+			}
+			POINT pt { x, y };
+			const int dx = x - my thumbXFromValue ();
+			const int dy = y - my trackY ();
+			const int hitR = my thumbRadius () + scaleDpi (4, my dpi);
+			const bool newHoverThumb = (dx * dx + dy * dy <= hitR * hitR) || (y >= scaleDpi (38, my dpi));
+			const bool newHoverBadge = (my value < 100) && PtInRect (& my badgeRect, pt) != FALSE;
+			if (newHoverThumb != my hoverThumb || newHoverBadge != my hoverBadge) {
+				my hoverThumb = newHoverThumb;
+				my hoverBadge = newHoverBadge;
+				InvalidateRect (hwnd, nullptr, FALSE);
+			}
+			return 0;
+		}
+
+		case WM_MOUSELEAVE: {
+			my trackingLeave = false;
+			if (my hoverThumb || my hoverBadge) {
+				my hoverThumb = false;
+				my hoverBadge = false;
+				InvalidateRect (hwnd, nullptr, FALSE);
+			}
+			return 0;
+		}
+
+		case WM_LBUTTONDOWN: {
+			const int x = GET_X_LPARAM (lParam);
+			const int y = GET_Y_LPARAM (lParam);
+			POINT pt { x, y };
+			if (PtInRect (& my badgeRect, pt)) {
+				my applyUserValue (100);
+				return 0;
+			}
+			if (y >= scaleDpi (34, my dpi)) {
+				my isDragging = true;
+				SetCapture (hwnd);
+				InvalidateRect (hwnd, nullptr, FALSE);
+				my applyUserValue (my valueFromClientX (x));
+			}
+			return 0;
+		}
+
+		case WM_LBUTTONDBLCLK: {
+			const int y = GET_Y_LPARAM (lParam);
+			if (y >= scaleDpi (34, my dpi))
+				my applyUserValue (100);
+			return 0;
+		}
+
+		case WM_LBUTTONUP: {
+			if (my isDragging) {
+				my isDragging = false;
+				ReleaseCapture ();
+				InvalidateRect (hwnd, nullptr, FALSE);
+			}
+			return 0;
+		}
+
+		case WM_CAPTURECHANGED: {
+			if (my isDragging) {
+				my isDragging = false;
+				InvalidateRect (hwnd, nullptr, FALSE);
+			}
+			return 0;
+		}
+
+		case WM_MOUSEWHEEL: {
+			const int delta = GET_WHEEL_DELTA_WPARAM (wParam);
+			if (delta != 0) {
+				const int step = (LOWORD (wParam) & (MK_SHIFT | MK_CONTROL)) ? 1 : 5;
+				const int ticks = delta / WHEEL_DELTA;
+				const int dir = (ticks != 0) ? ticks : (delta > 0 ? 1 : -1);
+				my applyUserValue (my value + dir * step);
+			}
+			return 0;
+		}
+
+		case WM_KEYDOWN: {
+			const int fineStep = (GetKeyState (VK_SHIFT) < 0 || GetKeyState (VK_CONTROL) < 0) ? 1 : 5;
+			switch (wParam) {
+				case VK_LEFT:
+				case VK_DOWN:
+					my applyUserValue (my value - fineStep);
+					return 0;
+				case VK_RIGHT:
+				case VK_UP:
+					my applyUserValue (my value + fineStep);
+					return 0;
+				case VK_NEXT:
+					my applyUserValue (my value - 10);
+					return 0;
+				case VK_PRIOR:
+					my applyUserValue (my value + 10);
+					return 0;
+				case VK_HOME:
+					my applyUserValue (kMinOpacityPercent);
+					return 0;
+				case VK_END:
+					my applyUserValue (kMaxOpacityPercent);
+					return 0;
+				case VK_ESCAPE:
+				case VK_RETURN:
+					GuiOpacityPanel_dismiss (me);
+					if (my ownerHwnd && IsWindow (my ownerHwnd))
+						SetActiveWindow (my ownerHwnd);
+					return 0;
+				default:
+					break;
+			}
+			break;
+		}
+
+		case WM_DPICHANGED: {
+			const int newDpi = HIWORD (wParam);
+			my ensureFontsForDpi (newDpi);
+			const RECT *suggested = reinterpret_cast <const RECT *> (lParam);
+			if (suggested) {
+				SetWindowPos (hwnd, nullptr, suggested -> left, suggested -> top,
+					suggested -> right - suggested -> left, suggested -> bottom - suggested -> top,
+					SWP_NOZORDER | SWP_NOACTIVATE);
+			}
+			InvalidateRect (hwnd, nullptr, FALSE);
+			return 0;
+		}
+
+		case WM_ACTIVATE: {
+			if (LOWORD (wParam) == WA_INACTIVE && my isShowing) {
+				POINT pt { };
+				GetCursorPos (& pt);
+				const bool leftDown = (GetAsyncKeyState (VK_LBUTTON) & 0x8000) != 0;
+				if (leftDown && PtInRect (& my anchorRect, pt)) {
+					my closedByAnchorClick = true;
+					my closedByAnchorTick = GetTickCount64 ();
+				}
+				GuiOpacityPanel_dismiss (me);
+				return 0;
+			}
+			break;
+		}
+
+		default:
+			break;
+	}
+	return DefWindowProcW (hwnd, msg, wParam, lParam);
+}
+
+static void ensureOpacityPanelClassRegistered () {
+	static bool registered = false;
+	if (registered)
+		return;
+	WNDCLASSEXW wc { };
+	wc.cbSize = sizeof (WNDCLASSEXW);
+	wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_DROPSHADOW;
+	wc.lpfnWndProc = opacityPanelWndProc;
+	wc.hInstance = theGui.instance;
+	wc.hCursor = LoadCursor (nullptr, IDC_ARROW);
+	wc.hbrBackground = nullptr;
+	wc.lpszClassName = kOpacityPanelClassName;
+	RegisterClassExW (& wc);
+	registered = true;
+}
+
+GuiOpacityPanel GuiOpacityPanel_create (GuiWindow owner, int initialOpacityPercent,
+	GuiOpacityPanel_ChangedCallback changedCallback, Thing boss)
+{
+	ensureOpacityPanelClassRegistered ();
+	GuiOpacityPanel me = Melder_calloc (struct structGuiOpacityPanel, 1);
+	my owner = owner;
+	my ownerHwnd = (owner && owner -> d_xmShell) ? owner -> d_xmShell -> window : nullptr;
+	my changedCallback = changedCallback;
+	my boss = boss;
+	Melder_clip (kMinOpacityPercent, & initialOpacityPercent, kMaxOpacityPercent);
+	my value = initialOpacityPercent;
+	my dpi = 96;
+	my ensureFontsForDpi (queryWindowDpi (my ownerHwnd));
+
+	my hwnd = CreateWindowExW (
+		WS_EX_TOOLWINDOW,
+		kOpacityPanelClassName,
+		L"",
+		WS_POPUP,
+		0, 0, my cardWidth (), my cardHeight (),
+		my ownerHwnd,
+		nullptr,
+		theGui.instance,
+		me
+	);
+	if (my hwnd) {
+		#ifndef DWMWA_WINDOW_CORNER_PREFERENCE
+		#define DWMWA_WINDOW_CORNER_PREFERENCE 33
+		#endif
+		#ifndef DWMWCP_ROUND
+		#define DWMWCP_ROUND 2
+		#endif
+		#ifndef DWMWA_BORDER_COLOR
+		#define DWMWA_BORDER_COLOR 34
+		#endif
+		DWORD cornerPref = DWMWCP_ROUND;
+		my hasDwmRoundCorners = SUCCEEDED (DwmSetWindowAttribute (
+			my hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, & cornerPref, sizeof (cornerPref)));
+		COLORREF borderCol = RGB (208, 213, 221);
+		DwmSetWindowAttribute (my hwnd, DWMWA_BORDER_COLOR, & borderCol, sizeof (borderCol));
+	}
+	return me;
+}
+
+void GuiOpacityPanel_dispose (GuiOpacityPanel *p_me) noexcept {
+	if (! p_me || ! *p_me)
+		return;
+	GuiOpacityPanel me = *p_me;
+	*p_me = nullptr;
+	my isShowing = false;
+	if (my hwnd) {
+		SetWindowLongPtrW (my hwnd, GWLP_USERDATA, 0);
+		if (IsWindow (my hwnd))
+			DestroyWindow (my hwnd);
+		my hwnd = nullptr;
+	}
+	my releaseCustomFonts ();
+	Melder_free (me);
+}
+
+void GuiOpacityPanel_show (GuiOpacityPanel me, int anchorLeft, int anchorRight, int anchorTop, int anchorBottom) {
+	if (! me || ! my hwnd)
+		return;
+	my closedByAnchorClick = false;
+	SetRect (& my anchorRect, anchorLeft, anchorTop, anchorRight, anchorBottom);
+	my ensureFontsForDpi (queryWindowDpi (my ownerHwnd ? my ownerHwnd : my hwnd));
+
+	const int w = my cardWidth ();
+	const int h = my cardHeight ();
+	int x = anchorLeft;
+	int y = anchorBottom + scaleDpi (2, my dpi);
+
+	HMONITOR mon = MonitorFromRect (& my anchorRect, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi { sizeof (MONITORINFO) };
+	if (mon && GetMonitorInfoW (mon, & mi)) {
+		const int margin = scaleDpi (6, my dpi);
+		if (x + w > mi.rcWork.right - margin)
+			x = mi.rcWork.right - margin - w;
+		if (x < mi.rcWork.left + margin)
+			x = mi.rcWork.left + margin;
+		if (y + h > mi.rcWork.bottom - margin)
+			y = anchorTop - h - scaleDpi (2, my dpi);
+		if (y < mi.rcWork.top + margin)
+			y = mi.rcWork.top + margin;
+	}
+
+	my isShowing = true;
+	SetWindowPos (my hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
+	InvalidateRect (my hwnd, nullptr, FALSE);
+	SetActiveWindow (my hwnd);
+	SetFocus (my hwnd);
+}
+
+void GuiOpacityPanel_dismiss (GuiOpacityPanel me) noexcept {
+	if (! me)
+		return;
+	my isShowing = false;
+	if (my isDragging) {
+		my isDragging = false;
+		if (GetCapture () == my hwnd)
+			ReleaseCapture ();
+	}
+	my hoverThumb = false;
+	my hoverBadge = false;
+	if (my hwnd && IsWindow (my hwnd))
+		ShowWindow (my hwnd, SW_HIDE);
+}
+
+void GuiOpacityPanel_setValue (GuiOpacityPanel me, int opacityPercent) {
+	if (! me)
+		return;
+	Melder_clip (kMinOpacityPercent, & opacityPercent, kMaxOpacityPercent);
+	my value = opacityPercent;
+	if (my hwnd && my isShowing)
+		InvalidateRect (my hwnd, nullptr, FALSE);
+}
+
+bool GuiOpacityPanel_isShowing (GuiOpacityPanel me) noexcept {
+	return me && my isShowing && my hwnd && IsWindowVisible (my hwnd);
+}
+
+bool GuiOpacityPanel_steppedAsideForAnchorClick (GuiOpacityPanel me) noexcept {
+	if (! me || ! my closedByAnchorClick)
+		return false;
+	my closedByAnchorClick = false;
+	return (GetTickCount64 () - my closedByAnchorTick) <= 500;
+}
+
+#else
+
+GuiOpacityPanel GuiOpacityPanel_create (GuiWindow, int, GuiOpacityPanel_ChangedCallback, Thing) {
+	return nullptr;
+}
+void GuiOpacityPanel_dispose (GuiOpacityPanel *p_me) noexcept {
+	if (p_me)
+		*p_me = nullptr;
+}
+void GuiOpacityPanel_show (GuiOpacityPanel, int, int, int, int) { }
+void GuiOpacityPanel_dismiss (GuiOpacityPanel) noexcept { }
+void GuiOpacityPanel_setValue (GuiOpacityPanel, int) { }
+bool GuiOpacityPanel_isShowing (GuiOpacityPanel) noexcept { return false; }
+bool GuiOpacityPanel_steppedAsideForAnchorClick (GuiOpacityPanel) noexcept { return false; }
+
+#endif
 
 bool GuiWindow_setDirty (GuiWindow me, bool dirty) {
 	#if gtk

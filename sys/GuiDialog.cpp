@@ -182,6 +182,8 @@ void GuiDialog_setResizable (GuiDialog me, bool resizable) {
 				SetWindowLongPtr (hwnd, GWL_EXSTYLE, exStyle);
 				SetWindowPos (hwnd, NULL, 0, 0, 0, 0,
 					SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+				if (my d_xmShell -> width > 0 && my d_xmShell -> height > 0)
+					XtVaSetValues (my d_xmShell, XmNwidth, my d_xmShell -> width, XmNheight, my d_xmShell -> height, nullptr);
 			}
 		#endif
 	#elif cocoa
@@ -263,7 +265,9 @@ integer GuiDialog_run (GuiDialog me) {
 					}
 				}
 
-				if (IsDialogMessage (my d_xmShell -> window, & event)) {   // not my d_widget -> window, because that would prevent closing
+				if (event. message == WM_MOUSEWHEEL || event. message == WM_MOUSEHWHEEL) {
+					XtDispatchEvent (& event);
+				} else if (IsDialogMessage (my d_xmShell -> window, & event)) {   // not my d_widget -> window, because that would prevent closing
 					trace (U"dialog message ", event. message);
 				} else if (event. message == WM_PAINT) {
 					trace (U"paint ", event. message);

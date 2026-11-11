@@ -85,6 +85,7 @@ Thing_define (Editor, DataGui) {
 
 	virtual void v_goAway () { forget_nozero (this); }
 	virtual bool v_canFullScreen () { return false; }
+	virtual bool v_canBeTranslucentShell () { return false; }
 	virtual bool v_scriptable () { return true; }
 
 	virtual bool v_hasMenuBar () { return true; }

@@ -1408,6 +1408,7 @@ static void UiForm_moveControl (GuiControl ctrl, int left, int right, int top, i
 	int h = bottom - top;
 	int w = right - left;
 	#if defined (_WIN32)
+		(void) visH;
 		HWND hwnd = NULL;
 		if (Thing_isa (ctrl, classGuiOptionMenu)) {
 			GuiOptionMenu om = (GuiOptionMenu) ctrl;
@@ -1415,6 +1416,8 @@ static void UiForm_moveControl (GuiControl ctrl, int left, int right, int top, i
 				if (om -> d_xmMenuBar && om -> d_xmMenuBar -> window) {
 					hwnd = om -> d_xmMenuBar -> window;
 					if (om -> d_xmCascadeButton && om -> d_xmCascadeButton -> window) {
+						om -> d_xmCascadeButton -> x = 4;
+						om -> d_xmCascadeButton -> y = 4;
 						om -> d_xmCascadeButton -> width = w;
 						om -> d_xmCascadeButton -> height = h;
 						SetWindowPos (om -> d_xmCascadeButton -> window, NULL, 4, 4, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
@@ -1430,16 +1433,16 @@ static void UiForm_moveControl (GuiControl ctrl, int left, int right, int top, i
 				}
 			#endif
 		}
-		if (! hwnd && ctrl -> d_widget && ctrl -> d_widget -> window)
+		if (! hwnd && ctrl -> d_widget) {
+			ctrl -> d_widget -> x = left;
+			ctrl -> d_widget -> y = top;
+			ctrl -> d_widget -> width = w;
+			ctrl -> d_widget -> height = h;
 			hwnd = ctrl -> d_widget -> window;
+		}
 		if (! hwnd)
 			return;
-		const bool outOfBounds = (h > 40) ? (top + h <= 0 || top >= visH - 8) : (top + h <= 0 || top + h > visH + 2);
-		if (outOfBounds) {
-			ShowWindow (hwnd, SW_HIDE);
-		} else {
-			SetWindowPos (hwnd, NULL, left, top, w, h, SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW);
-		}
+		SetWindowPos (hwnd, NULL, left, top, w, h, SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW);
 	#elif defined (macintosh)
 		if (! ctrl -> d_widget)
 			return;
@@ -1473,9 +1476,15 @@ static void UiForm_setControlRect (GuiControl ctrl, int left, int top, int width
 	if (! ctrl)
 		return;
 	#if defined (_WIN32)
-		HWND hwnd = ctrl -> d_widget ? ctrl -> d_widget -> window : NULL;
-		if (hwnd) {
-			SetWindowPos (hwnd, HWND_TOP, left, top, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+		if (ctrl -> d_widget) {
+			ctrl -> d_widget -> x = left;
+			ctrl -> d_widget -> y = top;
+			ctrl -> d_widget -> width = width;
+			ctrl -> d_widget -> height = height;
+			HWND hwnd = ctrl -> d_widget -> window;
+			if (hwnd) {
+				SetWindowPos (hwnd, HWND_TOP, left, top, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+			}
 		}
 	#elif defined (macintosh)
 		if (ctrl -> d_widget) {
@@ -1638,9 +1647,13 @@ static void UiForm_updateFieldPositions (UiForm me) {
 				UiForm_moveControl (thy label, Gui_LEFT_DIALOG_SPACING, contentRight, yl, yl + textFieldHeight, visH);
 				UiForm_moveControl (thy text, Gui_LEFT_DIALOG_SPACING, contentRight, y, y + Gui_TEXTFIELD_HEIGHT, visH);
 			} break;
-			case _kUiField_type::HEADING_:
-				UiForm_moveControl (thy label, Gui_LEFT_DIALOG_SPACING, contentRight, y, y + headerLabelHeight, visH);
-				break;
+			case _kUiField_type::HEADING_: {
+				int yl = y;
+				#if defined (macintosh)
+					yl += 2;
+				#endif
+				UiForm_moveControl (thy label, Gui_LEFT_DIALOG_SPACING, contentRight, yl + 5, yl + 5 + textFieldHeight, visH);
+			} break;
 			case _kUiField_type::COMMENT_:
 				UiForm_moveControl (thy label, Gui_LEFT_DIALOG_SPACING, contentRight, y + 5, y + 5 + textFieldHeight, visH);
 				break;
@@ -1688,20 +1701,11 @@ static void gui_form_cb_scroll (Thing void_me, GuiScrollBarEvent /* event */) {
 		return;
 	my scrollY = newScrollY;
 	#if defined (_WIN32)
-		if (my d_dialogForm && my d_dialogForm -> d_widget && my d_dialogForm -> d_widget -> window) {
-			HWND hwnd = my d_dialogForm -> d_widget -> window;
-			SendMessage (hwnd, WM_SETREDRAW, FALSE, 0);
+		HWND viewportHwnd = (my contentForm && my contentForm -> d_widget) ? my contentForm -> d_widget -> window :
+			((my d_dialogForm && my d_dialogForm -> d_widget) ? my d_dialogForm -> d_widget -> window : NULL);
+		if (viewportHwnd) {
 			UiForm_updateFieldPositions (me);
-			SendMessage (hwnd, WM_SETREDRAW, TRUE, 0);
-			RECT r;
-			GetClientRect (hwnd, & r);
-			r.bottom = my contentVisibleHeight + 5;
-			InvalidateRect (hwnd, & r, TRUE);
-			RedrawWindow (hwnd, & r, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
-			if (my scrollBar && my scrollBar -> d_widget && my scrollBar -> d_widget -> window) {
-				SetWindowPos (my scrollBar -> d_widget -> window, HWND_TOP, 0, 0, 0, 0,
-					SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
-			}
+			RedrawWindow (viewportHwnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
 		} else {
 			UiForm_updateFieldPositions (me);
 		}
@@ -1728,7 +1732,25 @@ static void gui_uiform_cb_resize (Thing void_me, int newWidth, int newHeight) {
 	UiForm_positionBottomButtons (me, newWidth, yButtons);
 
 	const int textFieldHeight = Gui_TEXTFIELD_HEIGHT;
-	if (my totalDialogHeight > newHeight) {
+	const bool needsScroll = (my totalDialogHeight > newHeight);
+	const int viewportW = newWidth - (needsScroll ? 18 : 0);
+	const int viewportH = (visH + 6 < yButtons - 2) ? (visH + 6) : visH;
+	if (my contentForm && my contentForm -> d_widget) {
+		#if defined (_WIN32)
+			my contentForm -> d_widget -> x = 0;
+			my contentForm -> d_widget -> y = 0;
+			my contentForm -> d_widget -> width = viewportW;
+			my contentForm -> d_widget -> height = viewportH;
+			if (my contentForm -> d_widget -> window) {
+				SetWindowPos (my contentForm -> d_widget -> window, HWND_BOTTOM,
+					0, 0, viewportW, viewportH, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+			}
+		#else
+			GuiControl_setSize (my contentForm, viewportW, viewportH);
+		#endif
+	}
+
+	if (needsScroll) {
 		my maxScrollY = my totalDialogHeight - newHeight;
 		if (my scrollY > my maxScrollY)
 			my scrollY = my maxScrollY;
@@ -1738,12 +1760,19 @@ static void gui_uiform_cb_resize (Thing void_me, int newWidth, int newHeight) {
 		if (my scrollBar) {
 			GuiThing_show (my scrollBar);
 			#if defined (_WIN32)
-				if (my scrollBar -> d_widget && my scrollBar -> d_widget -> window) {
-					MoveWindow (my scrollBar -> d_widget -> window,
-						newWidth - 18, Gui_TOP_DIALOG_SPACING,
-						16, my contentVisibleHeight - Gui_TOP_DIALOG_SPACING, true);
-					SetWindowPos (my scrollBar -> d_widget -> window, HWND_TOP, 0, 0, 0, 0,
-						SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
+				if (my scrollBar -> d_widget) {
+					const int sbX = newWidth - 18;
+					const int sbY = Gui_TOP_DIALOG_SPACING;
+					const int sbW = 16;
+					const int sbH = my contentVisibleHeight - Gui_TOP_DIALOG_SPACING;
+					my scrollBar -> d_widget -> x = sbX;
+					my scrollBar -> d_widget -> y = sbY;
+					my scrollBar -> d_widget -> width = sbW;
+					my scrollBar -> d_widget -> height = sbH;
+					if (my scrollBar -> d_widget -> window) {
+						SetWindowPos (my scrollBar -> d_widget -> window, HWND_TOP,
+							sbX, sbY, sbW, sbH, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+					}
 				}
 			#endif
 			GuiScrollBar_set (my scrollBar,
@@ -1767,15 +1796,8 @@ static void gui_uiform_cb_resize (Thing void_me, int newWidth, int newHeight) {
 	#if defined (_WIN32)
 		if (my d_dialogForm && my d_dialogForm -> d_widget && my d_dialogForm -> d_widget -> window) {
 			HWND hwnd = my d_dialogForm -> d_widget -> window;
-			SendMessage (hwnd, WM_SETREDRAW, FALSE, 0);
 			UiForm_updateFieldPositions (me);
-			SendMessage (hwnd, WM_SETREDRAW, TRUE, 0);
-			InvalidateRect (hwnd, NULL, TRUE);
 			RedrawWindow (hwnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
-			if (my maxScrollY > 0 && my scrollBar && my scrollBar -> d_widget && my scrollBar -> d_widget -> window) {
-				SetWindowPos (my scrollBar -> d_widget -> window, HWND_TOP, 0, 0, 0, 0,
-					SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
-			}
 		} else {
 			UiForm_updateFieldPositions (me);
 		}
@@ -1860,9 +1882,9 @@ void UiForm_finish (UiForm me) {
 	const int totalDialogHeight = dialogHeight + 2 * Gui_BOTTOM_DIALOG_SPACING + Gui_PUSHBUTTON_HEIGHT;
 	double screenX, screenY, screenWidth, screenHeight;
 	Gui_getWindowPositioningBounds (& screenX, & screenY, & screenWidth, & screenHeight);
-	int maxAllowedHeight = Melder_iround (screenHeight * 0.95);
-	if (maxAllowedHeight > 1080)
-		maxAllowedHeight = 1080;
+	int maxAllowedHeight = Melder_iround (screenHeight * 0.90);
+	if (maxAllowedHeight > 1000)
+		maxAllowedHeight = 1000;
 	if (maxAllowedHeight < 350)
 		maxAllowedHeight = 350;
 
@@ -1877,8 +1899,6 @@ void UiForm_finish (UiForm me) {
 	GuiDialog_setResizable (my d_dialogForm, true);
 	GuiDialog_setResizeCallback (my d_dialogForm, gui_uiform_cb_resize, me);
 
-	form = my d_dialogForm;
-
 	my totalDialogHeight = totalDialogHeight;
 	my currentDialogWidth = dialogWidth;
 	my currentDialogHeight = actualDialogHeight;
@@ -1886,7 +1906,7 @@ void UiForm_finish (UiForm me) {
 	my maxScrollY = needsScroll ? (totalDialogHeight - actualDialogHeight) : 0;
 	my scrollY = 0;
 
-	my scrollBar = GuiScrollBar_create (form,
+	my scrollBar = GuiScrollBar_create (my d_dialogForm,
 		dialogWidth - 18, dialogWidth - 2,
 		Gui_TOP_DIALOG_SPACING, my contentVisibleHeight,
 		0, (my maxScrollY > 0 ? my maxScrollY : 1) + my contentVisibleHeight,
@@ -1896,6 +1916,15 @@ void UiForm_finish (UiForm me) {
 	if (needsScroll) {
 		GuiThing_show (my scrollBar);
 	}
+
+	#if defined (_WIN32)
+		my contentForm = GuiForm_createShown (my d_dialogForm,
+			0, dialogWidth - (needsScroll ? 18 : 0),
+			0, my contentVisibleHeight + 6, 0);
+		form = my contentForm;
+	#else
+		form = my d_dialogForm;
+	#endif
 
 	const int rightMargin = needsScroll ? 26 : Gui_RIGHT_DIALOG_SPACING;
 	const int contentRight = dialogWidth - rightMargin;
@@ -2222,6 +2251,20 @@ void UiForm_finish (UiForm me) {
 			break;
 		}
 	}
+	#if defined (_WIN32)
+		if (my contentForm && my contentForm -> d_widget) {
+			const int viewportW = dialogWidth - (needsScroll ? 18 : 0);
+			const int viewportH = my contentVisibleHeight + 6;
+			my contentForm -> d_widget -> x = 0;
+			my contentForm -> d_widget -> y = 0;
+			my contentForm -> d_widget -> width = viewportW;
+			my contentForm -> d_widget -> height = viewportH;
+			if (my contentForm -> d_widget -> window) {
+				SetWindowPos (my contentForm -> d_widget -> window, HWND_BOTTOM,
+					0, 0, viewportW, viewportH, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+			}
+		}
+	#endif
 	for (integer ifield = 1; ifield <= my numberOfFields; ifield ++)
 		UiField_setDefault (my field [ifield].get());
 	/*separator = XmCreateSeparatorGadget (column, "separator", nullptr, 0);*/
@@ -2290,6 +2333,12 @@ void UiForm_finish (UiForm me) {
 		my okButton = GuiButton_createShown (form, x, x + Gui_OK_BUTTON_WIDTH, y, y + Gui_PUSHBUTTON_HEIGHT,
 				my isPauseForm ? U"Continue" : U"OK", gui_button_cb_ok, me, okButtonIsDefault ? GuiButton_DEFAULT : 0);
 	}
+	#if defined (_WIN32)
+		if (my d_dialogForm && my d_dialogForm -> d_widget) {
+			my d_dialogForm -> d_widget -> width = dialogWidth;
+			my d_dialogForm -> d_widget -> height = actualDialogHeight;
+		}
+	#endif
 	UiForm_positionBottomButtons (me, dialogWidth, y);
 	if (my scrollBar)
 		UiForm_updateFieldPositions (me);
@@ -2304,24 +2353,36 @@ void UiForm_do (UiForm me, bool modified) {
 	my allowExecutionHook = theAllowExecutionHookHint;
 	my allowExecutionClosure = theAllowExecutionClosureHint;
 	Melder_assert (my d_dialogForm);
+	#if defined (_WIN32)
+		if (my d_dialogForm -> d_widget) {
+			if (my currentDialogWidth > 0)
+				my d_dialogForm -> d_widget -> width = my currentDialogWidth;
+			if (my currentDialogHeight > 0)
+				my d_dialogForm -> d_widget -> height = my currentDialogHeight;
+		}
+	#endif
 	GuiThing_show (my d_dialogForm);
 	if (my scrollBar) {
 		#if defined (_WIN32)
 			HWND shellHwnd = my d_dialogForm -> d_xmShell -> window;
 			HWND formHwnd = my d_dialogForm -> d_widget -> window;
+			int desiredW = my currentDialogWidth > 0 ? my currentDialogWidth : my d_dialogForm -> d_widget -> width;
+			int desiredH = my currentDialogHeight > 0 ? my currentDialogHeight : my d_dialogForm -> d_widget -> height;
 			DWORD style = (DWORD) GetWindowLongPtr (shellHwnd, GWL_STYLE);
 			DWORD exStyle = (DWORD) GetWindowLongPtr (shellHwnd, GWL_EXSTYLE);
-			RECT wr = { 0, 0, my d_dialogForm -> d_widget -> width, my d_dialogForm -> d_widget -> height };
+			RECT wr = { 0, 0, desiredW, desiredH };
 			AdjustWindowRectEx (& wr, style, FALSE, exStyle);
 			RECT curRect;
 			GetWindowRect (shellHwnd, & curRect);
+			my d_dialogForm -> d_xmShell -> nat.shell.duringMoveWindow = True;
 			MoveWindow (shellHwnd, curRect.left, curRect.top, wr.right - wr.left, wr.bottom - wr.top, TRUE);
+			my d_dialogForm -> d_xmShell -> nat.shell.duringMoveWindow = False;
 			RECT clientRect;
 			GetClientRect (shellHwnd, & clientRect);
 			int targetW = clientRect.right - clientRect.left;
 			int targetH = clientRect.bottom - clientRect.top;
-			if (targetW <= 0) targetW = my d_dialogForm -> d_widget -> width;
-			if (targetH <= 0) targetH = my d_dialogForm -> d_widget -> height;
+			if (targetW <= 0) targetW = desiredW;
+			if (targetH <= 0) targetH = desiredH;
 			my d_dialogForm -> d_xmShell -> width = targetW;
 			my d_dialogForm -> d_xmShell -> height = targetH;
 			my d_dialogForm -> d_widget -> width = targetW;

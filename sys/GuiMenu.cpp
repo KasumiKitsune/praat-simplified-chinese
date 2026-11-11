@@ -505,6 +505,34 @@ GuiMenu GuiMenu_createInWindow (GuiWindow window, conststring32 title, uint32 fl
 	return me.releaseToAmbiguousOwner();
 }
 
+GuiMenu GuiMenu_createBarButtonInWindow (GuiWindow window, conststring32 title, uint32 flags,
+	GuiMenuItemCallback callback, Thing boss)
+{
+	GuiMenu me = GuiMenu_createInWindow (window, title, flags);
+	GuiMenuItem item = GuiMenu_addItem (me, title, flags, callback, boss);
+	#if motif
+		if (window && window -> d_xmMenuBar && me && my d_widget && item && item -> d_widget)
+			_GuiWinMenu_installAsBarCommand (window -> d_xmMenuBar, my d_widget, item -> d_widget);
+	#else
+		(void) item;
+	#endif
+	return me;
+}
+
+bool GuiMenu_getRectOnScreen (GuiMenu me, int *left, int *right, int *top, int *bottom) {
+	if (! me)
+		return false;
+	#if motif
+		if (! my d_shell || my d_shell -> classInfo != classGuiWindow)
+			return false;
+		GuiWindow window = static_cast <GuiWindow> (my d_shell);
+		return _GuiWinMenu_getBarEntryRectOnScreen (window -> d_xmMenuBar, my d_widget, left, right, top, bottom);
+	#else
+		(void) left; (void) right; (void) top; (void) bottom;
+		return false;
+	#endif
+}
+
 GuiMenu GuiMenu_createInMenu (GuiMenu supermenu, conststring32 title, uint32 flags) {
 	autoGuiMenu me = Thing_new (GuiMenu);
 	my d_shell = supermenu -> d_shell;

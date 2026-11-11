@@ -28,6 +28,14 @@ Thing_define (TextGridEditor, FunctionEditor) {
 	DEFINE_FunctionArea (2, SoundArea, soundArea)
 	DEFINE_FunctionArea (3, SoundAnalysisArea, soundAnalysisArea)
 
+	bool v_hasOpacityControl () override {
+		#if motif
+			return true;
+		#else
+			return false;
+		#endif
+	}
+
 	TextGrid textGrid() { return static_cast <TextGrid> (our data()); }
 
 	void v_createMenuItems_help (EditorMenu menu)

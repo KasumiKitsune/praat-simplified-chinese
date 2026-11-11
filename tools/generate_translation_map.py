@@ -107,14 +107,22 @@ EXACT_MAP = {
     "Time display decimals must be between 1 and 10.": "时间显示小数位数必须在 1 到 10 之间。",
 
     # Quit confirmation dialog & project saving
+    "Save Project": "保存工程",
+    "Save Project (.Collection)": "保存工程 (.Collection)",
     "Save Project (.praat)": "保存工程 (.praat)",
     "Quit Application": "退出程序",
+    "Save workspace as .Collection file": "保存工程为 .Collection 文件",
     "Save workspace as .praat file": "保存工程为 .praat 文件",
 
     # SoundRecorder channel switcher
     "Channels:": "声道：",
     "Mono": "单声道",
     "Stereo": "双声道",
+
+    # Editor window opacity flyout
+    "Opacity": "不透明度",
+    "Window opacity": "窗口不透明度",
+    "Cannot change window opacity.": "无法修改当前窗口的不透明度。",
 
     # AI Agent prompt generator
     "Copy AI Agent prompt (for Python)...": "复制 AI 提示词 (写 Python 脚本)...",

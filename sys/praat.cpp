@@ -147,24 +147,42 @@ static void gui_cb_topButton_open (Thing /* boss */, GuiButtonEvent /* event */)
 	}
 }
 
-static void gui_cb_topButton_save (Thing /* boss */, GuiButtonEvent /* event */) {
+static bool praat_saveWorkspaceAsCollection () {
+	if (! theCurrentPraatObjects || theCurrentPraatObjects -> n <= 0)
+		return false;
+	autostring32 chosenPath = GuiFileSelect_getOutfileName (
+		theCurrentPraatApplication -> topShell,
+		praat_translate (U"Save workspace as .Collection file"),
+		U"workspace.Collection"
+	);
+	if (! chosenPath || chosenPath [0] == U'\0')
+		return false;
+
+	MelderString filePath;
+	MelderString_copy (& filePath, chosenPath.get());
+	if (! Melder_endsWith_caseAware (filePath.string, U".Collection") &&
+	    ! Melder_endsWith_caseAware (filePath.string, U".collection"))
+		MelderString_append (& filePath, U".Collection");
+
 	try {
-		if (praat_actions_canExecute (U"Save as WAV file..."))
-			praat_actions_executeByName (U"Save as WAV file...");
-		else if (praat_actions_canExecute (U"Save as text file..."))
-			praat_actions_executeByName (U"Save as text file...");
-		else if (praat_actions_canExecute (U"Save as tab-separated file..."))
-			praat_actions_executeByName (U"Save as tab-separated file...");
-		else if (praat_actions_canExecute (U"Save as short text file..."))
-			praat_actions_executeByName (U"Save as short text file...");
-		else if (praat_actions_canExecute (U"Save as binary file..."))
-			praat_actions_executeByName (U"Save as binary file...");
-		else
-			praat_doMenuCommand (U"Save as text file...", nullptr, nullptr);
-		praat_updateSelection ();
+		structMelderFile file;
+		Melder_pathToFile (filePath.string, & file);
+		autoCollection set = Collection_create ();
+		for (integer iobject = 1; iobject <= theCurrentPraatObjects -> n; iobject ++) {
+			Daata object = (Daata) theCurrentPraatObjects -> list [iobject]. object;
+			if (object)
+				set -> addItem_ref (object);
+		}
+		Data_writeToBinaryFile (set.get(), & file);
+		return true;
 	} catch (MelderError) {
 		Melder_flushError ();
+		return false;
 	}
+}
+
+static void gui_cb_topButton_save (Thing /* boss */, GuiButtonEvent /* event */) {
+	praat_saveWorkspaceAsCollection ();
 }
 
 void praat_refreshObjectsWindowLanguage () {
@@ -175,13 +193,13 @@ void praat_refreshObjectsWindowLanguage () {
 	if (praatButton_open)
 		GuiButton_setText (praatButton_open, praat_translate (U"Open..."));
 	if (praatButton_save)
-		GuiButton_setText (praatButton_save, praat_translate (U"Save"));
+		GuiButton_setText (praatButton_save, praat_translate (U"Save Project"));
 }
 
 void praat_updateTopButtons () {
 	if (praatButton_save) {
-		bool hasSelection = (theCurrentPraatObjects && theCurrentPraatObjects -> totalSelection > 0);
-		GuiThing_setSensitive (praatButton_save, hasSelection);
+		bool hasObjects = (theCurrentPraatObjects && theCurrentPraatObjects -> n > 0);
+		GuiThing_setSensitive (praatButton_save, hasObjects);
 	}
 }
 
@@ -1250,29 +1268,8 @@ static void gui_button_cb_saveProjectAndQuit (Thing /* boss */, GuiButtonEvent /
 	const bool youHaveUnsavedScriptsOrNotebooks = ( ScriptEditors_dirty () || NotebookEditors_dirty () || PythonScriptEditors_dirty () );
 
 	if (youHaveObjectsInYourList) {
-		autostring32 chosenPath = GuiFileSelect_getOutfileName (theCurrentPraatApplication -> topShell, praat_translate (U"Save workspace as .praat file"), U"workspace.praat");
-		if (! chosenPath || chosenPath [0] == U'\0')
+		if (! praat_saveWorkspaceAsCollection ())
 			return;
-
-		MelderString filePath;
-		MelderString_copy (& filePath, chosenPath.get());
-		if (! Melder_endsWith_caseAware (filePath.string, U".praat"))
-			MelderString_append (& filePath, U".praat");
-
-		try {
-			structMelderFile file;
-			Melder_pathToFile (filePath.string, & file);
-			autoCollection set = Collection_create ();
-			for (integer iobject = 1; iobject <= theCurrentPraatObjects -> n; iobject ++) {
-				Daata object = (Daata) theCurrentPraatObjects -> list [iobject]. object;
-				if (object)
-					set -> addItem_ref (object);
-			}
-			Data_writeToBinaryFile (set.get(), & file);
-		} catch (MelderError) {
-			Melder_flushError ();
-			return;
-		}
 	}
 
 	if (youHaveUnsavedScriptsOrNotebooks) {
@@ -1311,7 +1308,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 	Melder_sprint (line2Text, 200, praat_translate (U"Do you still want to quit "), Melder_upperCaseAppName(), U"?");
 
 	if (! theQuitDialog) {
-		const int dialogWidth = 500;
+		const int dialogWidth = 515;
 		const int dialogHeight = 135;
 		theQuitDialog = GuiDialog_create (theCurrentPraatApplication -> topShell,
 			150, 70, dialogWidth, dialogHeight,
@@ -1340,9 +1337,9 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Help", gui_button_cb_helpQuit, nullptr, 0);
 
-		// Right-aligned buttons: Cancel, Save Project (.praat), Quit
+		// Right-aligned buttons: Cancel, Save Project (.Collection), Quit
 		const int cancelWidth = 80;
-		const int saveWidth = 180;
+		const int saveWidth = 195;
 		const int quitWidth = 95;
 		const int spacing = 10;
 
@@ -1355,11 +1352,11 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 			U"Cancel", gui_button_cb_cancelQuit, nullptr, GuiButton_CANCEL);
 		x += cancelWidth + spacing;
 
-		// Button 3: Save Project (.praat)
+		// Button 3: Save Project (.Collection)
 		GuiButton_createShown (theQuitDialog,
 			x, x + saveWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
-			U"Save Project (.praat)", gui_button_cb_saveProjectAndQuit, nullptr, 0);
+			U"Save Project (.Collection)", gui_button_cb_saveProjectAndQuit, nullptr, 0);
 		x += saveWidth + spacing;
 
 		// Button 4: Quit
@@ -2507,8 +2504,8 @@ void praat_init (conststring32 title,
 			praat_translate (U"Record"), gui_cb_topButton_record, nullptr, 0);
 		praatButton_open = GuiButton_createShown (raam, 86, 168, topBarY, topBarY + topBarH,
 			praat_translate (U"Open..."), gui_cb_topButton_open, nullptr, 0);
-		praatButton_save = GuiButton_createShown (raam, 172, 250, topBarY, topBarY + topBarH,
-			praat_translate (U"Save"), gui_cb_topButton_save, nullptr, 0);
+		praatButton_save = GuiButton_createShown (raam, 172, 272, topBarY, topBarY + topBarH,
+			praat_translate (U"Save Project"), gui_cb_topButton_save, nullptr, GuiButton_INSENSITIVE);
 
 		praatList_objects = GuiList_create (raam, 0, -250, topBarY + topBarH + 4, -114, true, U" Objects ");
 		GuiList_setSelectionChangedCallback (praatList_objects, gui_cb_list_selectionChanged, nullptr);

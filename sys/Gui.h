@@ -810,6 +810,7 @@ GuiMenu GuiMenu_createInForm (GuiForm form, int left, int right, int top, int bo
 
 void GuiMenu_empty (GuiMenu me);
 void GuiMenu_setTitle (GuiMenu me, conststring32 title /* cattable */);
+bool GuiMenu_getRectOnScreen (GuiMenu me, int *left, int *right, int *top, int *bottom);
 
 /********** GuiMenuItem **********/
 
@@ -821,6 +822,9 @@ typedef struct structGuiMenuItemEvent {
 } *GuiMenuItemEvent;
 
 using GuiMenuItemCallback = MelderCallback <void, structThing /* boss */, GuiMenuItemEvent>;
+
+GuiMenu GuiMenu_createBarButtonInWindow (GuiWindow window, conststring32 title, uint32 flags,
+		GuiMenuItemCallback callback, Thing boss);
 
 #if cocoa
 	extern GuiMenuItemCallback theGuiEscapeMenuItemCallback;
@@ -1202,11 +1206,27 @@ Thing_define (GuiWindow, GuiShell) {
 
 /* GuiWindow creation flags: */
 #define GuiWindow_FULLSCREEN  1
+#define GuiWindow_TRANSLUCENT_SHELL  2
 GuiWindow GuiWindow_create (int x, int y, int width, int height, int minimumWidth, int minimumHeight,
 	conststring32 title /* cattable */, GuiShell_GoAwayCallback goAwayCallback, Thing goAwayBoss, uint32 flags);
 	// returns a Form widget that has a new Shell parent.
 
 void GuiWindow_addMenuBar (GuiWindow me);
+bool GuiWindow_setOpacity (GuiWindow me, int opacityPercent);
+int GuiWindow_getOpacity (GuiWindow me);
+
+struct structGuiOpacityPanel;
+using GuiOpacityPanel = structGuiOpacityPanel *;
+using GuiOpacityPanel_ChangedCallback = void (*) (Thing boss, int opacityPercent);
+
+GuiOpacityPanel GuiOpacityPanel_create (GuiWindow owner, int initialOpacityPercent,
+	GuiOpacityPanel_ChangedCallback changedCallback, Thing boss);
+void GuiOpacityPanel_dispose (GuiOpacityPanel *p_me) noexcept;
+void GuiOpacityPanel_show (GuiOpacityPanel me, int anchorLeft, int anchorRight, int anchorTop, int anchorBottom);
+void GuiOpacityPanel_dismiss (GuiOpacityPanel me) noexcept;
+void GuiOpacityPanel_setValue (GuiOpacityPanel me, int opacityPercent);
+bool GuiOpacityPanel_isShowing (GuiOpacityPanel me) noexcept;
+bool GuiOpacityPanel_steppedAsideForAnchorClick (GuiOpacityPanel me) noexcept;
 bool GuiWindow_setDirty (GuiWindow me, bool dirty);
 	/*
 		Purpose: on OSX you get a little dot in the red close button,

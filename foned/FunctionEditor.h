@@ -168,6 +168,10 @@ Thing_define (FunctionEditor, Editor) {
 	GuiButton d_speedButton = nullptr;
 	double d_playbackSpeed = 1.0;
 
+	int opacityPercent = 100;
+	GuiMenu opacityMenu = nullptr;
+	GuiOpacityPanel opacityPanel = nullptr;
+
 	bool group, enableUpdates;
 	int nrect;
 	struct { double left, right, bottom, top; } rect [8];
@@ -187,6 +191,8 @@ Thing_define (FunctionEditor, Editor) {
 		override;
 
 	bool v_hasPlayMenu () override { return true; }
+	bool v_canBeTranslucentShell () override { return our v_hasOpacityControl (); }
+	virtual bool v_hasOpacityControl () { return false; }
 	void v_createMenus ()
 		override;
 	void v_createMenuItems_prefs (EditorMenu)

@@ -203,6 +203,7 @@ Thing_define (UiForm, Thing) {
 	autoUiField field [1 + MAXIMUM_NUMBER_OF_FIELDS];
 	UiField referenceToLatestUsedChoiceOrOptionMenu;
 	GuiButton okButton, cancelButton, revertButton, helpButton, applyButton, continueButtons [1 + MAXIMUM_NUMBER_OF_CONTINUE_BUTTONS];
+	GuiForm contentForm;
 	GuiScrollBar scrollBar;
 	int scrollY, maxScrollY, contentVisibleHeight;
 	int totalDialogHeight, currentDialogWidth, currentDialogHeight;
