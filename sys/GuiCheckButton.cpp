@@ -112,8 +112,14 @@ Thing_implement (GuiCheckButton, GuiControl, 0);
 			case WM_PAINT: {
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint (hwnd, & ps);
+				if (! hdc)
+					return 0;
 				RECT rc;
 				GetClientRect (hwnd, & rc);
+				if (rc.right <= 0 || rc.bottom <= 0) {
+					EndPaint (hwnd, & ps);
+					return 0;
+				}
 
 				HDC memDC = CreateCompatibleDC (hdc);
 				HBITMAP memBitmap = CreateCompatibleBitmap (hdc, rc.right, rc.bottom);
@@ -332,6 +338,22 @@ void GuiCheckButton_setValue (GuiCheckButton me, bool value) {
 	#elif cocoa
 		GuiCocoaCheckButton *checkButton = (GuiCocoaCheckButton *) my d_widget;
 		[checkButton setState: value ? NSOnState: NSOffState];
+	#endif
+}
+
+void GuiCheckButton_setText (GuiCheckButton me, conststring32 text /* cattable */) {
+	conststring32 translatedText = praat_translate (text);
+	#if gtk
+		gtk_button_set_label (GTK_BUTTON (my d_widget), Melder_peek32to8 (translatedText));
+	#elif motif
+		my d_widget -> name = Melder_dup_f (translatedText);
+		if (my d_widget -> window) {
+			SetWindowTextW (my d_widget -> window, Melder_peek32toW (_GuiWin_expandAmpersands (my d_widget -> name.get())));
+			InvalidateRect (my d_widget -> window, nullptr, FALSE);
+		}
+	#elif cocoa
+		GuiCocoaCheckButton *checkButton = (GuiCocoaCheckButton *) my d_widget;
+		[checkButton setTitle: (NSString *) Melder_peek32toCfstring (translatedText)];
 	#endif
 }
 

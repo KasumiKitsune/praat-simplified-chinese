@@ -360,6 +360,8 @@ Thing_implement (GuiButton, GuiControl, 0);
 						GuiButton btn = widget ? (GuiButton) _GuiObject_getUserData (widget) : nullptr;
 						splitCb (btn, (void *) hwnd, ptScreen.x, ptScreen.y);
 					}
+					if (! IsWindow (hwnd))
+						return 0;
 					RemovePropW (hwnd, L"PraatSplitPressed");
 					InvalidateRect (hwnd, nullptr, FALSE);
 					UpdateWindow (hwnd);

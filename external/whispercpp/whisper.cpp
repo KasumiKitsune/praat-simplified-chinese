@@ -24,6 +24,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <map>
@@ -34,8 +35,11 @@
 #include <thread>
 #include <vector>
 
-#ifdef _MSC_VER
-#include <codecvt>
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #endif
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -3627,11 +3631,17 @@ struct whisper_context_params whisper_context_default_params() {
 
 struct whisper_context * whisper_init_from_file_with_params_no_state(const char * path_model, struct whisper_context_params params) {
     WHISPER_LOG_INFO("%s: loading model from '%s'\n", __func__, path_model);
-#ifdef _MSC_VER
+#ifdef _WIN32
     // Convert UTF-8 path to wide string (UTF-16) for Windows, resolving character encoding issues.
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    std::wstring path_model_wide = converter.from_bytes(path_model);
-    auto fin = std::ifstream(path_model_wide, std::ios::binary);
+    std::wstring path_model_wide;
+    if (path_model) {
+        int wlen = MultiByteToWideChar(CP_UTF8, 0, path_model, -1, nullptr, 0);
+        if (wlen > 0) {
+            path_model_wide.resize(wlen - 1);
+            MultiByteToWideChar(CP_UTF8, 0, path_model, -1, &path_model_wide[0], wlen);
+        }
+    }
+    auto fin = std::ifstream(std::filesystem::path(path_model_wide), std::ios::binary);
 #else
     auto fin = std::ifstream(path_model, std::ios::binary);
 #endif

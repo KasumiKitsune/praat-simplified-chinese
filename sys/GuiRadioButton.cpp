@@ -145,8 +145,14 @@ static int _GuiRadioButton_getPosition (GuiRadioButton me) {
 			case WM_PAINT: {
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint (hwnd, & ps);
+				if (! hdc)
+					return 0;
 				RECT rc;
 				GetClientRect (hwnd, & rc);
+				if (rc.right <= 0 || rc.bottom <= 0) {
+					EndPaint (hwnd, & ps);
+					return 0;
+				}
 
 				HDC memDC = CreateCompatibleDC (hdc);
 				HBITMAP memBitmap = CreateCompatibleBitmap (hdc, rc.right, rc.bottom);
@@ -293,6 +299,7 @@ GuiRadioButton GuiRadioButton_create (GuiForm parent, int left, int right, int t
 	conststring32 buttonText, GuiRadioButtonCallback valueChangedCallback, Thing valueChangedBoss, uint32 flags)
 {
 	trace (U"begin: text %", buttonText);
+	conststring32 translatedText = praat_translate (buttonText);
 	autoGuiRadioButton me = Thing_new (GuiRadioButton);
 	my d_shell = parent -> d_shell;
 	my d_parent = parent;
@@ -301,7 +308,7 @@ GuiRadioButton GuiRadioButton_create (GuiForm parent, int left, int right, int t
 	my d_previous = latestRadioButton;
 	my d_next = nullptr;
 	#if gtk
-		my d_widget = gtk_radio_button_new_with_label_from_widget (latestRadioButton ? GTK_RADIO_BUTTON (latestRadioButton -> d_widget) : nullptr, Melder_peek32to8 (buttonText));
+		my d_widget = gtk_radio_button_new_with_label_from_widget (latestRadioButton ? GTK_RADIO_BUTTON (latestRadioButton -> d_widget) : nullptr, Melder_peek32to8 (translatedText));
 		_GuiObject_setUserData (my d_widget, me.get());
 		my v_positionInForm (my d_widget, left, right, top, bottom, parent);
 		if (flags & GuiRadioButton_SET) {
@@ -312,10 +319,10 @@ GuiRadioButton GuiRadioButton_create (GuiForm parent, int left, int right, int t
 		g_signal_connect (G_OBJECT (my d_widget), "destroy", G_CALLBACK (_GuiGtkRadioButton_destroyCallback), me.get());
 		g_signal_connect (GTK_TOGGLE_BUTTON (my d_widget), "toggled", G_CALLBACK (_GuiGtkRadioButton_handleToggle), me.get());
 	#elif motif
-		my d_widget = _Gui_initializeWidget (xmToggleButtonWidgetClass, parent -> d_widget, buttonText);
+		my d_widget = _Gui_initializeWidget (xmToggleButtonWidgetClass, parent -> d_widget, translatedText);
 		_GuiObject_setUserData (my d_widget, me.get());
 		my d_widget -> isRadioButton = true;
-		my d_widget -> window = CreateWindow (L"button", Melder_peek32toW (_GuiWin_expandAmpersands (buttonText)),
+		my d_widget -> window = CreateWindow (L"button", Melder_peek32toW (_GuiWin_expandAmpersands (translatedText)),
 			WS_CHILD
 			| ( my d_widget -> parent -> radioBehavior ? BS_AUTORADIOBUTTON : BS_RADIOBUTTON )
 			| WS_CLIPSIBLINGS,
@@ -346,7 +353,7 @@ GuiRadioButton GuiRadioButton_create (GuiForm parent, int left, int right, int t
 			[my d_cocoaRadioButton   setImage: image];
 			[my d_cocoaRadioButton   setAlternateImage: alternateImage];
 		}
-		[my d_cocoaRadioButton setTitle: (NSString *) Melder_peek32toCfstring (buttonText)];
+		[my d_cocoaRadioButton setTitle: (NSString *) Melder_peek32toCfstring (translatedText)];
 		if (flags & GuiCheckButton_SET) {
 			[my d_cocoaRadioButton setState: NSOnState];
 		}
@@ -360,7 +367,7 @@ GuiRadioButton GuiRadioButton_create (GuiForm parent, int left, int right, int t
 		my d_cocoaRadioButton = [[GuiCocoaRadioButton alloc] initWithFrame:matrixRect];
 		[my d_cocoaRadioButton   setUserData: me.get()];
 		[my d_cocoaRadioButton setButtonType: NSRadioButton];
-		[my d_cocoaRadioButton setTitle: (NSString *) Melder_peek32toCfstring (buttonText)];
+		[my d_cocoaRadioButton setTitle: (NSString *) Melder_peek32toCfstring (translatedText)];
     	NSMatrix *radioMatrix = [[NSMatrix alloc] initWithFrame: matrixRect   mode: NSRadioModeMatrix
 			prototype: (NSCell *) [my d_cocoaRadioButton cell]   numberOfRows: 1   numberOfColumns: 1];
 		my d_widget = (GuiObject) radioMatrix; //my d_cocoaRadioButton;
@@ -368,7 +375,7 @@ GuiRadioButton GuiRadioButton_create (GuiForm parent, int left, int right, int t
 		[radioMatrix   addSubview: my d_cocoaRadioButton];
 		[my d_cocoaRadioButton   setUserData: me.get()];
 		[my d_cocoaRadioButton setButtonType: NSRadioButton];
-		[my d_cocoaRadioButton setTitle: (NSString *) Melder_peek32toCfstring (buttonText)];
+		[my d_cocoaRadioButton setTitle: (NSString *) Melder_peek32toCfstring (translatedText)];
 		if (flags & GuiCheckButton_SET) {
 			[my d_cocoaRadioButton setState: NSOnState];
 		}

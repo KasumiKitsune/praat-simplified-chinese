@@ -167,10 +167,17 @@ static void gui_button_cb_whisperDownloadBase (Thing /* boss */, GuiButtonEvent 
 	ShellExecuteW (nullptr, L"open", url, nullptr, nullptr, SW_SHOWNORMAL);
 	#endif
 
-	Melder_information (foreignAccessible ?
-		praat_translate (U"已检测到国际网络连接正常（官方源），正在使用默认浏览器下载推荐模型 ggml-base.bin (约 142 MB)。\n\n已为您自动打开目标模型文件夹，待浏览器下载完成后，请将 ggml-base.bin 放入该文件夹即可。") :
-		praat_translate (U"未检测到国际网络连接，已自动切换为国内镜像源 (HF-Mirror)，正在使用默认浏览器下载推荐模型 ggml-base.bin (约 142 MB)。\n\n已为您自动打开目标模型文件夹，待浏览器下载完成后，请将 ggml-base.bin 放入该文件夹即可。")
-	);
+	if (g_language_choice == 0) {
+		Melder_information (foreignAccessible ?
+			U"International network connection detected (official source). Downloading recommended model ggml-base.bin (~142 MB) using the default browser.\n\nThe target models folder has been opened for you. After the download finishes, place ggml-base.bin into that folder." :
+			U"No international network connection detected; switched to mirror source (HF-Mirror). Downloading recommended model ggml-base.bin (~142 MB) using the default browser.\n\nThe target models folder has been opened for you. After the download finishes, place ggml-base.bin into that folder."
+		);
+	} else {
+		Melder_information (foreignAccessible ?
+			praat_translate (U"已检测到国际网络连接正常（官方源），正在使用默认浏览器下载推荐模型 ggml-base.bin (约 142 MB)。\n\n已为您自动打开目标模型文件夹，待浏览器下载完成后，请将 ggml-base.bin 放入该文件夹即可。") :
+			praat_translate (U"未检测到国际网络连接，已自动切换为国内镜像源 (HF-Mirror)，正在使用默认浏览器下载推荐模型 ggml-base.bin (约 142 MB)。\n\n已为您自动打开目标模型文件夹，待浏览器下载完成后，请将 ggml-base.bin 放入该文件夹即可。")
+		);
+	}
 }
 
 static void gui_button_cb_whisperBrowseAll (Thing /* boss */, GuiButtonEvent /* event */) {
@@ -289,10 +296,12 @@ OK
 
 	if (modelNames.size == 0) {
 		SpeechRecognizer_showModelGuideDialog ();
-		Melder_throw (praat_translate (
-			U"未检测到 Whisper 语音识别模型。\n"
-			U"已为您打开模型下载与配置向导，您也可以直接将 ggml-*.bin 模型放置于软件同级目录的 models/whispercpp 文件夹中。"
-		));
+		Melder_throw (g_language_choice == 0
+			? U"No Whisper speech recognition model detected.\nThe model download & setup guide has been opened. You can also place ggml-*.bin models directly into the models/whispercpp folder next to the executable."
+			: praat_translate (
+				U"未检测到 Whisper 语音识别模型。\n"
+				U"已为您打开模型下载与配置向导，您也可以直接将 ggml-*.bin 模型放置于软件同级目录的 models/whispercpp 文件夹中。"
+			));
 	}
 
 	SET_LIST (modelIndex, modelName, modelNames.get(), NUMfindFirst (modelNames.get(), TranscriptionDefaults::modelName))

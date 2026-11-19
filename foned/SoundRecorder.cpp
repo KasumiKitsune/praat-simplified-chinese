@@ -207,6 +207,7 @@ static void closePortAudioStream (SoundRecorder me) {
 		} catch (...) { }
 		my portaudioStream = nullptr;
 	}
+	std::lock_guard <std::mutex> monLock (my monitorMutex);
 	my monitorSamples = 0;
 }
 
@@ -239,8 +240,23 @@ static void stopRecording (SoundRecorder me) {
 	}
 }
 
+#if defined (_WIN32)
+#include <commctrl.h>
+static LRESULT CALLBACK holdRecordSubclassProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+#endif
+
 void structSoundRecorder :: v9_destroy () noexcept {
+	our isBeingDestroyed = true;
 	our recording = false;
+	our isHoldingRecord = false;
+	#if defined (_WIN32)
+		if (our holdRecordButton && our holdRecordButton -> d_widget && our holdRecordButton -> d_widget -> window) {
+			HWND hwnd = our holdRecordButton -> d_widget -> window;
+			if (GetCapture () == hwnd)
+				ReleaseCapture ();
+			RemoveWindowSubclass (hwnd, holdRecordSubclassProc, 2);
+		}
+	#endif
 	MelderAudio_stopPlaying (MelderAudio_IMPLICIT);   // must also occur before freeing our buffer
 	#if cocoa
 		if (our d_cocoaTimer)
@@ -410,10 +426,14 @@ static void showMeter (SoundRecorder me, const short *buffertje, integer nsamp) 
 			Graphics_setTextAlignment (my graphics.get(), Graphics_RIGHT, Graphics_TOP);
 			if (totalDuration > 30.0) {
 				Graphics_setColour (my graphics.get(), Melder_RED);
-				Graphics_text (my graphics.get(), 0.98, 0.98, Melder_cat (U"(前30秒预览 / 总长 ", Melder_fixed (totalDuration, 1), U"s)"));
+				Graphics_text (my graphics.get(), 0.98, 0.98, g_language_choice == 0
+					? Melder_cat (U"(First 30s preview / Total ", Melder_fixed (totalDuration, 1), U"s)")
+					: Melder_cat (U"(前30秒预览 / 总长 ", Melder_fixed (totalDuration, 1), U"s)"));
 			} else {
 				Graphics_setColour (my graphics.get(), MelderColour (0.392, 0.455, 0.545));
-				Graphics_text (my graphics.get(), 0.98, 0.98, Melder_cat (praat_translate (U"Duration: "), Melder_fixed (totalDuration, 2), U" s  [点击切换电平表]"));
+				Graphics_text (my graphics.get(), 0.98, 0.98, g_language_choice == 0
+					? Melder_cat (U"Duration: ", Melder_fixed (totalDuration, 2), U" s  [Click to toggle meter]")
+					: Melder_cat (praat_translate (U"Duration: "), Melder_fixed (totalDuration, 2), U" s  [点击切换电平表]"));
 			}
 
 			Graphics_setViewport (my graphics.get(), x1w, x2w, y1w, y2w);
@@ -575,14 +595,14 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 					GuiThing_setSensitive (my devices [i]. button, ! my recording);
 		}
 
-		if (my monoButton && my numberOfChannels == 1)
+		if (my monoButton && my numberOfChannels == 1 && ! GuiRadioButton_getValue (my monoButton))
 			GuiRadioButton_set (my monoButton);
-		if (my stereoButton && my numberOfChannels == 2)
+		if (my stereoButton && my numberOfChannels == 2 && ! GuiRadioButton_getValue (my stereoButton))
 			GuiRadioButton_set (my stereoButton);
 		for (integer i = 1; i <= SoundRecorder_IFSAMP_MAX; i ++)
-			if (my fsamps [i]. button && theControlPanel. sampleRate == my fsamps [i]. fsamp)
+			if (my fsamps [i]. button && theControlPanel. sampleRate == my fsamps [i]. fsamp && ! GuiRadioButton_getValue (my fsamps [i]. button))
 				GuiRadioButton_set (my fsamps [i]. button);
-		if (my devices [theControlPanel. inputSource]. button)
+		if (my devices [theControlPanel. inputSource]. button && ! GuiRadioButton_getValue (my devices [theControlPanel. inputSource]. button))
 			GuiRadioButton_set (my devices [theControlPanel. inputSource]. button);
 
 		if (my durationLabel) {
@@ -653,7 +673,6 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 						So we do it in such a way that the compiler cannot ask for my nsamp twice.
 					*/
 					my lastSample = getMyNsamp (me);
-					Pa_Sleep (10);
 				} else {
 					#if defined (_WIN32)
 						MMTIME mmtime;
@@ -666,29 +685,54 @@ static WORKPROC_RETURN workProc (WORKPROC_ARGS) {
 				my firstSample = my lastSample - 3000;
 				Melder_clipLeft (0_integer, & my firstSample);
 				GuiScale_setValue (my progressScale, 1000.0 * ((double) my lastSample / (double) my nmax));
-				my monitorTick ++;
-				if ((my monitorTick % 2 == 0) && my graphics) {
-					if (my inputUsesPortAudio && my monitorSamples > 0) {
-						showMeter (me, my monitorBuffer, my monitorSamples);
+				const double now = Melder_clock ();
+				if ((now - my lastMeterUpdateTime >= 0.033) && my graphics) {
+					my lastMeterUpdateTime = now;
+					if (my inputUsesPortAudio) {
+						short localMonitorBuf [2048 * 2];
+						integer localMonitorSamples = 0;
+						{
+							std::lock_guard <std::mutex> monLock (my monitorMutex);
+							if (my monitorSamples > 0) {
+								localMonitorSamples = my monitorSamples;
+								if (localMonitorSamples > 2048)
+									localMonitorSamples = 2048;
+								memcpy (localMonitorBuf, my monitorBuffer, (size_t) localMonitorSamples * (size_t) my numberOfChannels * sizeof (short));
+							}
+						}
+						if (localMonitorSamples > 0) {
+							showMeter (me, localMonitorBuf, localMonitorSamples);
+							Graphics_updateWs (my graphics.get());
+						}
 					} else {
 						integer nsamp = my lastSample - my firstSample;
-						if (nsamp > 0)
+						if (nsamp > 0) {
 							showMeter (me, & my recordBuffer [1 + my firstSample * my numberOfChannels], nsamp);
+							Graphics_updateWs (my graphics.get());
+						}
 					}
-					Graphics_updateWs (my graphics.get());
 				}
 			} else {
-				#if defined (_WIN32)
-					if (my inputUsesPortAudio) {
-						Pa_Sleep (10);
-					}
-				#endif
-				my monitorTick ++;
-				if ((my monitorTick % 2 == 0) && my inputUsesPortAudio) {
+				const double now = Melder_clock ();
+				if ((now - my lastMeterUpdateTime >= 0.033) && my inputUsesPortAudio) {
+					my lastMeterUpdateTime = now;
 					integer sel = getSelectedTakeIndex (me);
-					if (sel == 0 && my monitorSamples > 0 && my graphics) {
-						showMeter (me, my monitorBuffer, my monitorSamples);
-						Graphics_updateWs (my graphics.get());
+					if (sel == 0 && my graphics) {
+						short localMonitorBuf [2048 * 2];
+						integer localMonitorSamples = 0;
+						{
+							std::lock_guard <std::mutex> monLock (my monitorMutex);
+							if (my monitorSamples > 0) {
+								localMonitorSamples = my monitorSamples;
+								if (localMonitorSamples > 2048)
+									localMonitorSamples = 2048;
+								memcpy (localMonitorBuf, my monitorBuffer, (size_t) localMonitorSamples * (size_t) my numberOfChannels * sizeof (short));
+							}
+						}
+						if (localMonitorSamples > 0) {
+							showMeter (me, localMonitorBuf, localMonitorSamples);
+							Graphics_updateWs (my graphics.get());
+						}
 					}
 				}
 			}
@@ -723,8 +767,11 @@ static int portaudioStreamCallback (
 	const short *inSamples = static_cast <const short *> (input);
 	if (inSamples && frameCount > 0) {
 		uinteger copyCount = frameCount > 2048 ? 2048 : frameCount;
-		memcpy (my monitorBuffer, inSamples, copyCount * my numberOfChannels * sizeof (short));
-		my monitorSamples = copyCount;
+		std::unique_lock <std::mutex> monLock (my monitorMutex, std::try_to_lock);
+		if (monLock.owns_lock ()) {
+			memcpy (my monitorBuffer, inSamples, copyCount * my numberOfChannels * sizeof (short));
+			my monitorSamples = copyCount;
+		}
 	}
 
 	if (! my recording)
@@ -916,10 +963,9 @@ static void addCurrentRecordingToTakes (SoundRecorder me) {
 }
 
 #if defined (_WIN32)
-#include <commctrl.h>
 static LRESULT CALLBACK holdRecordSubclassProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
 	SoundRecorder me = (SoundRecorder) dwRefData;
-	if (me) {
+	if (me && ! my isBeingDestroyed) {
 		if (msg == WM_LBUTTONDOWN) {
 			my isHoldingRecord = true;
 			startRecording (me);
@@ -1006,7 +1052,7 @@ static void updateSoundRecorderPlayButtonUi (SoundRecorder me, double curTime, d
 
 static int soundRecorder_playCallback (Thing boss, int phase, double tmin, double tmax, double currentTime) {
 	SoundRecorder me = static_cast <SoundRecorder> (boss);
-	if (! me) return 1;
+	if (! me || my isBeingDestroyed) return 1;
 
 	if (phase == 1) {
 		my isPlayingSound = true;
@@ -1102,6 +1148,7 @@ static void gui_button_cb_play (SoundRecorder me, GuiButtonEvent /* event */) {
 		my playTotalDuration = dur;
 		my playCurrentTime = tResume;
 		updateSoundRecorderPlayButtonUi (me, tResume - sound -> xmin, dur, 1);
+		Sound_setPlaybackSpeed (1.0);
 		Sound_playPart (sound, tResume, sound -> xmax, soundRecorder_playCallback, me);
 	} else {
 		// Fresh play from start!
@@ -1112,6 +1159,7 @@ static void gui_button_cb_play (SoundRecorder me, GuiButtonEvent /* event */) {
 		my playCurrentTime = sound -> xmin;
 		my playingTakeIndex = index;
 		updateSoundRecorderPlayButtonUi (me, 0.0, dur, 1);
+		Sound_setPlaybackSpeed (1.0);
 		Sound_playPart (sound, sound -> xmin, sound -> xmax, soundRecorder_playCallback, me);
 	}
 }
@@ -1626,12 +1674,28 @@ static void gui_radiobutton_cb_channels (SoundRecorder me, GuiRadioButtonEvent e
 }
 
 static void gui_drawingarea_cb_expose (SoundRecorder me, GuiDrawingArea_ExposeEvent /* event */) {
-	if (! my graphics)
+	if (! my graphics || my isBeingDestroyed)
 		return;   // could be the case in the very beginning
+	auto snapshotMonitor = [&] (short *dst, integer & outSamples) {
+		outSamples = 0;
+		std::lock_guard <std::mutex> monLock (my monitorMutex);
+		if (my monitorSamples > 0) {
+			outSamples = my monitorSamples;
+			if (outSamples > 2048)
+				outSamples = 2048;
+			memcpy (dst, my monitorBuffer, (size_t) outSamples * (size_t) my numberOfChannels * sizeof (short));
+		}
+	};
 	if (my recording) {
-		if (my inputUsesPortAudio && my monitorSamples > 0)
-			showMeter (me, my monitorBuffer, my monitorSamples);
-		else {
+		if (my inputUsesPortAudio) {
+			short localMonitorBuf [2048 * 2];
+			integer localMonitorSamples = 0;
+			snapshotMonitor (localMonitorBuf, localMonitorSamples);
+			if (localMonitorSamples > 0)
+				showMeter (me, localMonitorBuf, localMonitorSamples);
+			else
+				showMeter (me, nullptr, 0);
+		} else {
 			integer nsamp = my lastSample - my firstSample;
 			if (nsamp > 0)
 				showMeter (me, & my recordBuffer [1 + my firstSample * my numberOfChannels], nsamp);
@@ -1640,12 +1704,19 @@ static void gui_drawingarea_cb_expose (SoundRecorder me, GuiDrawingArea_ExposeEv
 		}
 	} else {
 		integer sel = getSelectedTakeIndex (me);
-		if (sel >= 1 && sel <= my recordedSounds.size)
+		if (sel >= 1 && sel <= my recordedSounds.size) {
 			showMeter (me, nullptr, 0);
-		else if (my monitorSamples > 0)
-			showMeter (me, my monitorBuffer, my monitorSamples);
-		else
+		} else if (my inputUsesPortAudio) {
+			short localMonitorBuf [2048 * 2];
+			integer localMonitorSamples = 0;
+			snapshotMonitor (localMonitorBuf, localMonitorSamples);
+			if (localMonitorSamples > 0)
+				showMeter (me, localMonitorBuf, localMonitorSamples);
+			else
+				showMeter (me, nullptr, 0);
+		} else {
 			showMeter (me, nullptr, 0);
+		}
 	}
 }
 

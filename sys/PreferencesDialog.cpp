@@ -85,6 +85,16 @@ Thing_define (PreferencesDialog, Thing) {
 	GuiButton applyButton;
 	GuiButton cancelButton;
 	GuiButton okButton;
+
+	struct LocalizedOption {
+		GuiOptionMenu menu;
+		int position;
+		conststring32 key;
+	};
+	std::vector <std::pair <GuiLabel, conststring32>> localizedLabels;
+	std::vector <std::pair <GuiCheckButton, conststring32>> localizedCheckButtons;
+	std::vector <std::pair <GuiButton, conststring32>> localizedButtons;
+	std::vector <LocalizedOption> localizedOptions;
 };
 
 Thing_implement (PreferencesDialog, Thing, 0);
@@ -373,6 +383,43 @@ static bool PreferencesDialog_apply (PreferencesDialog me) {
 #define ADD_PANEL_CONTROL(panelIndex, control) \
 	my panelControls [panelIndex].push_back (control)
 
+void PreferencesDialog_languageChanged () {
+	PreferencesDialog me = thePreferencesDialogInstance;
+	if (! me || ! my dialog)
+		return;
+	GuiShell_setTitle (my dialog, praat_translate (U"Preferences"));
+	if (my categoryList) {
+		autoINTVEC selected = GuiList_getSelectedPositions (my categoryList);
+		const conststring32 catKeys [5] = {
+			U"General & Language",
+			U"Sound Recording & Playback",
+			U"Text & Encoding",
+			U"AI & Speech",
+			U"Advanced & Multi-threading"
+		};
+		for (int i = 0; i < 5; i ++)
+			GuiList_replaceItem (my categoryList, praat_translate (catKeys [i]), i + 1);
+		if (selected.size > 0 && selected [1] >= 1 && selected [1] <= 5)
+			GuiList_selectItem (my categoryList, selected [1]);
+	}
+	for (const auto& entry : my localizedLabels) {
+		if (entry.first && entry.second)
+			GuiLabel_setText (entry.first, entry.second);
+	}
+	for (const auto& entry : my localizedCheckButtons) {
+		if (entry.first && entry.second)
+			GuiCheckButton_setText (entry.first, entry.second);
+	}
+	for (const auto& entry : my localizedButtons) {
+		if (entry.first && entry.second)
+			GuiButton_setText (entry.first, praat_translate (entry.second));
+	}
+	for (const auto& opt : my localizedOptions) {
+		if (opt.menu && opt.key)
+			GuiOptionMenu_setOptionText (opt.menu, opt.position, opt.key);
+	}
+}
+
 void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	if (thePreferencesDialogInstance) {
 		PreferencesDialog_loadValues (thePreferencesDialogInstance);
@@ -391,9 +438,35 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	const int dialogY = Melder_iround (screenY + (screenHeight - dialogHeight) / 2.0);
 
 	my dialog = GuiDialog_create (parentWindow, dialogX, dialogY, dialogWidth, dialogHeight,
-			praat_translate (U"Preferences"), gui_preferences_dialog_cb_close, me.get(), GuiDialog_Modality::MODELESS);
+			U"Preferences", gui_preferences_dialog_cb_close, me.get(), GuiDialog_Modality::MODELESS);
 
 	GuiForm form = my dialog;
+
+	auto addLabel = [&] (int panelIndex, int left, int right, int top, int bottom, conststring32 key, uint32 flags) -> GuiLabel {
+		GuiLabel lbl = GuiLabel_createShown (form, left, right, top, bottom, key, flags);
+		if (panelIndex > 0)
+			ADD_PANEL_CONTROL (panelIndex, lbl);
+		my localizedLabels.push_back ({ lbl, key });
+		return lbl;
+	};
+	auto addCheck = [&] (int panelIndex, int left, int right, int top, int bottom, conststring32 key) -> GuiCheckButton {
+		GuiCheckButton chk = GuiCheckButton_createShown (form, left, right, top, bottom, key, nullptr, nullptr, 0);
+		if (panelIndex > 0)
+			ADD_PANEL_CONTROL (panelIndex, chk);
+		my localizedCheckButtons.push_back ({ chk, key });
+		return chk;
+	};
+	auto addButton = [&] (int panelIndex, int left, int right, int top, int bottom, conststring32 key, GuiButton_ActivateCallback cb, uint32 flags) -> GuiButton {
+		GuiButton btn = GuiButton_createShown (form, left, right, top, bottom, key, cb, me.get(), flags);
+		if (panelIndex > 0)
+			ADD_PANEL_CONTROL (panelIndex, btn);
+		my localizedButtons.push_back ({ btn, key });
+		return btn;
+	};
+	auto addOption = [&] (GuiOptionMenu menu, int pos, conststring32 key) {
+		GuiOptionMenu_addOption (menu, key);
+		my localizedOptions.push_back ({ menu, pos, key });
+	};
 
 	/*
 	 * 1. Left Sidebar: Category List
@@ -416,12 +489,10 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	 */
 	{
 		int y = 20;
-		GuiLabel h1 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Interface & Fonts"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (1, h1);
+		addLabel (1, fullX1, fullX2, y, y + 20, U"Interface & Fonts", GuiLabel_BOLD);
 		y += 30;
 
-		GuiLabel l1 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Interface language:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (1, l1);
+		addLabel (1, labelX1, labelX2, y, y + 20, U"Interface language:", GuiLabel_RIGHT);
 		my languageMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
 		GuiOptionMenu_addOption (my languageMenu, U"English");
 		GuiOptionMenu_addOption (my languageMenu, U"简体中文 (Simplified Chinese)");
@@ -429,44 +500,36 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 		ADD_PANEL_CONTROL (1, my languageMenu);
 		y += 32;
 
-		GuiLabel l2 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"CJK font style:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (1, l2);
+		addLabel (1, labelX1, labelX2, y, y + 20, U"CJK font style:", GuiLabel_RIGHT);
 		my cjkFontStyleMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
 		for (int i = (int) kGraphics_cjkFontStyle::MIN; i <= (int) kGraphics_cjkFontStyle::MAX; i ++)
-			GuiOptionMenu_addOption (my cjkFontStyleMenu, praat_translate (kGraphics_cjkFontStyle_getText ((kGraphics_cjkFontStyle) i)));
+			addOption (my cjkFontStyleMenu, i - (int) kGraphics_cjkFontStyle::MIN + 1, kGraphics_cjkFontStyle_getText ((kGraphics_cjkFontStyle) i));
 		ADD_PANEL_CONTROL (1, my cjkFontStyleMenu);
 		y += 32;
 
 		#if defined (_WIN32)
-		GuiLabel lDpi = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20,
-			g_language_choice != 0 ? U"DPI 缩放模式：" : U"DPI scaling mode:", GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (1, lDpi);
+		addLabel (1, labelX1, labelX2, y, y + 20, U"DPI scaling mode:", GuiLabel_RIGHT);
 		my dpiModeMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
-		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"GDI 缩放 (推荐，高清与兼容平衡)" : U"GDI Scaling (Default, crisp & compatible)");
-		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"系统原生缩放 (System DPI Aware)" : U"System DPI Aware");
-		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"每显示器感知 V2 (Per-Monitor V2)" : U"Per-Monitor DPI Aware V2");
-		GuiOptionMenu_addOption (my dpiModeMenu, g_language_choice != 0 ? U"传统兼容模式 (DPI Unaware - 防界面错位)" : U"DPI Unaware (Compatibility fallback)");
+		addOption (my dpiModeMenu, 1, U"GDI Scaling (Default, crisp & compatible)");
+		addOption (my dpiModeMenu, 2, U"System DPI Aware");
+		addOption (my dpiModeMenu, 3, U"Per-Monitor DPI Aware V2");
+		addOption (my dpiModeMenu, 4, U"DPI Unaware (Compatibility fallback)");
 		ADD_PANEL_CONTROL (1, my dpiModeMenu);
 		y += 24;
 
-		GuiLabel capDpi = GuiLabel_createShown (form, fieldX1, fullX2, y, y + 16,
-			g_language_choice != 0 ? U"(更改后需重启 Praat 生效)" : U"(Requires restarting Praat to take effect)", 0);
-		ADD_PANEL_CONTROL (1, capDpi);
+		addLabel (1, fieldX1, fullX2, y, y + 16, U"(Requires restarting Praat to take effect)", 0);
 		y += 28;
 		#else
 		y += 12;
 		#endif
 
-		GuiLabel h2 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Shortcuts & Customization"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (1, h2);
+		addLabel (1, fullX1, fullX2, y, y + 20, U"Shortcuts & Customization", GuiLabel_BOLD);
 		y += 30;
 
-		my openButtonEditorButton = GuiButton_createShown (form, fullX1, fullX1 + 220, y, y + Gui_PUSHBUTTON_HEIGHT,
-				praat_translate (U"Open Buttons Editor..."), gui_button_cb_openButtonEditor, me.get(), 0);
-		ADD_PANEL_CONTROL (1, my openButtonEditorButton);
+		my openButtonEditorButton = addButton (1, fullX1, fullX1 + 220, y, y + Gui_PUSHBUTTON_HEIGHT,
+				U"Open Buttons Editor...", gui_button_cb_openButtonEditor, 0);
 		y += 34;
-		GuiLabel cap1 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"(Customize menu commands and action buttons)"), 0);
-		ADD_PANEL_CONTROL (1, cap1);
+		addLabel (1, fullX1, fullX2, y, y + 20, U"(Customize menu commands and action buttons)", 0);
 	}
 
 	/*
@@ -474,28 +537,24 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	 */
 	{
 		int y = 20;
-		GuiLabel h1 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Sound Recording"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (2, h1);
+		addLabel (2, fullX1, fullX2, y, y + 20, U"Sound Recording", GuiLabel_BOLD);
 		y += 28;
 
-		GuiLabel l1 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Buffer size (MB):"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l1);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Buffer size (MB):", GuiLabel_RIGHT);
 		my recordingBufferSizeText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (2, my recordingBufferSizeText);
 		y += 30;
 
-		GuiLabel l2 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Input sound system:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l2);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Input sound system:", GuiLabel_RIGHT);
 		my inputSoundSystemMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
 		for (int i = (int) kMelder_inputSoundSystem::MIN; i <= (int) kMelder_inputSoundSystem::MAX; i ++)
-			GuiOptionMenu_addOption (my inputSoundSystemMenu, praat_translate (kMelder_inputSoundSystem_getText ((kMelder_inputSoundSystem) i)));
+			addOption (my inputSoundSystemMenu, i - (int) kMelder_inputSoundSystem::MIN + 1, kMelder_inputSoundSystem_getText ((kMelder_inputSoundSystem) i));
 		ADD_PANEL_CONTROL (2, my inputSoundSystemMenu);
 		y += 30;
 
-		GuiLabel l2b = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Input sound device:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l2b);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Input sound device:", GuiLabel_RIGHT);
 		my inputSoundDeviceMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
-		GuiOptionMenu_addOption (my inputSoundDeviceMenu, praat_translate (U"System default"));
+		addOption (my inputSoundDeviceMenu, 1, U"System default");
 		MelderAudio_DeviceList devList = { 0 };
 		MelderAudio_getInputDeviceList (& devList);
 		for (integer i = 0; i < devList. count; i ++) {
@@ -504,44 +563,37 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 		ADD_PANEL_CONTROL (2, my inputSoundDeviceMenu);
 		y += 38;
 
-		GuiLabel h2 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Sound Playback"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (2, h2);
+		addLabel (2, fullX1, fullX2, y, y + 20, U"Sound Playback", GuiLabel_BOLD);
 		y += 28;
 
-		GuiLabel l3 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Output sound system:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l3);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Output sound system:", GuiLabel_RIGHT);
 		my outputSoundSystemMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
 		for (int i = (int) kMelder_outputSoundSystem::MIN; i <= (int) kMelder_outputSoundSystem::MAX; i ++)
-			GuiOptionMenu_addOption (my outputSoundSystemMenu, praat_translate (kMelder_outputSoundSystem_getText ((kMelder_outputSoundSystem) i)));
+			addOption (my outputSoundSystemMenu, i - (int) kMelder_outputSoundSystem::MIN + 1, kMelder_outputSoundSystem_getText ((kMelder_outputSoundSystem) i));
 		ADD_PANEL_CONTROL (2, my outputSoundSystemMenu);
 		y += 30;
 
-		GuiLabel l4 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Maximum asynchronicity:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l4);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Maximum asynchronicity:", GuiLabel_RIGHT);
 		my maximumAsynchronicityMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
 		for (int i = (int) kMelder_asynchronicityLevel::MIN; i <= (int) kMelder_asynchronicityLevel::MAX; i ++)
-			GuiOptionMenu_addOption (my maximumAsynchronicityMenu, praat_translate (kMelder_asynchronicityLevel_getText ((kMelder_asynchronicityLevel) i)));
+			addOption (my maximumAsynchronicityMenu, i - (int) kMelder_asynchronicityLevel::MIN + 1, kMelder_asynchronicityLevel_getText ((kMelder_asynchronicityLevel) i));
 		ADD_PANEL_CONTROL (2, my maximumAsynchronicityMenu);
 		y += 30;
 
-		GuiLabel l5 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Silence before (seconds):"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l5);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Silence before (seconds):", GuiLabel_RIGHT);
 		my silenceBeforeText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (2, my silenceBeforeText);
 		y += 30;
 
-		GuiLabel l6 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Silence after (seconds):"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l6);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Silence after (seconds):", GuiLabel_RIGHT);
 		my silenceAfterText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (2, my silenceAfterText);
 		y += 38;
 
-		GuiLabel h3 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"LongSound"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (2, h3);
+		addLabel (2, fullX1, fullX2, y, y + 20, U"LongSound", GuiLabel_BOLD);
 		y += 28;
 
-		GuiLabel l7 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Max viewable part (seconds):"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (2, l7);
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Max viewable part (seconds):", GuiLabel_RIGHT);
 		my longSoundMaxViewablePartText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (2, my longSoundMaxViewablePartText);
 	}
@@ -551,29 +603,25 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	 */
 	{
 		int y = 20;
-		GuiLabel h1 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Text Files Encoding"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (3, h1);
+		addLabel (3, fullX1, fullX2, y, y + 20, U"Text Files Encoding", GuiLabel_BOLD);
 		y += 30;
 
-		GuiLabel l1 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"8-bit text reading encoding:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (3, l1);
+		addLabel (3, labelX1, labelX2, y, y + 20, U"8-bit text reading encoding:", GuiLabel_RIGHT);
 		my textInputEncodingMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
 		for (int i = (int) kMelder_textInputEncoding::MIN; i <= (int) kMelder_textInputEncoding::MAX; i ++)
-			GuiOptionMenu_addOption (my textInputEncodingMenu, praat_translate (kMelder_textInputEncoding_getText ((kMelder_textInputEncoding) i)));
+			addOption (my textInputEncodingMenu, i - (int) kMelder_textInputEncoding::MIN + 1, kMelder_textInputEncoding_getText ((kMelder_textInputEncoding) i));
 		ADD_PANEL_CONTROL (3, my textInputEncodingMenu);
 		y += 32;
 
-		GuiLabel l2 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Text writing output encoding:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (3, l2);
+		addLabel (3, labelX1, labelX2, y, y + 20, U"Text writing output encoding:", GuiLabel_RIGHT);
 		my textOutputEncodingMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
 		for (int i = (int) kMelder_textOutputEncoding::MIN; i <= (int) kMelder_textOutputEncoding::MAX; i ++)
-			GuiOptionMenu_addOption (my textOutputEncodingMenu, praat_translate (kMelder_textOutputEncoding_getText ((kMelder_textOutputEncoding) i)));
+			addOption (my textOutputEncodingMenu, i - (int) kMelder_textOutputEncoding::MIN + 1, kMelder_textOutputEncoding_getText ((kMelder_textOutputEncoding) i));
 		ADD_PANEL_CONTROL (3, my textOutputEncodingMenu);
 		y += 40;
 
-		GuiLabel note = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20,
-				praat_translate (U"Note: UTF-8 is recommended for modern cross-platform multilingual compatibility."), 0);
-		ADD_PANEL_CONTROL (3, note);
+		addLabel (3, fullX1, fullX2, y, y + 20,
+				U"Note: UTF-8 is recommended for modern cross-platform multilingual compatibility.", 0);
 	}
 
 	/*
@@ -581,35 +629,29 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	 */
 	{
 		int y = 20;
-		GuiLabel h1 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Speech-to-Text & Diarization"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (4, h1);
+		addLabel (4, fullX1, fullX2, y, y + 20, U"Speech-to-Text & Diarization", GuiLabel_BOLD);
 		y += 28;
 
-		GuiLabel cap0 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20,
-				praat_translate (U"Configure parallel thread allocation for local AI transcription & diarization."), 0);
-		ADD_PANEL_CONTROL (4, cap0);
+		addLabel (4, fullX1, fullX2, y, y + 20,
+				U"Configure parallel thread allocation for local AI transcription & diarization.", 0);
 		y += 32;
 
-		GuiLabel l1 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Transcription max threads:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (4, l1);
+		addLabel (4, labelX1, labelX2, y, y + 20, U"Transcription max threads:", GuiLabel_RIGHT);
 		my transcriptionThreadsText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (4, my transcriptionThreadsText);
 		y += 26;
 
-		GuiLabel cap1 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 18,
-				praat_translate (U"(0 = automatic; uses default CPU concurrency for Whisper transcription)"), 0);
-		ADD_PANEL_CONTROL (4, cap1);
+		addLabel (4, fullX1, fullX2, y, y + 18,
+				U"(0 = automatic; uses default CPU concurrency for Whisper transcription)", 0);
 		y += 34;
 
-		GuiLabel l2 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Diarization max threads:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (4, l2);
+		addLabel (4, labelX1, labelX2, y, y + 20, U"Diarization max threads:", GuiLabel_RIGHT);
 		my diarizationThreadsText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (4, my diarizationThreadsText);
 		y += 26;
 
-		GuiLabel cap2 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 18,
-				praat_translate (U"(0 = automatic; uses default CPU concurrency for speaker diarization)"), 0);
-		ADD_PANEL_CONTROL (4, cap2);
+		addLabel (4, fullX1, fullX2, y, y + 18,
+				U"(0 = automatic; uses default CPU concurrency for speaker diarization)", 0);
 	}
 
 	/*
@@ -617,43 +659,35 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	 */
 	{
 		int y = 20;
-		GuiLabel h1 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Multi-threading Settings"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (5, h1);
+		addLabel (5, fullX1, fullX2, y, y + 20, U"Multi-threading Settings", GuiLabel_BOLD);
 		y += 28;
 
-		my useMultithreadingCheck = GuiCheckButton_createShown (form, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
-				praat_translate (U"Enable multi-threading"), nullptr, nullptr, 0);
-		ADD_PANEL_CONTROL (5, my useMultithreadingCheck);
+		my useMultithreadingCheck = addCheck (5, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
+				U"Enable multi-threading");
 		y += 30;
 
-		GuiLabel l1 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Max concurrent threads:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (5, l1);
+		addLabel (5, labelX1, labelX2, y, y + 20, U"Max concurrent threads:", GuiLabel_RIGHT);
 		my maxThreadsText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (5, my maxThreadsText);
 		y += 30;
 
-		GuiLabel l2 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Min elements per thread:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (5, l2);
+		addLabel (5, labelX1, labelX2, y, y + 20, U"Min elements per thread:", GuiLabel_RIGHT);
 		my minElementsText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (5, my minElementsText);
 		y += 30;
 
-		my traceThreadsCheck = GuiCheckButton_createShown (form, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
-				praat_translate (U"Trace thread execution info"), nullptr, nullptr, 0);
-		ADD_PANEL_CONTROL (5, my traceThreadsCheck);
+		my traceThreadsCheck = addCheck (5, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
+				U"Trace thread execution info");
 		y += 38;
 
-		GuiLabel h2 = GuiLabel_createShown (form, fullX1, fullX2, y, y + 20, praat_translate (U"Debugging & Diagnostics"), GuiLabel_BOLD);
-		ADD_PANEL_CONTROL (5, h2);
+		addLabel (5, fullX1, fullX2, y, y + 20, U"Debugging & Diagnostics", GuiLabel_BOLD);
 		y += 28;
 
-		my tracingCheck = GuiCheckButton_createShown (form, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
-				praat_translate (U"Enable global tracing"), nullptr, nullptr, 0);
-		ADD_PANEL_CONTROL (5, my tracingCheck);
+		my tracingCheck = addCheck (5, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
+				U"Enable global tracing");
 		y += 30;
 
-		GuiLabel l3 = GuiLabel_createShown (form, labelX1, labelX2, y, y + 20, praat_translate (U"Debug option code:"), GuiLabel_RIGHT);
-		ADD_PANEL_CONTROL (5, l3);
+		addLabel (5, labelX1, labelX2, y, y + 20, U"Debug option code:", GuiLabel_RIGHT);
 		my debugOptionText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
 		ADD_PANEL_CONTROL (5, my debugOptionText);
 	}
@@ -662,17 +696,17 @@ void PRAAT_preferencesDialog (GuiWindow parentWindow) {
 	 * 7. Bottom Action Buttons
 	 */
 	const int buttonY = 455;
-	my restoreDefaultsButton = GuiButton_createShown (form, 16, 160, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
-			praat_translate (U"Restore Defaults"), gui_button_cb_restoreDefaults, me.get(), 0);
+	my restoreDefaultsButton = addButton (0, 16, 160, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"Restore Defaults", gui_button_cb_restoreDefaults, 0);
 
-	my applyButton = GuiButton_createShown (form, 440, 520, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
-			praat_translate (U"Apply"), gui_button_cb_apply, me.get(), 0);
+	my applyButton = addButton (0, 440, 520, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"Apply", gui_button_cb_apply, 0);
 
-	my cancelButton = GuiButton_createShown (form, 530, 610, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
-			praat_translate (U"Cancel"), gui_button_cb_cancel, me.get(), 0);
+	my cancelButton = addButton (0, 530, 610, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"Cancel", gui_button_cb_cancel, 0);
 
-	my okButton = GuiButton_createShown (form, 620, 704, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
-			praat_translate (U"OK"), gui_button_cb_ok, me.get(), GuiButton_DEFAULT);
+	my okButton = addButton (0, 620, 704, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"OK", gui_button_cb_ok, GuiButton_DEFAULT);
 
 	/*
 	 * 8. Initial State: Load values, select Panel 1, and show

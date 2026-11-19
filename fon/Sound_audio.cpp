@@ -630,8 +630,11 @@ void Sound_playPart (constSound me, double tmin, double tmax, Sound_PlayCallback
 			double *fromLeft = & my z [1] [0], *fromRight = ( my ny > 1 ? & my z [2] [0] : nullptr );
 			MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
 			integer i1, i2;
-			if ((thy numberOfSamples = Matrix_getWindowSamplesX (me, tmin, tmax, & i1, & i2)) < 1)
+			if ((thy numberOfSamples = Matrix_getWindowSamplesX (me, tmin, tmax, & i1, & i2)) < 1) {
+				if (callback)
+					callback (boss, 3, tmin, tmax, tmax);
 				return;
+			}
 			thy tmin = tmin;
 			thy tmax = tmax;
 			thy dt = my dx;

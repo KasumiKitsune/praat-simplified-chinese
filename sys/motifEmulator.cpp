@@ -1968,6 +1968,7 @@ void XtDestroyWidget (GuiObject me) {
 			theMenus [my nat.menu.id] = NULL;
 		} break;
 	}
+	my magicNumber = 0;
 	my name. reset();   // not automatic
 	if (my parent && me == my parent -> firstChild)   // remove dangling reference
 		my parent -> firstChild = my nextSibling;
@@ -2890,6 +2891,15 @@ static int win_shell_processKeyboardEquivalent (GuiObject me, int kar, int modif
 	return 0;
 }
 
+static inline GuiObject _GuiWin_getGuiObject (HWND hwnd) noexcept {
+	if (! hwnd)
+		return nullptr;
+	GuiObject obj = reinterpret_cast <GuiObject> (GetWindowLongPtr (hwnd, GWLP_USERDATA));
+	if (! obj || obj -> magicNumber != 15111959)
+		return nullptr;
+	return obj;
+}
+
 static int win_processKeyboardEquivalent (GuiObject me, int kar, int modifiers) {
 	/*
 	 * First try to send the key command to the active shell.
@@ -2944,7 +2954,7 @@ modifiers & _motif_SHIFT_MASK ? " shift" : "", message -> message == WM_KEYDOWN 
 	{
 		int kar = LOWORD (message -> wParam);
 		trace (U"kar1 ", kar);
-		GuiObject me = (GuiObject) GetWindowLongPtr (message -> hwnd, GWLP_USERDATA);
+		GuiObject me = _GuiWin_getGuiObject (message -> hwnd);
 		int modifiers = 0;
 		if (GetKeyState (VK_CONTROL) < 0)
 			modifiers |= _motif_COMMAND_MASK;
@@ -3057,7 +3067,7 @@ modifiers & _motif_SHIFT_MASK ? " shift" : "", message -> message == WM_KEYDOWN 
 		/* Not me or not my shell: let windowProc handle. */
 	} else if (message -> message == WM_CHAR) {
 		int kar = LOWORD (message -> wParam);
-		GuiObject me = (GuiObject) GetWindowLongPtr (message -> hwnd, GWLP_USERDATA);
+		GuiObject me = _GuiWin_getGuiObject (message -> hwnd);
 		if (me && MEMBER (me, Text) && kar == 1) {
 			return;   // swallow Ctrl+A in WM_CHAR
 		}
@@ -3115,7 +3125,7 @@ modifiers & _motif_SHIFT_MASK ? " shift" : "", message -> message == WM_KEYDOWN 
 		 * Catch mouse-down messages to cascade buttons:
 		 * post the associated menu, if any.
 		 */
-		GuiObject me = (GuiObject) GetWindowLongPtr (message -> hwnd, GWLP_USERDATA);
+		GuiObject me = _GuiWin_getGuiObject (message -> hwnd);
 		//Melder_information (Melder_pointer (me), U" -- ", Melder_pointer (my subMenuId));
 		if (me && MEMBER (me, CascadeButton) && my subMenuId) {
 			RECT rect;
@@ -3135,7 +3145,7 @@ modifiers & _motif_SHIFT_MASK ? " shift" : "", message -> message == WM_KEYDOWN 
 		if (targetPid == GetCurrentProcessId ()) {
 			GuiObject me = nullptr;
 			for (HWND h = targetWnd; h; h = GetParent (h)) {
-				me = (GuiObject) GetWindowLongPtr (h, GWLP_USERDATA);
+				me = _GuiWin_getGuiObject (h);
 				if (me)
 					break;
 			}
@@ -3498,7 +3508,7 @@ static GuiObject _motif_findScrollBar (GuiObject me, int orientation) {
 }
 
 static bool on_mouseWheel (HWND window, int xPos, int yPos, int zDelta, int fwKeys) {
-	GuiObject me = (GuiObject) GetWindowLongPtr (window, GWLP_USERDATA);
+	GuiObject me = _GuiWin_getGuiObject (window);
 	if (me) {
 		bool isHorizontal = ( fwKeys & MK_SHIFT );
 		const bool controlKeyPressed = ( fwKeys & MK_CONTROL );

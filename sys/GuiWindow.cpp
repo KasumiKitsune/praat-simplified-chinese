@@ -394,7 +394,14 @@ static void paintOpacityPanel (GuiOpacityPanel me, HDC targetDc) {
 		return;
 
 	HDC dc = CreateCompatibleDC (targetDc);
-	HBITMAP bmp = CreateCompatibleBitmap (targetDc, w, h);
+	HBITMAP bmp = dc ? CreateCompatibleBitmap (targetDc, w, h) : nullptr;
+	if (! dc || ! bmp) {
+		if (bmp)
+			DeleteObject (bmp);
+		if (dc)
+			DeleteDC (dc);
+		return;
+	}
 	HBITMAP oldBmp = (HBITMAP) SelectObject (dc, bmp);
 
 	// 1. Card background (and 1px border fallback when DWM rounded corners are unavailable on Win10)
@@ -529,10 +536,10 @@ static void paintOpacityPanel (GuiOpacityPanel me, HDC targetDc) {
 static LRESULT CALLBACK opacityPanelWndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	if (msg == WM_NCCREATE) {
 		CREATESTRUCTW *cs = reinterpret_cast <CREATESTRUCTW *> (lParam);
-		SetWindowLongPtrW (hwnd, GWLP_USERDATA, reinterpret_cast <LONG_PTR> (cs -> lpCreateParams));
+		SetWindowLongPtrW (hwnd, 0, reinterpret_cast <LONG_PTR> (cs -> lpCreateParams));
 		return TRUE;
 	}
-	GuiOpacityPanel me = reinterpret_cast <GuiOpacityPanel> (GetWindowLongPtrW (hwnd, GWLP_USERDATA));
+	GuiOpacityPanel me = reinterpret_cast <GuiOpacityPanel> (GetWindowLongPtrW (hwnd, 0));
 	if (! me)
 		return DefWindowProcW (hwnd, msg, wParam, lParam);
 
@@ -543,7 +550,8 @@ static LRESULT CALLBACK opacityPanelWndProc (HWND hwnd, UINT msg, WPARAM wParam,
 		case WM_PAINT: {
 			PAINTSTRUCT ps { };
 			HDC hdc = BeginPaint (hwnd, & ps);
-			paintOpacityPanel (me, hdc);
+			if (hdc)
+				paintOpacityPanel (me, hdc);
 			EndPaint (hwnd, & ps);
 			return 0;
 		}
@@ -685,18 +693,36 @@ static LRESULT CALLBACK opacityPanelWndProc (HWND hwnd, UINT msg, WPARAM wParam,
 		}
 
 		case WM_ACTIVATE: {
-			if (LOWORD (wParam) == WA_INACTIVE && my isShowing) {
-				POINT pt { };
-				GetCursorPos (& pt);
-				const bool leftDown = (GetAsyncKeyState (VK_LBUTTON) & 0x8000) != 0;
-				if (leftDown && PtInRect (& my anchorRect, pt)) {
-					my closedByAnchorClick = true;
-					my closedByAnchorTick = GetTickCount64 ();
+			if (LOWORD (wParam) == WA_INACTIVE) {
+				if (my isShowing) {
+					POINT pt { };
+					GetCursorPos (& pt);
+					const bool leftDown = (GetAsyncKeyState (VK_LBUTTON) & 0x8000) != 0;
+					if (leftDown && PtInRect (& my anchorRect, pt)) {
+						my closedByAnchorClick = true;
+						my closedByAnchorTick = GetTickCount64 ();
+					} else {
+						my closedByAnchorClick = false;
+					}
+					GuiOpacityPanel_dismiss (me);
+					return 0;
 				}
-				GuiOpacityPanel_dismiss (me);
-				return 0;
+			} else {
+				my closedByAnchorClick = false;
 			}
 			break;
+		}
+
+		case WM_NCDESTROY: {
+			SetWindowLongPtrW (hwnd, 0, 0);
+			my hwnd = nullptr;
+			my isShowing = false;
+			my isDragging = false;
+			my trackingLeave = false;
+			my hoverThumb = false;
+			my hoverBadge = false;
+			my releaseCustomFonts ();
+			return 0;
 		}
 
 		default:
@@ -713,6 +739,7 @@ static void ensureOpacityPanelClassRegistered () {
 	wc.cbSize = sizeof (WNDCLASSEXW);
 	wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_DROPSHADOW;
 	wc.lpfnWndProc = opacityPanelWndProc;
+	wc.cbWndExtra = sizeof (LONG_PTR);
 	wc.hInstance = theGui.instance;
 	wc.hCursor = LoadCursor (nullptr, IDC_ARROW);
 	wc.hbrBackground = nullptr;
@@ -725,7 +752,7 @@ GuiOpacityPanel GuiOpacityPanel_create (GuiWindow owner, int initialOpacityPerce
 	GuiOpacityPanel_ChangedCallback changedCallback, Thing boss)
 {
 	ensureOpacityPanelClassRegistered ();
-	GuiOpacityPanel me = Melder_calloc (struct structGuiOpacityPanel, 1);
+	GuiOpacityPanel me = new struct structGuiOpacityPanel ();
 	my owner = owner;
 	my ownerHwnd = (owner && owner -> d_xmShell) ? owner -> d_xmShell -> window : nullptr;
 	my changedCallback = changedCallback;
@@ -746,22 +773,25 @@ GuiOpacityPanel GuiOpacityPanel_create (GuiWindow owner, int initialOpacityPerce
 		theGui.instance,
 		me
 	);
-	if (my hwnd) {
-		#ifndef DWMWA_WINDOW_CORNER_PREFERENCE
-		#define DWMWA_WINDOW_CORNER_PREFERENCE 33
-		#endif
-		#ifndef DWMWCP_ROUND
-		#define DWMWCP_ROUND 2
-		#endif
-		#ifndef DWMWA_BORDER_COLOR
-		#define DWMWA_BORDER_COLOR 34
-		#endif
-		DWORD cornerPref = DWMWCP_ROUND;
-		my hasDwmRoundCorners = SUCCEEDED (DwmSetWindowAttribute (
-			my hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, & cornerPref, sizeof (cornerPref)));
-		COLORREF borderCol = RGB (208, 213, 221);
-		DwmSetWindowAttribute (my hwnd, DWMWA_BORDER_COLOR, & borderCol, sizeof (borderCol));
+	if (! my hwnd) {
+		my releaseCustomFonts ();
+		delete me;
+		return nullptr;
 	}
+	#ifndef DWMWA_WINDOW_CORNER_PREFERENCE
+	#define DWMWA_WINDOW_CORNER_PREFERENCE 33
+	#endif
+	#ifndef DWMWCP_ROUND
+	#define DWMWCP_ROUND 2
+	#endif
+	#ifndef DWMWA_BORDER_COLOR
+	#define DWMWA_BORDER_COLOR 34
+	#endif
+	DWORD cornerPref = DWMWCP_ROUND;
+	my hasDwmRoundCorners = SUCCEEDED (DwmSetWindowAttribute (
+		my hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, & cornerPref, sizeof (cornerPref)));
+	COLORREF borderCol = RGB (208, 213, 221);
+	DwmSetWindowAttribute (my hwnd, DWMWA_BORDER_COLOR, & borderCol, sizeof (borderCol));
 	return me;
 }
 
@@ -772,13 +802,14 @@ void GuiOpacityPanel_dispose (GuiOpacityPanel *p_me) noexcept {
 	*p_me = nullptr;
 	my isShowing = false;
 	if (my hwnd) {
-		SetWindowLongPtrW (my hwnd, GWLP_USERDATA, 0);
-		if (IsWindow (my hwnd))
+		if (IsWindow (my hwnd)) {
+			SetWindowLongPtrW (my hwnd, 0, 0);
 			DestroyWindow (my hwnd);
+		}
 		my hwnd = nullptr;
 	}
 	my releaseCustomFonts ();
-	Melder_free (me);
+	delete me;
 }
 
 void GuiOpacityPanel_show (GuiOpacityPanel me, int anchorLeft, int anchorRight, int anchorTop, int anchorBottom) {
@@ -846,7 +877,7 @@ bool GuiOpacityPanel_steppedAsideForAnchorClick (GuiOpacityPanel me) noexcept {
 	if (! me || ! my closedByAnchorClick)
 		return false;
 	my closedByAnchorClick = false;
-	return (GetTickCount64 () - my closedByAnchorTick) <= 500;
+	return (GetTickCount64 () - my closedByAnchorTick) <= 250;
 }
 
 #else

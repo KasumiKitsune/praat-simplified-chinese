@@ -117,6 +117,7 @@ FORM (PLAY_LongSound_playPart, U"LongSound: Play part", nullptr) {
 	OK
 DO
 	PLAY_EACH (LongSound)
+		Sound_setPlaybackSpeed (1.0);
 		LongSound_playPart (me, fromTime, toTime, nullptr, nullptr);
 	PLAY_EACH_END
 }
@@ -1367,6 +1368,22 @@ static void praat_sound_seek (double fraction, bool isDragging) {
 	if (s_soundIsPlaying) {
 		if (! isDragging) {
 			Sound snd = s_soundPlayPtr;
+			integer i1 = 0, i2 = 0;
+			const bool hasSamples = (targetTime < snd -> xmax) &&
+				(Matrix_getWindowSamplesX (snd, targetTime, snd -> xmax, & i1, & i2) >= 1);
+			if (! hasSamples) {
+				s_soundIsReplaying = false;
+				s_soundIsPlaying = false;
+				s_soundIsPaused = false;
+				s_soundIsDraggingSeek = false;
+				s_soundPausedTime = 0.0;
+				s_soundCurrentTime = 0.0;
+				s_soundPlayPtr = nullptr;
+				s_soundPlayId = 0;
+				MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
+				updatePlayButtonUi (0.0, 0.0, 0);
+				return;
+			}
 			s_soundIsReplaying = true;
 			MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
 			s_soundIsReplaying = false;
@@ -1382,10 +1399,17 @@ static void praat_sound_seek (double fraction, bool isDragging) {
 			updatePlayButtonUi (targetTime, s_soundTotalDuration, 1);
 		}
 	} else {
-		s_soundIsPaused = true;
-		s_soundPausedTime = targetTime;
-		s_soundCurrentTime = targetTime;
-		updatePlayButtonUi (targetTime, s_soundTotalDuration, 2);
+		if (! isDragging && targetTime >= s_soundPlayPtr -> xmax) {
+			s_soundIsPaused = false;
+			s_soundPausedTime = 0.0;
+			s_soundCurrentTime = 0.0;
+			updatePlayButtonUi (0.0, 0.0, 0);
+		} else {
+			s_soundIsPaused = true;
+			s_soundPausedTime = targetTime;
+			s_soundCurrentTime = targetTime;
+			updatePlayButtonUi (targetTime, s_soundTotalDuration, 2);
+		}
 	}
 }
 
@@ -1429,14 +1453,30 @@ static void praat_sound_playSplitCallback (GuiButton me, void *nativeHandle, int
 			if (s_soundIsPlaying && s_soundPlayPtr) {
 				Sound snd = s_soundPlayPtr;
 				double curT = s_soundCurrentTime;
-				s_soundIsReplaying = true;
-				MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
-				s_soundIsReplaying = false;
-				s_soundPlayPtr = snd;
-				s_soundCurrentTime = curT;
-				s_soundIsPlaying = true;
-				updatePlayButtonUi (curT, s_soundTotalDuration, 1);
-				Sound_playPart (snd, curT, snd -> xmax, praat_sound_playCallback, nullptr);
+				integer i1 = 0, i2 = 0;
+				const bool hasSamples = (curT < snd -> xmax) &&
+					(Matrix_getWindowSamplesX (snd, curT, snd -> xmax, & i1, & i2) >= 1);
+				if (! hasSamples) {
+					s_soundIsReplaying = false;
+					s_soundIsPlaying = false;
+					s_soundIsPaused = false;
+					s_soundIsDraggingSeek = false;
+					s_soundPausedTime = 0.0;
+					s_soundCurrentTime = 0.0;
+					s_soundPlayPtr = nullptr;
+					s_soundPlayId = 0;
+					MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
+					updatePlayButtonUi (0.0, 0.0, 0);
+				} else {
+					s_soundIsReplaying = true;
+					MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
+					s_soundIsReplaying = false;
+					s_soundPlayPtr = snd;
+					s_soundCurrentTime = curT;
+					s_soundIsPlaying = true;
+					updatePlayButtonUi (curT, s_soundTotalDuration, 1);
+					Sound_playPart (snd, curT, snd -> xmax, praat_sound_playCallback, nullptr);
+				}
 			}
 		} else if (cmd == 201) {
 			s_soundAllowSeeking = ! s_soundAllowSeeking;

@@ -90,7 +90,12 @@ static const char32* praat_translate_legend (const char32* text) {
 		if (std::u32string_view (transCore) != std::u32string_view (coreText)) {
 			static std::unordered_map<std::u32string, std::u32string> dynamic_legend_cache;
 			static std::mutex dynamic_legend_mutex;
+			static int last_lang = -1;
 			std::lock_guard<std::mutex> lock (dynamic_legend_mutex);
+			if (last_lang != g_language_choice) {
+				dynamic_legend_cache.clear ();
+				last_lang = g_language_choice;
+			}
 			std::u32string result = prefixAndTag + transCore;
 			auto [it, inserted] = dynamic_legend_cache.emplace (s, result);
 			return it->second.c_str();

@@ -9,6 +9,7 @@
 #include "praat.h"
 
 void PRAAT_preferencesDialog (GuiWindow parentWindow);
+void PreferencesDialog_languageChanged ();
 extern "C" void PRAAT_preferences (UiForm, integer, Stackel, conststring32, Interpreter, conststring32, bool, void *, Editor);
 
 #endif

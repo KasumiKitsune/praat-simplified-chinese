@@ -462,6 +462,22 @@ void structFunctionEditor :: v9_destroy () noexcept {
 	if (Melder_debug == 55)
 		Melder_casual (Thing_messageNameAndAddress (this), U" v9_destroy");
 	GuiOpacityPanel_dispose (& our opacityPanel);
+	#if defined (_WIN32)
+		if (our d_winBackgroundDC) {
+			if (our d_winOldBackgroundBitmap)
+				SelectObject (our d_winBackgroundDC, our d_winOldBackgroundBitmap);
+			if (our d_winBackgroundBitmap)
+				DeleteObject (our d_winBackgroundBitmap);
+			DeleteDC (our d_winBackgroundDC);
+		} else if (our d_winBackgroundBitmap) {
+			DeleteObject (our d_winBackgroundBitmap);
+		}
+		our d_winBackgroundDC = nullptr;
+		our d_winBackgroundBitmap = nullptr;
+		our d_winOldBackgroundBitmap = nullptr;
+		our d_winBackgroundWidth = 0;
+		our d_winBackgroundHeight = 0;
+	#endif
 	FunctionEditor_Parent :: v9_destroy ();
 }
 
@@ -482,6 +498,56 @@ void structFunctionEditor :: v1_info () {
 		if (area)
 			area -> v1_info ();
 	}
+}
+
+void structFunctionEditor :: v_languageChanged () {
+	FunctionEditor_Parent :: v_languageChanged ();
+	if (our opacityMenu)
+		GuiMenu_setTitle (our opacityMenu, U"Opacity");
+	const conststring32 zoomKeys [5] = { U"all", U"in", U"out", U"sel", U"bak" };
+	for (int i = 0; i < 5; i ++) {
+		if (our zoomButtons [i])
+			GuiButton_setText (our zoomButtons [i], praat_translate (zoomKeys [i]));
+	}
+	if (our groupButton)
+		GuiCheckButton_setText (our groupButton, U"Group");
+	if (our bottomCheck_spectrogram)
+		GuiCheckButton_setText (our bottomCheck_spectrogram, U"Spectrogram");
+	if (our bottomButton_spectrogramSettings)
+		GuiButton_setText (our bottomButton_spectrogramSettings, praat_translate (U"Settings"));
+	if (our bottomCheck_pitch)
+		GuiCheckButton_setText (our bottomCheck_pitch, U"Pitch");
+	if (our bottomButton_pitchSettings)
+		GuiButton_setText (our bottomButton_pitchSettings, praat_translate (U"Settings"));
+	if (our bottomCheck_intensity)
+		GuiCheckButton_setText (our bottomCheck_intensity, U"Intensity");
+	if (our bottomButton_intensitySettings)
+		GuiButton_setText (our bottomButton_intensitySettings, praat_translate (U"Settings"));
+	if (our bottomCheck_formants)
+		GuiCheckButton_setText (our bottomCheck_formants, U"Formants");
+	if (our bottomButton_formantSettings)
+		GuiButton_setText (our bottomButton_formantSettings, praat_translate (U"Settings"));
+	if (our bottomCheck_pulses)
+		GuiCheckButton_setText (our bottomCheck_pulses, U"Pulses");
+	if (our bottomButton_pulsesSettings)
+		GuiButton_setText (our bottomButton_pulsesSettings, praat_translate (U"Settings"));
+	if (our bottomButton_showAnalyses)
+		GuiButton_setText (our bottomButton_showAnalyses, praat_translate (U"Show analyses..."));
+	if (our topButton_spectralSlice)
+		GuiButton_setText (our topButton_spectralSlice, praat_translate (U"Spectral slice"));
+	if (our topButton_voiceReport)
+		GuiButton_setText (our topButton_voiceReport, praat_translate (U"Voice report"));
+	if (our topButton_formantListing)
+		GuiButton_setText (our topButton_formantListing, praat_translate (U"Formant listing"));
+	if (our topButton_getPitch)
+		GuiButton_setText (our topButton_getPitch, praat_translate (U"Get pitch"));
+	if (our topButton_getIntensity)
+		GuiButton_setText (our topButton_getIntensity, praat_translate (U"Get intensity"));
+	if (our topButton_extractSelection)
+		GuiButton_setText (our topButton_extractSelection, praat_translate (U"Extract selection"));
+	if (our topButton_saveWav)
+		GuiButton_setText (our topButton_saveWav, praat_translate (U"Save as WAV..."));
+	FunctionEditor_redraw (this);
 }
 
 void structFunctionEditor :: v_windowChanged () {
@@ -1202,22 +1268,22 @@ void structFunctionEditor :: updateQuickToolbarLayout () {
 
 	// 5 Acoustic Measurement buttons
 	int x = 4;
-	if (topButton_spectralSlice)  { GuiControl_move (topButton_spectralSlice,  x, topBarY); x += 74 + 4; }
-	if (topButton_voiceReport)    { GuiControl_move (topButton_voiceReport,    x, topBarY); x += 74 + 4; }
-	if (topButton_formantListing) { GuiControl_move (topButton_formantListing, x, topBarY); x += 82 + 4; }
+	if (topButton_spectralSlice)  { GuiControl_move (topButton_spectralSlice,  x, topBarY); x += 84 + 4; }
+	if (topButton_voiceReport)    { GuiControl_move (topButton_voiceReport,    x, topBarY); x += 80 + 4; }
+	if (topButton_formantListing) { GuiControl_move (topButton_formantListing, x, topBarY); x += 92 + 4; }
 	if (topButton_getPitch)       { GuiControl_move (topButton_getPitch,       x, topBarY); x += 74 + 4; }
-	if (topButton_getIntensity)   { GuiControl_move (topButton_getIntensity,   x, topBarY); x += 74 + 4; }
+	if (topButton_getIntensity)   { GuiControl_move (topButton_getIntensity,   x, topBarY); x += 82 + 4; }
 
 	// 2 Export buttons (Extract Selection, Save WAV)
-	const int exportWidth = 74 + 84 + 4;
-	int xExport = x + 16;
-	if (shellW >= 760) {
+	const int exportWidth = 96 + 104 + 4;
+	int xExport = x + 12;
+	if (shellW >= 680) {
 		// Right-aligned with 8px margin
 		xExport = shellW - exportWidth - 8;
-		if (xExport < x + 16)
-			xExport = x + 16;
+		if (xExport < x + 12)
+			xExport = x + 12;
 	}
-	if (topButton_extractSelection) { GuiControl_move (topButton_extractSelection, xExport, topBarY); xExport += 74 + 4; }
+	if (topButton_extractSelection) { GuiControl_move (topButton_extractSelection, xExport, topBarY); xExport += 96 + 4; }
 	if (topButton_saveWav)          { GuiControl_move (topButton_saveWav,          xExport, topBarY); }
 }
 
@@ -1451,9 +1517,9 @@ static void opacityPanelChanged (Thing boss, int opacityPercent) {
 		return;
 	Melder_clip (20, & opacityPercent, 100);
 	if (! GuiWindow_setOpacity (my windowForm, opacityPercent)) {
+		Melder_clearError ();
 		if (my opacityPanel)
 			GuiOpacityPanel_setValue (my opacityPanel, my opacityPercent);
-		Melder_flushError (praat_translate (U"Cannot change window opacity."));
 		return;
 	}
 	my opacityPercent = GuiWindow_getOpacity (my windowForm);
@@ -1626,32 +1692,60 @@ static void gui_drawingarea_cb_expose (FunctionEditor me, GuiDrawingArea_ExposeE
 		if (my duringPlay) {
 			GraphicsScreen graphics = (GraphicsScreen) my graphics.get();
 			HDC foregroundContext = graphics -> d_gdiGraphicsContext;
-			static HDC backgroundContext;
-			if (! my backgroundIsUpToDate) {
-				/*
-					Draw into background.
-				*/
-				static HBITMAP backgroundBitmap;
-				if (backgroundBitmap)
-					DeleteObject (backgroundBitmap);
-				if (backgroundContext)
-					DeleteDC (backgroundContext);
-				backgroundContext = CreateCompatibleDC (foregroundContext);
-				backgroundBitmap = CreateCompatibleBitmap (foregroundContext, my drawingArea -> d_widget -> width, my drawingArea -> d_widget -> height);
-				SelectObject (backgroundContext, backgroundBitmap);
-				SetBkMode (backgroundContext, TRANSPARENT);   // not the default!
-				SelectPen (backgroundContext, GetStockPen (BLACK_PEN));
-				SelectBrush (backgroundContext, GetStockBrush (BLACK_BRUSH));
-				SetTextAlign (backgroundContext, TA_LEFT | TA_BASELINE | TA_NOUPDATECP);   // baseline is not the default!
-				graphics -> d_gdiGraphicsContext = backgroundContext;
-				drawBackgroundAndData (me);
-				graphics -> d_gdiGraphicsContext = foregroundContext;
-				my backgroundIsUpToDate = true;
+			const int w = my drawingArea -> d_widget -> width;
+			const int h = my drawingArea -> d_widget -> height;
+			if (! my backgroundIsUpToDate || ! my d_winBackgroundDC || ! my d_winBackgroundBitmap ||
+					my d_winBackgroundWidth != w || my d_winBackgroundHeight != h)
+			{
+				if (my d_winBackgroundDC) {
+					if (my d_winOldBackgroundBitmap)
+						SelectObject (my d_winBackgroundDC, my d_winOldBackgroundBitmap);
+					if (my d_winBackgroundBitmap)
+						DeleteObject (my d_winBackgroundBitmap);
+					DeleteDC (my d_winBackgroundDC);
+				} else if (my d_winBackgroundBitmap) {
+					DeleteObject (my d_winBackgroundBitmap);
+				}
+				my d_winBackgroundDC = nullptr;
+				my d_winBackgroundBitmap = nullptr;
+				my d_winOldBackgroundBitmap = nullptr;
+				my d_winBackgroundWidth = 0;
+				my d_winBackgroundHeight = 0;
+				if (w > 0 && h > 0) {
+					my d_winBackgroundDC = CreateCompatibleDC (foregroundContext);
+					my d_winBackgroundBitmap = my d_winBackgroundDC
+						? CreateCompatibleBitmap (foregroundContext, w, h)
+						: nullptr;
+					if (my d_winBackgroundDC && my d_winBackgroundBitmap) {
+						my d_winOldBackgroundBitmap = (HBITMAP) SelectObject (my d_winBackgroundDC, my d_winBackgroundBitmap);
+						my d_winBackgroundWidth = w;
+						my d_winBackgroundHeight = h;
+						SetBkMode (my d_winBackgroundDC, TRANSPARENT);   // not the default!
+						SelectPen (my d_winBackgroundDC, GetStockPen (BLACK_PEN));
+						SelectBrush (my d_winBackgroundDC, GetStockBrush (BLACK_BRUSH));
+						SetTextAlign (my d_winBackgroundDC, TA_LEFT | TA_BASELINE | TA_NOUPDATECP);   // baseline is not the default!
+						graphics -> d_gdiGraphicsContext = my d_winBackgroundDC;
+						drawBackgroundAndData (me);
+						graphics -> d_gdiGraphicsContext = foregroundContext;
+						my backgroundIsUpToDate = true;
+					} else {
+						if (my d_winBackgroundBitmap)
+							DeleteObject (my d_winBackgroundBitmap);
+						if (my d_winBackgroundDC)
+							DeleteDC (my d_winBackgroundDC);
+						my d_winBackgroundDC = nullptr;
+						my d_winBackgroundBitmap = nullptr;
+					}
+				}
 			}
-			/*
-				Copy to foreground.
-			*/
-			BitBlt (foregroundContext, 0, 0, my drawingArea -> d_widget -> width, my drawingArea -> d_widget -> height, backgroundContext, 0, 0, SRCCOPY);
+			if (my d_winBackgroundDC && my d_winBackgroundBitmap) {
+				/*
+					Copy to foreground.
+				*/
+				BitBlt (foregroundContext, 0, 0, w, h, my d_winBackgroundDC, 0, 0, SRCCOPY);
+			} else {
+				drawBackgroundAndData (me);
+			}
 		} else {
 			my backgroundIsUpToDate = false;
 			drawBackgroundAndData (me);
@@ -2057,19 +2151,19 @@ void structFunctionEditor :: v_createChildren () {
 	/*
 		Create zoom buttons.
 	*/
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [0] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"all", gui_button_cb_showAll, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [1] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"in", gui_button_cb_zoomIn, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [2] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"out", gui_button_cb_zoomOut, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [3] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"sel", gui_button_cb_zoomToSelection, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [4] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"bak", gui_button_cb_zoomBack, this, 0);
 
 	/*
@@ -2103,52 +2197,52 @@ void structFunctionEditor :: v_createChildren () {
 
 		// 1. Spectrogram
 		bool showSpec = (area ? area -> instancePref_spectrogram_show () : true);
-		our bottomCheck_spectrogram = GuiCheckButton_createShown (our windowForm, bx, bx + 56, bTop, bBottom,
-			praat_translate (U"Spectrogram"), gui_cb_bottomCheck_spectrogram, this, showSpec ? GuiCheckButton_SET : 0);
-		bx += 56 + 6;
-		our bottomButton_spectrogramSettings = GuiButton_createShown (our windowForm, bx, bx + 40, bTop, bBottom,
-			praat_translate (U"Settings"), gui_cb_bottomButton_spectrogramSettings, this, 0);
-		bx += 40 + 16;
+		our bottomCheck_spectrogram = GuiCheckButton_createShown (our windowForm, bx, bx + 72, bTop, bBottom,
+			U"Spectrogram", gui_cb_bottomCheck_spectrogram, this, showSpec ? GuiCheckButton_SET : 0);
+		bx += 72 + 4;
+		our bottomButton_spectrogramSettings = GuiButton_createShown (our windowForm, bx, bx + 50, bTop, bBottom,
+			U"Settings", gui_cb_bottomButton_spectrogramSettings, this, 0);
+		bx += 50 + 8;
 
 		// 2. Pitch
 		bool showPitch = (area ? area -> instancePref_pitch_show () : true);
 		our bottomCheck_pitch = GuiCheckButton_createShown (our windowForm, bx, bx + 56, bTop, bBottom,
-			praat_translate (U"Pitch"), gui_cb_bottomCheck_pitch, this, showPitch ? GuiCheckButton_SET : 0);
-		bx += 56 + 6;
-		our bottomButton_pitchSettings = GuiButton_createShown (our windowForm, bx, bx + 40, bTop, bBottom,
-			praat_translate (U"Settings"), gui_cb_bottomButton_pitchSettings, this, 0);
-		bx += 40 + 16;
+			U"Pitch", gui_cb_bottomCheck_pitch, this, showPitch ? GuiCheckButton_SET : 0);
+		bx += 56 + 4;
+		our bottomButton_pitchSettings = GuiButton_createShown (our windowForm, bx, bx + 50, bTop, bBottom,
+			U"Settings", gui_cb_bottomButton_pitchSettings, this, 0);
+		bx += 50 + 8;
 
 		// 3. Intensity
 		bool showIntens = (area ? area -> instancePref_intensity_show () : false);
-		our bottomCheck_intensity = GuiCheckButton_createShown (our windowForm, bx, bx + 56, bTop, bBottom,
-			praat_translate (U"Intensity"), gui_cb_bottomCheck_intensity, this, showIntens ? GuiCheckButton_SET : 0);
-		bx += 56 + 6;
-		our bottomButton_intensitySettings = GuiButton_createShown (our windowForm, bx, bx + 40, bTop, bBottom,
-			praat_translate (U"Settings"), gui_cb_bottomButton_intensitySettings, this, 0);
-		bx += 40 + 16;
+		our bottomCheck_intensity = GuiCheckButton_createShown (our windowForm, bx, bx + 62, bTop, bBottom,
+			U"Intensity", gui_cb_bottomCheck_intensity, this, showIntens ? GuiCheckButton_SET : 0);
+		bx += 62 + 4;
+		our bottomButton_intensitySettings = GuiButton_createShown (our windowForm, bx, bx + 50, bTop, bBottom,
+			U"Settings", gui_cb_bottomButton_intensitySettings, this, 0);
+		bx += 50 + 8;
 
 		// 4. Formants
 		bool showForm = (area ? area -> instancePref_formant_show () : true);
-		our bottomCheck_formants = GuiCheckButton_createShown (our windowForm, bx, bx + 68, bTop, bBottom,
-			praat_translate (U"Formants"), gui_cb_bottomCheck_formants, this, showForm ? GuiCheckButton_SET : 0);
-		bx += 68 + 6;
-		our bottomButton_formantSettings = GuiButton_createShown (our windowForm, bx, bx + 40, bTop, bBottom,
-			praat_translate (U"Settings"), gui_cb_bottomButton_formantSettings, this, 0);
-		bx += 40 + 16;
+		our bottomCheck_formants = GuiCheckButton_createShown (our windowForm, bx, bx + 70, bTop, bBottom,
+			U"Formants", gui_cb_bottomCheck_formants, this, showForm ? GuiCheckButton_SET : 0);
+		bx += 70 + 4;
+		our bottomButton_formantSettings = GuiButton_createShown (our windowForm, bx, bx + 50, bTop, bBottom,
+			U"Settings", gui_cb_bottomButton_formantSettings, this, 0);
+		bx += 50 + 8;
 
 		// 5. Pulses
 		bool showPulses = (area ? area -> instancePref_pulses_show () : false);
 		our bottomCheck_pulses = GuiCheckButton_createShown (our windowForm, bx, bx + 56, bTop, bBottom,
-			praat_translate (U"Pulses"), gui_cb_bottomCheck_pulses, this, showPulses ? GuiCheckButton_SET : 0);
-		bx += 56 + 6;
-		our bottomButton_pulsesSettings = GuiButton_createShown (our windowForm, bx, bx + 40, bTop, bBottom,
-			praat_translate (U"Settings"), gui_cb_bottomButton_pulsesSettings, this, 0);
-		bx += 40 + 16;
+			U"Pulses", gui_cb_bottomCheck_pulses, this, showPulses ? GuiCheckButton_SET : 0);
+		bx += 56 + 4;
+		our bottomButton_pulsesSettings = GuiButton_createShown (our windowForm, bx, bx + 50, bTop, bBottom,
+			U"Settings", gui_cb_bottomButton_pulsesSettings, this, 0);
+		bx += 50 + 8;
 
 		// 6. Show analyses...
-		our bottomButton_showAnalyses = GuiButton_createShown (our windowForm, bx, bx + 95, bTop, bBottom,
-			praat_translate (U"Show analyses..."), gui_cb_bottomButton_showAnalyses, this, 0);
+		our bottomButton_showAnalyses = GuiButton_createShown (our windowForm, bx, bx + 94, bTop, bBottom,
+			U"Show analyses...", gui_cb_bottomButton_showAnalyses, this, 0);
 	}
 
 	/*
@@ -2158,21 +2252,21 @@ void structFunctionEditor :: v_createChildren () {
 		const int topBarY = Machine_getMenuBarBottom () + 2;
 
 		int x = 4;
-		our topButton_spectralSlice   = GuiButton_createShown (our windowForm, x, x + 74, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
-			praat_translate (U"Spectral slice"), gui_cb_topButton_spectralSlice, this, 0);
-		x += 74 + 4;
-		our topButton_voiceReport     = GuiButton_createShown (our windowForm, x, x + 74, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
-			praat_translate (U"Voice report"), gui_cb_topButton_voiceReport, this, 0);
-		x += 74 + 4;
-		our topButton_formantListing  = GuiButton_createShown (our windowForm, x, x + 82, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
-			praat_translate (U"Formant listing"), gui_cb_topButton_formantListing, this, 0);
-		x += 82 + 4;
+		our topButton_spectralSlice   = GuiButton_createShown (our windowForm, x, x + 84, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
+			U"Spectral slice", gui_cb_topButton_spectralSlice, this, 0);
+		x += 84 + 4;
+		our topButton_voiceReport     = GuiButton_createShown (our windowForm, x, x + 80, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
+			U"Voice report", gui_cb_topButton_voiceReport, this, 0);
+		x += 80 + 4;
+		our topButton_formantListing  = GuiButton_createShown (our windowForm, x, x + 92, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
+			U"Formant listing", gui_cb_topButton_formantListing, this, 0);
+		x += 92 + 4;
 		our topButton_getPitch        = GuiButton_createShown (our windowForm, x, x + 74, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
-			praat_translate (U"Get pitch"), gui_cb_topButton_getPitch, this, 0);
+			U"Get pitch", gui_cb_topButton_getPitch, this, 0);
 		x += 74 + 4;
-		our topButton_getIntensity    = GuiButton_createShown (our windowForm, x, x + 74, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
-			praat_translate (U"Get intensity"), gui_cb_topButton_getIntensity, this, 0);
-		x += 74 + 16;
+		our topButton_getIntensity    = GuiButton_createShown (our windowForm, x, x + 82, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
+			U"Get intensity", gui_cb_topButton_getIntensity, this, 0);
+		x += 82 + 12;
 
 		bool hasSound = false;
 		for (integer iarea = 1; iarea <= FunctionEditor_MAXIMUM_NUMBER_OF_FUNCTION_AREAS; iarea ++) {
@@ -2185,11 +2279,11 @@ void structFunctionEditor :: v_createChildren () {
 			}
 		}
 		if (hasSound) {
-			our topButton_extractSelection= GuiButton_createShown (our windowForm, x, x + 74, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
-				praat_translate (U"Extract selection"), gui_cb_topButton_extractSelection, this, 0);
-			x += 74 + 4;
-			our topButton_saveWav         = GuiButton_createShown (our windowForm, x, x + 84, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
-				praat_translate (U"Save as WAV..."), gui_cb_topButton_saveWav, this, 0);
+			our topButton_extractSelection= GuiButton_createShown (our windowForm, x, x + 96, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
+				U"Extract selection", gui_cb_topButton_extractSelection, this, 0);
+			x += 96 + 4;
+			our topButton_saveWav         = GuiButton_createShown (our windowForm, x, x + 104, topBarY, topBarY + TOP_TOOLBAR_ROW_HEIGHT,
+				U"Save as WAV...", gui_cb_topButton_saveWav, this, 0);
 		}
 	}
 

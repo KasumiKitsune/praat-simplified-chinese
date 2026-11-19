@@ -48,7 +48,7 @@ Thing_define (SpectrumEditor, FunctionEditor) {
 	int v_fixedPrecision_long ()
 		override { return 2; }
 	conststring32 v_format_units_long ()
-		override { return g_language_choice == 0 ? U"Hertz" : U"赫兹"; }
+		override { return U"Hertz"; }
 	conststring32 v_format_units_short ()
 		override { return U"Hz"; }
 	const char * v_format_totalDuration ()

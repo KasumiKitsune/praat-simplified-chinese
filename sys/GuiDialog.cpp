@@ -213,11 +213,14 @@ static void gui_blocking_dialog_cb_default (GuiDialog me) {
 	#endif
 }
 #if motif
-std::vector <HWND> theOtherWindows;
-BOOL CALLBACK enumWindowsProc (HWND window, LPARAM lParam) {
-	HWND modalWindow = (HWND) lParam;
-	if (window != modalWindow)
-		theOtherWindows. push_back (window);
+struct GuiDialogDisableState {
+	HWND modalWindow = nullptr;
+	std::vector <HWND> windows;
+};
+static BOOL CALLBACK enumWindowsProc (HWND window, LPARAM lParam) {
+	GuiDialogDisableState *state = reinterpret_cast <GuiDialogDisableState *> (lParam);
+	if (window != state -> modalWindow && IsWindowEnabled (window))
+		state -> windows. push_back (window);
 	return true;
 }
 #endif
@@ -236,9 +239,10 @@ integer GuiDialog_run (GuiDialog me) {
 	#if gtk
 		gtk_dialog_run (GTK_DIALOG (my d_gtkWindow));
 	#elif motif
-		theOtherWindows. clear ();
-		EnumThreadWindows (GetCurrentThreadId (), enumWindowsProc, (LPARAM) my d_xmShell -> window);
-		for (HWND window: theOtherWindows)
+		GuiDialogDisableState disableState;
+		disableState. modalWindow = my d_xmShell -> window;
+		EnumThreadWindows (GetCurrentThreadId (), enumWindowsProc, (LPARAM) & disableState);
+		for (HWND window: disableState. windows)
 			EnableWindow (window, false);
 		UpdateWindow (my d_xmShell -> window);   // the only way to actually show the contents of the dialog (or my d_widget -> window)
 		if (my defaultButton)
@@ -276,8 +280,9 @@ integer GuiDialog_run (GuiDialog me) {
 				}
 			}
 		} while (my clickedButtonId == -1);
-		for (HWND window: theOtherWindows)
-			EnableWindow (window, true);
+		for (HWND window: disableState. windows)
+			if (IsWindow (window))
+				EnableWindow (window, true);
 	#elif cocoa
 		[[NSApplication sharedApplication] runModalForWindow: my d_cocoaShell];
 	#endif

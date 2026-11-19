@@ -505,11 +505,15 @@ static void ensure_helper_module (const std::filesystem::path& tempDir) {
 		       "        f.write(script_text.strip() + '\\n')\n\n"
 		       "def call(command_name, *args):\n"
 		       "    \"\"\"Calls any native Praat command (e.g. To Pitch, To Formant, Filter, Rename, Draw).\"\"\"\n"
+		       "    if not isinstance(command_name, str) or '\\r' in command_name or '\\n' in command_name:\n"
+		       "        raise ValueError('Newlines are not allowed in praat.call command_name')\n"
 		       "    cmd_clean = command_name[:-3] if command_name.endswith('...') else command_name\n"
 		       "    if args:\n"
 		       "        arg_strs = []\n"
 		       "        for arg in args:\n"
 		       "            if isinstance(arg, str):\n"
+		       "                if '\\r' in arg or '\\n' in arg:\n"
+		       "                    raise ValueError('Newlines are not allowed in praat.call string arguments')\n"
 		       "                escaped = arg.replace('\"', '\"\"')\n"
 		       "                arg_strs.append(f'\"{escaped}\"')\n"
 		       "            elif isinstance(arg, bool):\n"
@@ -547,19 +551,31 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 	std::filesystem::path tempDir = get_process_workspace ();
 	std::filesystem::create_directories (tempDir);
 	std::filesystem::path outputDir = tempDir / "output";
-	try {
-		if (std::filesystem::exists (outputDir))
-			std::filesystem::remove_all (outputDir);
-		std::filesystem::create_directories (outputDir);
-	} catch (...) {}
-	ensure_helper_module (tempDir);
-
-	// Clean any previous commands file
 	std::filesystem::path commandsPath = tempDir / "praat_commands.praat";
-	try {
-		if (std::filesystem::exists (commandsPath))
-			std::filesystem::remove (commandsPath);
-	} catch (...) {}
+	std::filesystem::path contextJsonPath = tempDir / "praat_context.json";
+
+	struct PythonWorkspaceCleanupGuard {
+		std::filesystem::path outputDir;
+		std::filesystem::path commandsPath;
+		std::filesystem::path contextJsonPath;
+		std::vector<std::filesystem::path> exportedFiles;
+		~PythonWorkspaceCleanupGuard () {
+			std::error_code ec;
+			for (const auto& f : exportedFiles)
+				std::filesystem::remove (f, ec);
+			std::filesystem::remove (commandsPath, ec);
+			std::filesystem::remove (contextJsonPath, ec);
+			std::filesystem::remove_all (outputDir, ec);
+		}
+	} cleanupGuard { outputDir, commandsPath, contextJsonPath, {} };
+
+	{
+		std::error_code ec;
+		std::filesystem::remove_all (outputDir, ec);
+		std::filesystem::create_directories (outputDir, ec);
+		std::filesystem::remove (commandsPath, ec);
+	}
+	ensure_helper_module (tempDir);
 
 	// Record currently selected objects (list indices for iteration, unique IDs for Praat commands)
 	std::vector<integer> selectedIndices;
@@ -574,7 +590,6 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 	}
 
 	// Export selected objects to workspace
-	std::filesystem::path contextJsonPath = tempDir / "praat_context.json";
 	std::ofstream jsonOfs (contextJsonPath, std::ios::out | std::ios::trunc);
 	if (jsonOfs.is_open()) {
 		jsonOfs << "{\n  \"selected_objects\": [\n";
@@ -607,7 +622,8 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 			autoMelderString objFileName;
 			MelderString_append (& objFileName, objId, U"_", sanitizedBaseName, ext);
 			autostring8 objFileName8 = Melder_32to8 (objFileName.string);
-			std::filesystem::path objPath = tempDir / (objFileName8 ? objFileName8.get() : "obj");
+			std::filesystem::path objPath = tempDir / utf8_to_path (objFileName8 ? objFileName8.get() : "obj");
+			cleanupGuard.exportedFiles.push_back (objPath);
 			std::string objPathStr = path_to_utf8 (objPath);
 
 			if (isSound) {
@@ -628,14 +644,16 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 					praat_executeScriptFromText_withFullTrust (saveCmd.string);
 				} catch (MelderError) {
 					Melder_clearError ();
-				} catch (...) {}
+				}
 			} else {
 				structMelderFile objMelderFile { };
 				autostring32 objPath32 = Melder_8to32_e (objPathStr.c_str());
 				Melder_pathToFile (objPath32.get(), & objMelderFile);
 				try {
 					Data_writeToTextFile (object, & objMelderFile);
-				} catch (...) {}
+				} catch (MelderError) {
+					Melder_clearError ();
+				}
 			}
 
 			autostring8 utf8Name = Melder_32to8 (pureName ? pureName : U"");
@@ -661,7 +679,9 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 		}
 		try {
 			praat_executeScriptFromText_withFullTrust (restoreSelectionCmd.string);
-		} catch (...) {}
+		} catch (MelderError) {
+			Melder_clearError ();
+		}
 	}
 
 	conststring32 pyExec = praat_python_getExecutablePath ();
@@ -955,10 +975,12 @@ void praat_runPythonScriptFile (conststring32 filePath, conststring32 optionalWo
 				}
 			}
 			// Clean up output dir after loading into memory
-			std::filesystem::remove_all (outputDir);
-			std::filesystem::create_directories (outputDir);
+			std::error_code ec;
+			std::filesystem::remove_all (outputDir, ec);
 		}
-	} catch (...) {}
+	} catch (MelderError) {
+		Melder_clearError ();
+	}
 }
 
 void praat_runPythonScriptText (conststring32 scriptText, conststring32 optionalScriptDirectory) {
@@ -968,6 +990,13 @@ void praat_runPythonScriptText (conststring32 scriptText, conststring32 optional
 	std::filesystem::path tempDir = get_process_workspace ();
 	std::filesystem::create_directories (tempDir);
 	std::filesystem::path scriptPath = tempDir / "temp_exec_script.py";
+	struct ScriptFileCleanupGuard {
+		std::filesystem::path path;
+		~ScriptFileCleanupGuard () {
+			std::error_code ec;
+			std::filesystem::remove (path, ec);
+		}
+	} scriptGuard { scriptPath };
 
 	std::ofstream ofs (scriptPath, std::ios::out | std::ios::trunc | std::ios::binary);
 	if (! ofs.is_open())

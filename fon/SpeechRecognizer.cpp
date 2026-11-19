@@ -939,13 +939,25 @@ static conststring32 theWhisperModelsFolder ();
 static conststring32 thePortableWhisperModelsFolder () {
 	static autostring32 portableFolderPath;
 	if (! portableFolderPath) {
-		wchar_t exePath [MAX_PATH];
-		DWORD len = GetModuleFileNameW (nullptr, exePath, MAX_PATH);
+		std::vector<wchar_t> exePath (MAX_PATH);
+		DWORD len = 0;
+		while (true) {
+			len = GetModuleFileNameW (nullptr, exePath.data (), (DWORD) exePath.size ());
+			if (len == 0)
+				break;
+			if (len < exePath.size ())
+				break;
+			if (exePath.size () >= 32768) {
+				len = 0;
+				break;
+			}
+			exePath.resize (exePath.size () * 2);
+		}
 		if (len > 0) {
-			wchar_t *lastSlash = wcsrchr (exePath, L'\\');
+			wchar_t *lastSlash = wcsrchr (exePath.data (), L'\\');
 			if (lastSlash) {
 				*lastSlash = L'\0';
-				conststring32 exeDir = Melder_peekWto32 (exePath);
+				conststring32 exeDir = Melder_peekWto32 (exePath.data ());
 				conststring32 modelsDir = Melder_cat (exeDir, U"\\models");
 				conststring32 whisperDir = Melder_cat (modelsDir, U"\\whispercpp");
 				try {

@@ -128,6 +128,13 @@ Thing_define (FunctionEditor, Editor) {
 	GuiText textArea;   // optional text at top
 	bool clickWasModifiedByShiftKey, clickWasModifiedByOptionKey, clickWasModifiedByCommandKey;   // information for drag-and-drop and for start of play
 	bool duringPlay, backgroundIsUpToDate;
+	#if defined (_WIN32)
+		HDC d_winBackgroundDC = nullptr;
+		HBITMAP d_winBackgroundBitmap = nullptr;
+		HBITMAP d_winOldBackgroundBitmap = nullptr;
+		int d_winBackgroundWidth = 0;
+		int d_winBackgroundHeight = 0;
+	#endif
 	struct FunctionEditor_picture picture;
 	bool anchorIsInSelectionViewer = false;
 	bool anchorIsInWideDataView = false;
@@ -135,6 +142,7 @@ Thing_define (FunctionEditor, Editor) {
 	/* Private: */
 	GuiDrawingArea drawingArea;
 	GuiScrollBar scrollBar;
+	GuiButton zoomButtons [5] { };
 	GuiCheckButton groupButton;
 	GuiObject bottomArea;
 
@@ -189,6 +197,8 @@ Thing_define (FunctionEditor, Editor) {
 		override;
 	void v1_info ()
 		override;
+	void v_languageChanged ()
+		override;
 
 	bool v_hasPlayMenu () override { return true; }
 	bool v_canBeTranslucentShell () override { return our v_hasOpacityControl (); }
@@ -234,8 +244,8 @@ Thing_define (FunctionEditor, Editor) {
 	virtual conststring32 v_format_domain () { return U"Time"; }
 	virtual const char *v_format_short () { return u8"%.3f"; }
 	virtual const char *v_format_long () { return u8"%f"; }
-	virtual conststring32 v_format_units_long () { return g_language_choice == 0 ? U"seconds" : U"秒"; }
-	virtual conststring32 v_format_units_short () { return g_language_choice == 0 ? U"s" : U"秒"; }
+	virtual conststring32 v_format_units_long () { return U"seconds"; }
+	virtual conststring32 v_format_units_short () { return U"s"; }
 	virtual const char *v_format_totalDuration () { return g_language_choice == 0 ? "Total duration %f seconds" : u8"总时长 %f 秒"; }
 	virtual const char *v_format_window () { return g_language_choice == 0 ? "Visible part %f seconds" : u8"可见部分 %f 秒"; }
 	virtual const char *v_format_selection () { return g_language_choice == 0 ? "%f (%.3f / s)" : u8"%f (%.3f / 秒)"; }
