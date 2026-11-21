@@ -170,4 +170,20 @@ void GuiCheckButton_setValue (GuiCheckButton me, bool value) {
 	#endif
 }
 
+void GuiCheckButton_setText (GuiCheckButton me, conststring32 text /* cattable */) {
+	conststring32 translatedText = praat_translate (text);
+	#if gtk
+		gtk_button_set_label (GTK_BUTTON (my d_widget), Melder_peek32to8 (translatedText));
+	#elif motif
+		my d_widget -> name = Melder_dup_f (translatedText);
+		if (my d_widget -> window) {
+			SetWindowTextW (my d_widget -> window, Melder_peek32toW (_GuiWin_expandAmpersands (my d_widget -> name.get())));
+			InvalidateRect (my d_widget -> window, nullptr, FALSE);
+		}
+	#elif cocoa
+		GuiCocoaCheckButton *checkButton = (GuiCocoaCheckButton *) my d_widget;
+		[checkButton setTitle: (NSString *) Melder_peek32toCfstring (translatedText)];
+	#endif
+}
+
 /* End of file GuiCheckButton.cpp */

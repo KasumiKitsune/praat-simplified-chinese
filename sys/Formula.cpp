@@ -7671,7 +7671,7 @@ static void do_askForTrust () {
 	const GuiWindow parentShell = ( optionalTrustWindowOwningEditor ? optionalTrustWindowOwningEditor -> windowForm : theCurrentPraatApplication -> topShell );
 	const bool isAlreadyTrusted = (theInterpreter -> scriptReference && theInterpreter -> scriptReference -> trusted) ||
 	                              (theInterpreter -> notebookReference && theInterpreter -> notebookReference -> trusted) ||
-	                              theInterpreter -> isTrusted || theUntitledScriptsTrustedInThisSession;
+	                              theInterpreter -> isTrusted;
 	if (! isAlreadyTrusted) {
 		conststring32 message [1+5] = { };
 		if (theInterpreter -> scriptReference) {
@@ -7706,8 +7706,6 @@ static void do_askForTrust () {
 				theInterpreter -> scriptReference -> trusted = true;
 			else if (theInterpreter -> notebookReference)
 				theInterpreter -> notebookReference -> trusted = true;
-			else
-				theUntitledScriptsTrustedInThisSession = true;
 			theInterpreter -> isTrusted = true;
 		}
 	}

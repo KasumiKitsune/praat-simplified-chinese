@@ -387,6 +387,22 @@ void structFunctionEditor :: v9_destroy () noexcept {
 	}
 	if (Melder_debug == 55)
 		Melder_casual (Thing_messageNameAndAddress (this), U" v9_destroy");
+	#if defined (_WIN32)
+		if (our d_winBackgroundDC) {
+			if (our d_winOldBackgroundBitmap)
+				SelectObject (our d_winBackgroundDC, our d_winOldBackgroundBitmap);
+			if (our d_winBackgroundBitmap)
+				DeleteObject (our d_winBackgroundBitmap);
+			DeleteDC (our d_winBackgroundDC);
+		} else if (our d_winBackgroundBitmap) {
+			DeleteObject (our d_winBackgroundBitmap);
+		}
+		our d_winBackgroundDC = nullptr;
+		our d_winBackgroundBitmap = nullptr;
+		our d_winOldBackgroundBitmap = nullptr;
+		our d_winBackgroundWidth = 0;
+		our d_winBackgroundHeight = 0;
+	#endif
 	FunctionEditor_Parent :: v9_destroy ();
 }
 
@@ -405,6 +421,18 @@ void structFunctionEditor :: v1_info () {
 		if (area)
 			area -> v1_info ();
 	}
+}
+
+void structFunctionEditor :: v_languageChanged () {
+	FunctionEditor_Parent :: v_languageChanged ();
+	const conststring32 zoomKeys [5] = { U"all", U"in", U"out", U"sel", U"bak" };
+	for (int i = 0; i < 5; i ++) {
+		if (our zoomButtons [i])
+			GuiButton_setText (our zoomButtons [i], praat_translate (zoomKeys [i]));
+	}
+	if (our groupButton)
+		GuiCheckButton_setText (our groupButton, U"Group");
+	FunctionEditor_redraw (this);
 }
 
 void structFunctionEditor :: v_windowChanged () {
@@ -1241,32 +1269,60 @@ static void gui_drawingarea_cb_expose (FunctionEditor me, GuiDrawingArea_ExposeE
 		if (my duringPlay) {
 			GraphicsScreen graphics = (GraphicsScreen) my graphics.get();
 			HDC foregroundContext = graphics -> d_gdiGraphicsContext;
-			static HDC backgroundContext;
-			if (! my backgroundIsUpToDate) {
-				/*
-					Draw into background.
-				*/
-				static HBITMAP backgroundBitmap;
-				if (backgroundBitmap)
-					DeleteObject (backgroundBitmap);
-				if (backgroundContext)
-					DeleteDC (backgroundContext);
-				backgroundContext = CreateCompatibleDC (foregroundContext);
-				backgroundBitmap = CreateCompatibleBitmap (foregroundContext, my drawingArea -> d_widget -> width, my drawingArea -> d_widget -> height);
-				SelectObject (backgroundContext, backgroundBitmap);
-				SetBkMode (backgroundContext, TRANSPARENT);   // not the default!
-				SelectPen (backgroundContext, GetStockPen (BLACK_PEN));
-				SelectBrush (backgroundContext, GetStockBrush (BLACK_BRUSH));
-				SetTextAlign (backgroundContext, TA_LEFT | TA_BASELINE | TA_NOUPDATECP);   // baseline is not the default!
-				graphics -> d_gdiGraphicsContext = backgroundContext;
-				drawBackgroundAndData (me);
-				graphics -> d_gdiGraphicsContext = foregroundContext;
-				my backgroundIsUpToDate = true;
+			const int w = my drawingArea -> d_widget -> width;
+			const int h = my drawingArea -> d_widget -> height;
+			if (! my backgroundIsUpToDate || ! my d_winBackgroundDC || ! my d_winBackgroundBitmap ||
+					my d_winBackgroundWidth != w || my d_winBackgroundHeight != h)
+			{
+				if (my d_winBackgroundDC) {
+					if (my d_winOldBackgroundBitmap)
+						SelectObject (my d_winBackgroundDC, my d_winOldBackgroundBitmap);
+					if (my d_winBackgroundBitmap)
+						DeleteObject (my d_winBackgroundBitmap);
+					DeleteDC (my d_winBackgroundDC);
+				} else if (my d_winBackgroundBitmap) {
+					DeleteObject (my d_winBackgroundBitmap);
+				}
+				my d_winBackgroundDC = nullptr;
+				my d_winBackgroundBitmap = nullptr;
+				my d_winOldBackgroundBitmap = nullptr;
+				my d_winBackgroundWidth = 0;
+				my d_winBackgroundHeight = 0;
+				if (w > 0 && h > 0) {
+					my d_winBackgroundDC = CreateCompatibleDC (foregroundContext);
+					my d_winBackgroundBitmap = my d_winBackgroundDC
+						? CreateCompatibleBitmap (foregroundContext, w, h)
+						: nullptr;
+					if (my d_winBackgroundDC && my d_winBackgroundBitmap) {
+						my d_winOldBackgroundBitmap = (HBITMAP) SelectObject (my d_winBackgroundDC, my d_winBackgroundBitmap);
+						my d_winBackgroundWidth = w;
+						my d_winBackgroundHeight = h;
+						SetBkMode (my d_winBackgroundDC, TRANSPARENT);   // not the default!
+						SelectPen (my d_winBackgroundDC, GetStockPen (BLACK_PEN));
+						SelectBrush (my d_winBackgroundDC, GetStockBrush (BLACK_BRUSH));
+						SetTextAlign (my d_winBackgroundDC, TA_LEFT | TA_BASELINE | TA_NOUPDATECP);   // baseline is not the default!
+						graphics -> d_gdiGraphicsContext = my d_winBackgroundDC;
+						drawBackgroundAndData (me);
+						graphics -> d_gdiGraphicsContext = foregroundContext;
+						my backgroundIsUpToDate = true;
+					} else {
+						if (my d_winBackgroundBitmap)
+							DeleteObject (my d_winBackgroundBitmap);
+						if (my d_winBackgroundDC)
+							DeleteDC (my d_winBackgroundDC);
+						my d_winBackgroundDC = nullptr;
+						my d_winBackgroundBitmap = nullptr;
+					}
+				}
 			}
-			/*
-				Copy to foreground.
-			*/
-			BitBlt (foregroundContext, 0, 0, my drawingArea -> d_widget -> width, my drawingArea -> d_widget -> height, backgroundContext, 0, 0, SRCCOPY);
+			if (my d_winBackgroundDC && my d_winBackgroundBitmap) {
+				/*
+					Copy to foreground.
+				*/
+				BitBlt (foregroundContext, 0, 0, w, h, my d_winBackgroundDC, 0, 0, SRCCOPY);
+			} else {
+				drawBackgroundAndData (me);
+			}
 		} else {
 			my backgroundIsUpToDate = false;
 			drawBackgroundAndData (me);
@@ -1534,19 +1590,19 @@ void structFunctionEditor :: v_createChildren () {
 	/*
 		Create zoom buttons.
 	*/
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [0] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"all", gui_button_cb_showAll, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [1] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"in", gui_button_cb_zoomIn, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [2] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"out", gui_button_cb_zoomOut, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [3] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"sel", gui_button_cb_zoomToSelection, this, 0);
 	x += BUTTON_WIDTH + BUTTON_SPACING;
-	GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
+	our zoomButtons [4] = GuiButton_createShown (our windowForm, x, x + BUTTON_WIDTH, -4 - Gui_PUSHBUTTON_HEIGHT, -4,
 		U"bak", gui_button_cb_zoomBack, this, 0);
 
 	/*

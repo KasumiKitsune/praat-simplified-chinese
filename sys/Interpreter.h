@@ -205,7 +205,6 @@ void Interpreter_rememberScript_override (Interpreter me, MelderFile scriptFile,
 void Interpreter_rememberNotebook (Interpreter me, MelderFile notebookFile, const bool fullTrust);
 
 void Interpreters_undangleEnvironment (Editor environment) noexcept;
-extern bool theUntitledScriptsTrustedInThisSession;
 
 void Melder_includeIncludeFiles (autostring32 *text, bool onlyInCodeChunks = false);
 integer Interpreter_readParameters (Interpreter me, mutablestring32 text);

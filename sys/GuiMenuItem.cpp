@@ -72,7 +72,37 @@ Thing_implement (GuiMenuItem, GuiThing, 0);
 				modifiers & _motif_SHIFT_MASK ? U"Shift+" : nullptr, keyString
 			);
 		}
-		ModifyMenu (my nat.entry.handle, my nat.entry.id, MF_BYCOMMAND | MF_STRING, my nat.entry.id, Melder_peek32toW (title.string));
+		if (my nat.entry.handle) {
+			int itemCount = GetMenuItemCount (my nat.entry.handle);
+			int targetPos = -1;
+			for (int i = 0; i < itemCount; i ++) {
+				MENUITEMINFOW info { };
+				info. cbSize = sizeof (MENUITEMINFOW);
+				info. fMask = MIIM_ID | MIIM_SUBMENU;
+				if (GetMenuItemInfoW (my nat.entry.handle, (UINT) i, TRUE, & info)) {
+					if (my widgetClass == xmCascadeButtonWidgetClass) {
+						if (info. hSubMenu && info. hSubMenu == (HMENU) my nat.entry.id) {
+							targetPos = i;
+							break;
+						}
+					} else if (info. wID == (UINT) my nat.entry.id) {
+						targetPos = i;
+						break;
+					}
+				}
+			}
+			if (targetPos >= 0) {
+				MENUITEMINFOW setInfo { };
+				setInfo. cbSize = sizeof (MENUITEMINFOW);
+				setInfo. fMask = MIIM_STRING;
+				setInfo. dwTypeData = const_cast <LPWSTR> (Melder_peek32toW (title.string));
+				SetMenuItemInfoW (my nat.entry.handle, (UINT) targetPos, TRUE, & setInfo);
+				return;
+			}
+		}
+		ModifyMenu (my nat.entry.handle, my nat.entry.id,
+			MF_BYCOMMAND | (my widgetClass == xmCascadeButtonWidgetClass ? MF_POPUP : MF_STRING),
+			my nat.entry.id, Melder_peek32toW (title.string));
 	}
 #endif
 
@@ -147,6 +177,29 @@ Thing_implement (GuiMenuItem, GuiThing, 0);
 	@end
 #endif
 
+static void makeNeatMenuTitle (MelderString *neatTitle, conststring32 translatedTitle) {
+	const integer titleLength = Melder_length (translatedTitle);
+	integer leadingSpaces = 0;
+	while (leadingSpaces < titleLength && translatedTitle [leadingSpaces] == U' ')
+		leadingSpaces ++;
+	const bool isHeader = titleLength > 0 &&
+		(translatedTitle [titleLength - 1] == U':' || translatedTitle [titleLength - 1] == U'\uff1a');
+	if (isHeader && ! Melder_startsWith (translatedTitle + leadingSpaces, U"\u25BC ")) {
+		/*
+			bikeshed choices
+		*/
+		[[maybe_unused]] constexpr conststring32 down_triangle  = U"\u25BC";   // a bit fat and therefore prominent
+		if (leadingSpaces > 0) {
+			MelderString_ncopy (neatTitle, translatedTitle, leadingSpaces);
+			MelderString_append (neatTitle, down_triangle, U" ", translatedTitle + leadingSpaces);
+		} else {
+			MelderString_copy (neatTitle, down_triangle, U" ", translatedTitle);
+		}
+	} else {
+		MelderString_copy (neatTitle, translatedTitle);
+	}
+}
+
 GuiMenuItem GuiMenu_addItem (GuiMenu menu, conststring32 title, uint32 flags,
 	GuiMenuItemCallback commandCallback, Thing boss)
 {
@@ -161,24 +214,7 @@ GuiMenuItem GuiMenu_addItem (GuiMenu menu, conststring32 title, uint32 flags,
 	uint32 accelerator = flags & 127;
 	Melder_assert (translatedTitle);
 	static MelderString neatTitle;
-	const integer titleLength = Melder_length (translatedTitle);
-	if (titleLength > 0 && translatedTitle [titleLength - 1] == U':') {
-		/*
-			bikeshed choices
-		*/
-		[[maybe_unused]] constexpr conststring32 down_triangle  = U"\u25BC";   // a bit fat and therefore prominent
-		[[maybe_unused]] constexpr conststring32 empty_triangle  = U"\u25BD";
-		[[maybe_unused]] constexpr conststring32 small_down_triangle  = U"\u25BE";   // too small
-		[[maybe_unused]] constexpr conststring32 lower_right_triangle  = U"\u25E2";   // Windows style
-		[[maybe_unused]] constexpr conststring32 down_arrowhead = U"\u2304";   // a bit low
-		[[maybe_unused]] constexpr conststring32 countersink = U"\u2335";
-		[[maybe_unused]] constexpr conststring32 canadian_syllabics_pe = U"\u142F";
-		[[maybe_unused]] constexpr conststring32 logical_or = U"\u2228";
-		MelderString_copy (& neatTitle, down_triangle, U" ", translatedTitle);
-		//neatTitle.string [neatTitle.length - 1] = U' ';
-	} else {
-		MelderString_copy (& neatTitle, translatedTitle);
-	}
+	makeNeatMenuTitle (& neatTitle, translatedTitle);
 	#if gtk
 		static GSList *group = nullptr;
 		if (toggle) {
@@ -464,15 +500,17 @@ void GuiMenuItem_check (GuiMenuItem me, bool check) {
 }
 
 void GuiMenuItem_setText (GuiMenuItem me, conststring32 text) {
-	text = praat_translate (text);
+	conststring32 translatedTitle = praat_translate (text);
+	static MelderString neatTitle;
+	makeNeatMenuTitle (& neatTitle, translatedTitle);
 	#if gtk
-		gtk_label_set_label (GTK_LABEL (gtk_bin_get_child (GTK_BIN (my d_widget))), Melder_peek32to8 (text));
+		gtk_label_set_label (GTK_LABEL (gtk_bin_get_child (GTK_BIN (my d_widget))), Melder_peek32to8 (neatTitle.string));
 	#elif motif
-		my d_widget -> name = Melder_dup (text);
+		my d_widget -> name = Melder_dup (neatTitle.string);
 		_GuiWinMenuItem_setText (my d_widget);
 	#elif cocoa
 		GuiCocoaMenuItem *item = (GuiCocoaMenuItem *) my d_widget;
-		[item   setTitle: (NSString *) Melder_peek32toCfstring (text)];
+		[item   setTitle: (NSString *) Melder_peek32toCfstring (neatTitle.string)];
 	#endif
 }
 

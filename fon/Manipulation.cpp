@@ -176,6 +176,7 @@ void Manipulation_playPart (Manipulation me, double tmin, double tmax, int metho
 				for (imax = played -> nx; imax >= 1; imax --)
 					if (amp [imax] != 0.0)
 						break;
+				Sound_setPlaybackSpeed (1.0);
 				Sound_playPart (played.get(), played -> x1 + (imin - 1.5) * played -> dx, played -> x1 + (imax - 0.5) * played -> dx, nullptr, nullptr);
 			} catch (MelderError) {
 				my sound = saved.move();
@@ -183,6 +184,7 @@ void Manipulation_playPart (Manipulation me, double tmin, double tmax, int metho
 			}
 		} else {
 			autoSound sound = Manipulation_to_Sound (me, method);
+			Sound_setPlaybackSpeed (1.0);
 			Sound_playPart (sound.get(), tmin, tmax, nullptr, nullptr);
 		}
 	} catch (MelderError) {

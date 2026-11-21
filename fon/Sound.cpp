@@ -35,16 +35,16 @@ Thing_implement (Sound, Vector, 2);
 
 void structSound :: v1_info () {
 	structDaata :: v1_info ();
-	MelderInfo_writeLine (U"通道数: ", our ny, our ny == 1 ? U" (单声道 mono)" : our ny == 2 ? U" (双声道 stereo)" : U"");
-	MelderInfo_writeLine (U"时域 (Time domain):");
-	MelderInfo_writeLine (U"   起点时间: ", our xmin, U" 秒 (seconds)");
-	MelderInfo_writeLine (U"   终点时间: ", our xmax, U" 秒 (seconds)");
-	MelderInfo_writeLine (U"   总时长: ", our xmax - our xmin, U" 秒 (seconds)");
-	MelderInfo_writeLine (U"时间采样 (Time sampling):");
-	MelderInfo_writeLine (U"   采样点数: ", our nx);
-	MelderInfo_writeLine (U"   采样周期: ", our dx, U" 秒 (seconds)");
-	MelderInfo_writeLine (U"   采样频率: ", Melder_single (1.0 / our dx), U" Hz");
-	MelderInfo_writeLine (U"   首个采样中心时间: ", our x1, U" 秒 (seconds)");
+	MelderInfo_writeLine (U"Number of channels: ", our ny, our ny == 1 ? U" (mono)" : our ny == 2 ? U" (stereo)" : U"");
+	MelderInfo_writeLine (U"Time domain:");
+	MelderInfo_writeLine (U"   Start time: ", our xmin, U" seconds");
+	MelderInfo_writeLine (U"   End time: ", our xmax, U" seconds");
+	MelderInfo_writeLine (U"   Total duration: ", our xmax - our xmin, U" seconds");
+	MelderInfo_writeLine (U"Time sampling:");
+	MelderInfo_writeLine (U"   Number of samples: ", our nx);
+	MelderInfo_writeLine (U"   Sampling period: ", our dx, U" seconds");
+	MelderInfo_writeLine (U"   Sampling frequency: ", Melder_single (1.0 / our dx), U" Hz");
+	MelderInfo_writeLine (U"   First sample centred at: ", our x1, U" seconds");
 	integer numberOfCells = our nx * our ny;
 	bool thereAreEnoughObservationsToComputeFirstOrderOverallStatistics = ( numberOfCells >= 1 );
 	if (thereAreEnoughObservationsToComputeFirstOrderOverallStatistics) {
@@ -62,22 +62,22 @@ void structSound :: v1_info () {
 					maximum_Pa = value_Pa;
 			}
 		}
-		MelderInfo_writeLine (U"振幅 (Amplitude):");
-		MelderInfo_writeLine (U"   最小值: ", Melder_single (minimum_Pa), U" 帕斯卡 (Pascal)");
-		MelderInfo_writeLine (U"   最大值: ", Melder_single (maximum_Pa), U" 帕斯卡 (Pascal)");
+		MelderInfo_writeLine (U"Amplitude:");
+		MelderInfo_writeLine (U"   Minimum: ", Melder_single (minimum_Pa), U" Pascal");
+		MelderInfo_writeLine (U"   Maximum: ", Melder_single (maximum_Pa), U" Pascal");
 		const double mean_Pa = (double) sum_Pa / numberOfCells;
-		MelderInfo_writeLine (U"   平均值: ", Melder_single (mean_Pa), U" 帕斯卡 (Pascal)");
+		MelderInfo_writeLine (U"   Mean: ", Melder_single (mean_Pa), U" Pascal");
 		const double meanSquare_Pa2 = (double) sumOfSquares_Pa2 / numberOfCells;
 		const double rootMeanSquare_Pa = sqrt (meanSquare_Pa2);
-		MelderInfo_writeLine (U"   均方根 (RMS): ", Melder_single (rootMeanSquare_Pa), U" 帕斯卡 (Pascal)");
+		MelderInfo_writeLine (U"   Root-mean-square: ", Melder_single (rootMeanSquare_Pa), U" Pascal");
 		const double energy_Pa2s = (double) sumOfSquares_Pa2 * our dx / our ny;   // Pa2 s = kg2 m-2 s-3
-		MelderInfo_write (U"总能量: ", Melder_single (energy_Pa2s), U" 帕斯卡\u00B2·秒 (Pascal\u00B2 sec)");
+		MelderInfo_write (U"Total energy: ", Melder_single (energy_Pa2s), U" Pascal\u00B2 sec");
 		const double rho_c = 400.0;   // rho = 1.14 kg m-3; c = 353 m s-1; [rho c] = kg m-2 s-1
 		const double energy_J_m2 = energy_Pa2s / rho_c;   // kg s-2 = Joule m-2
-		MelderInfo_writeLine (U" (空气中能量: ", Melder_single (energy_J_m2), U" 焦耳/平方米 Joule/m\u00B2)");
+		MelderInfo_writeLine (U" (energy in air: ", Melder_single (energy_J_m2), U" Joule/m\u00B2)");
 		const double physicalDuration_s = our dx * our nx;
 		const double power_W_m2 = energy_J_m2 / physicalDuration_s;   // kg s-3 = Watt/m2
-		MelderInfo_write (U"空气中平均功率 (声强): ", Melder_single (power_W_m2), U" 瓦特/平方米 (Watt/m\u00B2)");
+		MelderInfo_write (U"Mean power (intensity) in air: ", Melder_single (power_W_m2), U" Watt/m\u00B2");
 		if (power_W_m2 != 0.0) {
 			const double referencePower_W_m2 = 1.0e-12;   // this equals the square of 2.0e-5 Pa, divided by rho c
 			const double power_dB = 10.0 * log10 (power_W_m2 / referencePower_W_m2);
@@ -90,7 +90,7 @@ void structSound :: v1_info () {
 	if (thereAreEnoughObservationsToComputeSecondOrderChannelStatistics) {
 		for (integer channel = 1; channel <= our ny; channel ++) {
 			const double stdev = NUMstdev (our z [channel]);
-			MelderInfo_writeLine (U"通道 ", channel, U" 的标准差: ", Melder_single (stdev), U" 帕斯卡 (Pascal)");
+			MelderInfo_writeLine (U"Standard deviation in channel ", channel, U": ", Melder_single (stdev), U" Pascal");
 		}
 	}
 }

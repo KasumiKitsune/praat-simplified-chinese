@@ -313,6 +313,7 @@ static void playSound (ExperimentMFC me, Sound sound, Sound carrierBefore, Sound
 
 	if (my stimuliAreSounds && ! my blankWhilePlaying)
 		my startingTime = Melder_clock ();
+	Sound_setPlaybackSpeed (1.0);
 	Sound_playPart (my playBuffer.get(), 0.0, numberOfSamplesWritten * my samplePeriod, nullptr, nullptr);
 	if (my stimuliAreSounds && my blankWhilePlaying)
 		my startingTime = Melder_clock ();

@@ -43,9 +43,9 @@ Thing_implement (FunctionList, Ordered, 0);
 
 void structFunction :: v1_info () {
 	Function_Parent :: v1_info ();
-	MelderInfo_writeLine (U"时间与频率域 (Domain):");
-	MelderInfo_writeLine (U"   最小值 (xmin): ", xmin);
-	MelderInfo_writeLine (U"   最大值 (xmax): ", xmax);
+	MelderInfo_writeLine (U"Domain:");
+	MelderInfo_writeLine (U"   xmin: ", xmin);
+	MelderInfo_writeLine (U"   xmax: ", xmax);
 }
 
 void structFunction :: v_shiftX (double xfrom, double xto) {

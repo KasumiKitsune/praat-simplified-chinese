@@ -165,6 +165,36 @@ void GuiOptionMenu_addOption (GuiOptionMenu me, conststring32 text) {
 	#endif
 }
 
+void GuiOptionMenu_setOptionText (GuiOptionMenu me, int optionPosition, conststring32 text) {
+	text = praat_translate (text);
+	#if gtk
+		gtk_combo_box_text_remove (GTK_COMBO_BOX_TEXT (my d_widget), optionPosition - 1);
+		gtk_combo_box_text_insert_text (GTK_COMBO_BOX_TEXT (my d_widget), optionPosition - 1, Melder_peek32to8 (text));
+		if (my d_value == optionPosition)
+			gtk_combo_box_set_active (GTK_COMBO_BOX (my d_widget), optionPosition - 1);
+	#elif motif
+		if (optionPosition >= 1 && optionPosition <= my d_options.size) {
+			GuiMenuItem menuItem = my d_options.at [optionPosition];
+			menuItem -> d_widget -> name = Melder_dup_f (text);
+			if (menuItem -> d_widget -> nat.entry.handle) {
+				MENUITEMINFOW setInfo { };
+				setInfo. cbSize = sizeof (MENUITEMINFOW);
+				setInfo. fMask = MIIM_STRING;
+				setInfo. dwTypeData = const_cast <LPWSTR> (Melder_peek32toW (_GuiWin_expandAmpersands (text)));
+				SetMenuItemInfoW (menuItem -> d_widget -> nat.entry.handle, (UINT) menuItem -> d_widget -> nat.entry.id, FALSE, & setInfo);
+			}
+			if (GuiOptionMenu_getValue (me) == optionPosition && my d_xmCascadeButton) {
+				XtVaSetValues (my d_xmCascadeButton, XmNlabelString, Melder_peek32to8 (text), nullptr);
+			}
+		}
+	#elif cocoa
+		GuiCocoaOptionMenu *menu = (GuiCocoaOptionMenu *) my d_widget;
+		if (optionPosition >= 1 && optionPosition <= [menu numberOfItems]) {
+			[[menu itemAtIndex: optionPosition - 1] setTitle: [NSString stringWithUTF8String: Melder_peek32to8 (text)]];
+		}
+	#endif
+}
+
 int GuiOptionMenu_getValue (GuiOptionMenu me) {
 	my d_value = 0;
 	#if gtk

@@ -901,7 +901,7 @@ static _Graphics_widechar *theWidechar;
 static char32 *charCodes;
 static int initBuffer (conststring32 txt) {
 	try {
-		constexpr integer maximumNumberOfReplacementCharactersPerCharacter = 2;
+		constexpr integer maximumNumberOfReplacementCharactersPerCharacter = 3;
 		integer sizeNeeded = maximumNumberOfReplacementCharactersPerCharacter * Melder_length (txt) + 1;
 		if (sizeNeeded > bufferSize) {
 			sizeNeeded += sizeNeeded / 2 + 100;
@@ -1203,19 +1203,23 @@ static void drawOneCell (Graphics me, int xDC, int yDC, _Graphics_widechar lc []
 							while (end -> kar != U'\0') {
 								end ++;
 							}
-							for (_Graphics_widechar *shift = end; shift >= wrapLc; shift --) {
-								* (shift + 1) = * shift;
+							if (theWidechar && lc >= theWidechar && end < theWidechar + bufferSize - 1) {
+								for (_Graphics_widechar *shift = end; shift >= wrapLc; shift --) {
+									* (shift + 1) = * shift;
+								}
+								plc = wrapLc;
+								plc -> kar = U'\n';
+								plc -> code = U'\n';
+								plc -> karInfo = Longchar_getInfoFromNative (U'\n');
+								plc -> width = 0.0;
+								plc -> link = 0;
+								plc -> rightToLeft = 0;
+
+								lastlc = plc;
+								x = xDC + dx + my secondIndent * my scaleX;
+							} else {
+								plc = overflowLc;
 							}
-							plc = wrapLc;
-							plc -> kar = U'\n';
-							plc -> code = U'\n';
-							plc -> karInfo = Longchar_getInfoFromNative (U'\n');
-							plc -> width = 0.0;
-							plc -> link = 0;
-							plc -> rightToLeft = 0;
-							
-							lastlc = plc;
-							x = xDC + dx + my secondIndent * my scaleX;
 						} else {
 							// We are at the very beginning of the line, so we cannot wrap before this character.
 							// Let it draw on the current line.

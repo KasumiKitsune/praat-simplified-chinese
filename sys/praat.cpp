@@ -48,6 +48,7 @@
 #include "../kar/UnicodeData.h"
 #include "InfoEditor.h"
 #include "praat_translate.h"
+#include "GuiP.h"
 
 extern "C" char *sendpraat (void *display, const char *programName, long timeOut, const char *text);
 
@@ -124,9 +125,12 @@ static structMelderFile messageFile { };
 static GuiList praatList_objects;
 static GuiLabel praatLabel_objects;
 
+static void praat_quitDialog_languageChanged ();
+
 void praat_refreshObjectsWindowLanguage () {
 	if (praatLabel_objects)
 		GuiLabel_setText (praatLabel_objects, U"Objects:");
+	praat_quitDialog_languageChanged ();
 }
 
 /***** selection *****/
@@ -875,6 +879,24 @@ static int publishProc (autoDaata me) {
 static GuiDialog theQuitDialog;
 static GuiLabel theQuitLabel1;
 static GuiLabel theQuitLabel2;
+static GuiButton theQuitHelpButton;
+static GuiButton theQuitCancelButton;
+static GuiButton theQuitSaveButton;
+static GuiButton theQuitDirectButton;
+
+static void praat_quitDialog_languageChanged () {
+	if (! theQuitDialog)
+		return;
+	GuiShell_setTitle (theQuitDialog, praat_translate (U"Confirm Quit"));
+	if (theQuitHelpButton)
+		GuiButton_setText (theQuitHelpButton, praat_translate (U"Help"));
+	if (theQuitCancelButton)
+		GuiButton_setText (theQuitCancelButton, praat_translate (U"Cancel"));
+	if (theQuitSaveButton)
+		GuiButton_setText (theQuitSaveButton, praat_translate (U"Save Project (.praat)"));
+	if (theQuitDirectButton)
+		GuiButton_setText (theQuitDirectButton, praat_translate (g_language_choice == 0 ? U"Quit" : U"Quit Application"));
+}
 
 static void gui_dialog_cb_quitGoAway (Thing /* boss */) {
 	if (theQuitDialog)
@@ -897,28 +919,85 @@ static void gui_button_cb_directQuit (Thing /* boss */, GuiButtonEvent /* event 
 }
 
 static void gui_button_cb_saveProjectAndQuit (Thing /* boss */, GuiButtonEvent /* event */) {
-	autostring32 chosenPath = GuiFileSelect_getOutfileName (theCurrentPraatApplication -> topShell, praat_translate (U"Save workspace as .praat file"), U"workspace.praat");
-	if (! chosenPath || chosenPath [0] == U'\0')
-		return;
+	const bool youHaveObjectsInYourList = ( theCurrentPraatObjects && theCurrentPraatObjects -> n > 0 );
+	if (youHaveObjectsInYourList) {
+		GuiShell dialogParent = theQuitDialog ? static_cast <GuiShell> (theQuitDialog) : static_cast <GuiShell> (theCurrentPraatApplication -> topShell);
 
-	MelderString filePath;
-	MelderString_copy (& filePath, chosenPath.get());
-	if (! Melder_endsWith_caseAware (filePath.string, U".praat"))
-		MelderString_append (& filePath, U".praat");
-
-	try {
-		structMelderFile file;
-		Melder_pathToFile (filePath.string, & file);
-		autoCollection set = Collection_create ();
 		for (integer iobject = 1; iobject <= theCurrentPraatObjects -> n; iobject ++) {
 			Daata object = (Daata) theCurrentPraatObjects -> list [iobject]. object;
-			if (object)
-				set -> addItem_ref (object);
+			if (object && ! Data_canWriteBinary (object)) {
+				Melder_flushError (U"Cannot save workspace as .praat: object \"",
+					Thing_getName (object), U"\" (class ", Thing_className (object),
+					U") cannot be written to a binary file.");
+				return;
+			}
 		}
-		Data_writeToBinaryFile (set.get(), & file);
-	} catch (MelderError) {
-		Melder_flushError ();
-		return;
+
+		autostring32 chosenPath = GuiFileSelect_getOutfileName (
+			dialogParent,
+			praat_translate (U"Save workspace as .praat file"),
+			U"workspace.praat"
+		);
+		if (! chosenPath || chosenPath [0] == U'\0')
+			return;
+
+		autoMelderString filePath;
+		MelderString_copy (& filePath, chosenPath.get());
+		const bool appendedSuffix = ! Melder_endsWith_caseAware (filePath.string, U".praat");
+		if (appendedSuffix)
+			MelderString_append (& filePath, U".praat");
+
+		structMelderFile file { };
+		structMelderFile tempFile { };
+		try {
+			Melder_pathToFile (filePath.string, & file);
+			#if defined (_WIN32)
+				if (appendedSuffix && MelderFile_exists (& file)) {
+					HWND ownerHwnd = (dialogParent && dialogParent -> d_xmShell)
+						? dialogParent -> d_xmShell -> window
+						: nullptr;
+					autoMelderString prompt;
+					MelderString_copy (& prompt, praat_translate (U"File already exists:\n"), filePath.string,
+						praat_translate (U"\n\nDo you want to replace it?"));
+					int ans = MessageBoxW (ownerHwnd, Melder_peek32toW (prompt.string),
+						Melder_peek32toW (praat_translate (U"Confirm Save As")),
+						MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
+					if (ans != IDYES)
+						return;
+				}
+			#endif
+
+			autoMelderString tempPath;
+			MelderString_copy (& tempPath, filePath.string, U".tmp.", Melder_integer (
+				#if defined (_WIN32)
+					(integer) GetCurrentProcessId ()
+				#else
+					(integer) getpid ()
+				#endif
+			));
+			Melder_pathToFile (tempPath.string, & tempFile);
+
+			autoCollection set = Collection_create ();
+			for (integer iobject = 1; iobject <= theCurrentPraatObjects -> n; iobject ++) {
+				Daata object = (Daata) theCurrentPraatObjects -> list [iobject]. object;
+				if (object)
+					set -> addItem_ref (object);
+			}
+			Data_writeToBinaryFile (set.get(), & tempFile);
+
+			#if defined (_WIN32)
+				autostringW fromW = Melder_32toW_fileSystem (MelderFile_peekPath (& tempFile));
+				autostringW toW = Melder_32toW_fileSystem (MelderFile_peekPath (& file));
+				if (! MoveFileExW (fromW.get(), toW.get(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+					Melder_throw (U"Cannot replace target file ", & file, U".");
+			#else
+				MelderFile_moveAndOrRename (& tempFile, & file);
+			#endif
+		} catch (MelderError) {
+			MelderFile_delete (& tempFile);
+			Melder_flushError ();
+			return;
+		}
 	}
 
 	if (theQuitDialog)
@@ -938,11 +1017,11 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 
 	conststring32 line1Text;
 	if (youHaveObjectsInYourList && youHaveUnsavedScriptsOrNotebooks)
-		line1Text = praat_translate (U"You have objects in your list, and unsaved scripts or notebooks!");
+		line1Text = U"You have objects in your list, and unsaved scripts or notebooks!";
 	else if (youHaveUnsavedScriptsOrNotebooks)
-		line1Text = praat_translate (U"You have unsaved scripts or notebooks!");
+		line1Text = U"You have unsaved scripts or notebooks!";
 	else
-		line1Text = praat_translate (U"You have objects in your list!");
+		line1Text = U"You have objects in your list!";
 
 	char32 line2Text [200];
 	Melder_sprint (line2Text, 200, praat_translate (U"Do you still want to quit "), Melder_upperCaseAppName(), U"?");
@@ -972,7 +1051,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 
 		// Button 1: Help
 		const int helpWidth = 65;
-		GuiButton_createShown (theQuitDialog,
+		theQuitHelpButton = GuiButton_createShown (theQuitDialog,
 			Gui_LEFT_DIALOG_SPACING, Gui_LEFT_DIALOG_SPACING + helpWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Help", gui_button_cb_helpQuit, nullptr, 0);
@@ -986,25 +1065,26 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 		int x = dialogWidth - Gui_RIGHT_DIALOG_SPACING - quitWidth - spacing - saveWidth - spacing - cancelWidth;
 
 		// Button 2: Cancel
-		GuiButton_createShown (theQuitDialog,
+		theQuitCancelButton = GuiButton_createShown (theQuitDialog,
 			x, x + cancelWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Cancel", gui_button_cb_cancelQuit, nullptr, GuiButton_CANCEL);
 		x += cancelWidth + spacing;
 
 		// Button 3: Save Project (.praat)
-		GuiButton_createShown (theQuitDialog,
+		theQuitSaveButton = GuiButton_createShown (theQuitDialog,
 			x, x + saveWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Save Project (.praat)", gui_button_cb_saveProjectAndQuit, nullptr, 0);
 		x += saveWidth + spacing;
 
 		// Button 4: Quit
-		GuiButton_createShown (theQuitDialog,
+		theQuitDirectButton = GuiButton_createShown (theQuitDialog,
 			x, x + quitWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			(g_language_choice == 0 ? U"Quit" : U"Quit Application"), gui_button_cb_directQuit, nullptr, GuiButton_DEFAULT);
 	} else {
+		praat_quitDialog_languageChanged ();
 		GuiLabel_setText (theQuitLabel1, line1Text);
 		GuiLabel_setText (theQuitLabel2, line2Text);
 	}
@@ -2023,6 +2103,7 @@ void praat_init (conststring32 title,
 		Preferences_read_i (& prefsFile5);
 		Preferences_read_i (& prefsFile7);
 	}
+	g_melder_translate = (g_language_choice == 0 ? nullptr : praat_translate);
 
 	theCurrentPraatApplication -> batch = Melder_batch;
 

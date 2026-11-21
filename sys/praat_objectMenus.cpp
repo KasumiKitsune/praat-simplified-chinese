@@ -27,6 +27,7 @@
 #include "GraphicsP.h"
 #include "DemoEditor.h"
 #include "praat_translate.h"
+#include "Editor.h"
 #include "praat_python.h"
 #include "PythonScriptEditor.h"
 #include "PreferencesDialog.h"
@@ -313,6 +314,7 @@ DIRECT (PRAAT__BilingualTable) {
 static GuiMenu praatMenu, editMenu, windowMenu, newMenu, readMenu, goodiesMenu, preferencesMenu, technicalMenu, applicationHelpMenu, helpMenu;
 
 void praat_languageChanged () {
+	g_melder_translate = (g_language_choice == 0 ? nullptr : praat_translate);
 	if (praatMenu)           GuiMenu_setTitle (praatMenu,           U"Praat");
 	if (editMenu)            GuiMenu_setTitle (editMenu,            U"Edit");
 	if (windowMenu)          GuiMenu_setTitle (windowMenu,          U"Window");
@@ -322,14 +324,17 @@ void praat_languageChanged () {
 	if (applicationHelpMenu) GuiMenu_setTitle (applicationHelpMenu, U"Help");
 	praat_picture_languageChanged ();
 	praat_refreshObjectsWindowLanguage ();
+	PreferencesDialog_languageChanged ();
+	Editors_languageChanged ();
 	for (integer i = 1; i <= praat_getNumberOfMenuCommands (); i ++) {
 		Praat_Command command = praat_getMenuCommand (i);
 		if (! command || ! command -> button || ! command -> title || command -> title [0] == U'-')
 			continue;
+		conststring32 rawTitle = command -> script ? Melder_cat (U"\u207A", command -> title.get()) : command -> title.get();
 		if (Thing_isa (command -> button, classGuiMenuItem))
-			GuiMenuItem_setText ((GuiMenuItem) command -> button, command -> title.get());
+			GuiMenuItem_setText ((GuiMenuItem) command -> button, rawTitle);
 		else if (Thing_isa (command -> button, classGuiButton))
-			GuiButton_setText ((GuiButton) command -> button, command -> title.get());
+			GuiButton_setText ((GuiButton) command -> button, praat_translate (rawTitle));
 	}
 	praat_updateSelection ();
 }
@@ -984,12 +989,12 @@ void praat_show () {
 
 void praat_addFixedButtons (GuiWindow window) {
 	praat_addFixedButtonCommand (window, U"Rename...", MODIFY_Rename, 8, 70);
-	praat_addFixedButtonCommand (window, U"Copy...", NEW1_Copy, 98, 70);
+	praat_addFixedButtonCommand (window, U"Copy...", NEW1_Copy, 104, 70);
 	praat_addFixedButtonCommand (window, U"Inspect",
 			PRAAT__Inspect, 8, 40);
-	praat_addFixedButtonCommand (window, U"Info", INFO_Info, 98, 40);
+	praat_addFixedButtonCommand (window, U"Info", INFO_Info, 104, 40);
 	praat_addFixedButtonCommand (window, U"Remove", PRAAT_Remove, 8, 10);
-	praat_addFixedButtonCommand (window, U"Bilingual", PRAAT__BilingualTable, 98, 10);
+	praat_addFixedButtonCommand (window, U"Bilingual", PRAAT__BilingualTable, 104, 10);
 	praat_sensitivizeFixedButtonCommand (U"Bilingual", true);
 }
 

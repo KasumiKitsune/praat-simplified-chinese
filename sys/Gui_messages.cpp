@@ -383,7 +383,7 @@ static void gui_trust (void *void_interpreter, conststring32 action) {
 	if (interpreter) {
 		Script script = interpreter -> scriptReference;
 		Notebook notebook = interpreter -> notebookReference;
-		if (script && script -> trusted || notebook && notebook -> trusted || interpreter -> isTrusted || theUntitledScriptsTrustedInThisSession)
+		if (script && script -> trusted || notebook && notebook -> trusted || interpreter -> isTrusted)
 			return;   // the request should be granted
 		if (Melder_appVersion() < 7000)
 			return;   // no trust checking before Praat 7.0
@@ -444,8 +444,6 @@ static void gui_trust (void *void_interpreter, conststring32 action) {
 			script -> trusted = true;
 		else if (notebook)
 			notebook -> trusted = true;
-		else
-			theUntitledScriptsTrustedInThisSession = true;
 		interpreter -> isTrusted = true;
 	}
 }

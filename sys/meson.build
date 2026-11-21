@@ -16,8 +16,8 @@ sources = '''
 	machine.cpp
 	ManPage.cpp ManPages.cpp ManPages_toHtml.cpp Manual.cpp  motifEmulator.cpp
 	Notebook.cpp NotebookEditor.cpp
-	Picture.cpp praat.cpp praat_actions.cpp praat_library.cpp praat_logo.cpp praat_menuCommands.cpp praat_objectMenus.cpp praat_picture.cpp praat_script.cpp praat_statistics.cpp
-	Preferences.cpp Printer.cpp
+	Picture.cpp praat.cpp praat_actions.cpp praat_library.cpp praat_logo.cpp praat_menuCommands.cpp praat_objectMenus.cpp praat_picture.cpp praat_python.cpp praat_script.cpp praat_statistics.cpp
+	Preferences.cpp PreferencesDialog.cpp Printer.cpp PythonScriptEditor.cpp
 	ScriptEditor.cpp StringsEditor.cpp
 	Script.cpp Simple.cpp site.cpp Strings.cpp
 	TextEditor.cpp Thing.cpp
@@ -27,7 +27,7 @@ libsys = static_library (
 	'sys',
 	sources : sources,
 	dependencies : gtk_dep,
-	include_directories : [melder_inc, dwsys_inc]
+	include_directories : [melder_inc, dwsys_inc, stat_inc, fon_inc]
 )
 
 libsys_dep = declare_dependency (
