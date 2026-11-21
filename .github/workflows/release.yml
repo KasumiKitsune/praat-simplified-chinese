@@ -24,9 +24,9 @@ on:
         default: false
         type: boolean
       praat_upstream_tag:
-        description: "Upstream Praat tag used for the Xcode project, e.g. v7.0.03beta"
+        description: "Upstream Praat tag used for the Xcode project, e.g. v7.0.03"
         required: false
-        default: "v7.0.03beta"
+        default: "v7.0.03"
         type: string
       praat_version_digits:
         description: "Praat version digits used in upstream asset names, e.g. 7003"
@@ -163,6 +163,7 @@ jobs:
               ("sys/PythonScriptEditor.cpp", "sys/PythonScriptEditor.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "31"),
               ("sys/PreferencesDialog.cpp", "sys/PreferencesDialog.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "41"),
               ("dwtools/Corpus_extensions.cpp", "", "236DE6F1139EA59B00EC42BA", "236DE6F2139EA59B00EC42BA", "", "51"),
+              ("dwtools/TIMITCorpus.cpp", "dwtools/TIMITCorpus.h", "236DE6F1139EA59B00EC42BA", "236DE6F2139EA59B00EC42BA", "", "61"),
           ]
 
           for cpp_path, h_path, anchor_grp, anchor_src, anchor_hdr, pfx in files_to_add:
