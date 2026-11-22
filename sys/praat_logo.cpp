@@ -25,6 +25,8 @@
 #include "praat_zh_logo_data.h"
 
 #include <atomic>
+#include <cmath>
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <memory>
@@ -823,6 +825,14 @@ static VOID CALLBACK winUpdatePollTimerProc (HWND /* hwnd */, UINT /* msg */, UI
 		applyCompletedUpdateJob (job);
 	}
 }
+#elif defined (macintosh)
+static void macApplyUpdateJob (void *userData) {
+	auto *holder = static_cast <std::shared_ptr <UpdateCheckJob> *> (userData);
+	if (holder) {
+		applyCompletedUpdateJob (*holder);
+		delete holder;
+	}
+}
 #elif defined (UNIX) && gtk
 static gboolean gtkApplyUpdateJob (gpointer userData) {
 	auto *holder = static_cast <std::shared_ptr <UpdateCheckJob> *> (userData);
@@ -866,9 +876,7 @@ static void gui_chineseAbout_cb_checkUpdate (Thing /* boss */, GuiButtonEvent /*
 		}
 		job -> finished.store (true, std::memory_order_release);
 		#if defined (macintosh)
-			dispatch_async (dispatch_get_main_queue (), ^{
-				applyCompletedUpdateJob (job);
-			});
+			dispatch_async_f (dispatch_get_main_queue (), new std::shared_ptr <UpdateCheckJob> (job), macApplyUpdateJob);
 		#elif defined (UNIX) && gtk
 			g_idle_add (gtkApplyUpdateJob, new std::shared_ptr <UpdateCheckJob> (job));
 		#endif

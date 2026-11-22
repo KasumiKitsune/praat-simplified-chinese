@@ -97,7 +97,7 @@ jobs:
 
   build-macos:
     name: Build macOS universal
-    runs-on: macos-14
+    runs-on: macos-15
     if: ${{ inputs.build_macos }}
 
     steps:

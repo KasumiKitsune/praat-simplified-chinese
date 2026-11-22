@@ -31,6 +31,8 @@
 
 #include <errno.h>
 #include "SoundRecorder.h"
+#include <thread>
+#include <mutex>
 #include "Sound_and_Spectrum.h"
 #include "machine.h"
 #include "EditorM.h"
