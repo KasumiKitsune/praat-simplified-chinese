@@ -1181,8 +1181,9 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 
 	autoMelderString out;
 	if (me -> title && me -> title [0] != U'\0') {
-		MelderString_append (& out, me -> title.get(), U"\n");
-		for (integer i = 0; i < Melder_length (me -> title.get()); i ++)
+		conststring32 displayTitle = Melder_trManualParagraph (me -> title.get(), 0, me -> title.get());
+		MelderString_append (& out, displayTitle, U"\n");
+		for (integer i = 0; i < Melder_length (displayTitle); i ++)
 			MelderString_appendCharacter (& out, U'=');
 		MelderString_append (& out, U"\n\n");
 	}
@@ -1272,11 +1273,13 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 
 	if (manPages && pageNumber > 0 && ManPages_uniqueLinksHither (manPages, pageNumber)) {
 		MelderString_append (& out, U"\n========================================\n");
-		MelderString_append (& out, U"Links to this page:\n");
+		MelderString_append (& out, Melder_tr (U"Links to this page"), U":\n");
 		for (integer ilink = 1; ilink <= me -> linksHither.size; ilink ++) {
 			integer jlink = me -> linksHither [ilink];
 			ManPage linkPage = manPages -> pages.at [jlink];
-			MelderString_append (& out, U"  • ", linkPage -> title.get(), U"\n");
+			conststring32 rawTitle = linkPage -> title.get();
+			conststring32 displayTitle = Melder_trManualParagraph (rawTitle, 0, rawTitle);
+			MelderString_append (& out, U"  • ", displayTitle, U"\n");
 		}
 	}
 

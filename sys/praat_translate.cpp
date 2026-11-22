@@ -214,14 +214,25 @@ void parseManualsTsv (std::string_view payload) {
 		if (t3 == std::string_view::npos) continue;
 
 		std::u32string title = decodeUtf8AndUnescape (line.substr (0, t1));
-		int32_t parIdx = 0;
-		for (char c : line.substr (t1 + 1, t2 - t1 - 1)) {
-			if (c >= '0' && c <= '9')
-				parIdx = parIdx * 10 + (c - '0');
+		int32_t parIdx = -1;
+		std::string_view idxSv = line.substr (t1 + 1, t2 - t1 - 1);
+		if (! idxSv.empty()) {
+			int32_t val = 0;
+			bool ok = true;
+			for (char c : idxSv) {
+				if (c >= '0' && c <= '9')
+					val = val * 10 + (c - '0');
+				else {
+					ok = false;
+					break;
+				}
+			}
+			if (ok)
+				parIdx = val;
 		}
 		const uint64_t enHash = parseHex64 (line.substr (t2 + 1, t3 - t2 - 1));
 		std::u32string zh = decodeUtf8AndUnescape (line.substr (t3 + 1));
-		if (title.empty() || parIdx <= 0 || zh.empty())
+		if (title.empty() || parIdx < 0 || zh.empty())
 			continue;
 		g_manual_zh_CN.insert (title, parIdx, enHash, zh);
 		g_manual_zh_TW.insert (title, parIdx, enHash, convertS2TString (zh));
@@ -310,8 +321,8 @@ void initTablesOnce () noexcept {
 		g_ui_zh_CN.reserve (6500, 180000);
 		g_ui_zh_TW.reserve (6500, 180000);
 		g_alias_zh_to_en.reserve (9000, 200000);
-		g_manual_zh_CN.reserve (3400, 260000);
-		g_manual_zh_TW.reserve (3400, 260000);
+		g_manual_zh_CN.reserve (9500, 720000);
+		g_manual_zh_TW.reserve (9500, 720000);
 
 		// 1. Load curated aliases first so they win reverse-disambiguation priority
 		parseAliasesTsv (std::string_view (reinterpret_cast <const char*> (kPraatI18nAliasesTsv), kPraatI18nAliasesTsv_size));
@@ -580,7 +591,7 @@ const char32_t* Melder_trCtx (const char32_t* key, const char32_t* ctx) noexcept
 const char32_t* Melder_trManualParagraph (const char32_t* pageTitle, int64_t parIndex, const char32_t* enText) noexcept {
 	if (! enText || ! *enText || g_language_choice == 0)
 		return enText;
-	if (! pageTitle || ! *pageTitle || parIndex <= 0)
+	if (! pageTitle || ! *pageTitle || parIndex < 0)
 		return enText;
 	Melder_i18n_init ();
 

@@ -97,17 +97,23 @@ void structManual :: v_draw () {
 	if (our visiblePageNumber == SEARCH_PAGE) {
 		HyperPage_pageTitle (this, Melder_tr (U"Best matches"));
 		HyperPage_intro (this, Melder_tr (U"The best matches to your query seem to be:"));
+		autoMelderString link;
 		for (int i = 1; i <= our numberOfMatches; i ++) {
-			char32 link [300];
 			const ManPage page = our manPages() -> pages.at [matches [i]];
-			Melder_sprint (link,300, U"• @@", page -> title.get());
-			HyperPage_listItem (this, link);
+			conststring32 rawTitle = page -> title.get();
+			conststring32 displayTitle = Melder_trManualParagraph (rawTitle, 0, rawTitle);
+			MelderString_empty (& link);
+			if (displayTitle && displayTitle != rawTitle && ! str32equ (displayTitle, rawTitle))
+				MelderString_append (& link, U"• @@", rawTitle, U"|", displayTitle, U"@");
+			else
+				MelderString_append (& link, U"• @@", rawTitle, U"@");
+			HyperPage_listItem (this, link.string);
 		}
 		return;
 	}
 	const ManPage page = our manPages() -> pages.at [our visiblePageNumber];
 	conststring32 pageTitle = page -> title.get();
-	HyperPage_pageTitle (this, pageTitle);   // TODO: check appropriateness of file name
+	HyperPage_pageTitle (this, Melder_trManualParagraph (pageTitle, 0, pageTitle));   // TODO: check appropriateness of file name
 	integer chunkNumber = 0;
 	for (integer ipar = 1; ipar <= page -> paragraphs.size; ipar ++) {
 		ManPage_Paragraph paragraph = & page -> paragraphs [ipar];
@@ -166,17 +172,24 @@ void structManual :: v_draw () {
 					HyperPage_entry (this, Melder_tr (U"Links to this page"));
 			}
 		}
-		if (goAhead) for (ilink = 1; ilink <= page -> linksHither.size; ilink ++) {
-			const integer link = page -> linksHither [ilink];
-			bool alreadyShown = false;
-			for (jlink = 1; jlink <= page -> linksThither.size; jlink ++)
-				if (page -> linksThither [jlink] == link)
-					alreadyShown = true;
-			if (! alreadyShown) {
-				conststring32 title = our manPages() -> pages.at [page -> linksHither [ilink]] -> title.get();
-				char32 linkText [304];
-				Melder_sprint (linkText, 304, U"@@", title, U"@");
-				HyperPage_listItem (this, linkText);
+		if (goAhead) {
+			autoMelderString linkText;
+			for (ilink = 1; ilink <= page -> linksHither.size; ilink ++) {
+				const integer link = page -> linksHither [ilink];
+				bool alreadyShown = false;
+				for (jlink = 1; jlink <= page -> linksThither.size; jlink ++)
+					if (page -> linksThither [jlink] == link)
+						alreadyShown = true;
+				if (! alreadyShown) {
+					conststring32 title = our manPages() -> pages.at [page -> linksHither [ilink]] -> title.get();
+					conststring32 displayTitle = Melder_trManualParagraph (title, 0, title);
+					MelderString_empty (& linkText);
+					if (displayTitle && displayTitle != title && ! str32equ (displayTitle, title))
+						MelderString_append (& linkText, U"@@", title, U"|", displayTitle, U"@");
+					else
+						MelderString_append (& linkText, U"@@", title, U"@");
+					HyperPage_listItem (this, linkText.string);
+				}
 			}
 		}
 	}
@@ -258,16 +271,27 @@ static double searchToken (ManPages me, integer ipage, conststring32 token) {
 	if (! token [0])
 		return 1.0;
 	/*
-		Try to find a match in the title, case-insensitively.
+		Try to find a match in the title (English or translated), case-insensitively.
 	*/
 	static MelderString buffer;
-	MelderString_copy (& buffer, page -> title.get());
-	for (char32 *p = & buffer.string [0]; *p != U'\0'; p ++)
-		*p = Melder_toLowerCase (*p);
-	if (str32str (buffer.string, token)) {
-		goodness += 300.0;   // lots of points for a match in the title!
-		if (str32equ (buffer.string, token))
-			goodness += 10000.0;   // even more points for an exact match!
+	conststring32 titleCandidates [2] = { page -> title.get(), nullptr };
+	if (g_language_choice != 0) {
+		conststring32 trTitle = Melder_trManualParagraph (page -> title.get(), 0, page -> title.get());
+		if (trTitle && trTitle != page -> title.get())
+			titleCandidates [1] = trTitle;
+	}
+	for (int ic = 0; ic < 2; ic ++) {
+		if (! titleCandidates [ic])
+			continue;
+		MelderString_copy (& buffer, titleCandidates [ic]);
+		for (char32 *p = & buffer.string [0]; *p != U'\0'; p ++)
+			*p = Melder_toLowerCase (*p);
+		if (str32str (buffer.string, token)) {
+			goodness += 300.0;   // lots of points for a match in the title!
+			if (str32equ (buffer.string, token))
+				goodness += 10000.0;   // even more points for an exact match!
+			break;
+		}
 	}
 	/*
 		Try to find a match in the paragraphs, case-insensitively.
