@@ -1,15 +1,12 @@
 name: Build and release
 
 on:
-  push:
-    branches:
-      - v6.4.62-zh
   workflow_dispatch:
     inputs:
       target_tag:
         description: "Target release tag to append to"
         required: true
-        default: "v7.0-zh.4"
+        default: "v7.0-zh.6"
         type: string
 
 permissions:
@@ -117,6 +114,7 @@ jobs:
               ("sys/praat_translate.cpp", "sys/praat_translate.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "01"),
               ("sys/praat_python.cpp", "sys/praat_python.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "21"),
               ("sys/PythonScriptEditor.cpp", "sys/PythonScriptEditor.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "31"),
+              ("sys/PreferencesDialog.cpp", "sys/PreferencesDialog.h", "23E5CB0809A22901004E41D5", "23E5D0BD09A22A57004E41D5", "23E5D0BC09A22A57004E41D5", "41"),
           ]
 
           for cpp_path, h_path, anchor_grp, anchor_src, anchor_hdr, pfx in files_to_add:
@@ -245,13 +243,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TARGET_TAG: ${{ inputs.target_tag || 'v7.0-zh.4' }}
+          TARGET_TAG: ${{ inputs.target_tag || 'v7.0-zh.6' }}
         run: |
           python3 - <<'PY'
           import os, glob, subprocess
 
           gh_repo = os.environ["GH_REPO"]
-          target_tag = os.environ.get("TARGET_TAG", "v7.0-zh.4")
+          target_tag = os.environ.get("TARGET_TAG", "v7.0-zh.6")
 
           # 1. Verify release exists
           view_res = subprocess.run(["gh", "release", "view", target_tag, "--repo", gh_repo, "--json", "body", "-q", ".body"], capture_output=True, text=True)

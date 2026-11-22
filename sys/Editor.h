@@ -42,6 +42,7 @@ Thing_define (EditorCommand, Thing) {
 	DataGui sender;
 	EditorMenu menu;
 	autostring32 itemTitle;
+	int depth = 0;
 	GuiMenuItem itemWidget;
 	DataGuiCommandCallback commandCallback;
 	autostring32 script;
@@ -101,9 +102,12 @@ Thing_define (Editor, DataGui) {
 	virtual void v_createChildren () { }
 
 	virtual void v1_dataChanged (Editor /* sender */) { }
+	virtual void v_languageChanged ();
 
 	#include "Editor_prefs.h"
 };
+
+void Editors_languageChanged ();
 
 GuiMenuItem DataGuiMenu_addCommand (EditorMenu me, conststring32 itemTitle /* cattable */, uint32 flags,
 		DataGuiCommandCallback commandCallback, DataGui sender);

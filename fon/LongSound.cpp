@@ -90,23 +90,23 @@ void structLongSound :: v9_destroy () noexcept {
 
 void structLongSound :: v1_info () {
 	structDaata :: v1_info ();
-	static const conststring32 encodingStrings [1+22] = { U"无 none",
-		U"线性 8位有符号 linear 8 bit signed", U"线性 8位无符号 linear 8 bit unsigned",
-		U"线性 16位大端 linear 16 bit big-endian", U"线性 16位小端 linear 16 bit little-endian",
-		U"线性 24位大端 linear 24 bit big-endian", U"线性 24位小端 linear 24 bit little-endian",
-		U"线性 32位大端 linear 32 bit big-endian", U"线性 32位小端 linear 32 bit little-endian",
-		U"mu-law (\u03bc-law)", U"A-law", U"shorten", U"polyphone",
-		U"IEEE 浮点 32位大端 IEEE float 32 bit big-endian", U"IEEE 浮点 32位小端 IEEE float 32 bit little-endian",
-		U"IEEE 浮点 64位大端 IEEE float 64 bit big-endian", U"IEEE 浮点 64位小端 IEEE float 64 bit little-endian",
+	static const conststring32 encodingStrings [1+22] = { U"none",
+		U"linear 8 bit signed", U"linear 8 bit unsigned",
+		U"linear 16 bit big-endian", U"linear 16 bit little-endian",
+		U"linear 24 bit big-endian", U"linear 24 bit little-endian",
+		U"linear 32 bit big-endian", U"linear 32 bit little-endian",
+		U"mu-law", U"A-law", U"shorten", U"polyphone",
+		U"IEEE float 32 bit big-endian", U"IEEE float 32 bit little-endian",
+		U"IEEE float 64 bit big-endian", U"IEEE float 64 bit little-endian",
 		U"FLAC", U"FLAC", U"FLAC", U"MP3", U"MP3", U"MP3" };
-	MelderInfo_writeLine (U"时长: ", xmax - xmin, U" 秒 (seconds)");
-	MelderInfo_writeLine (U"文件名: ", MelderFile_peekPath (& file));
-	MelderInfo_writeLine (U"文件类型: ", audioFileType > Melder_NUMBER_OF_AUDIO_FILE_TYPES ? U"未知 (unknown)" : Melder_audioFileTypeString (audioFileType));
-	MelderInfo_writeLine (U"通道数: ", numberOfChannels);
-	MelderInfo_writeLine (U"编码格式: ", encoding > 20 ? U"未知 (unknown)" : encodingStrings [encoding]);
-	MelderInfo_writeLine (U"采样频率: ", sampleRate, U" Hz");
-	MelderInfo_writeLine (U"数据大小: ", nx, U" 采样点 (samples)");
-	MelderInfo_writeLine (U"音频数据起点: ", startOfData, U" 字节 (从文件开头算起)");
+	MelderInfo_writeLine (U"Duration: ", xmax - xmin, U" seconds");
+	MelderInfo_writeLine (U"File name: ", MelderFile_peekPath (& file));
+	MelderInfo_writeLine (U"File type: ", audioFileType > Melder_NUMBER_OF_AUDIO_FILE_TYPES ? U"unknown" : Melder_audioFileTypeString (audioFileType));
+	MelderInfo_writeLine (U"Number of channels: ", numberOfChannels);
+	MelderInfo_writeLine (U"Encoding: ", encoding > 20 ? U"unknown" : encodingStrings [encoding]);
+	MelderInfo_writeLine (U"Sampling frequency: ", sampleRate, U" Hz");
+	MelderInfo_writeLine (U"Size: ", nx, U" samples");
+	MelderInfo_writeLine (U"Start of sample data: ", startOfData, U" bytes from the start of the file");
 }
 
 static void _LongSound_FLAC_convertFloats (LongSound me, const int32 *const samples[], const integer bitsPerSample, const integer numberOfSamples) {
@@ -677,7 +677,25 @@ void LongSound_playPart (LongSound me, double startTime, double endTime, Sound_P
 			}
 			if (thy playCallback)
 				thy playCallback (thy playBoss, 1, startTime, endTime, startTime);
-			MelderAudio_play16 (resampledBuffer, newSampleRate, silenceBefore + newN + silenceAfter, my numberOfChannels, melderPlayCallback, thee);
+			if (fabs (thy speed - 1.0) > 0.01) {
+				integer stretchedN = 0;
+				autovector <int16> stretched = Sound_wsolaStretch (
+					resampledBuffer + silenceBefore * my numberOfChannels,
+					newN,
+					my numberOfChannels,
+					newSampleRate,
+					thy speed,
+					& stretchedN
+				);
+				Melder_free (thy resampledBuffer);
+				thy resampledBuffer = Melder_calloc (int16, (silenceBefore + stretchedN + silenceAfter) * my numberOfChannels);
+				memcpy (thy resampledBuffer + silenceBefore * my numberOfChannels,
+						stretched.asArgumentToFunctionThatExpectsZeroBasedArray(),
+						stretchedN * sizeof (int16) * my numberOfChannels);
+				MelderAudio_play16 (thy resampledBuffer, newSampleRate, silenceBefore + stretchedN + silenceAfter, my numberOfChannels, melderPlayCallback, thee);
+			} else {
+				MelderAudio_play16 (resampledBuffer, newSampleRate, silenceBefore + newN + silenceAfter, my numberOfChannels, melderPlayCallback, thee);
+			}
 		}
 		//Melder_free (thy resampledBuffer);   // cannot do that, because MelderAudio_play16 isn't necessarily synchronous
 	} catch (MelderError) {

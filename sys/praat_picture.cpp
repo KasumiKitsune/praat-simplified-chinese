@@ -1686,6 +1686,17 @@ GuiMenu praat_picture_resolveMenu (conststring32 menu) {
 		editMenu;   // default
 }
 
+void praat_picture_languageChanged () {
+	if (fileMenu)    GuiMenu_setTitle (fileMenu,    U"File");
+	if (editMenu)    GuiMenu_setTitle (editMenu,    U"Edit");
+	if (marginsMenu) GuiMenu_setTitle (marginsMenu, U"Margins");
+	if (worldMenu)   GuiMenu_setTitle (worldMenu,   U"World");
+	if (selectMenu)  GuiMenu_setTitle (selectMenu,  U"Select");
+	if (fontMenu)    GuiMenu_setTitle (fontMenu,    U"Font");
+	if (penMenu)     GuiMenu_setTitle (penMenu,     U"Pen");
+	if (helpMenu)    GuiMenu_setTitle (helpMenu,    U"Help");
+}
+
 void praat_picture_exit () {
 	praat_picture. reset();
 }

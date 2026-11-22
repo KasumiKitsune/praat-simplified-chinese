@@ -19,6 +19,7 @@
 #include "melder.h"
 
 /* global */ std::mutex theMelder_error_mutex;
+const char32* (*g_melder_translate) (const char32* text) = nullptr;
 
 static void defaultErrorProc (conststring32 message) {
 	MelderConsole::write (str32str (message, U"You interrupted ") ? U"User interrupt: " : U"Error: ", true);
@@ -100,7 +101,7 @@ void Melder_appendError_noLine (const MelderArg& arg) {
 	} else {
 		theMelder_error_threadId = Melder_thisThread_getUniqueID ();
 	}
-	MelderError__appendOneString (arg._arg);
+	MelderError__appendOneString (g_melder_translate ? g_melder_translate (arg._arg) : arg._arg);
 }
 
 void Melder_flushError () {

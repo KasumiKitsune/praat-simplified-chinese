@@ -11,6 +11,35 @@
 
 Thing_implement (PythonScriptEditor, TextEditor, 0);
 
+static CollectionOf <structPythonScriptEditor> theReferencesToAllOpenPythonScriptEditors;
+
+bool PythonScriptEditors_dirty () {
+	for (integer i = 1; i <= theReferencesToAllOpenPythonScriptEditors.size; i ++) {
+		const PythonScriptEditor me = theReferencesToAllOpenPythonScriptEditors.at [i];
+		if (my dirty)
+			return true;
+	}
+	return false;
+}
+
+void structPythonScriptEditor :: v9_destroy () noexcept {
+	theReferencesToAllOpenPythonScriptEditors. undangleItem (this);
+	PythonScriptEditor_Parent :: v9_destroy ();
+}
+
+static void replaceEditorTextWithTemplate (PythonScriptEditor me, conststring32 newText) {
+	if (! newText)
+		return;
+	if (my dirty) {
+		autoPythonScriptEditor other = PythonScriptEditor_createFromText (newText);
+		other.releaseToUser ();
+		return;
+	}
+	GuiText_setString (my textWidget, newText);
+	my dirty = false;
+	my v_nameChanged ();
+}
+
 static void menu_cb_run (PythonScriptEditor me, EDITOR_ARGS) {
 	try {
 		autostring32 text = GuiText_getString (my textWidget);
@@ -45,7 +74,7 @@ static void menu_cb_runSelection (PythonScriptEditor me, EDITOR_ARGS) {
 
 static void menu_cb_insertTemplate (PythonScriptEditor me, EDITOR_ARGS) {
 	autostring32 tmpl = praat_python_getScriptTemplate ();
-	GuiText_setString (my textWidget, tmpl.get());
+	replaceEditorTextWithTemplate (me, tmpl.get());
 }
 
 static void menu_cb_settings (PythonScriptEditor /* me */, EDITOR_ARGS) {
@@ -70,15 +99,15 @@ static void menu_cb_apiRef (PythonScriptEditor /* me */, EDITOR_ARGS) {
 }
 
 static void menu_cb_exampleBatch (PythonScriptEditor me, EDITOR_ARGS) {
-	GuiText_setString (my textWidget, praat_python_getExampleBatch ().get());
+	replaceEditorTextWithTemplate (me, praat_python_getExampleBatch ().get());
 }
 
 static void menu_cb_exampleTextGrid (PythonScriptEditor me, EDITOR_ARGS) {
-	GuiText_setString (my textWidget, praat_python_getExampleTextGrid ().get());
+	replaceEditorTextWithTemplate (me, praat_python_getExampleTextGrid ().get());
 }
 
 static void menu_cb_exampleSound (PythonScriptEditor me, EDITOR_ARGS) {
-	GuiText_setString (my textWidget, praat_python_getExampleSound ().get());
+	replaceEditorTextWithTemplate (me, praat_python_getExampleSound ().get());
 }
 
 static void menu_cb_copyAgentPrompt (PythonScriptEditor /* me */, EDITOR_ARGS) {
@@ -131,6 +160,7 @@ void structPythonScriptEditor :: v_createMenuItems_help (EditorMenu menu) {
 
 void PythonScriptEditor_init (PythonScriptEditor me, conststring32 initialText) {
 	TextEditor_init (me, initialText ? initialText : praat_python_getScriptTemplate().get());
+	theReferencesToAllOpenPythonScriptEditors. addItem_ref (me);
 }
 
 autoPythonScriptEditor PythonScriptEditor_createFromText (conststring32 initialText) {

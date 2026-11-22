@@ -27,6 +27,8 @@
 		Use sparingly, because it interrupts the user's workflow.
 */
 
+#include "melder_error.h"
+
 namespace MelderWarning {
 	extern int _depth;
 	extern MelderString _buffer;
@@ -39,7 +41,7 @@ template <typename... Arg>
 void Melder_warning (const Arg... arg) {
 	if (MelderWarning::_depth < 0)
 		return;
-	MelderString_copy (& MelderWarning::_buffer, arg...);
+	MelderString_copy (& MelderWarning::_buffer, Melder_translate (MelderArg { arg }. _arg)...);
 	(*MelderWarning::_p_currentProc) (MelderWarning::_buffer.string);
 }
 

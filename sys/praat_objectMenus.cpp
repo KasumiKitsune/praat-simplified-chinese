@@ -29,6 +29,7 @@
 #include "praat_translate.h"
 #include "praat_python.h"
 #include "PythonScriptEditor.h"
+#include "PreferencesDialog.h"
 
 #define EDITOR  theCurrentPraatObjects -> list [IOBJECT]. editors
 
@@ -227,6 +228,33 @@ DIRECT (WINDOW_openPictureWindow) {
 
 static GuiMenu praatMenu, editMenu, windowMenu, newMenu, readMenu, goodiesMenu, preferencesMenu, technicalMenu, applicationHelpMenu, helpMenu;
 
+void praat_languageChanged () {
+	g_melder_translate = (g_language_choice == 0 ? nullptr : praat_translate);
+	if (praatMenu)           GuiMenu_setTitle (praatMenu,           U"Praat");
+	if (editMenu)            GuiMenu_setTitle (editMenu,            U"Edit");
+	if (windowMenu)          GuiMenu_setTitle (windowMenu,          U"Window");
+	if (newMenu)             GuiMenu_setTitle (newMenu,             U"New");
+	if (readMenu)            GuiMenu_setTitle (readMenu,            U"Open");
+	if (helpMenu)            GuiMenu_setTitle (helpMenu,            U"Help");
+	if (applicationHelpMenu) GuiMenu_setTitle (applicationHelpMenu, U"Help");
+	praat_picture_languageChanged ();
+	praat_refreshObjectsWindowLanguage ();
+	PreferencesDialog_languageChanged ();
+	praat_chineseAbout_languageChanged ();
+	Editors_languageChanged ();
+	for (integer i = 1; i <= praat_getNumberOfMenuCommands (); i ++) {
+		Praat_Command command = praat_getMenuCommand (i);
+		if (! command || ! command -> button || ! command -> title || command -> title [0] == U'-')
+			continue;
+		conststring32 rawTitle = command -> script ? Melder_cat (U"\u207A", command -> title.get()) : command -> title.get();
+		if (Thing_isa (command -> button, classGuiMenuItem))
+			GuiMenuItem_setText ((GuiMenuItem) command -> button, rawTitle);
+		else if (Thing_isa (command -> button, classGuiButton))
+			GuiButton_setText ((GuiButton) command -> button, praat_translate (rawTitle));
+	}
+	praat_updateSelection ();
+}
+
 GuiMenu praat_objects_resolveMenu (conststring32 menu) {
 	return
 		str32equ (menu, U"Praat") || str32equ (menu, U"Control") ? praatMenu :
@@ -253,6 +281,12 @@ GuiMenu praat_objects_resolveMenu (conststring32 menu) {
 DIRECT (PRAAT__About) {
 	PRAAT
 		praat_showLogo ();
+	PRAAT_END
+}
+
+DIRECT (PRAAT__AboutChineseEdition) {
+	PRAAT
+		praat_showChineseAbout ();
 	PRAAT_END
 }
 
@@ -465,7 +499,10 @@ OK
 	SET_OPTION (language, g_language_choice + 1)
 DO
 	PREFS
-		g_language_choice = language - 1;
+		if (g_language_choice != language - 1) {
+			g_language_choice = language - 1;
+			praat_languageChanged ();
+		}
 	PREFS_END
 }
 
@@ -868,12 +905,13 @@ void praat_show () {
 
 void praat_addFixedButtons (GuiWindow window) {
 	praat_addFixedButtonCommand (window, U"Rename...", MODIFY_Rename, 8, 70);
-	praat_addFixedButtonCommand (window, U"Copy...", NEW1_Copy, 98, 70);
+	praat_addFixedButtonCommand (window, U"Copy...", NEW1_Copy, 104, 70);
 	praat_addFixedButtonCommand (window, U"Inspect",
 			PRAAT__Inspect, 8, 40);
-	praat_addFixedButtonCommand (window, U"Info", INFO_Info, 98, 40);
+	praat_addFixedButtonCommand (window, U"Info", INFO_Info, 104, 40);
 	praat_addFixedButtonCommand (window, U"Remove", PRAAT_Remove, 8, 10);
-	praat_addFixedButtonCommand (window, U"Bilingual", PRAAT__BilingualTable, 98, 10);
+	praat_addFixedButtonCommand (window, U"Bilingual", PRAAT__BilingualTable, 104, 10);
+	praat_sensitivizeFixedButtonCommand (U"Bilingual", true);
 }
 
 static void searchProc () {
@@ -993,6 +1031,8 @@ void praat_addMenus (GuiWindow window) {
 	MelderString_append (& itemTitle_about, U"About ", Melder_upperCaseAppName());
 	praat_addMenuCommand (U"Objects", U"Praat", itemTitle_about.string, nullptr, GuiMenu_UNHIDABLE,
 			PRAAT__About);
+	praat_addMenuCommand (U"Objects", U"Praat", U"About Chinese Edition...", nullptr, GuiMenu_UNHIDABLE | GuiMenu_NO_API,
+			PRAAT__AboutChineseEdition);
 	#ifdef macintosh
 		#if cocoa
 			/*
@@ -1059,17 +1099,18 @@ void praat_addMenus (GuiWindow window) {
 
 	menuItem = praat_addMenuCommand (U"Objects", U"Praat", U"Settings", nullptr, GuiMenu_UNHIDABLE, nullptr);
 	preferencesMenu = menuItem ? menuItem -> d_menu : nullptr;
+	praat_addMenuCommand (U"Objects", U"Settings", U"Preferences...",
+			nullptr, GuiMenu_UNHIDABLE, PRAAT_preferences);
 	praat_addMenuCommand (U"Objects", U"Settings", U"Buttons...",
 			nullptr, GuiMenu_UNHIDABLE, PRAAT__editButtons);
-	praat_addMenuCommand (U"Objects", U"Settings", U"-- encoding prefs --", nullptr, 0, nullptr);
 	praat_addMenuCommand (U"Objects", U"Settings", U"Text reading settings... || Text reading preferences...",
-			nullptr, 0, SETTINGS__TextReadingSettings);   // alternative GuiMenu_DEPRECATED_2023
+			nullptr, GuiMenu_HIDDEN, SETTINGS__TextReadingSettings);   // alternative GuiMenu_DEPRECATED_2023
 	praat_addMenuCommand (U"Objects", U"Settings", U"Text writing settings... || Text writing preferences...",
-			nullptr, 0, SETTINGS__TextWritingSettings);   // alternative GuiMenu_DEPRECATED_2023
+			nullptr, GuiMenu_HIDDEN, SETTINGS__TextWritingSettings);   // alternative GuiMenu_DEPRECATED_2023
 	praat_addMenuCommand (U"Objects", U"Settings", U"CJK font style settings... || CJK font style preferences...",
-			nullptr, 0, SETTINGS__CjkFontStyleSettings);   // alternative GuiMenu_DEPRECATED_2023
+			nullptr, GuiMenu_HIDDEN, SETTINGS__CjkFontStyleSettings);   // alternative GuiMenu_DEPRECATED_2023
 	praat_addMenuCommand (U"Objects", U"Settings", U"Language settings... || Language preferences...",
-			nullptr, 0, SETTINGS__LanguageSettings);
+			nullptr, GuiMenu_HIDDEN, SETTINGS__LanguageSettings);
 
 	menuItem = praat_addMenuCommand (U"Objects", U"Praat", U"Technical", nullptr, GuiMenu_UNHIDABLE, nullptr);
 	technicalMenu = menuItem ? menuItem -> d_menu : nullptr;
@@ -1128,10 +1169,10 @@ void praat_addMenus2 () {
 			nullptr, 'M' | GuiMenu_NO_API, PRAAT__SearchManual);
 	praat_addMenuCommand (U"Objects", U"ApplicationHelp", itemTitle_about.string,
 			nullptr, GuiMenu_UNHIDABLE, PRAAT__About);
+	praat_addMenuCommand (U"Objects", U"ApplicationHelp", U"About Chinese Edition...",
+			nullptr, GuiMenu_UNHIDABLE | GuiMenu_NO_API, PRAAT__AboutChineseEdition);
 
-	#if defined (macintosh)
-		Gui_setOpenDocumentCallback (cb_openDocument, cb_finishedOpeningDocuments);
-	#endif
+	Gui_setOpenDocumentCallback (cb_openDocument, cb_finishedOpeningDocuments);
 }
 
 /* End of file praat_objectMenus.cpp */

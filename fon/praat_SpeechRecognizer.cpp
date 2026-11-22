@@ -1,7 +1,287 @@
+/* praat_SpeechRecognizer.cpp
+ *
+ * Copyright (C) 2025 Anastasia Shchupak
+ *
+ * This code is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * This code is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this work. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "praat_SpeechRecognizer.h"
 #include "SpeechRecognizer.h"
 #include "praatM.h"
+#include "Gui.h"
+#if defined (_WIN32)
+	#include <windows.h>
+	#include <shellapi.h>
+#endif
 
+static bool is_foreign_source_accessible () {
+#if defined (_WIN32)
+	HMODULE hWinInet = LoadLibraryW (L"wininet.dll");
+	if (! hWinInet)
+		return false;
+
+	typedef void* HINTERNET_T;
+	typedef HINTERNET_T (WINAPI *pfnInternetOpenW)(LPCWSTR, DWORD, LPCWSTR, LPCWSTR, DWORD);
+	typedef BOOL (WINAPI *pfnInternetSetOptionW)(HINTERNET_T, DWORD, LPVOID, DWORD);
+	typedef HINTERNET_T (WINAPI *pfnInternetOpenUrlW)(HINTERNET_T, LPCWSTR, LPCWSTR, DWORD, DWORD, DWORD_PTR);
+	typedef BOOL (WINAPI *pfnInternetCloseHandle)(HINTERNET_T);
+
+	auto pInternetOpenW = (pfnInternetOpenW) GetProcAddress (hWinInet, "InternetOpenW");
+	auto pInternetSetOptionW = (pfnInternetSetOptionW) GetProcAddress (hWinInet, "InternetSetOptionW");
+	auto pInternetOpenUrlW = (pfnInternetOpenUrlW) GetProcAddress (hWinInet, "InternetOpenUrlW");
+	auto pInternetCloseHandle = (pfnInternetCloseHandle) GetProcAddress (hWinInet, "InternetCloseHandle");
+
+	bool accessible = false;
+	if (pInternetOpenW && pInternetOpenUrlW && pInternetCloseHandle) {
+		HINTERNET_T hSession = pInternetOpenW (L"PraatNetworkProbe", 0 /* INTERNET_OPEN_TYPE_PRECONFIG */, nullptr, nullptr, 0);
+		if (hSession) {
+			if (pInternetSetOptionW) {
+				DWORD timeout = 2500; // 2.5s
+				pInternetSetOptionW (hSession, 2 /* INTERNET_OPTION_CONNECT_TIMEOUT */, & timeout, sizeof (timeout));
+				pInternetSetOptionW (hSession, 5 /* INTERNET_OPTION_RECEIVE_TIMEOUT */, & timeout, sizeof (timeout));
+			}
+			HINTERNET_T hUrl = pInternetOpenUrlW (hSession, L"https://huggingface.co", nullptr, 0,
+				0x80000000 | 0x00800000 | 0x04000000, 0);
+			if (hUrl) {
+				accessible = true;
+				pInternetCloseHandle (hUrl);
+			}
+			pInternetCloseHandle (hSession);
+		}
+	}
+	FreeLibrary (hWinInet);
+	return accessible;
+#else
+	return true;
+#endif
+}
+
+static GuiDialog theWhisperGuideDialog = nullptr;
+static GuiLabel theWhisperHeaderLabel = nullptr;
+static GuiLabel theWhisperDesc1 = nullptr;
+static GuiLabel theWhisperDesc2 = nullptr;
+static GuiLabel theWhisperDesc3 = nullptr;
+static GuiButton theWhisperDownloadButton = nullptr;
+
+static void updateWhisperGuideUi () {
+	if (! theWhisperGuideDialog)
+		return;
+
+	constSTRVEC modelNames = theCurrentSpeechRecognizerModelNames ();
+	bool isZh = (g_language_choice != 0);
+
+	if (modelNames.size > 0) {
+		conststring32 headerText = isZh
+			? Melder_cat (U"已就绪：检测到 ", Melder_integer (modelNames.size), U" 个可用 Whisper 模型")
+			: Melder_cat (U"Ready: ", Melder_integer (modelNames.size), U" Whisper model(s) detected");
+		GuiLabel_setText (theWhisperHeaderLabel, headerText);
+
+		MelderString listStr;
+		for (integer i = 1; i <= modelNames.size; i ++) {
+			if (i > 1)
+				MelderString_append (& listStr, U",  ");
+			MelderString_append (& listStr, modelNames [i]);
+		}
+		conststring32 desc1Text = isZh
+			? Melder_cat (U"当前就绪模型：", listStr.string)
+			: Melder_cat (U"Available models: ", listStr.string);
+		GuiLabel_setText (theWhisperDesc1, desc1Text);
+
+		GuiLabel_setText (theWhisperDesc2, isZh
+			? U"语音识别功能已就绪！您可在对象列表创建 SpeechRecognizer，或在 TextGrid 窗口直接转写。"
+			: U"Speech recognition is ready! Create a SpeechRecognizer or transcribe from TextGrid window.");
+
+		GuiLabel_setText (theWhisperDesc3, isZh
+			? U"模型存放目录：软件同级 models\\whispercpp\\ 或用户偏好目录。可通过下方按钮继续下载其他模型。"
+			: U"Models location: models\\whispercpp\\ or preferences folder. Use buttons below to manage models.");
+
+		if (theWhisperDownloadButton) {
+			bool hasBase = false;
+			for (integer i = 1; i <= modelNames.size; i ++) {
+				if (str32str (modelNames [i], U"base")) {
+					hasBase = true;
+					break;
+				}
+			}
+			GuiButton_setText (theWhisperDownloadButton, hasBase
+				? (isZh ? U"重新下载 base 模型" : U"Re-download base model")
+				: (isZh ? U"下载 base 模型" : U"Download base model"));
+		}
+	} else {
+		GuiLabel_setText (theWhisperHeaderLabel, isZh
+			? U"未检测到 Whisper 语音识别模型 (.bin)"
+			: U"No Whisper speech recognition models found (.bin)");
+		GuiLabel_setText (theWhisperDesc1, isZh
+			? U"Praat 已内置 Whisper.cpp 语音识别引擎，但需要至少一个模型权重文件以执行转写。"
+			: U"Praat includes Whisper.cpp engine, but requires at least one model weight file.");
+		GuiLabel_setText (theWhisperDesc2, isZh
+			? U"推荐模型：ggml-base.bin（约 142 MB，速度与准确率平衡，支持中文等多语言识别）。"
+			: U"Recommended model: ggml-base.bin (~142 MB, good balance of speed and accuracy).");
+		GuiLabel_setText (theWhisperDesc3, isZh
+			? U"支持便携目录：可直接放置于 Praat 程序同级的 models\\whispercpp\\ 或用户偏好目录。"
+			: U"Place models in models\\whispercpp\\ or user preferences directory.");
+		if (theWhisperDownloadButton)
+			GuiButton_setText (theWhisperDownloadButton, isZh ? U"下载 base 模型" : U"Download base model");
+	}
+}
+
+static void gui_button_cb_whisperRefresh (Thing /* boss */, GuiButtonEvent /* event */) {
+	updateWhisperGuideUi ();
+}
+
+static void gui_dialog_cb_whisperGoAway (Thing /* boss */) {
+	if (theWhisperGuideDialog)
+		GuiThing_hide (theWhisperGuideDialog);
+}
+
+static void gui_button_cb_whisperOpenFolder (Thing /* boss */, GuiButtonEvent /* event */) {
+	conststring32 folder = thePrimaryWhisperModelsFolder ();
+	#if defined (_WIN32)
+	ShellExecuteW (nullptr, L"open", Melder_peek32toW (folder), nullptr, nullptr, SW_SHOWNORMAL);
+	#endif
+}
+
+static void gui_button_cb_whisperDownloadBase (Thing /* boss */, GuiButtonEvent /* event */) {
+	conststring32 folder = thePrimaryWhisperModelsFolder ();
+	#if defined (_WIN32)
+	ShellExecuteW (nullptr, L"open", Melder_peek32toW (folder), nullptr, nullptr, SW_SHOWNORMAL);
+	#endif
+
+	bool foreignAccessible = is_foreign_source_accessible ();
+	const wchar_t *url = foreignAccessible
+		? L"https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+		: L"https://hf-mirror.com/ggerganov/whisper.cpp/resolve/main/ggml-base.bin";
+
+	#if defined (_WIN32)
+	ShellExecuteW (nullptr, L"open", url, nullptr, nullptr, SW_SHOWNORMAL);
+	#endif
+
+	if (g_language_choice == 0) {
+		Melder_information (foreignAccessible ?
+			U"International network connection detected (official source). Downloading recommended model ggml-base.bin (~142 MB) using the default browser.\n\nThe target models folder has been opened for you. After the download finishes, place ggml-base.bin into that folder." :
+			U"No international network connection detected; switched to mirror source (HF-Mirror). Downloading recommended model ggml-base.bin (~142 MB) using the default browser.\n\nThe target models folder has been opened for you. After the download finishes, place ggml-base.bin into that folder."
+		);
+	} else {
+		Melder_information (foreignAccessible ?
+			praat_translate (U"已检测到国际网络连接正常（官方源），正在使用默认浏览器下载推荐模型 ggml-base.bin (约 142 MB)。\n\n已为您自动打开目标模型文件夹，待浏览器下载完成后，请将 ggml-base.bin 放入该文件夹即可。") :
+			praat_translate (U"未检测到国际网络连接，已自动切换为国内镜像源 (HF-Mirror)，正在使用默认浏览器下载推荐模型 ggml-base.bin (约 142 MB)。\n\n已为您自动打开目标模型文件夹，待浏览器下载完成后，请将 ggml-base.bin 放入该文件夹即可。")
+		);
+	}
+}
+
+static void gui_button_cb_whisperBrowseAll (Thing /* boss */, GuiButtonEvent /* event */) {
+	bool foreignAccessible = is_foreign_source_accessible ();
+	const wchar_t *url = foreignAccessible
+		? L"https://huggingface.co/ggerganov/whisper.cpp/tree/main"
+		: L"https://hf-mirror.com/ggerganov/whisper.cpp/tree/main";
+
+	#if defined (_WIN32)
+	ShellExecuteW (nullptr, L"open", url, nullptr, nullptr, SW_SHOWNORMAL);
+	#endif
+}
+
+static void gui_button_cb_whisperClose (Thing /* boss */, GuiButtonEvent /* event */) {
+	if (theWhisperGuideDialog)
+		GuiThing_hide (theWhisperGuideDialog);
+}
+
+void SpeechRecognizer_showModelGuideDialog () {
+	if (! theWhisperGuideDialog) {
+		const int dialogWidth = 640;
+		const int dialogHeight = 225;
+		bool isZh = (g_language_choice != 0);
+		theWhisperGuideDialog = GuiDialog_create (theCurrentPraatApplication -> topShell,
+			100, 70, dialogWidth, dialogHeight,
+			isZh ? U"Whisper 模型下载与配置向导" : U"Whisper Model Download & Setup Guide",
+			gui_dialog_cb_whisperGoAway, nullptr,
+			GuiDialog_Modality::MODAL);
+
+		int y = Gui_TOP_DIALOG_SPACING;
+		theWhisperHeaderLabel = GuiLabel_createShown (theWhisperGuideDialog,
+			Gui_LEFT_DIALOG_SPACING, dialogWidth - Gui_RIGHT_DIALOG_SPACING,
+			y, y + Gui_LABEL_HEIGHT,
+			U"", GuiLabel_BOLD);
+		y += Gui_LABEL_HEIGHT + 10;
+
+		theWhisperDesc1 = GuiLabel_createShown (theWhisperGuideDialog,
+			Gui_LEFT_DIALOG_SPACING, dialogWidth - Gui_RIGHT_DIALOG_SPACING,
+			y, y + Gui_LABEL_HEIGHT,
+			U"", 0);
+		y += Gui_LABEL_HEIGHT + 6;
+
+		theWhisperDesc2 = GuiLabel_createShown (theWhisperGuideDialog,
+			Gui_LEFT_DIALOG_SPACING, dialogWidth - Gui_RIGHT_DIALOG_SPACING,
+			y, y + Gui_LABEL_HEIGHT,
+			U"", 0);
+		y += Gui_LABEL_HEIGHT + 6;
+
+		theWhisperDesc3 = GuiLabel_createShown (theWhisperGuideDialog,
+			Gui_LEFT_DIALOG_SPACING, dialogWidth - Gui_RIGHT_DIALOG_SPACING,
+			y, y + Gui_LABEL_HEIGHT,
+			U"", 0);
+
+		const int buttonY = dialogHeight - Gui_BOTTOM_DIALOG_SPACING - Gui_PUSHBUTTON_HEIGHT;
+
+		// Button 1: Open Folder
+		int x = Gui_LEFT_DIALOG_SPACING;
+		const int w1 = 120;
+		GuiButton_createShown (theWhisperGuideDialog,
+			x, x + w1,
+			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			isZh ? U"打开模型文件夹" : U"Open Folder", gui_button_cb_whisperOpenFolder, nullptr, 0);
+		x += w1 + 8;
+
+		// Button 2: Refresh Status
+		const int w2 = 90;
+		GuiButton_createShown (theWhisperGuideDialog,
+			x, x + w2,
+			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			isZh ? U"刷新状态" : U"Refresh", gui_button_cb_whisperRefresh, nullptr, 0);
+		x += w2 + 8;
+
+		// Button 3: Download base model
+		const int w3 = 155;
+		theWhisperDownloadButton = GuiButton_createShown (theWhisperGuideDialog,
+			x, x + w3,
+			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			isZh ? U"下载 base 模型" : U"Download base model", gui_button_cb_whisperDownloadBase, nullptr, GuiButton_DEFAULT);
+		x += w3 + 8;
+
+		// Button 4: Browse all models
+		const int w4 = 130;
+		GuiButton_createShown (theWhisperGuideDialog,
+			x, x + w4,
+			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			isZh ? U"浏览所有模型..." : U"All Models...", gui_button_cb_whisperBrowseAll, nullptr, 0);
+
+		// Button 5: Close
+		const int w5 = 75;
+		int x5 = dialogWidth - Gui_RIGHT_DIALOG_SPACING - w5;
+		GuiButton_createShown (theWhisperGuideDialog,
+			x5, x5 + w5,
+			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			isZh ? U"关闭" : U"Close", gui_button_cb_whisperClose, nullptr, GuiButton_CANCEL);
+	}
+
+	updateWhisperGuideUi ();
+	GuiThing_show (theWhisperGuideDialog);
+}
+
+DIRECT (DOWNLOAD__SpeechRecognizer_downloadGuide) {
+	SpeechRecognizer_showModelGuideDialog ();
+END_NO_NEW_DATA
+}
 
 DIRECT (HELP__SpeechRecognizer_help) {
 	HELP (U"SpeechRecognizer")
@@ -14,10 +294,15 @@ OK
 	static autoSTRVEC modelNames;
 	modelNames = copy_STRVEC (theCurrentSpeechRecognizerModelNames());   // cannot be called twice in the same scope
 
-	Melder_require (modelNames.size > 0,
-		U"Found no Whisper-cpp models to do speech recognition with.\n"
-		U"You can install them into the subfolders “whispercpp” of the folder “models” in the Praat preferences folder."
-	);
+	if (modelNames.size == 0) {
+		SpeechRecognizer_showModelGuideDialog ();
+		Melder_throw (g_language_choice == 0
+			? U"No Whisper speech recognition model detected.\nThe model download & setup guide has been opened. You can also place ggml-*.bin models directly into the models/whispercpp folder next to the executable."
+			: praat_translate (
+				U"未检测到 Whisper 语音识别模型。\n"
+				U"已为您打开模型下载与配置向导，您也可以直接将 ggml-*.bin 模型放置于软件同级目录的 models/whispercpp 文件夹中。"
+			));
+	}
 
 	SET_LIST (modelIndex, modelName, modelNames.get(), NUMfindFirst (modelNames.get(), theSpeechRecognizerDefaultModelName))
 	SET_LIST (languageIndex, languageName, theSpeechRecognizerLanguageNames(),
@@ -57,6 +342,8 @@ void praat_SpeechRecognizer_init () {
 		praat_addMenuCommand (U"Objects", U"New", U"-- new SpeechRecognizer --", nullptr, 1, nullptr);
 		praat_addMenuCommand (U"Objects", U"New", U"Create SpeechRecognizer...", nullptr, 1,
 				CREATE_ONE__SpeechRecognizer_create);
+		praat_addMenuCommand (U"Objects", U"New", U"Download Whisper models...", nullptr, 1,
+				DOWNLOAD__SpeechRecognizer_downloadGuide);
 
 	praat_addAction1 (classSpeechRecognizer, 0, U"SpeechRecognizer help", nullptr, 0,
 			HELP__SpeechRecognizer_help);

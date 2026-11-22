@@ -114,6 +114,7 @@ FORM (PLAY_LongSound_playPart, U"LongSound: Play part", nullptr) {
 	OK
 DO
 	PLAY_EACH (LongSound)
+		Sound_setPlaybackSpeed (1.0);
 		LongSound_playPart (me, fromTime, toTime, nullptr, nullptr);
 	PLAY_EACH_END
 }
@@ -1314,14 +1315,29 @@ static void praat_sound_playSplitCallback (GuiButton me, void *nativeHandle, int
 			if (s_soundIsPlaying && s_soundPlayPtr) {
 				Sound snd = s_soundPlayPtr;
 				double curT = s_soundCurrentTime;
-				s_soundIsReplaying = true;
-				MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
-				s_soundIsReplaying = false;
-				s_soundPlayPtr = snd;
-				s_soundCurrentTime = curT;
-				s_soundIsPlaying = true;
-				updatePlayButtonUi (curT, s_soundTotalDuration, 1);
-				Sound_playPart (snd, curT, snd -> xmax, praat_sound_playCallback, nullptr);
+				integer i1 = 0, i2 = 0;
+				const bool hasSamples = (curT < snd -> xmax) &&
+					(Matrix_getWindowSamplesX (snd, curT, snd -> xmax, & i1, & i2) >= 1);
+				if (! hasSamples) {
+					s_soundIsReplaying = false;
+					s_soundIsPlaying = false;
+					s_soundIsPaused = false;
+					s_soundPausedTime = 0.0;
+					s_soundCurrentTime = 0.0;
+					s_soundPlayPtr = nullptr;
+					s_soundPlayId = 0;
+					MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
+					updatePlayButtonUi (0.0, 0.0, 0);
+				} else {
+					s_soundIsReplaying = true;
+					MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
+					s_soundIsReplaying = false;
+					s_soundPlayPtr = snd;
+					s_soundCurrentTime = curT;
+					s_soundIsPlaying = true;
+					updatePlayButtonUi (curT, s_soundTotalDuration, 1);
+					Sound_playPart (snd, curT, snd -> xmax, praat_sound_playCallback, nullptr);
+				}
 			}
 		}
 	#else
@@ -1345,6 +1361,11 @@ void praat_sound_updatePlayButtonIfActive () {
 		if (praat_numberOfSelected (classSound) == 1 && praat_idOfSelected (classSound, 1) == s_soundPlayId) {
 			updatePlayButtonUi (s_soundCurrentTime, s_soundTotalDuration, s_soundIsPlaying ? 1 : 2);
 		} else {
+			if (s_soundIsPlaying && MelderAudio_isPlaying) {
+				s_soundIsReplaying = true;
+				MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
+				s_soundIsReplaying = false;
+			}
 			s_soundIsPaused = false;
 			s_soundIsPlaying = false;
 			s_soundPausedTime = 0.0;
@@ -1356,7 +1377,7 @@ void praat_sound_updatePlayButtonIfActive () {
 }
 
 DIRECT (PLAY_EACH__Sound_play) {
-	if (MelderAudio_isPlaying) {
+	if (s_soundIsPlaying && MelderAudio_isPlaying) {
 		// Currently playing -> pause!
 		s_soundIsPaused = true;
 		s_soundIsPlaying = false;
@@ -2548,12 +2569,11 @@ void praat_Sound_init () {
 	praat_addMenuCommand (U"Objects", U"Goodies", U"-- sound goodies --", nullptr, 0, nullptr);
 	praat_addMenuCommand (U"Objects", U"Goodies", U"Stop playing sound", nullptr, GuiMenu_ESCAPE,
 			PLAY__stopPlayingSound);
-	praat_addMenuCommand (U"Objects", U"Settings", U"-- sound settings --", nullptr, 0, nullptr);
-	praat_addMenuCommand (U"Objects", U"Settings", U"Sound recording settings... || Sound recording preferences...", nullptr, 0,
+	praat_addMenuCommand (U"Objects", U"Settings", U"Sound recording settings... || Sound recording preferences...", nullptr, GuiMenu_HIDDEN,
 			SETTINGS__SoundRecordingSettings);   // alternative GuiMenu_DEPRECATED_2023
-	praat_addMenuCommand (U"Objects", U"Settings", U"Sound playing settings... || Sound playing preferences...", nullptr, 0,
+	praat_addMenuCommand (U"Objects", U"Settings", U"Sound playing settings... || Sound playing preferences...", nullptr, GuiMenu_HIDDEN,
 			SETTINGS__SoundPlayingSettings);   // alternative GuiMenu_DEPRECATED_2023
-	praat_addMenuCommand (U"Objects", U"Settings", U"LongSound settings... || LongSound preferences...", nullptr, 0,
+	praat_addMenuCommand (U"Objects", U"Settings", U"LongSound settings... || LongSound preferences...", nullptr, GuiMenu_HIDDEN,
 			SETTINGS__LongSoundSettings);   // alternative GuiMenu_DEPRECATED_2023
 #ifdef HAVE_PULSEAUDIO
 	praat_addMenuCommand (U"Objects", U"Technical", U"Report sound server properties", U"Report system properties", 0,

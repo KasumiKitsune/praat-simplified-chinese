@@ -98,6 +98,8 @@ struct WhisperTranscription {
 */
 constSTRVEC theCurrentSpeechRecognizerModelNames ();
 constSTRVEC theSpeechRecognizerLanguageNames ();
+conststring32 thePrimaryWhisperModelsFolder ();
+void SpeechRecognizer_showModelGuideDialog ();
 
 /*
 	Default model parameters.

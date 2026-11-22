@@ -107,7 +107,7 @@ extern const char * ipaSerifRegularPS [];
 			wcscpy (logFont. lfFaceName, L"Doulos SIL");
 			EnumFontFamiliesExW (my d_gdiGraphicsContext, & logFont, fontFuncEx_doulos, 0, 0);
 			ipaInited = true;
-			if (! hasCharis && ! hasDoulos) {
+			if (! hasCharis && ! hasDoulos &&0) {
 				/* BUG: The next warning may cause reentry of drawing (on window exposure) and lead to crash. Some code must be non-reentrant !! */
 				Melder_warning (U"The phonetic font is not available.\n"
 					"Several characters may not look correct.\n"
@@ -901,7 +901,7 @@ static _Graphics_widechar *theWidechar;
 static char32 *charCodes;
 static int initBuffer (conststring32 txt) {
 	try {
-		constexpr integer maximumNumberOfReplacementCharactersPerCharacter = 2;
+		constexpr integer maximumNumberOfReplacementCharactersPerCharacter = 3;
 		integer sizeNeeded = maximumNumberOfReplacementCharactersPerCharacter * Melder_length (txt) + 1;
 		if (sizeNeeded > bufferSize) {
 			sizeNeeded += sizeNeeded / 2 + 100;
@@ -1194,25 +1194,32 @@ static void drawOneCell (Graphics me, int xDC, int yDC, _Graphics_widechar lc []
 						// Hopeless situation: no spaces. For CJK/Chinese text, wrap at character level.
 						_Graphics_widechar *wrapLc = overflowLc;
 						_Graphics_widechar *boundary = ( lastlc == lc ? lastlc : lastlc + 1 );
+						// Avoid breaking inside a hyperlink if possible
+						while (wrapLc > boundary && wrapLc -> link)
+							wrapLc --;
 						if (wrapLc > boundary) {
 							// Shift elements right by 1 to make room for U'\n'
 							_Graphics_widechar *end = wrapLc;
 							while (end -> kar != U'\0') {
 								end ++;
 							}
-							for (_Graphics_widechar *shift = end; shift >= wrapLc; shift --) {
-								* (shift + 1) = * shift;
+							if (theWidechar && lc >= theWidechar && end < theWidechar + bufferSize - 1) {
+								for (_Graphics_widechar *shift = end; shift >= wrapLc; shift --) {
+									* (shift + 1) = * shift;
+								}
+								plc = wrapLc;
+								plc -> kar = U'\n';
+								plc -> code = U'\n';
+								plc -> karInfo = Longchar_getInfoFromNative (U'\n');
+								plc -> width = 0.0;
+								plc -> link = 0;
+								plc -> rightToLeft = 0;
+
+								lastlc = plc;
+								x = xDC + dx + my secondIndent * my scaleX;
+							} else {
+								plc = overflowLc;
 							}
-							plc = wrapLc;
-							plc -> kar = U'\n';
-							plc -> code = U'\n';
-							plc -> karInfo = Longchar_getInfoFromNative (U'\n');
-							plc -> width = 0.0;
-							plc -> link = 0;
-							plc -> rightToLeft = 0;
-							
-							lastlc = plc;
-							x = xDC + dx + my secondIndent * my scaleX;
 						} else {
 							// We are at the very beginning of the line, so we cannot wrap before this character.
 							// Let it draw on the current line.

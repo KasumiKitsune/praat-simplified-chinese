@@ -56,6 +56,11 @@ void Melder_appendError_noLine (const MelderArg& arg1);
 	which is wrong.
 */
 
+extern const char32* (*g_melder_translate) (const char32* text);
+inline const char32* Melder_translate (const char32* text) {
+	return g_melder_translate ? g_melder_translate (text) : text;
+}
+
 void MelderError__appendOneString (conststring32 message);
 
 template <typename... Arg>
@@ -68,7 +73,7 @@ void Melder_appendError (const Arg... arg) {
 		theMelder_error_threadId = Melder_thisThread_getUniqueID ();
 	}
 	(// fold
-		MelderError__appendOneString (MelderArg { arg }. _arg)
+		MelderError__appendOneString (Melder_translate (MelderArg { arg }. _arg))
 				, ...
 	);
 	MelderError__appendOneString (U"\n");

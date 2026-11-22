@@ -110,10 +110,13 @@ Thing_define (SoundRecorder, Editor) {
 	const PaDeviceInfo *deviceInfos [1+SoundRecorder_IDEVICE_MAX];
 	PaDeviceIndex deviceIndices [1+SoundRecorder_IDEVICE_MAX];
 	std::mutex portAudioMutex;
+	std::mutex monitorMutex;
 	std::thread portaudioInitThread;
 	PaStream *portaudioStream;
 	short monitorBuffer [2048 * 2];
 	integer monitorSamples;
+	double lastMeterUpdateTime = 0.0;
+	bool isBeingDestroyed = false;
 	char32 lastDurationText [64];
 	bool lastSensRecording;
 	bool lastSensHasTakes;

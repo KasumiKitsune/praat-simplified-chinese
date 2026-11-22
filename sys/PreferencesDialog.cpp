@@ -1,0 +1,631 @@
+/* PreferencesDialog.cpp
+ *
+ * Copyright (C) 1992-2026 Paul Boersma, KasumiKitsune
+ *
+ * This code is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * This code is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this work. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "PreferencesDialog.h"
+#include <vector>
+#include "GuiP.h"
+#include "praatP.h"
+#include "praatM.h"
+#include "ButtonEditor.h"
+#include "GraphicsP.h"
+#include "praat_translate.h"
+#include "melder_audio.h"
+#include "MelderThread.h"
+extern "C" void PRAAT__editButtons (UiForm, integer, Stackel, conststring32, Interpreter, conststring32, bool, void *, Editor);
+
+/* Forward declarations for subsystem preferences */
+integer SoundRecorder_getBufferSizePref_MB ();
+void SoundRecorder_setBufferSizePref_MB (integer bufferSize);
+
+integer LongSound_getBufferSizePref_seconds ();
+void LongSound_setBufferSizePref_seconds (integer maxViewable);
+
+Thing_define (PreferencesDialog, Thing) {
+	GuiDialog dialog;
+	GuiList categoryList;
+	integer currentPanel;
+	std::vector <GuiControl> panelControls [5]; // 1-indexed: panels 1 to 4
+
+	// Panel 1: General & Language
+	GuiOptionMenu languageMenu;
+	GuiOptionMenu cjkFontStyleMenu;
+	GuiButton openButtonEditorButton;
+
+	// Panel 2: Sound & Audio
+	GuiText recordingBufferSizeText;
+	GuiOptionMenu inputSoundSystemMenu;
+	GuiOptionMenu inputSoundDeviceMenu;
+	GuiOptionMenu outputSoundSystemMenu;
+	GuiOptionMenu maximumAsynchronicityMenu;
+	GuiText silenceBeforeText;
+	GuiText silenceAfterText;
+	GuiText longSoundMaxViewablePartText;
+
+	// Panel 3: Text & Encoding
+	GuiOptionMenu textInputEncodingMenu;
+	GuiOptionMenu textOutputEncodingMenu;
+
+	// Panel 4: Advanced & Multithreading
+	GuiCheckButton useMultithreadingCheck;
+	GuiText maxThreadsText;
+	GuiText minElementsText;
+	GuiCheckButton traceThreadsCheck;
+	GuiCheckButton tracingCheck;
+	GuiText debugOptionText;
+
+	// Bottom action buttons
+	GuiButton restoreDefaultsButton;
+	GuiButton applyButton;
+	GuiButton cancelButton;
+	GuiButton okButton;
+
+	struct LocalizedOption {
+		GuiOptionMenu menu;
+		int position;
+		conststring32 key;
+	};
+	std::vector <std::pair <GuiLabel, conststring32>> localizedLabels;
+	std::vector <std::pair <GuiCheckButton, conststring32>> localizedCheckButtons;
+	std::vector <std::pair <GuiButton, conststring32>> localizedButtons;
+	std::vector <LocalizedOption> localizedOptions;
+};
+
+Thing_implement (PreferencesDialog, Thing, 0);
+
+static PreferencesDialog thePreferencesDialogInstance = nullptr;
+
+static void PreferencesDialog_close (PreferencesDialog me);
+static bool PreferencesDialog_apply (PreferencesDialog me);
+static void PreferencesDialog_restoreDefaults (PreferencesDialog me);
+static void PreferencesDialog_loadValues (PreferencesDialog me);
+
+static void PreferencesDialog_showPanel (PreferencesDialog me, integer panelIndex) {
+	if (panelIndex < 1 || panelIndex > 4)
+		return;
+	for (integer ipanel = 1; ipanel <= 4; ipanel ++) {
+		if (ipanel != panelIndex) {
+			for (GuiControl control : my panelControls [ipanel])
+				GuiThing_hide (control);
+		}
+	}
+	for (GuiControl control : my panelControls [panelIndex])
+		GuiThing_show (control);
+	my currentPanel = panelIndex;
+
+	#if motif
+		if (my dialog && my dialog -> d_widget && my dialog -> d_widget -> window) {
+			RECT r { 215, 10, 715, 450 };
+			RedrawWindow ((HWND) my dialog -> d_widget -> window, & r, NULL,
+				RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+		}
+	#elif gtk
+		if (my dialog && my dialog -> d_widget) {
+			gtk_widget_queue_draw (GTK_WIDGET (my dialog -> d_widget));
+		}
+	#elif cocoa
+		if (my dialog && my dialog -> d_widget) {
+			[(NSView *) my dialog -> d_widget setNeedsDisplay: YES];
+		}
+	#endif
+}
+
+static void gui_categoryList_cb_selectionChanged (Thing boss, GuiList_SelectionChangedEvent event) {
+	PreferencesDialog me = (PreferencesDialog) boss;
+	autoINTVEC selected = GuiList_getSelectedPositions (event -> list);
+	if (selected.size > 0 && selected [1] >= 1 && selected [1] <= 4) {
+		PreferencesDialog_showPanel (me, selected [1]);
+	}
+}
+
+static void gui_button_cb_openButtonEditor (Thing /* boss */, GuiButtonEvent /* event */) {
+	PRAAT__editButtons (nullptr, 0, nullptr, nullptr, nullptr, nullptr, false, nullptr, nullptr);
+}
+
+static void gui_button_cb_restoreDefaults (Thing boss, GuiButtonEvent /* event */) {
+	PreferencesDialog me = (PreferencesDialog) boss;
+	PreferencesDialog_restoreDefaults (me);
+}
+
+static void gui_button_cb_apply (Thing boss, GuiButtonEvent /* event */) {
+	PreferencesDialog me = (PreferencesDialog) boss;
+	PreferencesDialog_apply (me);
+}
+
+static void gui_button_cb_cancel (Thing boss, GuiButtonEvent /* event */) {
+	PreferencesDialog me = (PreferencesDialog) boss;
+	PreferencesDialog_close (me);
+}
+
+static void gui_button_cb_ok (Thing boss, GuiButtonEvent /* event */) {
+	PreferencesDialog me = (PreferencesDialog) boss;
+	if (PreferencesDialog_apply (me)) {
+		PreferencesDialog_close (me);
+	}
+}
+
+static void gui_preferences_dialog_cb_close (Thing boss) {
+	PreferencesDialog me = (PreferencesDialog) boss;
+	PreferencesDialog_close (me);
+}
+
+static void PreferencesDialog_close (PreferencesDialog me) {
+	if (my dialog) {
+		GuiThing_hide (my dialog);
+	}
+}
+
+static void PreferencesDialog_loadValues (PreferencesDialog me) {
+	// Panel 1: General & Language
+	GuiOptionMenu_setValue (my languageMenu, g_language_choice + 1);
+	GuiOptionMenu_setValue (my cjkFontStyleMenu, (int) theGraphicsCjkFontStyle - (int) kGraphics_cjkFontStyle::MIN + 1);
+
+	// Panel 2: Sound & Audio
+	GuiText_setString (my recordingBufferSizeText, Melder_integer (SoundRecorder_getBufferSizePref_MB ()));
+	GuiOptionMenu_setValue (my inputSoundSystemMenu, (int) MelderAudio_getInputSoundSystem () - (int) kMelder_inputSoundSystem::MIN + 1);
+	{
+		conststring32 curDevName = MelderAudio_getInputDeviceName ();
+		int selectedOption = 1; // 1 = "System default"
+		if (curDevName && curDevName [0] != U'\0') {
+			MelderAudio_DeviceList devList = { 0 };
+			MelderAudio_getInputDeviceList (& devList);
+			for (integer i = 0; i < devList. count; i ++) {
+				if (Melder_equ (curDevName, devList. names [i]. get())) {
+					selectedOption = (int) i + 2;
+					break;
+				}
+			}
+		}
+		GuiOptionMenu_setValue (my inputSoundDeviceMenu, selectedOption);
+	}
+	GuiOptionMenu_setValue (my outputSoundSystemMenu, (int) MelderAudio_getOutputSoundSystem () - (int) kMelder_outputSoundSystem::MIN + 1);
+	GuiOptionMenu_setValue (my maximumAsynchronicityMenu, (int) MelderAudio_getOutputMaximumAsynchronicity () - (int) kMelder_asynchronicityLevel::MIN + 1);
+	GuiText_setString (my silenceBeforeText, Melder_double (MelderAudio_getOutputSilenceBefore ()));
+	GuiText_setString (my silenceAfterText, Melder_double (MelderAudio_getOutputSilenceAfter ()));
+	GuiText_setString (my longSoundMaxViewablePartText, Melder_integer (LongSound_getBufferSizePref_seconds ()));
+
+	// Panel 3: Text & Encoding
+	GuiOptionMenu_setValue (my textInputEncodingMenu, (int) Melder_getInputEncoding () - (int) kMelder_textInputEncoding::MIN + 1);
+	GuiOptionMenu_setValue (my textOutputEncodingMenu, (int) Melder_getOutputEncoding () - (int) kMelder_textOutputEncoding::MIN + 1);
+
+	// Panel 4: Advanced & Multithreading
+	GuiCheckButton_setValue (my useMultithreadingCheck, MelderThread_getUseMultithreading ());
+	GuiText_setString (my maxThreadsText, Melder_integer (MelderThread_getMaximumNumberOfConcurrentThreads ()));
+	GuiText_setString (my minElementsText, Melder_integer (MelderThread_getMinimumNumberOfElementsPerThread ()));
+	GuiCheckButton_setValue (my traceThreadsCheck, MelderThread_getTraceThreads ());
+	GuiCheckButton_setValue (my tracingCheck, Melder_isTracingGlobally);
+	GuiText_setString (my debugOptionText, Melder_integer (Melder_debug));
+}
+
+static void PreferencesDialog_restoreDefaults (PreferencesDialog me) {
+	// Panel 1: General & Language
+	GuiOptionMenu_setValue (my languageMenu, 2); // Simplified Chinese
+	GuiOptionMenu_setValue (my cjkFontStyleMenu, (int) kGraphics_cjkFontStyle::DEFAULT - (int) kGraphics_cjkFontStyle::MIN + 1);
+
+	// Panel 2: Sound & Audio
+	GuiText_setString (my recordingBufferSizeText, U"60");
+	GuiOptionMenu_setValue (my inputSoundSystemMenu, (int) kMelder_inputSoundSystem::DEFAULT - (int) kMelder_inputSoundSystem::MIN + 1);
+	GuiOptionMenu_setValue (my inputSoundDeviceMenu, 1);
+	GuiOptionMenu_setValue (my outputSoundSystemMenu, (int) kMelder_outputSoundSystem::DEFAULT - (int) kMelder_outputSoundSystem::MIN + 1);
+	GuiOptionMenu_setValue (my maximumAsynchronicityMenu, (int) kMelder_asynchronicityLevel::DEFAULT - (int) kMelder_asynchronicityLevel::MIN + 1);
+	GuiText_setString (my silenceBeforeText, Melder_double (kMelderAudio_outputSilenceBefore_DEFAULT));
+	GuiText_setString (my silenceAfterText, Melder_double (kMelderAudio_outputSilenceAfter_DEFAULT));
+	GuiText_setString (my longSoundMaxViewablePartText, U"60");
+
+	// Panel 3: Text & Encoding
+	GuiOptionMenu_setValue (my textInputEncodingMenu, (int) kMelder_textInputEncoding::DEFAULT - (int) kMelder_textInputEncoding::MIN + 1);
+	GuiOptionMenu_setValue (my textOutputEncodingMenu, (int) kMelder_textOutputEncoding::DEFAULT - (int) kMelder_textOutputEncoding::MIN + 1);
+
+	// Panel 4: Advanced & Multithreading
+	GuiCheckButton_setValue (my useMultithreadingCheck, true);
+	GuiText_setString (my maxThreadsText, U"0");
+	GuiText_setString (my minElementsText, U"0");
+	GuiCheckButton_setValue (my traceThreadsCheck, false);
+	GuiCheckButton_setValue (my tracingCheck, false);
+	GuiText_setString (my debugOptionText, U"0");
+}
+
+static bool PreferencesDialog_apply (PreferencesDialog me) {
+	try {
+		// 1. Language & Fonts
+		int langVal = GuiOptionMenu_getValue (my languageMenu);
+		int newLang = (langVal >= 1 && langVal <= 3) ? (langVal - 1) : 1;
+		bool langChanged = (g_language_choice != newLang);
+		g_language_choice = newLang;
+
+		int cjkVal = GuiOptionMenu_getValue (my cjkFontStyleMenu);
+		theGraphicsCjkFontStyle = (kGraphics_cjkFontStyle) (cjkVal - 1 + (int) kGraphics_cjkFontStyle::MIN);
+
+		// 2. Sound & Audio
+		autostring32 recBufStr = GuiText_getString (my recordingBufferSizeText);
+		integer recBuf = Melder_atoi (recBufStr.get());
+		if (recBuf <= 0)
+			Melder_throw (U"Recording buffer size must be a positive integer.");
+		if (recBuf > 1000)
+			Melder_throw (U"Recording buffer size cannot exceed 1000 megabytes.");
+		SoundRecorder_setBufferSizePref_MB (recBuf);
+
+		int inSysVal = GuiOptionMenu_getValue (my inputSoundSystemMenu);
+		MelderAudio_setInputSoundSystem ((kMelder_inputSoundSystem) (inSysVal - 1 + (int) kMelder_inputSoundSystem::MIN));
+
+		int inDevChoice = GuiOptionMenu_getValue (my inputSoundDeviceMenu);
+		if (inDevChoice <= 1) {
+			MelderAudio_setInputDeviceName (U"");
+		} else {
+			MelderAudio_DeviceList devList = { 0 };
+			MelderAudio_getInputDeviceList (& devList);
+			int devIndex = inDevChoice - 2;
+			if (devIndex >= 0 && devIndex < devList. count) {
+				MelderAudio_setInputDeviceName (devList. names [devIndex]. get());
+			} else {
+				MelderAudio_setInputDeviceName (U"");
+			}
+		}
+
+		int outSysVal = GuiOptionMenu_getValue (my outputSoundSystemMenu);
+		MelderAudio_setOutputSoundSystem ((kMelder_outputSoundSystem) (outSysVal - 1 + (int) kMelder_outputSoundSystem::MIN));
+
+		int asyncVal = GuiOptionMenu_getValue (my maximumAsynchronicityMenu);
+		MelderAudio_setOutputMaximumAsynchronicity ((kMelder_asynchronicityLevel) (asyncVal - 1 + (int) kMelder_asynchronicityLevel::MIN));
+
+		autostring32 sbStr = GuiText_getString (my silenceBeforeText);
+		double sb = Melder_atof (sbStr.get());
+		MelderAudio_setOutputSilenceBefore (sb);
+
+		autostring32 saStr = GuiText_getString (my silenceAfterText);
+		double sa = Melder_atof (saStr.get());
+		MelderAudio_setOutputSilenceAfter (sa);
+
+		autostring32 lsStr = GuiText_getString (my longSoundMaxViewablePartText);
+		integer ls = Melder_atoi (lsStr.get());
+		if (ls <= 0)
+			Melder_throw (U"LongSound maximum viewable part must be positive.");
+		LongSound_setBufferSizePref_seconds (ls);
+
+		// 3. Text & Encoding
+		int inEncVal = GuiOptionMenu_getValue (my textInputEncodingMenu);
+		Melder_setInputEncoding ((kMelder_textInputEncoding) (inEncVal - 1 + (int) kMelder_textInputEncoding::MIN));
+
+		int outEncVal = GuiOptionMenu_getValue (my textOutputEncodingMenu);
+		Melder_setOutputEncoding ((kMelder_textOutputEncoding) (outEncVal - 1 + (int) kMelder_textOutputEncoding::MIN));
+
+		// 4. Advanced & Multithreading
+		bool useMt = GuiCheckButton_getValue (my useMultithreadingCheck);
+		autostring32 maxThStr = GuiText_getString (my maxThreadsText);
+		integer maxTh = Melder_atoi (maxThStr.get());
+		autostring32 minElStr = GuiText_getString (my minElementsText);
+		integer minEl = Melder_atoi (minElStr.get());
+		bool traceTh = GuiCheckButton_getValue (my traceThreadsCheck);
+		MelderThread_debugMultithreading (useMt, maxTh, minEl, traceTh);
+
+		bool traceGlob = GuiCheckButton_getValue (my tracingCheck);
+		Melder_setTracing (traceGlob);
+		autostring32 dbgStr = GuiText_getString (my debugOptionText);
+		integer dbg = Melder_atoi (dbgStr.get());
+		Melder_debug = dbg;
+
+		if (langChanged) {
+			praat_languageChanged ();
+		}
+
+		return true;
+	} catch (MelderError) {
+		Melder_flushError (U"Preferences could not be completely saved.");
+		return false;
+	}
+}
+
+#define ADD_PANEL_CONTROL(panelIndex, control) \
+	my panelControls [panelIndex].push_back (control)
+
+void PreferencesDialog_languageChanged () {
+	PreferencesDialog me = thePreferencesDialogInstance;
+	if (! me || ! my dialog)
+		return;
+	GuiShell_setTitle (my dialog, praat_translate (U"Preferences"));
+	if (my categoryList) {
+		autoINTVEC selected = GuiList_getSelectedPositions (my categoryList);
+		const conststring32 catKeys [4] = {
+			U"General & Language",
+			U"Sound Recording & Playback",
+			U"Text & Encoding",
+			U"Advanced & Multi-threading"
+		};
+		for (int i = 0; i < 4; i ++)
+			GuiList_replaceItem (my categoryList, praat_translate (catKeys [i]), i + 1);
+		if (selected.size > 0 && selected [1] >= 1 && selected [1] <= 4)
+			GuiList_selectItem (my categoryList, selected [1]);
+	}
+	for (const auto& entry : my localizedLabels) {
+		if (entry.first && entry.second)
+			GuiLabel_setText (entry.first, entry.second);
+	}
+	for (const auto& entry : my localizedCheckButtons) {
+		if (entry.first && entry.second)
+			GuiCheckButton_setText (entry.first, entry.second);
+	}
+	for (const auto& entry : my localizedButtons) {
+		if (entry.first && entry.second)
+			GuiButton_setText (entry.first, praat_translate (entry.second));
+	}
+	for (const auto& opt : my localizedOptions) {
+		if (opt.menu && opt.key)
+			GuiOptionMenu_setOptionText (opt.menu, opt.position, opt.key);
+	}
+}
+
+void PRAAT_preferencesDialog (GuiWindow parentWindow) {
+	if (thePreferencesDialogInstance) {
+		PreferencesDialog_loadValues (thePreferencesDialogInstance);
+		GuiThing_show (thePreferencesDialogInstance -> dialog);
+		return;
+	}
+
+	autoPreferencesDialog me = Thing_new (PreferencesDialog);
+
+	const int dialogWidth = 720;
+	const int dialogHeight = 500;
+
+	double screenX, screenY, screenWidth, screenHeight;
+	Gui_getWindowPositioningBounds (& screenX, & screenY, & screenWidth, & screenHeight);
+	const int dialogX = Melder_iround (screenX + (screenWidth - dialogWidth) / 2.0);
+	const int dialogY = Melder_iround (screenY + (screenHeight - dialogHeight) / 2.0);
+
+	my dialog = GuiDialog_create (parentWindow, dialogX, dialogY, dialogWidth, dialogHeight,
+			U"Preferences", gui_preferences_dialog_cb_close, me.get(), GuiDialog_Modality::MODELESS);
+
+	GuiForm form = my dialog;
+
+	auto addLabel = [&] (int panelIndex, int left, int right, int top, int bottom, conststring32 key, uint32 flags) -> GuiLabel {
+		GuiLabel lbl = GuiLabel_createShown (form, left, right, top, bottom, key, flags);
+		if (panelIndex > 0)
+			ADD_PANEL_CONTROL (panelIndex, lbl);
+		my localizedLabels.push_back ({ lbl, key });
+		return lbl;
+	};
+	auto addCheck = [&] (int panelIndex, int left, int right, int top, int bottom, conststring32 key) -> GuiCheckButton {
+		GuiCheckButton chk = GuiCheckButton_createShown (form, left, right, top, bottom, key, nullptr, nullptr, 0);
+		if (panelIndex > 0)
+			ADD_PANEL_CONTROL (panelIndex, chk);
+		my localizedCheckButtons.push_back ({ chk, key });
+		return chk;
+	};
+	auto addButton = [&] (int panelIndex, int left, int right, int top, int bottom, conststring32 key, GuiButton_ActivateCallback cb, uint32 flags) -> GuiButton {
+		GuiButton btn = GuiButton_createShown (form, left, right, top, bottom, key, cb, me.get(), flags);
+		if (panelIndex > 0)
+			ADD_PANEL_CONTROL (panelIndex, btn);
+		my localizedButtons.push_back ({ btn, key });
+		return btn;
+	};
+	auto addOption = [&] (GuiOptionMenu menu, int pos, conststring32 key) {
+		GuiOptionMenu_addOption (menu, key);
+		my localizedOptions.push_back ({ menu, pos, key });
+	};
+
+	/*
+	 * 1. Left Sidebar: Category List
+	 */
+	my categoryList = GuiList_create (form, 16, 210, 16, 440, false, nullptr);
+	GuiList_insertItem (my categoryList, praat_translate (U"General & Language"), 1);
+	GuiList_insertItem (my categoryList, praat_translate (U"Sound Recording & Playback"), 2);
+	GuiList_insertItem (my categoryList, praat_translate (U"Text & Encoding"), 3);
+	GuiList_insertItem (my categoryList, praat_translate (U"Advanced & Multi-threading"), 4);
+	GuiList_setSelectionChangedCallback (my categoryList, gui_categoryList_cb_selectionChanged, me.get());
+	GuiThing_show (my categoryList);
+
+	const int labelX1 = 230, labelX2 = 420;
+	const int fieldX1 = 430, fieldX2 = 700;
+	const int fullX1 = 230, fullX2 = 700;
+
+	/*
+	 * 2. Panel 1: General & Language
+	 */
+	{
+		int y = 20;
+		addLabel (1, fullX1, fullX2, y, y + 20, U"Interface & Fonts", GuiLabel_BOLD);
+		y += 30;
+
+		addLabel (1, labelX1, labelX2, y, y + 20, U"Interface language:", GuiLabel_RIGHT);
+		my languageMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		GuiOptionMenu_addOption (my languageMenu, U"English");
+		GuiOptionMenu_addOption (my languageMenu, U"简体中文 (Simplified Chinese)");
+		GuiOptionMenu_addOption (my languageMenu, U"繁体中文 (Traditional Chinese)");
+		ADD_PANEL_CONTROL (1, my languageMenu);
+		y += 32;
+
+		addLabel (1, labelX1, labelX2, y, y + 20, U"CJK font style:", GuiLabel_RIGHT);
+		my cjkFontStyleMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		for (int i = (int) kGraphics_cjkFontStyle::MIN; i <= (int) kGraphics_cjkFontStyle::MAX; i ++)
+			addOption (my cjkFontStyleMenu, i - (int) kGraphics_cjkFontStyle::MIN + 1, kGraphics_cjkFontStyle_getText ((kGraphics_cjkFontStyle) i));
+		ADD_PANEL_CONTROL (1, my cjkFontStyleMenu);
+		y += 44;
+
+		addLabel (1, fullX1, fullX2, y, y + 20, U"Shortcuts & Customization", GuiLabel_BOLD);
+		y += 30;
+
+		my openButtonEditorButton = addButton (1, fullX1, fullX1 + 220, y, y + Gui_PUSHBUTTON_HEIGHT,
+				U"Open Buttons Editor...", gui_button_cb_openButtonEditor, 0);
+		y += 34;
+		addLabel (1, fullX1, fullX2, y, y + 20, U"(Customize menu commands and action buttons)", 0);
+	}
+
+	/*
+	 * 3. Panel 2: Sound & Audio
+	 */
+	{
+		int y = 20;
+		addLabel (2, fullX1, fullX2, y, y + 20, U"Sound Recording", GuiLabel_BOLD);
+		y += 28;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Buffer size (MB):", GuiLabel_RIGHT);
+		my recordingBufferSizeText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+		ADD_PANEL_CONTROL (2, my recordingBufferSizeText);
+		y += 30;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Input sound system:", GuiLabel_RIGHT);
+		my inputSoundSystemMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		for (int i = (int) kMelder_inputSoundSystem::MIN; i <= (int) kMelder_inputSoundSystem::MAX; i ++)
+			addOption (my inputSoundSystemMenu, i - (int) kMelder_inputSoundSystem::MIN + 1, kMelder_inputSoundSystem_getText ((kMelder_inputSoundSystem) i));
+		ADD_PANEL_CONTROL (2, my inputSoundSystemMenu);
+		y += 30;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Input sound device:", GuiLabel_RIGHT);
+		my inputSoundDeviceMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		addOption (my inputSoundDeviceMenu, 1, U"System default");
+		MelderAudio_DeviceList devList = { 0 };
+		MelderAudio_getInputDeviceList (& devList);
+		for (integer i = 0; i < devList. count; i ++) {
+			GuiOptionMenu_addOption (my inputSoundDeviceMenu, devList. names [i]. get());
+		}
+		ADD_PANEL_CONTROL (2, my inputSoundDeviceMenu);
+		y += 38;
+
+		addLabel (2, fullX1, fullX2, y, y + 20, U"Sound Playback", GuiLabel_BOLD);
+		y += 28;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Output sound system:", GuiLabel_RIGHT);
+		my outputSoundSystemMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		for (int i = (int) kMelder_outputSoundSystem::MIN; i <= (int) kMelder_outputSoundSystem::MAX; i ++)
+			addOption (my outputSoundSystemMenu, i - (int) kMelder_outputSoundSystem::MIN + 1, kMelder_outputSoundSystem_getText ((kMelder_outputSoundSystem) i));
+		ADD_PANEL_CONTROL (2, my outputSoundSystemMenu);
+		y += 30;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Maximum asynchronicity:", GuiLabel_RIGHT);
+		my maximumAsynchronicityMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		for (int i = (int) kMelder_asynchronicityLevel::MIN; i <= (int) kMelder_asynchronicityLevel::MAX; i ++)
+			addOption (my maximumAsynchronicityMenu, i - (int) kMelder_asynchronicityLevel::MIN + 1, kMelder_asynchronicityLevel_getText ((kMelder_asynchronicityLevel) i));
+		ADD_PANEL_CONTROL (2, my maximumAsynchronicityMenu);
+		y += 30;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Silence before (seconds):", GuiLabel_RIGHT);
+		my silenceBeforeText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+		ADD_PANEL_CONTROL (2, my silenceBeforeText);
+		y += 30;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Silence after (seconds):", GuiLabel_RIGHT);
+		my silenceAfterText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+		ADD_PANEL_CONTROL (2, my silenceAfterText);
+		y += 38;
+
+		addLabel (2, fullX1, fullX2, y, y + 20, U"LongSound", GuiLabel_BOLD);
+		y += 28;
+
+		addLabel (2, labelX1, labelX2, y, y + 20, U"Max viewable part (seconds):", GuiLabel_RIGHT);
+		my longSoundMaxViewablePartText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+		ADD_PANEL_CONTROL (2, my longSoundMaxViewablePartText);
+	}
+
+	/*
+	 * 4. Panel 3: Text & Encoding
+	 */
+	{
+		int y = 20;
+		addLabel (3, fullX1, fullX2, y, y + 20, U"Text Files Encoding", GuiLabel_BOLD);
+		y += 30;
+
+		addLabel (3, labelX1, labelX2, y, y + 20, U"8-bit text reading encoding:", GuiLabel_RIGHT);
+		my textInputEncodingMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		for (int i = (int) kMelder_textInputEncoding::MIN; i <= (int) kMelder_textInputEncoding::MAX; i ++)
+			addOption (my textInputEncodingMenu, i - (int) kMelder_textInputEncoding::MIN + 1, kMelder_textInputEncoding_getText ((kMelder_textInputEncoding) i));
+		ADD_PANEL_CONTROL (3, my textInputEncodingMenu);
+		y += 32;
+
+		addLabel (3, labelX1, labelX2, y, y + 20, U"Text writing output encoding:", GuiLabel_RIGHT);
+		my textOutputEncodingMenu = GuiOptionMenu_createShown (form, fieldX1, fieldX2, y, y + 20, 0);
+		for (int i = (int) kMelder_textOutputEncoding::MIN; i <= (int) kMelder_textOutputEncoding::MAX; i ++)
+			addOption (my textOutputEncodingMenu, i - (int) kMelder_textOutputEncoding::MIN + 1, kMelder_textOutputEncoding_getText ((kMelder_textOutputEncoding) i));
+		ADD_PANEL_CONTROL (3, my textOutputEncodingMenu);
+		y += 40;
+
+		addLabel (3, fullX1, fullX2, y, y + 20,
+				U"Note: UTF-8 is recommended for modern cross-platform multilingual compatibility.", 0);
+	}
+
+	/*
+	 * 5. Panel 4: Advanced & Multithreading
+	 */
+	{
+		int y = 20;
+		addLabel (4, fullX1, fullX2, y, y + 20, U"Multi-threading Settings", GuiLabel_BOLD);
+		y += 28;
+
+		my useMultithreadingCheck = addCheck (4, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
+				U"Enable multi-threading");
+		y += 30;
+
+		addLabel (4, labelX1, labelX2, y, y + 20, U"Max concurrent threads:", GuiLabel_RIGHT);
+		my maxThreadsText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+		ADD_PANEL_CONTROL (4, my maxThreadsText);
+		y += 30;
+
+		addLabel (4, labelX1, labelX2, y, y + 20, U"Min elements per thread:", GuiLabel_RIGHT);
+		my minElementsText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+		ADD_PANEL_CONTROL (4, my minElementsText);
+		y += 30;
+
+		my traceThreadsCheck = addCheck (4, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
+				U"Trace thread execution info");
+		y += 38;
+
+		addLabel (4, fullX1, fullX2, y, y + 20, U"Debugging & Diagnostics", GuiLabel_BOLD);
+		y += 28;
+
+		my tracingCheck = addCheck (4, fullX1, fullX2, y, y + Gui_CHECKBUTTON_HEIGHT,
+				U"Enable global tracing");
+		y += 30;
+
+		addLabel (4, labelX1, labelX2, y, y + 20, U"Debug option code:", GuiLabel_RIGHT);
+		my debugOptionText = GuiText_createShown (form, fieldX1, fieldX2, y, y + Gui_TEXTFIELD_HEIGHT, 0);
+		ADD_PANEL_CONTROL (4, my debugOptionText);
+	}
+
+	/*
+	 * 6. Bottom Action Buttons
+	 */
+	const int buttonY = 455;
+	my restoreDefaultsButton = addButton (0, 16, 160, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"Restore Defaults", gui_button_cb_restoreDefaults, 0);
+
+	my applyButton = addButton (0, 440, 520, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"Apply", gui_button_cb_apply, 0);
+
+	my cancelButton = addButton (0, 530, 610, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"Cancel", gui_button_cb_cancel, 0);
+
+	my okButton = addButton (0, 620, 704, buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
+			U"OK", gui_button_cb_ok, GuiButton_DEFAULT);
+
+	/*
+	 * 7. Initial State: Load values, select Panel 1, and show
+	 */
+	PreferencesDialog_loadValues (me.get());
+	GuiList_selectItem (my categoryList, 1);
+	PreferencesDialog_showPanel (me.get(), 1);
+
+	thePreferencesDialogInstance = me.get();
+	GuiThing_show (my dialog);
+
+	me.releaseToUser ();
+}
+
+DIRECT (PRAAT_preferences) {
+	PRAAT
+		PRAAT_preferencesDialog (theCurrentPraatApplication -> topShell);
+	PRAAT_END
+}
+
+/* End of file PreferencesDialog.cpp */

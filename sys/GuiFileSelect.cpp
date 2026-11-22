@@ -22,7 +22,7 @@
 	#include <shlobj.h>
 #endif
 
-autoStringSet GuiFileSelect_getInfileNames (GuiWindow optionalParent, conststring32 title, bool allowMultipleFiles) {
+autoStringSet GuiFileSelect_getInfileNames (GuiShell optionalParent, conststring32 title, bool allowMultipleFiles) {
 	autoMelderSaveCurrentFolder saveFolder;
 	autoStringSet me = StringSet_create ();
 	#if gtk
@@ -123,7 +123,7 @@ autoStringSet GuiFileSelect_getInfileNames (GuiWindow optionalParent, conststrin
 	return me;
 }
 
-autostring32 GuiFileSelect_getOutfileName (GuiWindow optionalParent, conststring32 title, conststring32 defaultName) {
+autostring32 GuiFileSelect_getOutfileName (GuiShell optionalParent, conststring32 title, conststring32 defaultName) {
 	autoMelderSaveCurrentFolder saveFolder;
 	autostring32 outfileName;
 	#if gtk
@@ -187,7 +187,7 @@ autostring32 GuiFileSelect_getOutfileName (GuiWindow optionalParent, conststring
 	return outfileName;
 }
 
-autostring32 GuiFileSelect_getFolderName (GuiWindow optionalParent, conststring32 title) {
+autostring32 GuiFileSelect_getFolderName (GuiShell optionalParent, conststring32 title) {
 	autoMelderSaveCurrentFolder saveFolder;
 	autostring32 folderName;
 	#if gtk

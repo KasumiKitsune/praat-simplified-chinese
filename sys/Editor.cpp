@@ -1,10 +1,10 @@
 /* Editor.cpp
  *
- * Copyright (C) 1992-2024 Paul Boersma, 2008 Stefan de Konink, 2010 Franz Brausse
+ * Copyright (C) 1992-2024,2026 Paul Boersma, 2008 Stefan de Konink, 2010 Franz Brausse
  *
  * This code is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  *
  * This code is distributed in the hope that it will be useful, but
@@ -17,12 +17,16 @@
  */
 
 #include <time.h>
+#include <vector>
+#include <algorithm>
 #include "ScriptEditor.h"
 #include "machine.h"
 #include "EditorM.h"
 #include "praat_script.h"
 
 Thing_implement (Editor, DataGui, 0);
+
+static std::vector<Editor> theOpenEditors;
 
 #include "Prefs_define.h"
 #include "Editor_prefs.h"
@@ -72,6 +76,7 @@ static GuiMenuItem DataGuiMenu_addCommand_ (EditorMenu me, conststring32 itemTit
 	}
 	const int depth = (flags & GuiMenu_DEPTH_3) >> 16;   // the maximum depth in editor windows is 3
 	thy itemTitle = Melder_dup (itemTitle);
+	thy depth = depth;
 	if (depth > 0) {
 		/*
 			bikeshed choices for indented menu items
@@ -193,6 +198,7 @@ static GuiMenuItem EditorMenu_addCommandScript (EditorMenu me, conststring32 ite
 	if (itemTitle && itemTitle [0] != U'-')
 		itemTitle = Melder_cat (U"\u207A", itemTitle);
 	const int depth = (flags & GuiMenu_DEPTH_3) >> 16;   // the maximum depth in editor windows is 3
+	cmd -> depth = depth;
 	if (depth > 0) {
 		/*
 			bikeshed choices for indented menu items
@@ -311,6 +317,7 @@ void Editor_doMenuCommand (Editor me, conststring32 commandTitle, integer narg, 
 /********** class Editor **********/
 
 void structEditor :: v9_destroy () noexcept {
+	theOpenEditors.erase (std::remove (theOpenEditors.begin (), theOpenEditors.end (), this), theOpenEditors.end ());
 	MelderAudio_stopPlaying (MelderAudio_IMPLICIT);
 	/*
 		The following command must be performed before the shell is destroyed.
@@ -364,7 +371,7 @@ void structEditor :: v1_info () {
 	MelderInfo_writeLine (U"Editor type: ", Thing_className (this));
 	MelderInfo_writeLine (U"Editor name: ", our name ? our name.get() : U"<no name>");
 	time_t today = time (nullptr);
-	MelderInfo_writeLine (U"Date: ", Melder_peek8to32 (ctime (& today)));   // includes a newline
+	MelderInfo_writeLine (U"Date: ", Melder_peek8to32_u (ctime (& today)));   // includes a newline
 	if (our data()) {
 		MelderInfo_writeLine (U"Data type: ", our data() -> classInfo -> className);
 		MelderInfo_writeLine (U"Data name: ", our data() -> name.get());
@@ -404,7 +411,11 @@ static void menu_cb_sendBackToCallingProgram (Editor me, EDITOR_ARGS) {
 static void menu_cb_close (Editor me, EDITOR_ARGS) {
 	my v_goAway ();
 	if (optionalInterpreter && (optionalInterpreter -> optionalOwningEnvironmentEditor() == me || optionalInterpreter -> optionalDynamicEnvironmentEditor() == me))
-		optionalInterpreter -> undangleEditorEnvironments();
+		optionalInterpreter -> undangleEditorEnvironments ();
+}
+
+static void menu_cb_quit (Editor /* me */, EDITOR_ARGS) {
+	Gui_runQuitApplicationCallback ();
 }
 
 static void menu_cb_undo (Editor me, EDITOR_ARGS) {
@@ -537,8 +548,33 @@ static void gui_window_cb_goAway (Editor me) {
 	my v_goAway ();
 }
 
+void structEditor :: v_languageChanged () {
+	for (integer imenu = 1; imenu <= our menus.size; imenu ++) {
+		EditorMenu menu = our menus.at [imenu];
+		if (menu -> menuWidget && menu -> menuTitle)
+			GuiMenu_setTitle (menu -> menuWidget, menu -> menuTitle.get());
+		for (integer icmd = 1; icmd <= menu -> commands.size; icmd ++) {
+			EditorCommand cmd = menu -> commands.at [icmd];
+			if (cmd -> itemWidget && cmd -> itemTitle) {
+				conststring32 rawTitle = (cmd -> depth > 0)
+					? Melder_cat (U"      ", cmd -> itemTitle.get())
+					: cmd -> itemTitle.get();
+				GuiMenuItem_setText (cmd -> itemWidget, rawTitle);
+			}
+		}
+	}
+}
+
+void Editors_languageChanged () {
+	for (Editor ed : theOpenEditors) {
+		if (ed)
+			ed -> v_languageChanged ();
+	}
+}
+
 void praat_addCommandsToEditor (Editor me);
 void Editor_init (Editor me, int x, int y, int width, int height, conststring32 title, Daata data) {
+	theOpenEditors.push_back (me);
 	DataGui_init (me, data, true, me);   // I am my own boss! BUG: check editability
 	/*
 		Zero widths are taken from the preferences.
@@ -654,6 +690,9 @@ void Editor_init (Editor me, int x, int y, int width, int height, conststring32 
 		if (my callbackSocket)
 			EditorMenu_addCommand (my fileMenu, U"Send back to calling program", 0, menu_cb_sendBackToCallingProgram);
 		EditorMenu_addCommand (my fileMenu, U"Close", 'W', menu_cb_close);
+		#ifndef macintosh
+			EditorMenu_addCommand (my fileMenu, Melder_cat (U"Quit ", Melder_upperCaseAppName (), U" || Quit"), 'Q', menu_cb_quit);
+		#endif
 	}
 	GuiThing_show (my windowForm);
 }

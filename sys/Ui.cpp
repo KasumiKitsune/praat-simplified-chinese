@@ -173,15 +173,15 @@ static autoUiField UiField_create (_kUiField_type type, conststring32 labelTextO
 		str32ncpy (shortName, labelTextOrNull, 100);
 		shortName [100] = U'\0';
 		/*
-			Strip parentheses and the occasional colon off the parameter name.
+			Strip parentheses (both ASCII and full-width) and the occasional colon off the parameter name.
 		*/
-		if (!! (p = (char32 *) str32chr (shortName, U'('))) {
+		if (!! (p = (char32 *) str32chr (shortName, U'(')) || !! (p = (char32 *) str32chr (shortName, U'\uff08'))) {
 			*p = U'\0';
 			if (p - shortName > 0 && p [-1] == U' ')
 				p [-1] = U'\0';
 		}
 		p = shortName;
-		if (*p != U'\0' && p [Melder_length (p) - 1] == U':')
+		if (*p != U'\0' && (p [Melder_length (p) - 1] == U':' || p [Melder_length (p) - 1] == U'\uff1a'))
 			p [Melder_length (p) - 1] = U'\0';   // unlikely
 		Thing_setName (me.get(), shortName);
 	}
@@ -938,15 +938,7 @@ autoUiForm UiForm_createE (EditorCommand cmd, conststring32 title, conststring32
 static UiField UiForm_addField (UiForm me, _kUiField_type type, conststring32 labelText) {
 	if (my numberOfFields == MAXIMUM_NUMBER_OF_FIELDS)
 		Melder_throw (U"Cannot have more than ", MAXIMUM_NUMBER_OF_FIELDS, U"fields in a form.");
-	autostring32 translatedLabel;
-	if (str32nequ (labelText, U"left ", 5)) {
-		translatedLabel = Melder_dup (Melder_cat (U"left ", praat_translate (labelText + 5)));
-	} else if (str32nequ (labelText, U"right ", 6)) {
-		translatedLabel = Melder_dup (Melder_cat (U"right ", praat_translate (labelText + 6)));
-	} else {
-		translatedLabel = Melder_dup (praat_translate (labelText));
-	}
-	my field [++ my numberOfFields] = UiField_create (type, translatedLabel.get());
+	my field [++ my numberOfFields] = UiField_create (type, labelText);
 	return my field [my numberOfFields].get();
 }
 
@@ -1031,7 +1023,7 @@ UiField UiForm_addHeading (UiForm me, conststring32 *variable, conststring32 lab
 	UiField thee = UiForm_addField (me, _kUiField_type::HEADING_, U"");   // this field gets no name; so that the user can give it any title
 	my referenceToLatestUsedChoiceOrOptionMenu = nullptr;
 	thy stringVariable = variable;
-	thy stringValue = Melder_dup (praat_translate (labelText));
+	thy stringValue = Melder_dup (labelText);
 	return thee;
 }
 
@@ -1039,7 +1031,7 @@ UiField UiForm_addComment (UiForm me, conststring32 *variable, conststring32 lab
 	UiField thee = UiForm_addField (me, _kUiField_type::COMMENT_, U"");   // this field gets no name; so that the user can give it any title
 	my referenceToLatestUsedChoiceOrOptionMenu = nullptr;
 	thy stringVariable = variable;
-	thy stringValue = Melder_dup (praat_translate (labelText));
+	thy stringValue = Melder_dup (labelText);
 	return thee;
 }
 
@@ -1047,7 +1039,7 @@ UiField UiForm_addCaption (UiForm me, conststring32 *variable, conststring32 lab
 	UiField thee = UiForm_addField (me, _kUiField_type::CAPTION_, U"");   // this field gets no name; so that the user can give it any title
 	my referenceToLatestUsedChoiceOrOptionMenu = nullptr;
 	thy stringVariable = variable;
-	thy stringValue = Melder_dup (praat_translate (labelText));
+	thy stringValue = Melder_dup (labelText);
 	return thee;
 }
 
@@ -1666,7 +1658,7 @@ void UiForm_finish (UiForm me) {
 				GuiRadioGroup_begin ();
 				for (integer ibutton = 1; ibutton <= thy options.size; ibutton ++) {
 					UiOption button = thy options.at [ibutton];
-					MelderString_copy (& theFinishBuffer, praat_translate (button -> name.get()));
+					MelderString_copy (& theFinishBuffer, button -> name.get());
 					button -> radioButton = GuiRadioButton_createShown (form,
 						fieldX, dialogWidth /* allow to extend into the margin */,
 						thy y + (ibutton - 1) * (Gui_RADIOBUTTON_HEIGHT + Gui_RADIOBUTTON_SPACING),
@@ -1690,7 +1682,7 @@ void UiForm_finish (UiForm me) {
 				thy optionMenu = GuiOptionMenu_createShown (form, fieldX, fieldX + fieldWidth, thy y, thy y + Gui_OPTIONMENU_HEIGHT, 0);
 				for (integer ibutton = 1; ibutton <= thy options.size; ibutton ++) {
 					UiOption button = thy options.at [ibutton];
-					MelderString_copy (& theFinishBuffer, praat_translate (button -> name.get()));
+					MelderString_copy (& theFinishBuffer, button -> name.get());
 					GuiOptionMenu_addOption (thy optionMenu, theFinishBuffer.string);
 				}
 			}

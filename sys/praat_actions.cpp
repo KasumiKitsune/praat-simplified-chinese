@@ -912,6 +912,30 @@ integer praat_getNumberOfActions () { return theActions.size; }
 Praat_Command praat_getAction (integer i)
 	{ return i < 0 || i > theActions.size ? nullptr : theActions.at [i]; }
 
+bool praat_actions_canExecute (conststring32 titlePrefix) {
+	for (integer i = 1; i <= theActions.size; i ++) {
+		Praat_Command action = theActions.at [i];
+		if (action -> visible && action -> executable && action -> title) {
+			if (str32nequ (action -> title.get(), titlePrefix, Melder_length (titlePrefix)))
+				return true;
+		}
+	}
+	return false;
+}
+
+bool praat_actions_executeByName (conststring32 titlePrefix) {
+	for (integer i = 1; i <= theActions.size; i ++) {
+		Praat_Command action = theActions.at [i];
+		if (action -> visible && action -> executable && action -> title) {
+			if (str32nequ (action -> title.get(), titlePrefix, Melder_length (titlePrefix))) {
+				do_menu (action, false);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 GuiButton praat_actions_getPlayButton () {
 	for (integer i = 1; i <= theActions.size; i ++) {
 		Praat_Command action = theActions.at [i];

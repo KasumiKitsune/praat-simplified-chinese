@@ -17,6 +17,7 @@
  */
 
 #include "GuiP.h"
+#include <string>
 #include "machine.h"
 #include <locale.h>
 
@@ -281,12 +282,16 @@ void Gui_getWindowPositioningBounds (double *x, double *y, double *width, double
 
 			SelectObject (hdcBig, oldFontBig);
 			SelectObject (hdcBig, oldBmpBig);
-			DeleteObject (hbmpBig);
-			DeleteDC (hdcBig);
 		}
+		if (hbmpBig)
+			DeleteObject (hbmpBig);
+		if (hdcBig)
+			DeleteDC (hdcBig);
 
-		DeleteDC (hdcMem);
-		ReleaseDC (nullptr, hdcScreen);
+		if (hdcMem)
+			DeleteDC (hdcMem);
+		if (hdcScreen)
+			ReleaseDC (nullptr, hdcScreen);
 		return hbmpDst;
 	}
 

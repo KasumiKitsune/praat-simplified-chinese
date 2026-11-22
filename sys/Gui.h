@@ -524,6 +524,7 @@ GuiCheckButton GuiCheckButton_createShown (GuiForm parent,
 
 bool GuiCheckButton_getValue (GuiCheckButton me);
 void GuiCheckButton_setValue (GuiCheckButton me, bool value);
+void GuiCheckButton_setText (GuiCheckButton me, conststring32 text /* cattable */);
 
 /********** GuiDialog **********/
 
@@ -664,9 +665,9 @@ void GuiDrawingArea_setZoomCallback (GuiDrawingArea me, GuiDrawingArea_ZoomCallb
 
 /********** GuiFileSelect **********/
 
-autoStringSet GuiFileSelect_getInfileNames (GuiWindow optionalParent, conststring32 title, bool allowMultipleFiles);
-autostring32 GuiFileSelect_getOutfileName (GuiWindow optionalParent, conststring32 title, conststring32 defaultName);
-autostring32 GuiFileSelect_getFolderName (GuiWindow optionalParent, conststring32 title);
+autoStringSet GuiFileSelect_getInfileNames (GuiShell optionalParent, conststring32 title, bool allowMultipleFiles);
+autostring32 GuiFileSelect_getOutfileName (GuiShell optionalParent, conststring32 title, conststring32 defaultName);
+autostring32 GuiFileSelect_getFolderName (GuiShell optionalParent, conststring32 title);
 
 /********** GuiForm **********/
 
@@ -987,6 +988,7 @@ GuiOptionMenu GuiOptionMenu_create        (GuiForm parent, int left, int right, 
 GuiOptionMenu GuiOptionMenu_createShown   (GuiForm parent, int left, int right, int top, int bottom, uint32 flags);
 
 void GuiOptionMenu_addOption (GuiOptionMenu me, conststring32 text);
+void GuiOptionMenu_setOptionText (GuiOptionMenu me, int optionPosition, conststring32 text);
 int GuiOptionMenu_getValue (GuiOptionMenu me);
 void GuiOptionMenu_setValue (GuiOptionMenu me, int value);
 

@@ -42,11 +42,13 @@
 #include "Printer.h"
 #include "ScriptEditor.h"
 #include "NotebookEditor.h"
+#include "PythonScriptEditor.h"
 #include "Strings_.h"
 #include "praat_python.h"
 #include "../kar/UnicodeData.h"
 #include "InfoEditor.h"
 #include "praat_translate.h"
+#include "GuiP.h"
 extern "C" char *sendpraat (void *display, const char *programName, long timeOut, const char *text);
 
 Thing_implement (Praat_Command, Thing, 0);
@@ -120,6 +122,15 @@ static structMelderFile buttonsFile { };
 static structMelderFile tracingFile { };
 
 static GuiList praatList_objects;
+static GuiLabel praatLabel_objects;
+
+static void praat_quitDialog_languageChanged ();
+
+void praat_refreshObjectsWindowLanguage () {
+	if (praatLabel_objects)
+		GuiLabel_setText (praatLabel_objects, U"Objects:");
+	praat_quitDialog_languageChanged ();
+}
 
 /***** selection *****/
 
@@ -471,6 +482,308 @@ static void gui_cb_list_selectionChanged (Thing /* boss */, GuiList_SelectionCha
 		theCurrentPraatObjects -> totalSelection += 1;
 	}
 	praat_show ();
+}
+
+static void gui_cb_list_contextMenu (Thing /* boss */, GuiList_ContextMenuEvent event) {
+#if motif
+	if (! praatList_objects || ! praatList_objects -> d_widget || ! praatList_objects -> d_widget -> window || theCurrentPraatObjects -> n == 0)
+		return;
+
+	static auto createMenuIcon = [] (const wchar_t *glyph, COLORREF color) -> HBITMAP {
+		return _GuiWin_createMenuIcon (glyph, color);
+	};
+
+	static auto setMenuItemIcon = [] (HMENU hMenu, UINT cmdId, HBITMAP hbmp) {
+		_GuiWin_setMenuItemIcon (hMenu, cmdId, hbmp);
+	};
+
+	static auto setMenuItemIconByPos = [] (HMENU hMenu, UINT pos, HBITMAP hbmp) {
+		if (! hbmp) return;
+		MENUITEMINFOW mii;
+		memset (& mii, 0, sizeof (mii));
+		mii.cbSize = sizeof (mii);
+		mii.fMask = MIIM_BITMAP;
+		mii.hbmpItem = hbmp;
+		SetMenuItemInfoW (hMenu, pos, TRUE, & mii);
+	};
+
+	static auto menuLabelW = [] (conststring32 enKey, conststring32 zhFallback) -> std::wstring {
+		conststring32 text32 = enKey;
+		if (g_language_choice != 0) {
+			conststring32 translated = praat_translate (enKey);
+			if (translated && ! str32equ (translated, enKey))
+				text32 = translated;
+			else
+				text32 = praat_translate (zhFallback);
+		}
+		const wchar_t *raw = Melder_peek32toW (text32);
+		std::wstring out;
+		if (raw) {
+			for (const wchar_t *p = raw; *p; ++ p) {
+				if (*p == L'&')
+					out.push_back (L'&');
+				out.push_back (*p);
+			}
+		}
+		return out;
+	};
+
+	HMENU hMenu = CreatePopupMenu ();
+	if (! hMenu)
+		return;
+
+	enum {
+		CMD_VIEW_EDIT = 1001,
+		CMD_PLAY,
+		CMD_RENAME,
+		CMD_COPY,
+		CMD_INFO,
+		CMD_INSPECT,
+		CMD_SELECT_ALL,
+		CMD_DESELECT_ALL,
+		CMD_REMOVE,
+		CMD_SAVE_WAV,
+		CMD_SAVE_TEXT,
+		CMD_SAVE_TAB,
+		CMD_SAVE_SHORT,
+		CMD_SAVE_BINARY,
+		CMD_QUERY_DURATION,
+		CMD_QUERY_SAMPLERATE,
+		CMD_QUERY_NUMSAMPLES
+	};
+
+	bool canViewEdit = praat_actions_canExecute (U"View & Edit") ||
+	                   praat_actions_canExecute (U"Edit") ||
+	                   praat_actions_canExecute (U"Open");
+	bool canPlay     = praat_actions_canExecute (U"Play");
+	bool canRename   = praat_canExecuteMenuCommand (U"Rename...");
+	bool canCopy     = praat_canExecuteMenuCommand (U"Copy...");
+	bool canInfo     = praat_canExecuteMenuCommand (U"Info");
+	bool canInspect  = praat_canExecuteMenuCommand (U"Inspect");
+	bool canRemove   = praat_canExecuteMenuCommand (U"Remove");
+	bool hasSelection = (theCurrentPraatObjects -> totalSelection > 0);
+	bool isCurrentlyPlaying = MelderAudio_isPlaying;
+	bool isPaused = praat_sound_isPaused ();
+
+	// 1. View & Edit
+	UINT flagViewEdit = (canViewEdit ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	AppendMenuW (hMenu, flagViewEdit, CMD_VIEW_EDIT, menuLabelW (U"View & Edit", U"查看与编辑").c_str ());
+	if (canViewEdit)
+		SetMenuDefaultItem (hMenu, CMD_VIEW_EDIT, FALSE);
+
+	// 2. Play / Pause / Resume
+	if (canPlay) {
+		std::wstring labelPlay = isCurrentlyPlaying
+			? menuLabelW (U"Pause", U"暂停")
+			: (isPaused
+				? menuLabelW (U"Resume", U"继续播放")
+				: menuLabelW (U"Play", U"播放"));
+		AppendMenuW (hMenu, MF_STRING, CMD_PLAY, labelPlay.c_str ());
+	}
+
+	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 3. Rename...
+	UINT flagRename = (canRename ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	AppendMenuW (hMenu, flagRename, CMD_RENAME, menuLabelW (U"Rename...", U"重命名...").c_str ());
+
+	// 4. Copy...
+	UINT flagCopy = (canCopy ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	AppendMenuW (hMenu, flagCopy, CMD_COPY, menuLabelW (U"Copy...", U"复制...").c_str ());
+
+	// 5. Info
+	UINT flagInfo = (canInfo ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	AppendMenuW (hMenu, flagInfo, CMD_INFO, menuLabelW (U"Info", U"信息").c_str ());
+
+	// 6. Inspect
+	UINT flagInspect = (canInspect ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	AppendMenuW (hMenu, flagInspect, CMD_INSPECT, menuLabelW (U"Inspect", U"检查").c_str ());
+
+	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 7. Submenu: Save as
+	HMENU hSubMenuSave = CreatePopupMenu ();
+	bool canSaveWav    = praat_actions_canExecute (U"Save as WAV file...");
+	bool canSaveText   = praat_actions_canExecute (U"Save as text file...");
+	bool canSaveTab    = praat_actions_canExecute (U"Save as tab-separated file...");
+	bool canSaveShort  = praat_actions_canExecute (U"Save as short text file...");
+	bool canSaveBinary = praat_actions_canExecute (U"Save as binary file...");
+
+	if (canSaveWav)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_WAV, menuLabelW (U"Save as WAV file...", U"保存为 WAV 文件...").c_str ());
+	if (canSaveText)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TEXT, menuLabelW (U"Save as text file...", U"保存为文本文件...").c_str ());
+	if (canSaveTab)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_TAB, menuLabelW (U"Save as tab-separated file...", U"保存为制表符分隔文件...").c_str ());
+	if (canSaveShort)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_SHORT, menuLabelW (U"Save as short text file...", U"保存为短文本文件...").c_str ());
+	if (canSaveBinary)
+		AppendMenuW (hSubMenuSave, MF_STRING, CMD_SAVE_BINARY, menuLabelW (U"Save as binary file...", U"保存为二进制文件...").c_str ());
+
+	HBITMAP bmpSaveAs = nullptr;
+	if (hSubMenuSave && GetMenuItemCount (hSubMenuSave) > 0) {
+		int posSaveAs = GetMenuItemCount (hMenu);
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuSave, menuLabelW (U"Save as...", U"保存为...").c_str ());
+		bmpSaveAs = createMenuIcon (L"\uE74E", RGB (55, 65, 81));
+		setMenuItemIconByPos (hMenu, posSaveAs, bmpSaveAs);
+	} else if (hSubMenuSave) {
+		DestroyMenu (hSubMenuSave);
+		hSubMenuSave = nullptr;
+	}
+
+	// 8. Submenu: Query
+	HMENU hSubMenuQuery = CreatePopupMenu ();
+	bool canGetDuration   = praat_actions_canExecute (U"Get total duration");
+	bool canGetSampleRate = praat_actions_canExecute (U"Get sampling frequency");
+	bool canGetNumSamples = praat_actions_canExecute (U"Get number of samples");
+
+	if (canGetDuration)
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_DURATION, menuLabelW (U"Get total duration", U"获取总时长").c_str ());
+	if (canGetSampleRate)
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_SAMPLERATE, menuLabelW (U"Get sampling frequency", U"获取采样率").c_str ());
+	if (canGetNumSamples)
+		AppendMenuW (hSubMenuQuery, MF_STRING, CMD_QUERY_NUMSAMPLES, menuLabelW (U"Get number of samples", U"获取采样点数").c_str ());
+
+	HBITMAP bmpQuery = nullptr;
+	if (hSubMenuQuery && GetMenuItemCount (hSubMenuQuery) > 0) {
+		int posQuery = GetMenuItemCount (hMenu);
+		AppendMenuW (hMenu, MF_POPUP, (UINT_PTR) hSubMenuQuery, menuLabelW (U"Query...", U"查询...").c_str ());
+		bmpQuery = createMenuIcon (L"\uE721", RGB (55, 65, 81));
+		setMenuItemIconByPos (hMenu, posQuery, bmpQuery);
+	} else if (hSubMenuQuery) {
+		DestroyMenu (hSubMenuQuery);
+		hSubMenuQuery = nullptr;
+	}
+
+	if (hSubMenuSave || hSubMenuQuery)
+		AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 9. Select All
+	AppendMenuW (hMenu, MF_STRING, CMD_SELECT_ALL, menuLabelW (U"Select all", U"全选").c_str ());
+
+	// 10. Deselect All
+	if (hasSelection)
+		AppendMenuW (hMenu, MF_STRING, CMD_DESELECT_ALL, menuLabelW (U"Deselect all", U"取消全选").c_str ());
+
+	AppendMenuW (hMenu, MF_SEPARATOR, 0, nullptr);
+
+	// 11. Remove
+	UINT flagRemove = (canRemove ? MF_STRING : (MF_STRING | MF_GRAYED | MF_DISABLED));
+	AppendMenuW (hMenu, flagRemove, CMD_REMOVE, menuLabelW (U"Remove", U"移除").c_str ());
+
+	// Set Menu Icons
+	HBITMAP bmpViewEdit    = createMenuIcon (L"\uE70F", canViewEdit ? RGB (0, 103, 192) : RGB (156, 163, 175));
+	HBITMAP bmpPlay        = canPlay ? createMenuIcon (
+		isCurrentlyPlaying ? L"\uE769" : L"\uE768",
+		isCurrentlyPlaying ? RGB (16, 124, 65) : (isPaused ? RGB (217, 119, 6) : RGB (16, 124, 65))
+	) : nullptr;
+	HBITMAP bmpRename      = createMenuIcon (L"\uE8EC", canRename ? RGB (55, 65, 81) : RGB (156, 163, 175));
+	HBITMAP bmpCopy        = createMenuIcon (L"\uE8C8", canCopy ? RGB (55, 65, 81) : RGB (156, 163, 175));
+	HBITMAP bmpInfo        = createMenuIcon (L"\uE946", canInfo ? RGB (0, 103, 192) : RGB (156, 163, 175));
+	HBITMAP bmpInspect     = createMenuIcon (L"\uE721", canInspect ? RGB (55, 65, 81) : RGB (156, 163, 175));
+	HBITMAP bmpSelectAll   = createMenuIcon (L"\uE762", RGB (55, 65, 81));
+	HBITMAP bmpDeselectAll = hasSelection ? createMenuIcon (L"\uE894", RGB (55, 65, 81)) : nullptr;
+	HBITMAP bmpRemove      = createMenuIcon (L"\uE74D", canRemove ? RGB (220, 38, 38) : RGB (156, 163, 175));
+
+	setMenuItemIcon (hMenu, CMD_VIEW_EDIT, bmpViewEdit);
+	if (bmpPlay)
+		setMenuItemIcon (hMenu, CMD_PLAY, bmpPlay);
+	setMenuItemIcon (hMenu, CMD_RENAME, bmpRename);
+	setMenuItemIcon (hMenu, CMD_COPY, bmpCopy);
+	setMenuItemIcon (hMenu, CMD_INFO, bmpInfo);
+	setMenuItemIcon (hMenu, CMD_INSPECT, bmpInspect);
+	setMenuItemIcon (hMenu, CMD_SELECT_ALL, bmpSelectAll);
+	if (bmpDeselectAll)
+		setMenuItemIcon (hMenu, CMD_DESELECT_ALL, bmpDeselectAll);
+	setMenuItemIcon (hMenu, CMD_REMOVE, bmpRemove);
+
+	HWND hwnd = praatList_objects -> d_widget -> window;
+	SetForegroundWindow (hwnd);
+	int cmd = TrackPopupMenuEx (hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+		event -> x, event -> y, hwnd, nullptr);
+	DestroyMenu (hMenu);
+
+	if (bmpViewEdit) DeleteObject (bmpViewEdit);
+	if (bmpPlay) DeleteObject (bmpPlay);
+	if (bmpRename) DeleteObject (bmpRename);
+	if (bmpCopy) DeleteObject (bmpCopy);
+	if (bmpInfo) DeleteObject (bmpInfo);
+	if (bmpInspect) DeleteObject (bmpInspect);
+	if (bmpSaveAs) DeleteObject (bmpSaveAs);
+	if (bmpQuery) DeleteObject (bmpQuery);
+	if (bmpSelectAll) DeleteObject (bmpSelectAll);
+	if (bmpDeselectAll) DeleteObject (bmpDeselectAll);
+	if (bmpRemove) DeleteObject (bmpRemove);
+
+	try {
+		switch (cmd) {
+			case CMD_VIEW_EDIT:
+				if (praat_actions_canExecute (U"View & Edit"))
+					praat_actions_executeByName (U"View & Edit");
+				else if (praat_actions_canExecute (U"Edit"))
+					praat_actions_executeByName (U"Edit");
+				else if (praat_actions_canExecute (U"Open"))
+					praat_actions_executeByName (U"Open");
+				break;
+			case CMD_PLAY:
+				praat_actions_executeByName (U"Play");
+				break;
+			case CMD_RENAME:
+				praat_doMenuCommand (U"Rename...", nullptr, nullptr);
+				break;
+			case CMD_COPY:
+				praat_doMenuCommand (U"Copy...", nullptr, nullptr);
+				break;
+			case CMD_INFO:
+				praat_doMenuCommand (U"Info", nullptr, nullptr);
+				break;
+			case CMD_INSPECT:
+				praat_doMenuCommand (U"Inspect", nullptr, nullptr);
+				break;
+			case CMD_SAVE_WAV:
+				praat_actions_executeByName (U"Save as WAV file...");
+				break;
+			case CMD_SAVE_TEXT:
+				praat_actions_executeByName (U"Save as text file...");
+				break;
+			case CMD_SAVE_TAB:
+				praat_actions_executeByName (U"Save as tab-separated file...");
+				break;
+			case CMD_SAVE_SHORT:
+				praat_actions_executeByName (U"Save as short text file...");
+				break;
+			case CMD_SAVE_BINARY:
+				praat_actions_executeByName (U"Save as binary file...");
+				break;
+			case CMD_QUERY_DURATION:
+				praat_actions_executeByName (U"Get total duration");
+				break;
+			case CMD_QUERY_SAMPLERATE:
+				praat_actions_executeByName (U"Get sampling frequency");
+				break;
+			case CMD_QUERY_NUMSAMPLES:
+				praat_actions_executeByName (U"Get number of samples");
+				break;
+			case CMD_SELECT_ALL:
+				praat_selectAll ();
+				praat_show ();
+				break;
+			case CMD_DESELECT_ALL:
+				praat_deselectAll ();
+				praat_show ();
+				break;
+			case CMD_REMOVE:
+				praat_doMenuCommand (U"Remove", nullptr, nullptr);
+				break;
+			default:
+				break;
+		}
+	} catch (MelderError) {
+		Melder_flushError ();
+	}
+#else
+	(void) event;
+#endif
 }
 
 void praat_list_renameAndSelect (integer position, conststring32 name) {
@@ -859,6 +1172,24 @@ static int publishProc (autoDaata me) {
 static GuiDialog theQuitDialog;
 static GuiLabel theQuitLabel1;
 static GuiLabel theQuitLabel2;
+static GuiButton theQuitHelpButton;
+static GuiButton theQuitCancelButton;
+static GuiButton theQuitSaveButton;
+static GuiButton theQuitDirectButton;
+
+static void praat_quitDialog_languageChanged () {
+	if (! theQuitDialog)
+		return;
+	GuiShell_setTitle (theQuitDialog, praat_translate (U"Confirm Quit"));
+	if (theQuitHelpButton)
+		GuiButton_setText (theQuitHelpButton, praat_translate (U"Help"));
+	if (theQuitCancelButton)
+		GuiButton_setText (theQuitCancelButton, praat_translate (U"Cancel"));
+	if (theQuitSaveButton)
+		GuiButton_setText (theQuitSaveButton, praat_translate (U"Save Project (.praat)"));
+	if (theQuitDirectButton)
+		GuiButton_setText (theQuitDirectButton, praat_translate (g_language_choice == 0 ? U"Quit" : U"Quit Application"));
+}
 
 static void gui_dialog_cb_quitGoAway (Thing /* boss */) {
 	if (theQuitDialog)
@@ -881,28 +1212,85 @@ static void gui_button_cb_directQuit (Thing /* boss */, GuiButtonEvent /* event 
 }
 
 static void gui_button_cb_saveProjectAndQuit (Thing /* boss */, GuiButtonEvent /* event */) {
-	autostring32 chosenPath = GuiFileSelect_getOutfileName (theCurrentPraatApplication -> topShell, praat_translate (U"Save workspace as .praat file"), U"workspace.praat");
-	if (! chosenPath || chosenPath [0] == U'\0')
-		return;
+	const bool youHaveObjectsInYourList = ( theCurrentPraatObjects && theCurrentPraatObjects -> n > 0 );
+	if (youHaveObjectsInYourList) {
+		GuiShell dialogParent = theQuitDialog ? static_cast <GuiShell> (theQuitDialog) : static_cast <GuiShell> (theCurrentPraatApplication -> topShell);
 
-	MelderString filePath;
-	MelderString_copy (& filePath, chosenPath.get());
-	if (! Melder_endsWith_caseAware (filePath.string, U".praat"))
-		MelderString_append (& filePath, U".praat");
-
-	try {
-		structMelderFile file;
-		Melder_pathToFile (filePath.string, & file);
-		autoCollection set = Collection_create ();
 		for (integer iobject = 1; iobject <= theCurrentPraatObjects -> n; iobject ++) {
 			Daata object = (Daata) theCurrentPraatObjects -> list [iobject]. object;
-			if (object)
-				set -> addItem_ref (object);
+			if (object && ! Data_canWriteBinary (object)) {
+				Melder_flushError (U"Cannot save workspace as .praat: object \"",
+					Thing_getName (object), U"\" (class ", Thing_className (object),
+					U") cannot be written to a binary file.");
+				return;
+			}
 		}
-		Data_writeToBinaryFile (set.get(), & file);
-	} catch (MelderError) {
-		Melder_flushError ();
-		return;
+
+		autostring32 chosenPath = GuiFileSelect_getOutfileName (
+			dialogParent,
+			praat_translate (U"Save workspace as .praat file"),
+			U"workspace.praat"
+		);
+		if (! chosenPath || chosenPath [0] == U'\0')
+			return;
+
+		autoMelderString filePath;
+		MelderString_copy (& filePath, chosenPath.get());
+		const bool appendedSuffix = ! Melder_endsWith_caseAware (filePath.string, U".praat");
+		if (appendedSuffix)
+			MelderString_append (& filePath, U".praat");
+
+		structMelderFile file { };
+		structMelderFile tempFile { };
+		try {
+			Melder_pathToFile (filePath.string, & file);
+			#if defined (_WIN32)
+				if (appendedSuffix && MelderFile_exists (& file)) {
+					HWND ownerHwnd = (dialogParent && dialogParent -> d_xmShell)
+						? dialogParent -> d_xmShell -> window
+						: nullptr;
+					autoMelderString prompt;
+					MelderString_copy (& prompt, praat_translate (U"File already exists:\n"), filePath.string,
+						praat_translate (U"\n\nDo you want to replace it?"));
+					int ans = MessageBoxW (ownerHwnd, Melder_peek32toW (prompt.string),
+						Melder_peek32toW (praat_translate (U"Confirm Save As")),
+						MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
+					if (ans != IDYES)
+						return;
+				}
+			#endif
+
+			autoMelderString tempPath;
+			MelderString_copy (& tempPath, filePath.string, U".tmp.", Melder_integer (
+				#if defined (_WIN32)
+					(integer) GetCurrentProcessId ()
+				#else
+					(integer) getpid ()
+				#endif
+			));
+			Melder_pathToFile (tempPath.string, & tempFile);
+
+			autoCollection set = Collection_create ();
+			for (integer iobject = 1; iobject <= theCurrentPraatObjects -> n; iobject ++) {
+				Daata object = (Daata) theCurrentPraatObjects -> list [iobject]. object;
+				if (object)
+					set -> addItem_ref (object);
+			}
+			Data_writeToBinaryFile (set.get(), & tempFile);
+
+			#if defined (_WIN32)
+				autostringW fromW = Melder_32toW_fileSystem (MelderFile_peekPath (& tempFile));
+				autostringW toW = Melder_32toW_fileSystem (MelderFile_peekPath (& file));
+				if (! MoveFileExW (fromW.get(), toW.get(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+					Melder_throw (U"Cannot replace target file ", & file, U".");
+			#else
+				MelderFile_moveAndOrRename (& tempFile, & file);
+			#endif
+		} catch (MelderError) {
+			MelderFile_delete (& tempFile);
+			Melder_flushError ();
+			return;
+		}
 	}
 
 	if (theQuitDialog)
@@ -914,7 +1302,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 	Interpreter /* interpreter */, conststring32 /* invokingButtonTitle */, bool /* isModified */, void * /* buttonClosure */, Editor /* optionalEditor */)
 {
 	const bool youHaveObjectsInYourList = ( theCurrentPraatObjects -> n > 0 );
-	const bool youHaveUnsavedScriptsOrNotebooks = ( ScriptEditors_dirty () || NotebookEditors_dirty () );
+	const bool youHaveUnsavedScriptsOrNotebooks = ( ScriptEditors_dirty () || NotebookEditors_dirty () || PythonScriptEditors_dirty () );
 	if ((! youHaveObjectsInYourList && ! youHaveUnsavedScriptsOrNotebooks) || theCurrentPraatApplication -> batch) {
 		praat_exit (0);
 		return;
@@ -922,11 +1310,11 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 
 	conststring32 line1Text;
 	if (youHaveObjectsInYourList && youHaveUnsavedScriptsOrNotebooks)
-		line1Text = praat_translate (U"You have objects in your list, and unsaved scripts or notebooks!");
+		line1Text = U"You have objects in your list, and unsaved scripts or notebooks!";
 	else if (youHaveUnsavedScriptsOrNotebooks)
-		line1Text = praat_translate (U"You have unsaved scripts or notebooks!");
+		line1Text = U"You have unsaved scripts or notebooks!";
 	else
-		line1Text = praat_translate (U"You have objects in your list!");
+		line1Text = U"You have objects in your list!";
 
 	char32 line2Text [200];
 	Melder_sprint (line2Text, 200, praat_translate (U"Do you still want to quit "), Melder_upperCaseAppName(), U"?");
@@ -956,7 +1344,7 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 
 		// Button 1: Help
 		const int helpWidth = 65;
-		GuiButton_createShown (theQuitDialog,
+		theQuitHelpButton = GuiButton_createShown (theQuitDialog,
 			Gui_LEFT_DIALOG_SPACING, Gui_LEFT_DIALOG_SPACING + helpWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Help", gui_button_cb_helpQuit, nullptr, 0);
@@ -970,25 +1358,26 @@ extern "C" void DO_Quit (UiForm /* sendingForm */, integer /* narg */, Stackel /
 		int x = dialogWidth - Gui_RIGHT_DIALOG_SPACING - quitWidth - spacing - saveWidth - spacing - cancelWidth;
 
 		// Button 2: Cancel
-		GuiButton_createShown (theQuitDialog,
+		theQuitCancelButton = GuiButton_createShown (theQuitDialog,
 			x, x + cancelWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Cancel", gui_button_cb_cancelQuit, nullptr, GuiButton_CANCEL);
 		x += cancelWidth + spacing;
 
 		// Button 3: Save Project (.praat)
-		GuiButton_createShown (theQuitDialog,
+		theQuitSaveButton = GuiButton_createShown (theQuitDialog,
 			x, x + saveWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			U"Save Project (.praat)", gui_button_cb_saveProjectAndQuit, nullptr, 0);
 		x += saveWidth + spacing;
 
 		// Button 4: Quit
-		GuiButton_createShown (theQuitDialog,
+		theQuitDirectButton = GuiButton_createShown (theQuitDialog,
 			x, x + quitWidth,
 			buttonY, buttonY + Gui_PUSHBUTTON_HEIGHT,
 			(g_language_choice == 0 ? U"Quit" : U"Quit Application"), gui_button_cb_directQuit, nullptr, GuiButton_DEFAULT);
 	} else {
+		praat_quitDialog_languageChanged ();
 		GuiLabel_setText (theQuitLabel1, line1Text);
 		GuiLabel_setText (theQuitLabel2, line2Text);
 	}
@@ -1948,6 +2337,7 @@ void praat_init (conststring32 title,
 ) {
 	setThePraatLocale ();
 	Melder_init ();
+	g_melder_translate = praat_translate;
 	const bool weWereStartedFromTheCommandLine = tryToAttachToTheCommandLine ();
 	MelderConsole_init ();
 
@@ -1978,6 +2368,7 @@ void praat_init (conststring32 title,
 	if (! praatP.ignorePreferenceFiles) {
 		Preferences_read (& prefsFile);
 	}
+	g_melder_translate = (g_language_choice == 0 ? nullptr : praat_translate);
 
 	theCurrentPraatApplication -> batch = Melder_batch;
 
@@ -2090,9 +2481,10 @@ void praat_init (conststring32 title,
 		praat_addMenus (praatP.menuBar);
 
 		trace (U"creating the object list in the Objects window");
-		GuiLabel_createShown (raam, 3, -250, Machine_getMenuBarBottom () + 5, Machine_getMenuBarBottom () + 5 + Gui_LABEL_HEIGHT, U"Objects:", 0);
+		praatLabel_objects = GuiLabel_createShown (raam, 3, -250, Machine_getMenuBarBottom () + 5, Machine_getMenuBarBottom () + 5 + Gui_LABEL_HEIGHT, U"Objects:", 0);
 		praatList_objects = GuiList_create (raam, 0, -250, Machine_getMenuBarBottom () + 26, -100, true, U" Objects ");
 		GuiList_setSelectionChangedCallback (praatList_objects, gui_cb_list_selectionChanged, nullptr);
+		GuiList_setContextMenuCallback (praatList_objects, gui_cb_list_contextMenu, nullptr);
 		GuiThing_show (praatList_objects);
 		praat_addFixedButtons (raam);
 
