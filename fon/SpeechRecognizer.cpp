@@ -17,6 +17,9 @@
  */
 
 #include "SpeechRecognizer.h"
+#include <string>
+#include <algorithm>
+#include <vector>
 #include "Sound.h"
 #include "whisper.h"
 #include "melder.h"
