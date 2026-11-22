@@ -17,6 +17,7 @@
  */
 
 #include "melder.h"
+#include <string>
 #include <stdarg.h>
 #if defined (UNIX) || defined (macintosh)
 	#include <sys/types.h>

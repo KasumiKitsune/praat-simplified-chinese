@@ -17,6 +17,7 @@
  */
 
 #include "FunctionEditor.h"
+#include <algorithm>
 #include "machine.h"
 #include "EditorM.h"
 #include "GuiP.h"
