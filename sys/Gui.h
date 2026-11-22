@@ -392,6 +392,8 @@ Thing_define (GuiThing, Thing) {
 	GuiThing d_parent;
 	GuiObject d_widget;
 
+	void v9_destroy () noexcept
+		override;
 	virtual void v_show ();
 	virtual void v_hide ();
 	virtual void v_setSensitive (bool sensitive);
@@ -969,6 +971,7 @@ void GuiMenuItem_setText (GuiMenuItem me, conststring32 text);
 
 Thing_define (GuiOptionMenu, GuiControl) {
 	int d_value;
+	int d_i18nOptionCount;
 	OrderedOf<structGuiMenuItem> d_options;
 	#if gtk
 		//GtkComboBox *d_gtkCascadeButton;
@@ -1040,6 +1043,7 @@ void GuiRadioGroup_end ();
 
 bool GuiRadioButton_getValue (GuiRadioButton me);
 void GuiRadioButton_set (GuiRadioButton me);
+void GuiRadioButton_setText (GuiRadioButton me, conststring32 text /* cattable */);
 
 /********** GuiScale **********/
 

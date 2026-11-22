@@ -27,217 +27,341 @@ R"~~~(
 "Voice"
 © Paul Boersma 2003-2006
 
-本教程介绍如何在 Praat 中进行嗓音分析（voice analysis）。
-要理解本教程，您需要先熟悉 @@Intro|入门教程@，其中介绍了 @@SoundEditor|声音编辑器@ 窗口的更通用功能。
+This tutorial describes how you can do voice analysis with Praat.
+To understand this tutorial, you have to be familiar with the @Intro,
+which describes the more general features of the @SoundEditor window.
 
-Praat 的大多数嗓音分析方法都始于声门脉冲（glottal pulses），它们在 @@SoundEditor|声音编辑器@ 窗口中显示为穿过波形图的蓝色垂直线。如果您没有看到这些线，请从 #Pulses（脉冲）菜单中选择 @@Show pulses|显示脉冲@。如果您的声音较长，您可能需要放大（zoom in）才能看到单个脉冲。您可能会注意到，对于某些声音，当您放大或滚动时，脉冲的时间位置可能会发生变化。这是因为分析时仅使用声音的可见部分。当您放大或滚动时，测量结果也会略有不同。
+Most of Praat’s voice analysis methods start from the glottal pulses that are visible in the @SoundEditor window
+as blue vertical lines through the waveform. If you do not see these lines,
+choose @@Show pulses@ from the #Pulses menu. If your sound is long, you may have to zoom in
+in order to see the separate pulses. You may notice that for some sounds, the time location of the pulses
+can vary when you zoom or scroll. This is because only the visible part of the sound is used for the analysis.
+The measurement results will also vary slightly when you zoom or scroll.
 
-Pulse（脉冲）菜单包含 @@Voice report|嗓音报告@ 命令，它会在 @@Info window|信息窗口@ 中显示选区可见部分（如果只有光标而没有选区，或者选区不可见，则为整个声音的可见部分）的许多嗓音测量结果。
+The Pulse menu contains the command @@Voice report@, which will show in the Info window
+the results of many voice measurements for the visible part of the selection
+(or for the visible part of the whole sound, if there is a cursor instead of a selection or if the selection is not visible).
 
-Pitch settings（音高设置）
-=========================
+Pitch settings
+==============
 
-嗓音测量结果将取决于您的 @@Pitch settings...|音高设置...@。
-通常，您需要注意音高范围。标准范围是 75\--600 赫兹（Hertz），但如果是病理性的男性嗓音，如果其典型范围处于该区间，可以采用例如 50\--200 赫兹的范围。
-您可能还需要选择 ##Optimize for voice analysis#（针对嗓音分析优化）；否则，嗓音报告会抱怨可能存在不准确性。
-“高级”音高设置（例如 ##Silence threshold#（静音阈值）和 ##Octave jump cost#（倍频跳变惩罚））可以保持在其标准值。
+The results of the voice measurements will depend on your @@Pitch settings...|Pitch settings@.
+In general, you will want to be careful about the pitch range. The standard range is 75\--600 Hertz,
+but take a range of e.g. 50\--200 Hertz for pathological male voices if that is the typical range.
+You may also want to choose ##Optimize for voice analysis#; otherwise, the voice report will complain about possible inaccuracies.
+The “advanced” pitch settings like ##Silence threshold# and ##Octave jump cost# can stay at their standard values.
 
-,	@@Voice 1. Voice breaks|Voice 1. 语音中断@
-,	@@Voice 2. Jitter|Voice 2. 基频微扰 (Jitter)@
-,	@@Voice 3. Shimmer|Voice 3. 振幅微扰 (Shimmer)@
-,	@@Voice 4. Additive noise|Voice 4. 加性噪声@ (HNR, harmonicity)
-,	@@Voice 5. Comparison with other programs|Voice 5. 与其他软件的对比@
-,	@@Voice 6. Automating voice analysis with a script|Voice 6. 使用脚本自动进行嗓音分析@
+,	@@Voice 1. Voice breaks@
+,	@@Voice 2. Jitter@
+,	@@Voice 3. Shimmer@
+,	@@Voice 4. Additive noise@ (HNR, harmonicity)
+,	@@Voice 5. Comparison with other programs@
+,	@@Voice 6. Automating voice analysis with a script@
 
 ################################################################################
 "Voice 1. Voice breaks"
 © Paul Boersma 2003
 
-正常嗓音在发音 [a] 时可以轻松维持一段时间的发声（phonation）。
-有些病理嗓音在这方面会遇到困难。在 Praat 中可以通过两种方式来测量这一点。
+Normal voices can easily maintain phonation for some time when saying [a].
+Some pathological voices have trouble with it. This can be measured in Praat
+in two ways.
 
-局部清音音高帧比例 (Fraction of locally unvoiced pitch frames)
-=============================================================
+Fraction of locally unvoiced pitch frames
+======================================
 
-这是被分析为清音（无声）的音高帧比例（MDVP 称之为 DUV）。如果音高下限（pitch floor）是 75 Hz，您的 @@SoundEditor|声音编辑器@ 窗口将包含间隔 0.01 秒的音高测量值，因此如果您选择一秒，将会有 100 个音高帧。如果其中有 86 个是局部浊音帧，则比例将为 14%。
+This is the fraction of pitch frames that are analysed as unvoiced (MDVP calls it DUV). If the pitch floor is 75 Hz,
+your Sound editor window will contain pitch measurements that are 0.01 seconds apart, so that if you select one second,
+there will be 100 pitch frames. If 86 of these are locally voiced, the Fraction will be 14 percent.
 
-通常的音高分析包含一个%%寻路器%（path finder），它会在局部的音高候选者中搜索一条平滑的路径。在确定局部清音帧比例时，该寻路器会被临时关闭。如果一个帧的发声强度低于%%发声阈值%（voicing threshold，标准值为 0.45），或者其局部峰值低于%%静音阈值%（silence threshold，标准值为 0.03），则该帧被视为%局部清音帧。
+The usual pitch analysis contains a %%path finder% that searches for a smooth path through the local
+pitch candidates. This path finder is temporarily switched off to determine the fraction of locally unvoiced frames.
+A frame is regarded as %locally unvoiced if it has a voicing strength below the %%voicing threshold% (whose standard value is 0.45),
+or a local peak below the %%silence threshold% (whose standard value is 0.03).
 
-在嗓音报告中，清音帧的比例将报告如下：
+In the voice report, the fraction of unvoiced frames will be reported as follows:
 {;
 	Fraction of locally unvoiced frames: 14.000% (14/100)
 }
-括号中的数字分别是清音帧数和总帧数（在 MDVP 中，它们分别被称为 NUV 和 SEG）。
+The numbers between parentheses are the number of unvoiced frames and the total number of frames,
+respectively (in MDVP, these are called NUV and SEG, respectively).
 
-清音帧比例的规范值（参考值）为 0，即正常健康的嗓音在持续元音发音期间应该能够毫无困难地维持发声。任何非零值都可以被视为病理迹象（类似于普通感微度）。
-自然地，在测量此参数时，您不应选择音频开头和结尾的静音段。
+The normative value for the fraction of unvoiced frames is 0, i.e., normal healthy voices should
+have no trouble maintaining voicing during a sustained vowel. Every non-zero value can be considered
+a sign of pathology (like a common cold).
+Naturally, you will not select the leading and trailing silences when measuring this parameter.
 
-语音中断次数 (Number of voice breaks)
-=====================================
+Number of voice breaks
+======================
 
-相邻脉冲之间的距离长于 1.25 除以音高下限（pitch floor）的次数。
-因此，如果音高下限是 75 Hz，则所有长于 16.6667 毫秒的脉冲间间隔都将被视为语音中断（voice breaks）。
+The number of distances between consecutive pulses that are longer than 1.25 divided by the pitch floor.
+Thus, if the pitch floor is 75 Hz, all inter-pulse intervals longer than 16.6667 milliseconds are regarded as voice breaks.
 
-语音中断程度 (Degree of voice breaks)
-=====================================
+Degree of voice breaks
+======================
 
-这是信号中浊音部分之间中断的总时长，除以被分析信号的总时长（MDVP 称之为 DVB）。由于信号开头 and 结尾的静音不被视为中断，在测量此参数时，您可能不想选择这些静音段。
+This is the total duration of the breaks between the voiced parts of the signal,
+divided by the total duration of the analysed part of the signal (MDVP calls it DVB). Since silences at the beginning
+and the end of the signal are not considered breaks, you will probably not want to select these silences
+when measuring this parameter.
 
-在嗓音报告中，语音中断程度将报告如下：
+In the voice report, the degree of voice breaks will be reported like this:
 {;
 	Degree of voice breaks: 29.529% (1.163061 s / 3.938685 s)
 }
-括号中的数字分别是语音中断的总时长和被分析信号的持续时间。
+The numbers between parentheses are the total duration of the voice breaks and the duration of the analysed part of the signal,
+respectively.
 
 ################################################################################
 "Voice 2. Jitter"
 © Paul Boersma 2003,2011
 
-您可以在 @@SoundEditor|声音编辑器@ 窗口中测量基频微扰（Jitter）。首先，从 #Pulses（脉冲）菜单中选择 @@Show pulses|显示脉冲@。您将看到蓝色垂直线，它们可以被理解为代表声门的关闭。使用 #Pulses 菜单中的 @@Voice report|嗓音报告@ 来获取选定部分的 Jitter。通常，您只对持续的长元音进行 Jitter 测量。
+You can measure jitter in the Sound editor window, after choosing @@Show pulses@ from the #Pulses menu.
+You will see blue lines that can be thought of as representing the glottal closures.
+Use @@Voice report@ from the #Pulses menu to get the jitter in the selected part.
+You typically perform jitter measurements only on long sustained vowels.
 
-嗓音报告提供了五种 Jitter 测量。所有这些测量都基于通过波形匹配程序（waveform-matching procedure，参见 @@Voice 6. Automating voice analysis with a script|Voice 6. 使用脚本自动进行嗓音分析@）对所有%周期（periods）进行的计算。其中，##Period floor#（周期下限）设置是 0.8 除以音高上限（pitch ceiling），##Period ceiling#（周期上限）设置是 1.25 除以音高下限（pitch floor），而 ##Maximum period factor#（最大周期因子）则在 @@Advanced pulses settings...@ 中确定。
+The voice report gives five kinds of jitter measurements.
+All of these measurements are based on the computation of all %periods by the waveform-matching procedure
+(see @@Voice 6. Automating voice analysis with a script@),
+where the ##Period floor# setting is 0.8 divided by the pitch ceiling,
+the ##Period ceiling# setting is 1.25 divided by the pitch floor,
+and the ##Maximum period factor# is determined in @@Advanced pulses settings...@.
 
-Jitter (local) 局部基频微扰
-==========================
+Jitter (local)
+==============
 
-这是相邻周期之间差值的平均绝对值，除以平均周期。有关精确的过程，参见 @@PointProcess: Get jitter (local)...@。
+This is the average absolute difference between consecutive periods, divided by the average period.
+For the precise procedure, see @@PointProcess: Get jitter (local)...@.
 
-MDVP 将此参数称为 %Jitt，并将 1.040% 设定为病理学阈值。由于该数值基于受噪声影响的 Jitter 测量（参见 @@Voice 5. Comparison with other programs|Voice 5. 与其他软件的对比@），正确的阈值可能更低。
+MDVP calls this parameter %Jitt, and gives 1.040\%  as a threshold for pathology.
+As this number was based on jitter measurements influenced by noise (see @@Voice 5. Comparison with other programs@),
+the correct threshold is probably lower.
 
-Jitter (local, absolute) 绝对局部基频微扰
-========================================
+Jitter (local, absolute)
+========================
 
-这是相邻周期之间差值的平均绝对值，单位为秒。有关精确的过程，参见 @@PointProcess: Get jitter (local, absolute)...@。
+This is the average absolute difference between consecutive periods, in seconds.
+For the precise procedure, see @@PointProcess: Get jitter (local, absolute)...@.
 
-MDVP 将此参数称为 %Jita，并将 83.200 \mus（微秒）设定为病理学阈值。由于该数值基于受噪声影响的 Jitter 测量（参见 @@Voice 5. Comparison with other programs|Voice 5. 与其他软件的对比@），正确的阈值可能更低。
+MDVP calls this parameter %Jita, and gives 83.200 \mus as a threshold for pathology.
+As this number was based on jitter measurements influenced by noise (see @@Voice 5. Comparison with other programs@),
+the correct threshold is probably lower.
 
-Jitter (rap) 相对平均扰动
-=========================
+Jitter (rap)
+============
 
-这是相对平均扰动（Relative Average Perturbation），即一个周期与其相邻的两个周期的平均值之间的绝对差值的平均值，除以平均周期。有关精确的过程，参见 @@PointProcess: Get jitter (rap)...@。
+This is the Relative Average Perturbation,
+the average absolute difference between a period and the average of it and its two neighbours, divided by the average period.
+For the precise procedure, see @@PointProcess: Get jitter (rap)...@.
 
-MDVP 将 0.680% 设定为病理学阈值。由于该数值基于受噪声影响的 Jitter 测量（参见 @@Voice 5. Comparison with other programs|Voice 5. 与其他软件的对比@），正确的阈值可能更低。
+MDVP gives 0.680\%  as a threshold for pathology.
+As this number was based on jitter measurements influenced by noise (see @@Voice 5. Comparison with other programs@),
+the correct threshold is probably lower.
 
-Jitter (ppq5) 五点周期扰动商
-===========================
+Jitter (ppq5)
+=============
 
-这是五点周期扰动商（Period Perturbation Quotient），即一个周期与其自身及最邻近的四个周期的平均值之间的绝对差值的平均值，除以平均周期。有关精确的过程，参见 @@PointProcess: Get jitter (ppq5)...@。
+This is the five-point Period Perturbation Quotient,
+the average absolute difference between a period and the average of it and its four closest neighbours, divided by the average period.
+For the precise procedure, see @@PointProcess: Get jitter (ppq5)...@.
 
-MDVP 将此参数称为 %PPQ，并将 0.840% 设定为病理学阈值；由于该数值基于受噪声影响的 Jitter 测量（参见 @@Voice 5. Comparison with other programs|Voice 5. 与其他软件的对比@），正确的阈值可能更低。
+MDVP calls this parameter %PPQ, and gives 0.840\%  as a threshold for pathology;
+as this number was based on jitter measurements influenced by noise (see @@Voice 5. Comparison with other programs@),
+the correct threshold is probably lower.
 
-Jitter (ddp) 差分基频微扰
-=========================
+Jitter (ddp)
+============
 
-这是相邻周期的差值之间差值的平均绝对值，除以平均周期。有关精确的过程，参见 @@PointProcess: Get jitter (ddp)...@。
+This is the average absolute difference between consecutive differences between consecutive periods, divided by the average period.
+For the precise procedure, see @@PointProcess: Get jitter (ddp)...@.
 
-这是 Praat 原始的 ##Get jitter# 测量值。其值是 RAP 的三倍。
+This is Praat’s original ##Get jitter#. The value is three times RAP.
 
 ################################################################################
 "Voice 3. Shimmer"
 © Paul Boersma 2003,2026
 
-您可以在 @@SoundEditor|声音编辑器@ 窗口中测量振幅微扰（Shimmer）。首先，从 #Pulses（脉冲）菜单中选择 @@Show pulses|显示脉冲@。您将看到蓝色垂直线，它们可以被理解为代表声门的关闭。使用 Pulse（脉冲）菜单来获取选定部分的 Shimmer。通常，您只对持续的长元音进行 Shimmer 测量。嗓音报告提供了六种 Shimmer 测量。
+You can measure shimmer in the Sound editor window, after choosing @@Show pulses@ from the #Pulses menu.
+You will see blue lines that can be thought of as representing the glottal closures.
+Use the Pulse menu to get the shimmer in the selected part. You typically perform shimmer measurements only on
+long sustained vowels. The voice report gives six kinds of shimmer measurements.
 
-Shimmer (local) 局部振幅微扰
-===========================
+Shimmer (local)
+===============
 
-这是相邻周期振幅之间绝对差值的平均值，除以平均振幅。MDVP 将此参数称为 %Shim，并将 3.810% 设定为病理学阈值。
+This is the average absolute difference between the amplitudes of consecutive periods, divided by the average amplitude.
+MDVP calls this parameter %Shim, and gives 3.810\%  as a threshold for pathology.
 
-Shimmer (local, dB) 分贝局部振幅微扰
-===================================
+Shimmer (local, dB)
+===================
 
-这是相邻周期振幅之比的以 10 为底的对数的平均绝对值，乘以 20。MDVP 将此参数称为 %ShdB，并将 0.350 dB 设定为病理学阈值。
+This is the average absolute base-10 logarithm of the difference between the amplitudes of consecutive periods, multiplied by 20.
+MDVP calls this parameter %ShdB, and gives 0.350 dB as a threshold for pathology.
 
-Shimmer (apq3) 三点振幅扰动商
-============================
+Shimmer (apq3)
+==============
 
-这是三点振幅扰动商（Amplitude Perturbation Quotient），即一个周期的振幅与其相邻的两个周期的振幅平均值之间的绝对差值的平均值，除以平均振幅。
+This is the three-point Amplitude Perturbation Quotient,
+the average absolute difference between the amplitude of a period and the average of the amplitudes of its neighbours,
+divided by the average amplitude.
 
-Shimmer (apq5) 五点振幅扰动商
-============================
+Shimmer (apq5)
+==============
 
-这是五点振幅扰动商（Amplitude Perturbation Quotient），即一个周期的振幅与其自身及最邻近的四个周期的振幅平均值之间的绝对差值的平均值，除以平均振幅。
+This is the five-point Amplitude Perturbation Quotient,
+the average absolute difference between the amplitude of a period and the average of the amplitudes of it and its four closest neighbours,
+divided by the average amplitude.
 
-Shimmer (apq11) 十一点振幅扰动商
-===============================
+Shimmer (apq11)
+===============
 
-这是十一点振幅扰动商（Amplitude Perturbation Quotient），即一个周期的振幅与其自身及最邻近的十个周期的振幅平均值之间的绝对差值的平均值，除以平均振幅。MDVP 将此参数称为 %APQ，并将 3.070% 设定为病理学阈值。
+This is the 11-point Amplitude Perturbation Quotient,
+the average absolute difference between the amplitude of a period and the average of the amplitudes of it and its ten closest neighbours,
+divided by the average amplitude.
+MDVP calls this parameter %APQ, and gives 3.070\%  as a threshold for pathology.
 
-Shimmer (dda) 差分振幅微扰
-==========================
+Shimmer (dda)
+=============
 
-这是相邻周期振幅的差值之间差值的平均绝对值。这是 Praat 原始的 ##Get shimmer# 测量值。其值是 APQ3 的三倍。
+This is the average absolute difference between consecutive differences between the amplitudes of consecutive periods.
+This is Praat's original ##Get shimmer#. The value is three times APQ3.
 
 ################################################################################
 "Voice 4. Additive noise"
 © Paul Boersma 2002
 
-对于可以假定为周期性的信号（例如持续元音），信噪比（signal-to-noise ratio）等于谐噪比（harmonics-to-noise ratio，HNR），您可以通过选择一个 @Sound（声音）对象并从 Periodicity（周期性）菜单中选择 ##To Harmonicity...# 命令之一来获取该值（有关算法，请参见 @@Sound: To Harmonicity (ac)...@ 或 @@Sound: To Harmonicity (cc)...@）。这是世界上最灵敏的 HNR 测量（最高可达 90 dB）。有关更多信息，请参阅 @Harmonicity 手册页。
+For a signal that can be assumed periodic (i.e., a sustained vowel),
+the signal-to-noise ratio equals the harmonics-to-noise ratio, which you get can get
+by selecting a Sound and choosing one of the ##To Harmonicity...# commands from the Periodicity menu
+(for the algorithm, see @@Sound: To Harmonicity (ac)...@ or @@Sound: To Harmonicity (cc)...@).
+These are the world’s most sensitive HNR measurements (up to 90 dB).
+For more information, see the @Harmonicity manual page.
 
 ################################################################################
 "Voice 5. Comparison with other programs"
 © Paul Boersma 2003,2006,2010
 
-Praat 所做的发声（voicing）、基频微扰（jitter）和振幅微扰（shimmer）测量并不总是能与 MDVP 等其他软件做出的测量直接进行对比。原因在于发声判定决策策略以及周期和峰值确定的准确性差异。
+Voicing, jitter, and shimmer measurements made by Praat cannot always be compared directly with those made by other
+programs such as MDVP. The causes are the voicing decision strategy and the accuracy of period and peak determination.
 
-5.1. 发声判定决策：略有不同
-===========================
+5.1. Voicing decisions: slightly different
+======================================
 
-不同的软件使用非常不同的方法来决定信号的某个不规则部分是否被判断为浊音（voiced）。通过对比 Praat 的 @@Boersma (1993)@ 和 MDVP 的 @@Deliyski (1993)@ 可以得出以下思考。Praat 和 MDVP 都使用自相关方法（autocorrelation method）进行音高分析，但 MDVP 在计算自相关之前会将振幅量化为 -1、0 和 +1，而 Praat 使用原始振幅。此外，Praat 会通过将自相关函数除以窗口的自相关函数来进行校正，这与其他任何软件都不同。最后，Praat 使用 sinc 插值计算自相关峰值高度的精确估计，这与其他任何软件都不同。这三种差异（还有更多）都会影响 1/F0 处自相关峰值高度 of 的测量。这个高度通常被用作判断是否发声（voiced）的标准：如果它大于%%发声阈值%（voicing threshold，您可以通过 @@Pitch settings...|音高设置...@ 进行更改），该帧就被认为是浊音，否则被认为是清音（无声）。
-在 Praat 中，标准的发声阈值是 0.45，而在 MDVP 中是 0.29，这表明 MDVP 倾向于比 Praat 将更多的帧判断为浊音。但这二者数值之间的差异部分可以通过以下事实来解释：MDVP 不校正自相关函数，且 MDVP 不进行精确的 sinc 插值。这两个特性都导致（在 MDVP 中）测量得到的 1/F0 处的峰值高度低于真实高度，正如 @@Boersma (1993)@ 所解释的那样。
+Different programs use very different methods for deciding whether an irregular part of the signal is voiced or not.
+A comparison of @@Boersma (1993)@ for Praat and @@Deliyski (1993)@ for MDVP leads to the
+following considerations. Both Praat and MDVP use an autocorrelation method for
+pitch analysis, but MDVP quantizes the amplitudes into the values -1, 0, and +1 before computing
+the autocorrelation, whereas Praat uses the original amplitude. Also, Praat corrects
+the autocorrelation function by dividing it by the autocorrelation function of the window,
+unlike any other program. Lastly, Praat uses sinc interpolation to compute an accurate
+estimate of the height of the autocorrelation peaks, unlike any other program.
+All three of these differences (and there are more) influence the measurement of the height
+of the autocorrelation peak at 1/F0. This height is generally taken as a criterion for voicing:
+if it is more than the %%voicing threshold% (which you can change with @@Pitch settings...@,
+the frame is considered voiced, otherwise voiceless.
+In Praat, the standard voicing threshold is 0.45, in MDVP it is 0.29, which suggests that MDVP
+tends to regard more frames as voiced than Praat. But the difference between these two numbers
+may partly be explained by the fact that MDVP does not correct the autocorrelation function and that MDVP
+does not do an accurate sinc interpolation: both of these properties cause
+the measured height of the peak at 1/F0 (in MDVP) to be lower than the real height, as explained by @@Boersma (1993)@.
 
-5.2. Jitter 测量：有时非常不同
-==============================
+5.2. Jitter measurements: sometimes very different
+======================================
 
-不同软件中的 Jitter 测量可能会产生不同的结果，Praat 经常给出比 MDVP 低得多的值，尤其是对于多噪声的声音。我现在来解释一下其中的差异来自哪里。在 @@Boersma (2009a)@ 中提供了更详细的带有插图的说明。
+The jitter measures in various programs may yield different results, with Praat often giving much lower values than MDVP,
+especially for noisy sounds. I will now explain where the difference comes from.
+A more elaborate explanation with pictures is given in @@Boersma (2009a)@.
 
-如果一段声音由计算机生成为声门源信号，具有 1% 的随机周期时长变化（围绕恒定的 F0 波动），然后使用对应于持续元音的声道配置特征进行滤波，Praat 和 MDVP 都将测量该声音具有 1% 的“Jitter”。因此，对于无噪声的微扰信号，这两个软件给出同样准确的结果。
+If a sound is computer-generated as a glottal source signal with a random period duration variation of 1 percent (around a constant F0),
+then filtered with the characteristics of a vocal tract configuration corresponding to a sustained vowel,
+both Praat and MDVP will measure this sound as having a “jitter” of 1 percent.
+For non-noisy jittery sginals, therefore, the two programs give equally accurate results.
 
-如果一段声音由计算机生成为具有恒定周期的声门源信号，然后使用对应于持续元音的声道配置特征进行滤波，Praat 和 MDVP 测得该声音的“Jitter”都将小于 0.01%。因此，这两个软件在测量极小 Jitter 值时具有相当的灵敏度。
+If a sound is computer-generated as a glottal source signal with a constant period,
+then filtered with the characteristics of a vocal tract configuration corresponding to a sustained vowel,
+both Praat and MDVP will measure this sound as having a “jitter” of less than 0.01 percent.
+The two programs, therefore, have a comparable sensitivity in measuring small jitter values.
 
-到目前为止，这两个软件给出的结果还是相当的。当加入噪声时，两者的差异就出现了。
+So far, the two programs give comparable results. The difference between the two programs comes when noise is added.
 
-如果一段声音由计算机生成为具有恒定周期的声门源信号，然后使用对应于持续元音的声道配置特征进行滤波，并且接着加入 1% 的加性“白”噪声（这是一个非常普通的量），Praat 测得该声音的“Jitter”为 0.02%，而 MDVP 测得该声音的“Jitter”为 0.6%。换句话说，Praat 会告诉您几乎没有 Jitter，而 MDVP 则会告诉您 Jitter 达到了接近病理的水平。相关的曲线可以在我的论文《Stemmen meten met Praat》和 @@Boersma (2009a)@ 中看到，其数值已由 Deliyski, Shaw & Evans 证实（%%Journal of Voice%, 2005: 23）。
+If a sound is computer-generated as a glottal source signal with a constant period,
+then filtered with the characteristics of a vocal tract configuration corresponding to a sustained vowel,
+and if then 1 percent additive “white” noise (a quite usual amount) is added,
+Praat will measure this sound as having a “jitter” of 0.02 percent,
+whereas MDVP will measure this sound as having a “jitter” of 0.6 percent.
+In other words, Praat will tell you that there is almost no jitter,
+whereas MDVP will tell you that the jitter is of an almost pathological level.
+The relevant curves can be seen in my papers “Stemmen meten met Praat” and @@Boersma (2009a)@,
+and the numbers are confirmed by Deliyski, Shaw & Evans (%%Journal of Voice%, 2005: 23).
 
-可以看出，Praat 的“Jitter”测量试图将周期时长变化的影响（它报告为“Jitter”）与加性噪声的影响（它不报告为“Jitter”）分离开来；而 MDVP 的“Jitter”测量则结合了周期时长变化与加性噪声的影响（两者都被其报告为“Jitter”）。
+One can see that Praat's “jitter” measure attempts to separate the influence of period duration variation
+(which it reports as “jitter”) from the influence of additive noise (which is does not report as “jitter”),
+and that MDVP’s “jitter” measure combines the influence of period duration variation with the influence of additive noise
+(both of which it reports as “jitter”).
 
-Praat 和 MDVP 在 Jitter 测量上的差异是由于测量周期方式的不同所致。Praat 使用%%波形匹配%（waveform-matching）法，其中周期的长度是通过寻找最佳匹配的波形形状（“互相关”最大值）来确定的。而 MDVP 使用%%峰值拾取%（peak-picking）法，通过测量波形中两个局部最高峰值之间的时间差来确定周期长度。波形匹配方法平均去掉了加性噪声的很大一部分影响，而峰值拾取方法对加性噪声高度敏感。详细图解参见 @@Boersma (2009a)@。
+The difference between Praat’s and MDVP’s jitter measures is due to a difference between the way in which periods are measured.
+Praat uses %%waveform-matching%, in which the duration of a period is determined by looking for best matching wave shapes
+(a “cross-correlation” maximum). MDVP uses %%peak-picking% instead, where the duration of a period is determined by
+measuring the time difference between two locally highest peaks in the wave form. The waveform-matching method
+averages away much of the influence of additive noise, whereas peak-picking is highly sensitive to additive noise.
+For detailed illustrations, see @@Boersma (2009a)@.
 
 ################################################################################
 "Voice 6. Automating voice analysis with a script"
 © Paul Boersma 2005,2006,2014,2022,2023,2025
 
-在 Praat 脚本中，您通常不想弹出声音窗口（Sound window）。相反，您可能只想在对象窗口（Objects window）中对数据对象进行操作。本页向您介绍如何使用脚本进行嗓音分析。
+In a Praat script you usually do not want to raise a Sound window.
+Instead, you probably want to work with objects in the Objects window only.
+This page tells you how to do that for voice analysis.
 
-1. 在对象窗口中创建脉冲 (Creating the pulses in the Objects window)
-=============================================================
+1. Creating the pulses in the Objects window
+======================================
 
-您看到的蓝色垂直线脉冲是一个 @PointProcess 对象。如果您在声音窗口的 #Pulses 菜单中选择 ##Extract visible pulses#（提取可见脉冲），您就会看到这一点：一个 PointProcess 对象将会出现在列表中。
+The pulses you see as blue lines are a @PointProcess object. You can see this if
+you choose ##Extract visible pulses# from the #Pulses menu in the Sound window:
+a PointProcess object will appear in the list.
 
-您也可以直接在对象窗口中创建 PointProcess。为此，选择一个 @Sound 对象，并从 Periodicity（周期性）菜单中选择 @@Sound: To PointProcess (periodic, cc)...@。
+You can also create a PointProcess in the Objects window directly. To do this,
+select a Sound and choose @@Sound: To PointProcess (periodic, cc)...@ from the #Periodicity menu.
 
-您也可以分两步来完成。首先，使用 @@Sound: To Pitch (raw autocorrelation)...@ 或 @@Sound: To Pitch (raw cross-correlation)...@ 创建一个 @Pitch 对象。然后，选择生成的 Pitch %连同原始 @Sound 对象，并选择 @@Sound & Pitch: To PointProcess (cc)@。
+You can also do this in two steps. First you create a Pitch with
+@@Sound: To Pitch (raw autocorrelation)...@ or @@Sound: To Pitch (raw cross-correlation)...@.
+Then you select the resulting Pitch %together with the original Sound
+and choose @@Sound & Pitch: To PointProcess (cc)@.
 
-由于 @@Sound: To PointProcess (periodic, cc)...@ 的直接方法实际上使用 AC（自相关）方法来计算 Pitch（这对于语调分析是最佳的），如果您的目标是进行嗓音分析，您可能更倾向于采用两步法版本。在这种情况下，第一步使用 @@Sound: To Pitch (raw cc)...@，第二步使用 @@Sound & Pitch: To PointProcess (cc)@。声音编辑器窗口也是这样处理的：如果您在 @@Pitch settings...|音高设置...@ 中选择了 ##Optimize for voice analysis#（针对嗓音分析优化），Praat 会使用 @@Sound: To Pitch (raw cc)...@ 进行音高分析。
+Since the direct method of @@Sound: To PointProcess (periodic, cc)...@ actually uses the AC method
+for computing the Pitch (which is optimal for intonation analysis),
+you may prefer the two-step version if your goal is to do voice analysis.
+In that case, you use @@Sound: To Pitch (raw cc)...@ as the first step,
+and @@Sound & Pitch: To PointProcess (cc)@ as the second step.
+This is also how the Sound window does it: if you choose ##Optimize for voice analysis# in the @@Pitch settings...|Pitch settings@,
+Praat uses @@Sound: To Pitch (raw cc)...@ for pitch analysis.
 
-如果您想进行嗓音分析，%不应该做 的是仅通过选择一个 Pitch 对象并选择 @@Pitch: To PointProcess@ 来创建 PointProcess。因为这样生成的脉冲不会与 Sound 中的周期对齐。
+What you should %not do if you want to perform voice analysis is to create the PointProcess
+by selecting a Pitch only and then choosing @@Pitch: To PointProcess@. In that way,
+the resulting pulses would not be aligned to the periods in the Sound.
 
-2. 从脚本测量 Jitter (Measuring jitter from a script)
-====================================================
+2. Measuring jitter from a script
+=================================
 
-一旦您拥有了代表 Sound 中周期的 PointProcess，您可以选择它并从 @@Query submenu|查询子菜单@ 中选择一些 ##Get jitter# 命令。
+Once you have a PointProcess that represents the periods in the Sound,
+you can select it and choose some ##Get jitter# commands from the @@Query submenu@.
 
-3. 从脚本测量 Shimmer (Measuring shimmer from a script)
-======================================================
+3. Measuring shimmer from a script
+==================================
 
-一旦您拥有了代表 Sound 中周期的 PointProcess，您可以将它与 Sound 一起选中，然后从 @@Query submenu|查询子菜单@ 中选择一些 ##Get shimmer# 命令。
+Once you have a PointProcess that represents the periods in the Sound,
+you can select it together with the Sound, then choose some ##Get shimmer# commands from the @@Query submenu@.
 
-4. 从脚本获取整个嗓音报告 (Getting the whole voice report from a script)
-======================================================================
+4. Getting the whole voice report from a script
+======================================
 
-如果您将 Sound、Pitch 和 PointProcess 一起选中（全部三个），将会出现一个名为 ##Voice report...# 的按钮。如果您按下它，嗓音报告将会输出到 @@Info window|信息窗口@ 中。这与声音窗口中的嗓音报告完全相同，尽管您必须手动键入以指定时间范围。
+If you select the Sound, the Pitch, and the PointProcess together (all three),
+there will be a button that says ##Voice report...#. If you press it, the voice report
+will be written to the Info window. This is identical to the voice report in the Sound window,
+although you will have to specify the time range by manually typing it.
 
-在脚本中，您可以通过以下类似操作从嗓音报告中提取 Jitter 和 Shimmer 值：
+In a script, you can get the jitter and shimmer from the voice report by doing something like:
 {;
 	voiceReport$ = \#{Voice report:} 0, 0, 75, 500, 1.3, 1.6, 0.03, 0.45
 	jitter = \`{extractNumber} (voiceReport$, “Jitter (local): ”)
@@ -245,16 +369,22 @@ Praat 和 MDVP 在 Jitter 测量上的差异是由于测量周期方式的不同
 	\`{writeInfoLine}: “Jitter = ”, percent$ (jitter, 3), “, shimmer = ”, \`{percent$} (shimmer, 3)
 }
 
-5. 自动嗓音分析的缺点 (Disadvantage of automating voice analysis)
-=============================================================
+5. Disadvantage of automating voice analysis
+======================================
 
-在上述所有命令中，您必须估算时间范围，并且通常会提供“0.0”和“0.0”，在这种情况下，您将获得整个声音的平均 Jitter 和 Shimmer。这可能会包含您通常不感兴趣的声音部分，例如不正确的人声起音。当在声音窗口中索取嗓音报告时，您不会遇到这些问题，因为在判断哪部分声音是相关的之后，您可以用手做出明确的时间选择。
+In all the commands mentioned above, you have to guess the time range,
+and you would usually supply “0.0” and “0.0”, in which case
+you will get the average jitter and shimmer for the whole sound.
+This may include parts of the sound that you are often not interested in, such as false starts.
+You do not have these problems when asking for a voice report in the sound window,
+because there you would make an explicit time selection by hand after judging what part of the sound is relevant.
 
 ################################################################################
 "Voice report"
 © Paul Boersma 2003
 
-#Pulses（脉冲）菜单中的一个命令，它将向 @@Info window|信息窗口@ 写入关于许多嗓音参数的详细报告。参见 @Voice 教程。
+A command in the #Pulses menu that will write to the Info window an extensive report
+about many voice parameters. See the @Voice tutorial.
 
 )~~~"
 MAN_PAGES_END

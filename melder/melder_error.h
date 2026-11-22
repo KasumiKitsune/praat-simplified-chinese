@@ -61,10 +61,23 @@ inline const char32* Melder_translate (const char32* text) {
 	return g_melder_translate ? g_melder_translate (text) : text;
 }
 
+template <size_t N>
+inline const char32* Melder_translateLiteralOnly (const char32 (&literal) [N]) {
+	return (N > 2 && g_melder_translate) ? g_melder_translate (literal) : literal;
+}
+template <size_t N>
+inline const char32* Melder_translateLiteralOnly (char32 (&buf) [N]) {
+	return buf;
+}
+template <typename T>
+inline const char32* Melder_translateLiteralOnly (const T& arg) {
+	return MelderArg { arg }. _arg;
+}
+
 void MelderError__appendOneString (conststring32 message);
 
 template <typename... Arg>
-void Melder_appendError (const Arg... arg) {
+void Melder_appendError (const Arg&... arg) {
 	std::lock_guard lock (theMelder_error_mutex);
 	if (Melder_hasError ()) {
 		if (Melder_thisThread_getUniqueID () != theMelder_error_threadId)
@@ -73,7 +86,7 @@ void Melder_appendError (const Arg... arg) {
 		theMelder_error_threadId = Melder_thisThread_getUniqueID ();
 	}
 	(// fold
-		MelderError__appendOneString (Melder_translate (MelderArg { arg }. _arg))
+		MelderError__appendOneString (Melder_translateLiteralOnly (arg))
 				, ...
 	);
 	MelderError__appendOneString (U"\n");

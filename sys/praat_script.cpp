@@ -196,7 +196,7 @@ bool praat_executeCommand (Interpreter interpreter, char32 *command) {
 		else
 			praat_select (IOBJECT); 
 		praat_show ();
-	} else if (Melder_isLetter (command [0]) && ! Melder_isUpperCaseLetter (command [0])) {   // all directives start with an ASCII lower-case letter
+	} else if (command [0] >= U'a' && command [0] <= U'z') {   // all directives start with an ASCII lower-case letter
 		if (str32nequ (command, U"select ", 7)) {
 			if (str32nequ (command + 7, U"all", 3) && (command [10] == U'\0' || command [10] == U' ' || command [10] == U'\t')) {
 				praat_selectAll ();
@@ -467,6 +467,35 @@ bool praat_executeCommand (Interpreter interpreter, char32 *command) {
 						throw;
 				}
 				if (! theCommandIsAnExistingMenuCommand) {
+					/*
+						Layer 3 bilingual alias fallback (zero cost on English fast path):
+						if command is a localized Chinese command alias, resolve to canonical English and re-dispatch.
+					*/
+					conststring32 lookupName = hasColon ? command2 : command;
+					conststring32 canonicalCmd = Melder_i18n_resolveScriptAlias (lookupName);
+					if (canonicalCmd && ! str32equ (canonicalCmd, lookupName)) {
+						if (! praat_commandsWithExternalSideEffectsAreAllowed () &&
+							(str32nequ (canonicalCmd, U"Save ", 5) ||
+							 str32nequ (canonicalCmd, U"Write ", 6) ||
+							 str32nequ (canonicalCmd, U"Append to ", 10) ||
+							 str32nequ (canonicalCmd, U"Export ", 7) ||
+							 str32nequ (canonicalCmd, U"Quit", 4)))
+						{
+							Melder_throw (U"Commands that write files (including Quit) are not available inside manuals.");
+						}
+						if (hasColon)
+							theCommandIsAnExistingAction = praat_doAction (canonicalCmd, narg, args, interpreter);
+						else
+							theCommandIsAnExistingAction = praat_doAction (canonicalCmd, arguments, interpreter);
+						if (! theCommandIsAnExistingAction) {
+							if (hasColon)
+								theCommandIsAnExistingMenuCommand = praat_doMenuCommand (canonicalCmd, narg, args, interpreter);
+							else
+								theCommandIsAnExistingMenuCommand = praat_doMenuCommand (canonicalCmd, arguments, interpreter);
+						}
+					}
+				}
+				if (! theCommandIsAnExistingAction && ! theCommandIsAnExistingMenuCommand) {
 					const integer length = Melder_length (command);
 					if (str32nequ (command, U"ARGS ", 5))
 						Melder_throw (U"Command “ARGS” no longer supported. Instead use “form” and “endform”.");

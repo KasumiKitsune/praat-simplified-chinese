@@ -22,34 +22,34 @@ void manual_Manual_init (ManPages me);
 void manual_Manual_init (ManPages me) {
 
 MAN_BEGIN (U"Manual", U"ppgb", 20110101)
-INTRO (U"Praat 程序的文档系统。")
-NORMAL (U"每当您从 #帮助 菜单中选择任何内容，或者点击 #帮助 按钮时，都会打开一个手册窗口。")
-ENTRY (U"如何找到您要寻找的内容")
-NORMAL (U"您可以通过以下几种方式浏览手册：")
-LIST_ITEM (U"\\bu 要返回引言页，请使用 #主页 按钮。")
-LIST_ITEM (U"\\bu 要转到 %链接 (蓝色文本) 所指向的信息，只需点击它即可。")
-LIST_ITEM (U"\\bu 要在带有页码的教程中前进或后退，请使用 “##1 >#” 和 “##< 1#”。")
-LIST_ITEM (U"\\bu 要 %重新访问 先前的页面，请使用 #< 和 #> 按钮。")
-LIST_ITEM (U"\\bu 要按 %字母顺序 浏览，请使用水平滚动条和名为 “##< 1#” 与 “##1 >#” 的按钮，"
-	"或 “转到” 菜单中的 ##搜索页面 (列表)...# 命令。")
-LIST_ITEM (U"\\bu 要查找具有 %%已知标题% 的页面，请使用 ##搜索页面...# 命令。")
-NORMAL (U"通常，找到您所需内容最快的方法是使用 #搜索 按钮。")
-ENTRY (U"搜索")
-NORMAL (U"在 #搜索 按钮后面的文本框中，您可以输入由空格分隔的字符串。"
-	"当您按下 Return (或 Enter) 键，或者点击 #搜索 按钮时，"
-	"所有手册页都将搜索您输入的字符串组合。"
-	"最匹配的 20 个页面的标题将以链接形式显示。")
-NORMAL (U"##示例：# 若想了解如何从声音创建音高曲线，请输入")
+INTRO (U"The documentation system for the Praat program.")
+NORMAL (U"You will get a manual window every time you choose anything from a #Help menu or press a #Help button.")
+ENTRY (U"How to find what you are looking for")
+NORMAL (U"You can navigate the manual in several ways:")
+LIST_ITEM (U"\\bu To go to the Intro, use the #Home button.")
+LIST_ITEM (U"\\bu To go to the information behind a %link (a piece of blue text), just click on it.")
+LIST_ITEM (U"\\bu To go forward and backward through a tutorial with numbered pages, use “##1 >#” and “##< 1#”.")
+LIST_ITEM (U"\\bu To %revisit previous pages, use the #< and #> buttons.")
+LIST_ITEM (U"\\bu To browse %alphabetically, use the horizontal scroll bar and the buttons "
+	"named “##< 1#” and “##1 >#”, or the ##Search for page (list)...# command in the “Go to” menu.")
+LIST_ITEM (U"\\bu To find a page with a %%known title%, use the ##Search for page...# command.")
+NORMAL (U"The fastest way to find what you want is usually the #Search button.")
+ENTRY (U"Search")
+NORMAL (U"In the text field after the Search button, you can type strings, separated by spaces. "
+	"When you press the Return (or Enter) key, or click the #Search button, "
+	"all manual pages are searched for the combination of strings that you typed. "
+	"The titles of the 20 best matching pages are displayed as links.")
+NORMAL (U"##Example:# to know how to create a pitch contour from a sound, type")
 CODE (U"sou pit")
-NORMAL (U"然后按下 Return 键。最佳匹配项应显示在最上方。其中应包括 "
-	"##Sound: To Pitch (ac)...# 和 ##Sound: To Pitch (cc)...#。")
-NORMAL (U"搜索是不区分大小写的。例如，搜索字符串 “$script” 将为您提供所有 "
-	"包含单词 %script、%Script、%description、%PostScript 或 %SCRIPT 等的页面。")
-NORMAL (U"#背景。# 搜索算法使用以下启发式规则：")
-LIST_ITEM (U"\\bu 页面标题中的匹配优于正文其他部分的匹配。")
-LIST_ITEM (U"\\bu 匹配项较多的页面优于匹配项较少的页面。")
-ENTRY (U"您自己的手册页")
-NORMAL (U"要创建您自己的手册页，请创建 @ManPages 文本文件。")
+NORMAL (U"and press Return. The best matches should appear on top. These should include "
+	"##Sound: To Pitch (ac)...# and ##Sound: To Pitch (cc)...#.")
+NORMAL (U"The search is case-insensitive. For instance, the search string “$script” will give you all "
+	"the pages that contain the words %script, %Script, %description, %PostScript, or %SCRIPT, and so on.")
+NORMAL (U"#Background. The search algorithm uses the following heuristics:")
+LIST_ITEM (U"\\bu A match in the page title is better than one in the rest of the text.")
+LIST_ITEM (U"\\bu Pages with many matches are better than those with few.")
+ENTRY (U"Your own manual pages")
+NORMAL (U"To create your own manual pages, create @ManPages text files.")
 MAN_END
 
 MAN_PAGES_BEGIN R"~~~(

@@ -17,6 +17,7 @@
  */
 
 #include "ManPages.h"
+#include "praat_translate.h"
 
 Thing_implement (ManPages, Daata, 0);
 
@@ -1189,18 +1190,21 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 	for (integer ipar = 1; ipar <= me -> paragraphs.size; ipar ++) {
 		ManPage_Paragraph paragraph = & me -> paragraphs [ipar];
 		if (! paragraph -> text) continue;
+		conststring32 ptext = (paragraph -> type == kManPage_type::PICTURE || paragraph -> type == kManPage_type::SCRIPT)
+			? paragraph -> text
+			: Melder_trManualParagraph (me -> title.get(), ipar, paragraph -> text);
 
 		switch (paragraph -> type) {
 			case kManPage_type::ENTRY:
 			case kManPage_type::SUBHEADER:
 				MelderString_append (& out, U"\n=== ");
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U" ===\n\n");
 				break;
 
 			case kManPage_type::INTRO:
 			case kManPage_type::NORMAL:
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U"\n\n");
 				break;
 
@@ -1209,7 +1213,7 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 			case kManPage_type::LIST_ITEM2:
 			case kManPage_type::LIST_ITEM3:
 				MelderString_append (& out, U"  • ");
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U"\n");
 				break;
 
@@ -1218,7 +1222,7 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 			case kManPage_type::TERM2:
 			case kManPage_type::TERM3:
 				MelderString_append (& out, U"\n");
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U":\n");
 				break;
 
@@ -1227,7 +1231,7 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 			case kManPage_type::DEFINITION2:
 			case kManPage_type::DEFINITION3:
 				MelderString_append (& out, U"    ");
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U"\n");
 				break;
 
@@ -1239,13 +1243,13 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 			case kManPage_type::CODE5:
 			case kManPage_type::SCRIPT:
 				MelderString_append (& out, U"    ");
-				MelderString_append (& out, paragraph -> text);
+				MelderString_append (& out, ptext);
 				MelderString_append (& out, U"\n");
 				break;
 
 			case kManPage_type::EQUATION:
 				MelderString_append (& out, U"    ");
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U"\n");
 				break;
 
@@ -1255,12 +1259,12 @@ autostring32 ManPage_toCleanPlainText (ManPage me, ManPages manPages, integer pa
 			case kManPage_type::QUOTE2:
 			case kManPage_type::QUOTE3:
 				MelderString_append (& out, U"    \"");
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U"\"\n\n");
 				break;
 
 			default:
-				appendCleanText (& out, paragraph -> text);
+				appendCleanText (& out, ptext);
 				MelderString_append (& out, U"\n");
 				break;
 		}

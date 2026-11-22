@@ -48,6 +48,8 @@ Thing_define (Manual, HyperPage) {
 		override;
 	void v_draw ()
 		override;
+	void v_languageChanged ()
+		override;
 	void v_defaultHeaders (EditorCommand cmd)
 		override;
 	integer v_getNumberOfPages ()

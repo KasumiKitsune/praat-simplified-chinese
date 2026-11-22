@@ -441,6 +441,7 @@ GuiMenuItem GuiMenu_addItem (GuiMenu menu, conststring32 title, uint32 flags,
 	#elif cocoa
 	#endif
 
+	GuiI18n_bind (me.get(), GuiI18nKind::MenuItem, title);
 	return me.releaseToAmbiguousOwner();
 }
 
@@ -500,6 +501,7 @@ void GuiMenuItem_check (GuiMenuItem me, bool check) {
 }
 
 void GuiMenuItem_setText (GuiMenuItem me, conststring32 text) {
+	GuiI18n_bind (me, GuiI18nKind::MenuItem, text);
 	conststring32 translatedTitle = praat_translate (text);
 	static MelderString neatTitle;
 	makeNeatMenuTitle (& neatTitle, translatedTitle);

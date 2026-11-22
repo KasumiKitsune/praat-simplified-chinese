@@ -23,6 +23,7 @@
 #endif
 
 autoStringSet GuiFileSelect_getInfileNames (GuiShell optionalParent, conststring32 title, bool allowMultipleFiles) {
+	title = praat_translate (title);
 	autoMelderSaveCurrentFolder saveFolder;
 	autoStringSet me = StringSet_create ();
 	#if gtk
@@ -124,6 +125,7 @@ autoStringSet GuiFileSelect_getInfileNames (GuiShell optionalParent, conststring
 }
 
 autostring32 GuiFileSelect_getOutfileName (GuiShell optionalParent, conststring32 title, conststring32 defaultName) {
+	title = praat_translate (title);
 	autoMelderSaveCurrentFolder saveFolder;
 	autostring32 outfileName;
 	#if gtk
@@ -188,6 +190,7 @@ autostring32 GuiFileSelect_getOutfileName (GuiShell optionalParent, conststring3
 }
 
 autostring32 GuiFileSelect_getFolderName (GuiShell optionalParent, conststring32 title) {
+	title = praat_translate (title);
 	autoMelderSaveCurrentFolder saveFolder;
 	autostring32 folderName;
 	#if gtk

@@ -38,10 +38,10 @@ namespace MelderWarning {
 }
 
 template <typename... Arg>
-void Melder_warning (const Arg... arg) {
+void Melder_warning (const Arg&... arg) {
 	if (MelderWarning::_depth < 0)
 		return;
-	MelderString_copy (& MelderWarning::_buffer, Melder_translate (MelderArg { arg }. _arg)...);
+	MelderString_copy (& MelderWarning::_buffer, Melder_translateLiteralOnly (arg)...);
 	(*MelderWarning::_p_currentProc) (MelderWarning::_buffer.string);
 }
 

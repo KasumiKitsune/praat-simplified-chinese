@@ -86,11 +86,17 @@ static void Manual_runAllChunksToCache (Manual me, ManPage page) {
 	);
 }
 
+void structManual :: v_languageChanged () {
+	Manual_Parent :: v_languageChanged ();
+	if (our graphics)
+		Graphics_updateWs (our graphics.get());
+}
+
 void structManual :: v_draw () {
 	//TRACE
 	if (our visiblePageNumber == SEARCH_PAGE) {
-		HyperPage_pageTitle (this, U"Best matches");
-		HyperPage_intro (this, U"The best matches to your query seem to be:");
+		HyperPage_pageTitle (this, Melder_tr (U"Best matches"));
+		HyperPage_intro (this, Melder_tr (U"The best matches to your query seem to be:"));
 		for (int i = 1; i <= our numberOfMatches; i ++) {
 			char32 link [300];
 			const ManPage page = our manPages() -> pages.at [matches [i]];
@@ -100,20 +106,24 @@ void structManual :: v_draw () {
 		return;
 	}
 	const ManPage page = our manPages() -> pages.at [our visiblePageNumber];
-	HyperPage_pageTitle (this, page -> title.get());   // TODO: check appropriateness of file name
+	conststring32 pageTitle = page -> title.get();
+	HyperPage_pageTitle (this, pageTitle);   // TODO: check appropriateness of file name
 	integer chunkNumber = 0;
 	for (integer ipar = 1; ipar <= page -> paragraphs.size; ipar ++) {
 		ManPage_Paragraph paragraph = & page -> paragraphs [ipar];
+		conststring32 ptext = (paragraph -> type == kManPage_type::PICTURE || paragraph -> type == kManPage_type::SCRIPT)
+			? paragraph -> text
+			: Melder_trManualParagraph (pageTitle, ipar, paragraph -> text);
 		switch (paragraph -> type) {
-			case kManPage_type::INTRO: HyperPage_intro (this, paragraph -> text); break;
-			case kManPage_type::ENTRY: HyperPage_entry (this, paragraph -> text); break;
-			case kManPage_type::NORMAL: HyperPage_paragraph (this, paragraph -> text); break;
-			case kManPage_type::LIST_ITEM: HyperPage_listItem (this, paragraph -> text); break;
-			case kManPage_type::TERM: HyperPage_listTag (this, paragraph -> text); break;
-			case kManPage_type::DEFINITION: HyperPage_definition (this, paragraph -> text); break;
-			case kManPage_type::CODE: HyperPage_code (this, paragraph -> text); break;
-			case kManPage_type::PROTOTYPE: HyperPage_prototype (this, paragraph -> text); break;
-			case kManPage_type::EQUATION: HyperPage_formula (this, paragraph -> text); break;
+			case kManPage_type::INTRO: HyperPage_intro (this, ptext); break;
+			case kManPage_type::ENTRY: HyperPage_entry (this, ptext); break;
+			case kManPage_type::NORMAL: HyperPage_paragraph (this, ptext); break;
+			case kManPage_type::LIST_ITEM: HyperPage_listItem (this, ptext); break;
+			case kManPage_type::TERM: HyperPage_listTag (this, ptext); break;
+			case kManPage_type::DEFINITION: HyperPage_definition (this, ptext); break;
+			case kManPage_type::CODE: HyperPage_code (this, ptext); break;
+			case kManPage_type::PROTOTYPE: HyperPage_prototype (this, ptext); break;
+			case kManPage_type::EQUATION: HyperPage_formula (this, ptext); break;
 			case kManPage_type::PICTURE: HyperPage_picture (this, paragraph -> width,
 					paragraph -> height, paragraph -> draw); break;
 			case kManPage_type::SCRIPT:
@@ -121,26 +131,26 @@ void structManual :: v_draw () {
 				trace (U"Drawing chunk ", chunkNumber);
 				HyperPage_script (this, paragraph -> width, paragraph -> height,
 						paragraph -> text, paragraph -> cacheGraphics.get(), paragraph -> cacheInfo.string); break;
-			case kManPage_type::LIST_ITEM1: HyperPage_listItem1 (this, paragraph -> text); break;
-			case kManPage_type::LIST_ITEM2: HyperPage_listItem2 (this, paragraph -> text); break;
-			case kManPage_type::LIST_ITEM3: HyperPage_listItem3 (this, paragraph -> text); break;
-			case kManPage_type::TERM1: HyperPage_listTag1 (this, paragraph -> text); break;
-			case kManPage_type::TERM2: HyperPage_listTag2 (this, paragraph -> text); break;
-			case kManPage_type::TERM3: HyperPage_listTag3 (this, paragraph -> text); break;
-			case kManPage_type::DEFINITION1: HyperPage_definition1 (this, paragraph -> text); break;
-			case kManPage_type::DEFINITION2: HyperPage_definition2 (this, paragraph -> text); break;
-			case kManPage_type::DEFINITION3: HyperPage_definition3 (this, paragraph -> text); break;
-			case kManPage_type::CODE1: HyperPage_code1 (this, paragraph -> text); break;
-			case kManPage_type::CODE2: HyperPage_code2 (this, paragraph -> text); break;
-			case kManPage_type::CODE3: HyperPage_code3 (this, paragraph -> text); break;
-			case kManPage_type::CODE4: HyperPage_code4 (this, paragraph -> text); break;
-			case kManPage_type::CODE5: HyperPage_code5 (this, paragraph -> text); break;
-			case kManPage_type::CAPTION: HyperPage_caption (this, paragraph -> text); break;
-			case kManPage_type::QUOTE: HyperPage_quote (this, paragraph -> text); break;
-			case kManPage_type::QUOTE1: HyperPage_quote1 (this, paragraph -> text); break;
-			case kManPage_type::QUOTE2: HyperPage_quote2 (this, paragraph -> text); break;
-			case kManPage_type::QUOTE3: HyperPage_quote3 (this, paragraph -> text); break;
-			case kManPage_type::SUBHEADER: HyperPage_subheader (this, paragraph -> text); break;
+			case kManPage_type::LIST_ITEM1: HyperPage_listItem1 (this, ptext); break;
+			case kManPage_type::LIST_ITEM2: HyperPage_listItem2 (this, ptext); break;
+			case kManPage_type::LIST_ITEM3: HyperPage_listItem3 (this, ptext); break;
+			case kManPage_type::TERM1: HyperPage_listTag1 (this, ptext); break;
+			case kManPage_type::TERM2: HyperPage_listTag2 (this, ptext); break;
+			case kManPage_type::TERM3: HyperPage_listTag3 (this, ptext); break;
+			case kManPage_type::DEFINITION1: HyperPage_definition1 (this, ptext); break;
+			case kManPage_type::DEFINITION2: HyperPage_definition2 (this, ptext); break;
+			case kManPage_type::DEFINITION3: HyperPage_definition3 (this, ptext); break;
+			case kManPage_type::CODE1: HyperPage_code1 (this, ptext); break;
+			case kManPage_type::CODE2: HyperPage_code2 (this, ptext); break;
+			case kManPage_type::CODE3: HyperPage_code3 (this, ptext); break;
+			case kManPage_type::CODE4: HyperPage_code4 (this, ptext); break;
+			case kManPage_type::CODE5: HyperPage_code5 (this, ptext); break;
+			case kManPage_type::CAPTION: HyperPage_caption (this, ptext); break;
+			case kManPage_type::QUOTE: HyperPage_quote (this, ptext); break;
+			case kManPage_type::QUOTE1: HyperPage_quote1 (this, ptext); break;
+			case kManPage_type::QUOTE2: HyperPage_quote2 (this, ptext); break;
+			case kManPage_type::QUOTE3: HyperPage_quote3 (this, ptext); break;
+			case kManPage_type::SUBHEADER: HyperPage_subheader (this, ptext); break;
 			default: break;
 		}
 	}
@@ -153,7 +163,7 @@ void structManual :: v_draw () {
 				if (our printing && our suppressLinksHither)
 					goAhead = false;
 				else
-					HyperPage_entry (this, U"Links to this page");
+					HyperPage_entry (this, Melder_tr (U"Links to this page"));
 			}
 		}
 		if (goAhead) for (ilink = 1; ilink <= page -> linksHither.size; ilink ++) {
@@ -265,15 +275,25 @@ static double searchToken (ManPages me, integer ipage, conststring32 token) {
 	for (integer ipar = 1; ipar <= page -> paragraphs.size; ipar ++) {
 		ManPage_Paragraph par = & page -> paragraphs [ipar];
 		if (par -> text) {
-			char32 *ptoken;
-			MelderString_copy (& buffer, par -> text);
-			for (char32 *p = & buffer.string [0]; *p != '\0'; p ++)
-				*p = Melder_toLowerCase (*p);
-			ptoken = str32str (buffer.string, token);
-			if (ptoken) {
-				goodness += 10.0;   // ten points for every paragraph with a match!
-				if (str32str (ptoken + Melder_length (token), token))
-					goodness += 1.0;   // one point for every second occurrence in a paragraph!
+			conststring32 candidates [2] = { par -> text, nullptr };
+			if (g_language_choice != 0 && par -> type != kManPage_type::PICTURE && par -> type != kManPage_type::SCRIPT) {
+				conststring32 overlay = Melder_trManualParagraph (page -> title.get(), ipar, par -> text);
+				if (overlay && overlay != par -> text)
+					candidates [1] = overlay;
+			}
+			for (int ic = 0; ic < 2; ic ++) {
+				if (! candidates [ic])
+					continue;
+				MelderString_copy (& buffer, candidates [ic]);
+				for (char32 *p = & buffer.string [0]; *p != '\0'; p ++)
+					*p = Melder_toLowerCase (*p);
+				char32 *ptoken = str32str (buffer.string, token);
+				if (ptoken) {
+					goodness += 10.0;   // ten points for every paragraph with a match!
+					if (str32str (ptoken + Melder_length (token), token))
+						goodness += 1.0;   // one point for every second occurrence in a paragraph!
+					break;
+				}
 			}
 		}
 	}

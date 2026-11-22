@@ -219,6 +219,7 @@ GuiButton GuiButton_create (GuiForm parent, int left, int right, int top, int bo
 	#endif
 	if (flags & GuiButton_INSENSITIVE)
 		GuiThing_setSensitive (me.get(), false);
+	GuiI18n_bind (me.get(), GuiI18nKind::Button, buttonText);
 	return me.releaseToAmbiguousOwner();
 }
 
@@ -231,10 +232,12 @@ GuiButton GuiButton_createShown (GuiForm parent, int left, int right, int top, i
 }
 
 void GuiButton_setText (GuiButton me, conststring32 text /* cattable */) {
+	GuiI18n_bind (me, GuiI18nKind::Button, text);
+	conststring32 translatedText = praat_translate (text);
 	#if gtk
-		gtk_button_set_label (GTK_BUTTON (my d_widget), Melder_peek32to8 (text));
+		gtk_button_set_label (GTK_BUTTON (my d_widget), Melder_peek32to8 (translatedText));
 	#elif motif
-		my d_widget -> name = Melder_dup_f (text);
+		my d_widget -> name = Melder_dup_f (translatedText);
 		if (my d_widget -> window) {
 			HWND hwnd = my d_widget -> window;
 			SetWindowTextW (hwnd, Melder_peek32toW (_GuiWin_expandAmpersands (my d_widget -> name.get())));
@@ -242,7 +245,7 @@ void GuiButton_setText (GuiButton me, conststring32 text /* cattable */) {
 			UpdateWindow (hwnd);
 		}
 	#elif cocoa
-		[(NSButton *) my d_widget setTitle: (NSString *) Melder_peek32toCfstring (text)];
+		[(NSButton *) my d_widget setTitle: (NSString *) Melder_peek32toCfstring (translatedText)];
 	#endif
 }
 

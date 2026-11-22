@@ -301,6 +301,8 @@ static void drawBackgroundAndData (FunctionEditor me) {
 					inverseValue = 1.0 / value;
 				}
 			}
+			if (g_language_choice != 0 && (i == 0 || i == 1 || i == 7))
+				format = Melder_peek32to8 (Melder_tr (Melder_peek8to32_u (format)));
 			char text8 [100];
 			snprintf (text8, 100, format, value, inverseValue);
 			autostring32 text = Melder_8to32_e (text8);

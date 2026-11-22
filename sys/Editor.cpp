@@ -310,6 +310,26 @@ void Editor_doMenuCommand (Editor me, conststring32 commandTitle, integer narg, 
 			}
 		}
 	}
+	/*
+		Layer 3 bilingual fallback: if English exact match failed and commandTitle is a localized Chinese alias,
+		resolve to canonical English (or match translated command title) and dispatch.
+	*/
+	conststring32 canonicalAlias = Melder_i18n_resolveScriptAlias (commandTitle);
+	for (int imenu = 1; imenu <= numberOfMenus; imenu ++) {
+		EditorMenu menu = my menus.at [imenu];
+		integer numberOfCommands = menu -> commands.size;
+		for (integer icommand = 1; icommand <= numberOfCommands; icommand ++) {
+			EditorCommand command = menu -> commands.at [icommand];
+			if (! command -> itemTitle)
+				continue;
+			if ((canonicalAlias && str32equ (canonicalAlias, command -> itemTitle.get())) ||
+				Melder_i18n_matchesTranslation (commandTitle, command -> itemTitle.get()))
+			{
+				command -> commandCallback (command -> sender, command, nullptr, narg, args, arguments, interpreter);
+				return;
+			}
+		}
+	}
 	Melder_assert (my classInfo);
 	Melder_throw (U"Command not available in ", my classInfo -> className, U".");
 }

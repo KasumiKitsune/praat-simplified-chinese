@@ -327,6 +327,7 @@ void praat_languageChanged () {
 	PreferencesDialog_languageChanged ();
 	praat_chineseAbout_languageChanged ();
 	Editors_languageChanged ();
+	GuiI18n_refreshAll ();
 	for (integer i = 1; i <= praat_getNumberOfMenuCommands (); i ++) {
 		Praat_Command command = praat_getMenuCommand (i);
 		if (! command || ! command -> button || ! command -> title || command -> title [0] == U'-')
@@ -335,7 +336,7 @@ void praat_languageChanged () {
 		if (Thing_isa (command -> button, classGuiMenuItem))
 			GuiMenuItem_setText ((GuiMenuItem) command -> button, rawTitle);
 		else if (Thing_isa (command -> button, classGuiButton))
-			GuiButton_setText ((GuiButton) command -> button, praat_translate (rawTitle));
+			GuiButton_setText ((GuiButton) command -> button, rawTitle);
 	}
 	praat_updateSelection ();
 }

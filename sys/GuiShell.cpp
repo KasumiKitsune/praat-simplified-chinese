@@ -162,19 +162,23 @@ int GuiShell_getShellHeight (GuiShell me) {
 }
 
 void GuiShell_setTitle (GuiShell me, conststring32 title /* cattable */) {
+	GuiI18n_bind (me, GuiI18nKind::Shell, title);
+	conststring32 translatedTitle = praat_translate (title);
 	#if gtk
-		gtk_window_set_title (my d_gtkWindow, Melder_peek32to8 (title));
+		gtk_window_set_title (my d_gtkWindow, Melder_peek32to8 (translatedTitle));
 		#if defined (chrome)
 			if (my chrome_surrogateShellTitleLabelWidget) {
-				char *markup = g_markup_printf_escaped ("<span weight=\"ultrabold\" underline=\"low\">%s</span>", Melder_peek32to8 (title));
+				char *markup = g_markup_printf_escaped ("<span weight=\"ultrabold\" underline=\"low\">%s</span>", Melder_peek32to8 (translatedTitle));
 				gtk_label_set_markup (GTK_LABEL (my chrome_surrogateShellTitleLabelWidget), markup);
 				g_free (markup);
 			}
 		#endif
 	#elif motif
-		SetWindowTextW (my d_xmShell -> window, Melder_peek32toW (title));
+		if (my d_xmShell && my d_xmShell -> window)
+			SetWindowTextW (my d_xmShell -> window, Melder_peek32toW (translatedTitle));
 	#elif cocoa
-		[my d_cocoaShell   setTitle: (NSString *) Melder_peek32toCfstring (title)];
+		if (my d_cocoaShell)
+			[my d_cocoaShell   setTitle: (NSString *) Melder_peek32toCfstring (translatedTitle)];
 	#endif
 }
 

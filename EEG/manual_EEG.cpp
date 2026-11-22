@@ -22,9 +22,9 @@ void manual_EEG_init (ManPages me);
 void manual_EEG_init (ManPages me) {
 
 MAN_BEGIN (U"EEG", U"ppgb", 20180329)
-INTRO (U"EEG 表示脑电图（electro-encephalography）：是通过放置在头皮上的例如 32 或 64 个电极记录的脑电位。 "
-	"在 Praat 中，一个 EEG 对象类似于一个包含例如 32 或 64 个通道的 Sound 对象 "
-	"与一个用于标记事件的 TextGrid 对象的组合。")
+INTRO (U"EEG means electro-encephalography: brain potentials recorded via e.g. 32 or 64 electrodes on the scalp. "
+	"In Praat, an EEG object looks like a combination of a Sound object with e.g. 32 or 64 channels "
+	"and a TextGrid object that marks the events.")
 ENTRY (U"1. How to get an EEG object in Praat")
 NORMAL (U"You typically create an EEG object in Praat by opening a BDF/EDF file with @@Read from file...@. "
 	"Praat tries to read the whole file into memory, so you may want to work with a 64-bit edition of Praat "
@@ -87,26 +87,26 @@ NORMAL (U"Once you have an ERP object, you can look into it with ##View & Edit#.
 	"If you want to see in the ERP window the scalp distribution at the time of the cursor, or the average scalp distribution in the selected time stretch, "
 	"you have to switch on ##Show selection viewer# in the #Preferences window (available from the File menu).")
 ENTRY (U"See also")
-LIST_ITEM (U"\\bu @@Independent Component Analysis on EEG|EEG 上的独立成分分析@")
+LIST_ITEM (U"\\bu @@Independent Component Analysis on EEG@")
 MAN_END
 
 MAN_BEGIN (U"Independent Component Analysis on EEG", U"ppgb", 20180502)
-INTRO (U"独立成分分析（ICA）常用于改善 @EEG 信号。 "
-	"算法参见 @@blind source separation|盲源分离@。")
-ENTRY (U"1. 选择通道")
-NORMAL (U"您通常不希望对信号的所有 80 个通道都进行 ICA，其中一些甚至可能不是 EEG 通道。 "
-	"如果想创建一个例如仅包含 64 个头皮通道的较小 EEG，请使用 ##EEG: Extract channels...#（提取通道）按钮。 "
-	"从这里开始，我们假设您简化后的 EEG 具有 64 个通道。")
-ENTRY (U"2. 如何获取混合矩阵（MixingMatrix）")
-NORMAL (U"获得简化后的 EEG 之后，您就可以开始对其进行 ICA 了。 "
-	"首先需要创建一个 @MixingMatrix（混合矩阵）：选择您的 EEG 对象并点击 ##To MixingMatrix...# 按钮。 "
-	"生成的 MixingMatrix 对象将包含 64 行（对应您的 64 个 EEG 通道），列名为 “ic1” 到 “ic64”。")
-ENTRY (U"3. 如何查看独立成分")
-NORMAL (U"同时选中您的 EEG 对象和 MixingMatrix 对象，然后点击 ##Unmix# 按钮。 "
-	"生成的 ICA-EEG 将包含 64 个名为 “ic1” 到 “ic64” 的通道。")
-ENTRY (U"4. 逆向检查验证")
-NORMAL (U"如果您同时选择 ICA-EEG 对象和 MixingMatrix 对象并点击 ##Mix# 按钮， "
-	"生成的新 EEG 对象应该与您原来的 64 通道 EEG 非常相似。")
+INTRO (U"Independent Component Analysis (ICA) is often used to improve @EEG signals. "
+	"See @@blind source separation@ for the algorithm.")
+ENTRY (U"1. Selecting your channels")
+NORMAL (U"You typically will not want to do ICA on all 80 channels of your signal, "
+	"some of which may not even be EEG channels. To create a smaller EEG with e.g. only the 64 scalp channels, "
+	"use ##EEG: Extract channels...#. From here on we will assume that your reduced EEG has 64 channels.")
+ENTRY (U"2. How to get a MixingMatrix")
+NORMAL (U"Once you have your reduced EEG, you can start to do ICA on it. "
+	"This starts by creating a @MixingMatrix: select your EEG object and choose ##To MixingMatrix...#. "
+	"The resulting MixingMatrix has one row for each of your 64 EEG channels, and columns called “ic1” through “ic64”.")
+ENTRY (U"3. How to see the independent components")
+NORMAL (U"Select your EEG and your MixingMatrix together and choose ##Unmix#. "
+	"The resulting ICA-EEG will have 64 channels called “ic1” through “ic64”.")
+ENTRY (U"4. Just checking back")
+NORMAL (U"If you select your ICA-EEG together with your MixingMatrix and choose ##Mix#, "
+	"the resulting EEG should be very similar to your original 64-channel EEG.")
 MAN_END
 
 }

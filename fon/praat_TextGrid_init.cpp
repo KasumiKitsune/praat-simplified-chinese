@@ -586,12 +586,8 @@ OK
 
 	if (modelNames.size == 0) {
 		SpeechRecognizer_showModelGuideDialog ();
-		Melder_throw (g_language_choice == 0
-			? U"No Whisper speech recognition model detected.\nThe model download & setup guide has been opened. You can also place ggml-*.bin models directly into the models/whispercpp folder next to the executable."
-			: praat_translate (
-				U"未检测到 Whisper 语音识别模型。\n"
-				U"已为您打开模型下载与配置向导，您也可以直接将 ggml-*.bin 模型放置于软件同级目录的 models/whispercpp 文件夹中。"
-			));
+		Melder_throw (
+			U"No Whisper speech recognition model detected.\nThe model download & setup guide has been opened. You can also place ggml-*.bin models directly into the models/whispercpp folder next to the executable.");
 	}
 
 	SET_LIST (modelIndex, modelName, modelNames.get (), NUMfindFirst (modelNames.get (), TranscriptionDefaults::modelName))

@@ -72,19 +72,26 @@ which will allow you to print the drawing or to copy it to your word processor.
 "Dynamic menu"
 © Paul Boersma 20110131  // 2023-06-08
 
-位于 @@Objects window|对象窗口@ 右侧的按钮列表栏，同时在逻辑上也包含对象窗口中的 Save（保存）菜单。
+A column of buttons in the right-hand part of the @@Objects window@,
+plus the @@Save menu@ in the Objects window.
 
-当您在左侧列表中选中一个或多个数据对象时，所有可对这些对象执行的操作均会动态呈现在该菜单中。这些操作包括：查看与编辑（viewing & editing）、保存（saving）、在图画窗口绘制（drawing）、转换为其他类型的对象（包括特征分析与语音合成）等。
+If you select one or more @objects in the list,
+the possible actions that you can perform with the selected objects
+will appear in the dynamic menu.
+These actions can include viewing & editing, saving, drawing,
+conversions to other types (including analysis and synthesis), and more.
 
-特征分析示例：
-=============
+Example of analysis:
+====================
 
-录制一段声音，选中对应的 Sound 对象，点击右侧的 ##To Pitch...#。这会使用分析算法生成一个新的 Pitch（基频/音高）对象并将其放入对象列表中。接下来您就可以对这个 Pitch 对象进行编辑、写盘保存以及绘制。
+Record a Sound, select it, and click ##To Pitch...#.
+This will create a new Pitch object and put it in the list of objects.
+You can then edit, write, and draw this Pitch object.
 
-语音合成示例：
-=============
+Example of synthesis:
+=====================
 
-先创建一个 Speaker 对象，再创建并编辑一个 Artword（发音词）对象，最后点击 ##To Sound...#，即可合成输出对应的声音信号。
+Create a Speaker, create and edit an Artword, and click ##To Sound...#.
 
 ################################################################################
 "View & Edit"
@@ -131,12 +138,12 @@ See @@Intro 3. Spectral analysis@
 "FAQ (Frequently Asked Questions)"
 © Paul Boersma 2007-12-10
 
-,	@@FAQ: How to cite Praat|FAQ: 如何引用 Praat@
-,	@@Unicode|Unicode 编码@
-,	@@FAQ: Formant analysis|FAQ: 共振峰分析@
-,	@@FAQ: Pitch analysis|FAQ: 音高分析@
-,	@@FAQ: Spectrograms|FAQ: 声谱图@
-,	@@FAQ: Scripts|FAQ: 脚本@
+,	@@FAQ: How to cite Praat
+,	@Unicode
+,	@@FAQ: Formant analysis
+,	@@FAQ: Pitch analysis
+,	@@FAQ: Spectrograms
+,	@@FAQ: Scripts
 
 // Hardware
 // Pitch: octave errors
@@ -145,89 +152,131 @@ See @@Intro 3. Spectral analysis@
 "FAQ: Formant analysis"
 © Paul Boersma 2003-09-16
 
-#问题：如果我选择分析 3 个共振峰，与选择分析 4 个共振峰相比，会得到不同的共振峰数值。
+#Problem: I get different formant values if I choose to analyse 3 formants
+than if I choose to analyse 4 formants.
 
-解答：“共振峰数量”（number of formants）在共振峰分析中决定了用于模拟%整个频谱%的峰值数量。对于普通的女性声音，即使您只对前三个共振峰感兴趣，也应该选择在最高到 5500 Hz 的范围内分析 5 个共振峰。
+Solution: the “number of formants” in formant analysis determines the
+number of peaks with which the %entire spectrum is modelled. For an average
+female voice, you should choose to analyse 5 formants in the region up to 5500 Hz,
+even if you are interested only in the first three formants.
 
-#问题：在声谱图中我能清楚看到 2 个共振峰的区域，却经常只得到 1 个共振峰。
+#Problem: I often get only 1 formant in a region where I see clearly 2 formants
+in the spectrogram.
 
-这主要发生在男性声音的后元音（F1 和 F2 靠得很近）中。如果是将“最大共振峰频率”（maximum formant）设置为了适用于女性声音的 5500 Hz 标准值，就会出现这种情况。请将“最大共振峰频率”调低至 5000 Hz。
-不，Praat 不提供万能保证：共振峰分析是基于线性预测编码（LPC）的，这伴随着对语音频谱特征的若干假设。
+This occurs mainly in back vowels (F1 and F2 close together) for male voices,
+if the “maximum formant” is set to the standard of 5500 Hz, which is appropriate
+for female voices. Set the “maximum formant” down to 5000 Hz.
+No, Praat comes without a guarantee: the formant analysis is based on LPC,
+and this comes with several assumptions as to what a speech spectrum is like.
 
-#问题：共振峰分析使用的是什么算法？
+#Question: what algorithm is used for formant analysis?
 
-回答：参见 @@Sound: To Formant (burg)...|Sound: To Formant (burg)...@。
+Answer: see @@Sound: To Formant (burg)...@.
 
 ################################################################################
 "FAQ: How to cite Praat"
 © Paul Boersma 2005,2010,2014,2025,2026
 
-#问题：如何在我的文章中引用 Praat？
+#Question: how do I cite Praat in my articles?
 
-回答：如今大多数期刊都允许您引用计算机程序和网站。
-美国心理学会（APA）批准的样式，也是许多期刊采用的格式如下（请根据需要更改日期和版本号）：
+Answer: nowadays most journals allow you to cite computer programs and web sites.
+The style approved by the American Psychological Association,
+and therefore by many journals, is like the following
+(change the dates and version number as needed):
 {-
 	writeInfoLine: “Paul Boersma, David Weenink & Anastasia Shchupak (”, appYear(),
 	... “). Praat: doing phonetics by computer [Computer program]. Version ”, appVersion$(),
 	... “, retrieved ”, appDay(), “ ”, appMonth$(), “ ”, appYear(), “ from https://praat.org”
 }
-如果期刊不允许您引用网站，可以尝试以下格式：
+If the journal does not allow you to cite a web site, then try:
 
 Boersma, Paul (2001). Praat, a system for doing phonetics by computer.
 %%Glot International% ##5:9/10#, 341-345.
 
-此论文可以从 Boersma 的个人网站上下载。
+This paper can be downloaded from Boersma’s website.
 
 ################################################################################
 "FAQ: Pitch analysis"
 © Paul Boersma, 2002,2006,2022-2024
 
-另请参阅 @@how to choose a pitch analysis method|如何选择音高分析方法@。
+Please also consult @@how to choose a pitch analysis method@.
 
-#问题：音高分析使用的是什么算法？
+#Question: what algorithm is used for pitch analysis?
 
-回答：有关基础音高分析方法的工作原理，参见 @@Sound: To Pitch (ac)...|Sound: To Pitch (ac)...@。发表于 1993 年的相关文献可从以下网址下载：
+Answer: for how the raw pitch analysis method works,
+see @@Sound: To Pitch (ac)...@. The 1993 article is downloadable from
 https://www.fon.hum.uva.nl/paul/
 
-#问题：为什么我觉得是浊音（有声）的片段，Praat 却将其分析为清音（无声）？
+#Question: why does Praat consider my sound voiceless while I hear it as voiced?
 
-至少有五种可能性。其中大多数可以通过放大 @@waveform|波形图@ 来进行排查：
+There are at least five possibilities. Most of them can be checked by zooming in on the @waveform.
 
-第一种可能性是音高已经降到了“音高下限”（@@pitch floor@）以下。例如，您的音高下限设为 50 Hz，但英语发音人在话语末尾产生了裂音（creak）；或者音高下限为 50 Hz，但汉语发音人正处于第三声的低谷。如果发生这种情况，将音高下限降低到 30 Hz 左右可能会有所帮助（@@Pitch settings...|音高设置...@），尽管这可能会导致其他位置的音高曲线被过度平滑。
+The first possibility is that the pitch has fallen below the @@pitch floor@. For instance,
+your pitch floor could be 50 Hz but the English speaker produces creak at the end of the utterance.
+Or your pitch floor could be 50 Hz but the Chinese speaker is in the middle of a third tone.
+If this happens, it may help to lower the pitch floor to e.g. 30 Hz (@@Pitch settings...@),
+although that may also smooth the pitch curve too much in other places.
 
-第二种可能性是音高变化太快。这可能会发生在汉语第四声的末尾，因为第四声下降非常快。如果是这种情况，使用 @@pitch analysis by raw cross-correlation|原始互相关音高分析方法@ 可能会有帮助，尽管这可能会导致 Praat 在其他本该是清音的地方产生“幻觉”音高。
+The second possibility is that the pitch has moved too fast. This could happen at the end of a Chinese fourth tone,
+which drops very fast. If this happens, it may help to use @@pitch analysis by raw cross-correlation@,
+although Praat may then hallucinate pitches in other places that you would prefer to consider voiceless.
 
-第三种可能性是周期非常不规则，例如在某些病理嗓音中。如果您想在这些情况下得到音高，使用 @@pitch analysis by raw cross-correlation|原始互相关音高分析方法@ 可能会有所帮助。或者也可以将“浊音阈值”（##voicing threshold#）设置调低到 0.25 左右（标准值为 0.50）（@@Pitch settings...|音高设置...@）。
+The third possibility is that the periods are very irregular, as in some pathological voices.
+If you want to see a pitch in those cases, it may help to use @@pitch analysis by raw cross-correlation@.
+Or it may help to lower the ##voicing threshold# setting
+to 0.25 (instead of the standard 0.50) or so (@@Pitch settings...@).
 
-第四种可能性是存在大量的背景噪音，例如在繁忙的街道上录音。在这种情况下，将“浊音阈值”（##voicing threshold#）设置调低到 0.25 左右可能会有所帮助。调低此设置的缺点是，对于没有噪音的录音，Praat 会在一些您更希望算作清音的地方过度敏感地分析出浊音。因此，一旦您完成对嘈杂录音的分析，请务必将其重新设置为 0.50。
+The fourth possibility is that there is a lot of background noise, as in a recording on a busy street.
+In such a case, it may help to lower the ##voicing threshold# setting
+to 0.25 (instead of the standard 0.50) or so. The disadvantage of lowering this setting is that for non-noisy
+recordings, Praat will become too eager to find voicing in some places that you would prefer to consider voiceless;
+so make sure to set it back to 0.50 once you have finished analysing the noisy recordings.
 
-第五种可能性是分析为清音的片段的音量比其他部分小得多，或者声音在其他地方含有强噪音。这可以通过放大被分析为清音的部分来验证：如果 Praat 突然将其识别为浊音，说明这部分声音比其他部分安静得多。要让 Praat 将这部分分析为浊音，您可以将“静音阈值”（##silence threshold#）设置调低到 0.01 左右（标准值为 0.09）。调低此设置的缺点是，Praat 可能会开始将一些远处的背景声音（以及安静的回音）识别为浊音。
+The fifth possibility is that the part analysed as voiceless is much less loud than the rest of the sound,
+or that the sound contains a loud noise elsewhere. This can be checked by zooming in on the part analysed as voiceless:
+if Praat suddenly considers it as voiced, this is a sign that this part is much quieter than the rest.
+To make Praat analyse this part as voiced, you can lower the ##silence threshold# setting to 0.01
+(instead of the standard 0.09) or so. The disadvantage of lowering this setting is that Praat may start to consider
+some distant background sounds (and quiet echos, for instance) as voiced.
 
-#问题：为什么在...时我得到的最大音高结果会有所不同？
+#Question: why do I get different results for the maximum pitch if...?
 
-如果您选择一个 Sound 并运行 @@Sound: To Pitch (filtered ac)...|Sound: To Pitch (filtered ac)...@，时间步长通常为 0.015 秒。生成的 @Pitch 对象中时间间隔即为 0.015 秒。如果您随后点击“信息”或从 @@Query submenu|查询子菜单@ 中选择 ##Get maximum pitch#，结果将基于这些时间采样点。相比指下，如果您在声音编辑器窗口中从 @@Pitch menu|音高菜单@ 选择 ##Get maximum pitch#，结果将基于当前视窗中可见的采样点（通常有上百个）。这些不同的时间采样间隔会导致音高曲线略有不同。
+If you select a Sound and choose @@Sound: To Pitch (filtered ac)...@, the time step will usually
+be 0.015 seconds. The resulting @Pitch object will have values for times that are
+0.015 seconds apart. If you then click Info or choose ##Get maximum pitch# from the @@Query submenu@,
+the result is based on those time points. By contrast, if you choose ##Get maximum pitch#
+from the @@Pitch menu@ in the SoundEditor window, the result will be based on the visible points,
+of which there tend to be a hundred in the visible window. These different time spacings will
+lead to slightly different pitch contours.
 
-如果您选择 ##Move cursor to maximum pitch#（移动光标到最大音高），然后从 @@Pitch menu|音高菜单@ 选择 ##Get pitch#，结果会再次不同。这是因为 ##Get maximum pitch# 可以在最大值周围进行抛物线插值，而 ##Get pitch# 在不知道光标处于最大值的情况下，只进行简单的线性插值，这往往会得到稍低的值。
+If you choose ##Move cursor to maximum pitch#, then choose ##Get pitch# from the
+@@Pitch menu@, the result will be different again. This is because ##Get maximum pitch#
+can do a parabolic interpolation around the maximum, whereas ##Get pitch#, not realizing
+that the cursor is at a maximum, does a stupid linear interpolation, which tends to lead to
+lower values.
 
 ################################################################################
 "FAQ: Scripts"
 © Paul Boersma 2001,2004,2011,2013,2014,2023
 
-#问题：如何对一个文件夹中的所有文件执行相同的操作？
+#Question: how do I do something to all the files in a directory?
 
-回答：参考 @`fileNames$#` () 函数或者 @@Create Strings as file list...|Create Strings as file list...@ 菜单命令。
+Answer: look at @`fileNames$#` () or @@Create Strings as file list...@.
 ,
 
-#问题：为什么编辑器窗口对我的脚本命令没有反应？
+#Question: why doesn't the editor window react to my commands?
 
-您的脚本命令可能写成类似这样：
+Your commands are probably something like:
 {;
 	Read from file: “hello.wav”
 	View & Edit
 	Zoom: 0.3, 0.5
 }
 
-回答：Praat 并不知道它必须把 #Zoom 命令发送给名为 ##14. Sound hello# 的编辑器窗口。因为您的屏幕上可能同时打开了多个声音编辑器窗口。根据 @@Scripting 7.1. Scripting an editor from a shell script|Scripting 7.1. Scripting an editor from a shell script@，您必须显式指定目标编辑器窗口：
+Answer: Praat doesn’t know it has to send the #Zoom command to the editor
+window called ##14. Sound hello#. There could be several Sound editor windows on your
+screen. According to @@Scripting 7.1. Scripting an editor from a shell script@,
+you will have to say this explicitly:
 {;
 	Read from file: “hello.wav”
 	View & Edit
@@ -236,32 +285,44 @@ https://www.fon.hum.uva.nl/paul/
 }
 ,
 
-#问题：像 “%`Number = 1`” 这样的一行无法工作。
+#Problem: a line like “%`Number = 1`” does not work.
 
-解答：变量的名称应当以小写字母开头。
+Solution: names of variables should start with a lower-case letter.
 ,
 
-#问题：为什么变量名称必须以小写字母开头？我想使用像 “`F0 = Get mean pitch`” 这样的写法。
+#Question: why do names of variables have to start with a lower-case letter?
+I would like to do things like “`F0 = Get mean pitch`”.
 
-回答：Praat 脚本将按钮命令与只在脚本中发生的功能结合在一起。按钮命令总是以大写字母开头，例如 `Play`（因为在界面中有一个名为 #Play 的按钮）。脚本专属命令则总是以小写字母开头，例如 `writeInfoLine: “Hello”`（$writeInfoLine 是一个内置函数）。
-一个典型的例子是 “$select”（它在脚本中模拟对象列表中的鼠标点击），与 “`Select...`”（它在编辑器窗口中设定选择范围）之间的区别。如果我们允许变量名首字母大写，在赋值时就会变得相当含糊。例如在 “`x = Get`” 中，“%`Get`” 会是一个变量；而在 “`x = Get mean`” 中，##Get mean# 是一个界面按钮命令。为了防止这种混淆，Praat 强制执行了严格的大小写区分规则。
+Answer: Praat scripts combine button commands with things that only occur
+in scripts. Button commands always start with a capital letter, e.g. `Play` (there is a button #Play).
+Script commands always start with lower case, e.g. `writeInfoLine: “Hello”`
+($writeInfoLine is a built-in function).
+A minimal pair is “$select”, which simulates a mouse click in the object list,
+versus “`Select...`”, which sets the selection in editor windows. If we allowed initial capitals,
+variable names would become rather ambiguous in assignments,
+as in “`x = Get`”, where “%`Get`” would be a variable, versus “`x = Get mean`”,
+where ##Get mean# is a button command. To prevent this confusion, Praat enforces
+a rigorous lower-case/upper-case distinction.
 ,
 
-#问题：如何将数字转换为字符串？
+#Question: how do I convert a number into a string?
 
-回答：`a$ = string$ (a)`
+Answer: `a$ = string$ (a)`
 
-#问题：如何将字符串转换为数字？
+#Question: how do I convert a string into a number?
 
-回答：`a = number (a$)`
+Answer: `a = number (a$)`
 
 ################################################################################
 "FAQ: Spectrograms"
 © Paul Boersma 2002,2003
 
-#问题：声谱图背景是灰色的，而不是白色的（对比度太低）
+#Problem: the background is grey instead of white (too little contrast)
 
-解答：调低声谱图设置中的“动态范围”（##Dynamic range#）。标准值是 50 dB，这对于在录音良好的语音中检测塞音浊化等微小特征非常合适。对于诸如元音共振峰之类的粗略特征，或者对于有背景噪音的语音，您可能需要将动态范围更改为 40 甚至 30 dB。
+Solution: reduce the ##Dynamic range# in the spectrogram settings. The standard value is 50 dB,
+which is fine for detecting small things like plosive voicing in well recorded speech.
+For gross features like vowel formants, or for noisy speech, you may want to change the dynamic range
+to 40 or even 30 dB.
 
 ################################################################################
 "File menu"
@@ -416,772 +477,864 @@ most commands in any @@Query submenu@ also write into the Info window.
 "Inspect"
 © Paul Boersma 1996
 
-@@Objects window|对象窗口@中的固定按钮之一。
+One of the fixed buttons in the @@Objects window@.
 
-在列表中选中一个对象后，您可以使用此命令。
+You can use this command after selecting one object in the list.
 
-选中对象的内容将在数据编辑器（Data Editor）中显示。您可以查看并更改对象中的数据，但请注意：直接以这种方式更改数据可能会导致数据不一致。
+The contents of the selected object will become visible in a Data Editor.
+You can then view and change the data in the object,
+but beware: changing the data directly in this way may render them inconsistent.
 
-您使用另一个编辑器（例如 @SoundEditor）或通过 #Modify 菜单下的命令对数据所做的更改，会立即反映在顶层的数据编辑器中；然而，任何子编辑器都将被销毁，因为它们现在可能会引用无效的数据。
+Changes that you make to the data with another Editor (e.g., a SoundEditor),
+or with the commands under #Modify,
+are immediately reflected in the top-level Data Editor;
+any subeditors are destroyed, however, because they may now refer to invalid data.
 
-您使用数据编辑器对数据所做的更改，会立即反映在任何已打开的特定类型编辑器（例如 @SoundEditor）中。
+Changes that you make to the data with a Data Editor,
+are immediately reflected in any open type-specific Editors (e.g., a SoundEditor).
 
 ################################################################################
 "Intro"
 © Paul Boersma 2003,2004,2007,2009,2011,2025
 
-本教程是 Praat 的入门指南。Praat 是一款用于分析、合成、处理语音信号，并能为您撰写论文及报告绘制高质量插图的计算机软件。建议您通读本教程的所有章节。
+This is an introductory tutorial to Praat, a computer program
+with which you can analyse, synthesize, and manipulate speech,
+and create high-quality pictures for your articles and thesis.
+You are advised to work through all of this tutorial.
 
-您可以使用窗口顶部的“##1 >#”（下一页）和“##< 1#”（上一页）按钮按顺序阅读，也可以通过点击蓝色超链接直接跳转到所需的信息页。
+You can read this tutorial sequentially with the help of the “##1 >#” and “##< 1#” buttons,
+or go to the desired information by clicking on the blue links.
 
-, @@Intro 1. How to get a sound|Intro 1. 如何获取声音@:
-	@@Intro 1.1. Recording a sound|录音@,
-	@@Intro 1.2. Reading a sound from disk|从磁盘读取@,
-	@@Intro 1.3. Creating a sound from a formula|通过公式创建@.
-, @@Intro 2. What to do with a sound|Intro 2. 声音的操作与处理@:
-	@@Intro 2.1. Saving a sound to disk|保存声音到磁盘@,
-	@@Intro 2.2. Viewing and editing a sound|查看与编辑@.
-, @@Intro 3. Spectral analysis|Intro 3. 声谱分析@
-	, 声谱图：@@Intro 3.1. Viewing a spectrogram|查看声谱图@,
-		@@Intro 3.2. Configuring the spectrogram|设置声谱图参数@,
-		@@Intro 3.3. Querying the spectrogram|查询声谱图信息@,
-		@@Intro 3.4. Printing the spectrogram|打印声谱图@,
-		@@Intro 3.5. The Spectrogram object|Spectrogram 对象@.
-	, 频谱切片：@@Intro 3.6. Viewing a spectral slice|查看频谱切片@,
-		@@Intro 3.7. Configuring the spectral slice|设置频谱切片参数@,
-		@@Intro 3.8. The Spectrum object|Spectrum 对象@.
-, @@Intro 4. Pitch analysis|Intro 4. 音高分析@
-	, 音高曲线：@@Intro 4.1. Viewing a pitch contour|查看音高曲线@,
-		@@Intro 4.2. Configuring the pitch contour|设置音高曲线参数@,
-		@@Intro 4.3. Querying the pitch contour|查询音高曲线信息@,
-		@@Intro 4.4. Printing the pitch contour|打印音高曲线@,
-		@@Intro 4.5. The Pitch object|Pitch 对象@.
-, @@Intro 5. Formant analysis|Intro 5. 共振峰分析@
-	, 共振峰曲线：@@Intro 5.1. Viewing formant contours|查看共振峰曲线@,
-		@@Intro 5.2. Configuring the formant contours|设置共振峰曲线参数@,
-		@@Intro 5.3. Querying the formant contours|查询共振峰曲线信息@,
-		@@Intro 5.4. The Formant object|Formant 对象@.
-, @@Intro 6. Intensity analysis|Intro 6. 音强分析@
-	, 音强曲线：@@Intro 6.1. Viewing an intensity contour|查看音强曲线@,
-		@@Intro 6.2. Configuring the intensity contour|设置音强曲线参数@,
-		@@Intro 6.3. Querying the intensity contour|查询音强曲线信息@,
-		@@Intro 6.4. The Intensity object|Intensity 对象@.
-, @@Intro 7. Annotation|Intro 7. 标注@
-, @@Intro 8. Manipulation|Intro 8. 声音操控@：包括
-	@@Intro 8.1. Manipulation of pitch|音高@、
-	@@Intro 8.2. Manipulation of duration|时长@、
-	@@Intro 8.3. Manipulation of intensity|音强@、
-	@@Intro 8.4. Manipulation of formants|共振峰@的操控。
+, @@Intro 1. How to get a sound@:
+	@@Intro 1.1. Recording a sound|record@,
+	@@Intro 1.2. Reading a sound from disk|read@,
+	@@Intro 1.3. Creating a sound from a formula|formula@.
+, @@Intro 2. What to do with a sound@:
+	@@Intro 2.1. Saving a sound to disk|write@,
+	@@Intro 2.2. Viewing and editing a sound|view@.
+, @@Intro 3. Spectral analysis
+	, spectrograms: @@Intro 3.1. Viewing a spectrogram|view@,
+		@@Intro 3.2. Configuring the spectrogram|configure@,
+		@@Intro 3.3. Querying the spectrogram|query@,
+		@@Intro 3.4. Printing the spectrogram|print@,
+		@@Intro 3.5. The Spectrogram object|the Spectrogram object@.
+	, spectral slices: @@Intro 3.6. Viewing a spectral slice|view@,
+		@@Intro 3.7. Configuring the spectral slice|configure@,
+		@@Intro 3.8. The Spectrum object|the Spectrum object@.
+, @@Intro 4. Pitch analysis
+	, pitch contours: @@Intro 4.1. Viewing a pitch contour|view@,
+		@@Intro 4.2. Configuring the pitch contour|configure@,
+		@@Intro 4.3. Querying the pitch contour|query@,
+		@@Intro 4.4. Printing the pitch contour|print@,
+		@@Intro 4.5. The Pitch object|the Pitch object@.
+, @@Intro 5. Formant analysis
+	, formant contours: @@Intro 5.1. Viewing formant contours|view@,
+		@@Intro 5.2. Configuring the formant contours|configure@,
+		@@Intro 5.3. Querying the formant contours|query@,
+		@@Intro 5.4. The Formant object|the Formant object@.
+, @@Intro 6. Intensity analysis
+	, intensity contours: @@Intro 6.1. Viewing an intensity contour|view@,
+		@@Intro 6.2. Configuring the intensity contour|configure@,
+		@@Intro 6.3. Querying the intensity contour|query@,
+		@@Intro 6.4. The Intensity object|the Intensity object@.
+, @@Intro 7. Annotation
+, @@Intro 8. Manipulation@: of
+	@@Intro 8.1. Manipulation of pitch|pitch@,
+	@@Intro 8.2. Manipulation of duration|duration@,
+	@@Intro 8.3. Manipulation of intensity|intensity@,
+	@@Intro 8.4. Manipulation of formants|formants@.
 
-此外还有一些更具针对性的专题教程：
-, 语音学相关：
-	• 嗓音/声源分析（基频微扰、振幅微扰、噪声）：@Voice
-	• 听辨实验：@@ExperimentMFC@
-	• @@Sound files|声音文件操作@
-	• @@Filtering|滤波器与滤波操作@
-	• @@Source-filter synthesis|源-滤波器合成@
-	• @@Articulatory synthesis|声道模拟/发音合成@
-, 机器学习与认知建模：
-	• @@Feedforward neural networks|前馈神经网络模型@
-	• @@OT learning|优选论（OT）学习算法@
-, 统计分析：
-	• @@Principal component analysis|主成分分析（PCA）@
-	• @@Multidimensional scaling|多维尺度分析（MDS）@
-	• @@Discriminant analysis|判别分析@
-, 通用与基础功能：
-	• @@Scripting|脚本编写与批处理@
-	• @@Demo window|演示窗口交互界面@
-	• @@Printing|图形输出与打印@
+There are also more specialized tutorials:
+, Phonetics:
+	• Voice analysis (jitter, shimmer, noise): @Voice
+	• Listening experiments: @@ExperimentMFC@
+	• @@Sound files@
+	• @@Filtering@
+	• @@Source-filter synthesis@
+	• @@Articulatory synthesis@
+, Learning:
+	• @@Feedforward neural networks@
+	• @@OT learning@
+, Statistics:
+	• @@Principal component analysis@
+	• @@Multidimensional scaling@
+	• @@Discriminant analysis@
+, General:
+	• @@Scripting@
+	• @@Demo window@
+	• @@Printing@
 
-关于作者：
+The authors
+===========
 
-Praat 软件由阿姆斯特丹大学语音科学研究所的 Paul Boersma 和 David Weenink 共同开发。
-官方主页：#`https://praat.org` 或 #`https://www.fon.hum.uva.nl/praat`。
+The Praat program was created by Paul Boersma and David Weenink of
+the Institute of Phonetics Sciences of the University of Amsterdam.
+Home page: #`https://praat.org` or #`https://www.fon.hum.uva.nl/praat`.
 
-如有任何问题或建议，欢迎发送邮件至 Praat 讨论组（可从 Praat 主页访问），或直接发送至 #`paul.boersma@uva.nl`。
+For questions and suggestions, mail to the Praat discussion list,
+which is reachable from the Praat home page, or directly to #`paul.boersma@uva.nl`.
 
 ################################################################################
 )~~~"
 MAN_PAGES_END
 
 MAN_BEGIN (U"Intro 1. How to get a sound", U"ppgb", 20021212)
-INTRO (U"大多数人使用 Praat 都是从一个声音开始的。 "
-	"获取声音至少有以下三种方法：")
-LIST_ITEM (U"@@Intro 1.1. Recording a sound|Intro 1.1. 录音@")
-LIST_ITEM (U"@@Intro 1.2. Reading a sound from disk|Intro 1.2. 从磁盘读取声音@")
-LIST_ITEM (U"@@Intro 1.3. Creating a sound from a formula|Intro 1.3. 通过公式创建声音@")
+INTRO (U"Most of the things most people do with Praat start with a sound. "
+	"There are at least three ways to get a sound:")
+LIST_ITEM (U"@@Intro 1.1. Recording a sound")
+LIST_ITEM (U"@@Intro 1.2. Reading a sound from disk")
+LIST_ITEM (U"@@Intro 1.3. Creating a sound from a formula")
 MAN_END
 
 MAN_BEGIN (U"Intro 1.1. Recording a sound", U"ppgb", 20201120)
-INTRO (U"要在 Praat 中录制语音，您需要一台带有麦克风的计算机。")
-NORMAL (U"要使用麦克风进行录音，请执行以下步骤：")
-LIST_ITEM (U"1. 从 @@Objects window|对象窗口@ 的 @@New menu|新建菜单@ 中选择 @@Record mono Sound...@（录制单声道声音...）。 "
-	"屏幕上将弹出一个 @SoundRecorder 录音机窗口。")
-LIST_ITEM (U"2. 在 SoundRecorder 窗口的左侧，选择合适的输入设备，例如选择 ##Internal microphone#（内置麦克风）。 "
-	"（在 Windows 上，您也可以右键单击任务栏上的扬声器图标进行设置；有关更多详细信息，请参阅 @SoundRecorder 手册页。）")
-LIST_ITEM (U"3. 使用 #Record（录音）和 #Stop（停止）按钮录制几秒钟的语音。")
-LIST_ITEM (U"4. 使用 #Play（播放）按钮聆听您录制的声音。")
-LIST_ITEM (U"5. 重复步骤 3 和 4，直到您对录音满意为止。")
-LIST_ITEM (U"6. 点击 ##Save to list#（保存到列表）按钮。您的录音现在会出现在对象窗口中， "
-	"名称为“Sound sound”。")
-LIST_ITEM (U"7. 您现在可以关闭 SoundRecorder 窗口了。")
-LIST_ITEM (U"8. 当您将声音保存到对象窗口时，该窗口中会出现一些按钮。 "
-	"这些按钮向您展示了您可以对该声音进行的操作。试试 #Play（播放）和 @@View & Edit@（查看与编辑）按钮。")
-NORMAL (U"有关录音的更多信息，请参阅 @SoundRecorder 手册页。")
+INTRO (U"To record a speech sound into Praat, you need a computer with a microphone.")
+NORMAL (U"To record from the microphone, perform the following steps:")
+LIST_ITEM (U"1. Choose @@Record mono Sound...@ from the @@New menu@ in the @@Objects window@. "
+	"A @SoundRecorder window will appear on your screen.")
+LIST_ITEM (U"2. On the left in the SoundRecorder window, choose the appropriate input device, e.g. choose ##Internal microphone#. "
+	"(On Windows, instead right-click the loudspeaker symbol in the Start bar; see @SoundRecorder for more details.)")
+LIST_ITEM (U"3. Use the #Record and #Stop buttons to record a few seconds of your speech.")
+LIST_ITEM (U"4. Use the #Play button to hear what you have recorded.")
+LIST_ITEM (U"5. Repeat steps 3 and 4 until you are satisfied with your recording.")
+LIST_ITEM (U"6. Click the ##Save to list# button. Your recording will now appear in the Objects window, "
+	"where it will be called “Sound sound”.")
+LIST_ITEM (U"7. You can now close the SoundRecorder window.")
+LIST_ITEM (U"8. When you saved your sound to the Objects window, some buttons appeared in that window. "
+	"These buttons show you what you can do with the sound. Try the #Play and @@View & Edit@ buttons.")
+NORMAL (U"For more information on recording, see the @SoundRecorder manual page.")
 MAN_END
 
 MAN_BEGIN (U"Intro 1.2. Reading a sound from disk", U"ppgb", 20041126)
-INTRO (U"除了使用麦克风录制新声音外，您也可以从磁盘中读取现有的声音文件。")
-NORMAL (U"通过 @@Open menu|打开菜单@ 中的 @@Read from file...@，Praat 将能够读取大多数标准类型的声音文件，例如 WAV 文件。 "
-	"它们将作为 @Sound 对象出现在对象窗口中。例如，如果您打开了 ##hello.wav# 文件， "
-	"列表中就会出现一个名为“Sound hello”的对象。")
-NORMAL (U"如果您的磁盘上没有声音文件，您可以从互联网上下载一个 WAV 文件（或类似格式文件）， "
-	"然后使用 ##Read from file...#（从文件读取...）将其读入 Praat。")
+INTRO (U"Apart from recording a new sound from a microphone, you could read an existing sound file from your disk.")
+NORMAL (U"With @@Read from file...@ from the @@Open menu@, "
+	"Praat will be able to read most standard types of sound files, e.g. WAV files. "
+	"They will appear as @Sound objects in the Objects window. For instance, if you open the file ##hello.wav#, "
+	"an object called “Sound hello” will appear in the list.")
+NORMAL (U"If you do not have a sound file on your disk, you can download a WAV file (or so) from the Internet, "
+	"then read that file into Praat with ##Read from file...#.")
 MAN_END
 
 MAN_BEGIN (U"Intro 1.3. Creating a sound from a formula", U"ppgb", 20070225)
-INTRO (U"如果您没有麦克风、磁盘上没有声音文件，且无法访问互联网， "
-	"您仍然可以使用 @@New menu|新建菜单@ 中的 @@Create Sound from formula...@（通过公式创建声音...）来生成声音。")
+INTRO (U"If you have no microphone, no sound files on disk, and no access to the Internet, "
+	"you could still create a sound with @@Create Sound from formula...@ from the @@New menu@.")
 MAN_END
 
 MAN_BEGIN (U"Intro 2. What to do with a sound", U"ppgb", 20110131)
-INTRO (U"一旦您在 @@List of Objects|对象列表@ 中有了 @Sound 对象， "
-	"@@Objects window|对象窗口@右侧的 @@Dynamic menu|动态菜单@ 按钮就会向您展示可以对其执行的操作。")
-LIST_ITEM (U"@@Intro 2.1. Saving a sound to disk|Intro 2.1. 保存声音到磁盘@")
-LIST_ITEM (U"@@Intro 2.2. Viewing and editing a sound|Intro 2.2. 查看与编辑声音@")
+INTRO (U"As soon as you have a @Sound in the @@List of Objects@, "
+	"the buttons in the @@Dynamic menu@ (the right-hand part of the @@Objects window@) "
+	"will show you what you can do with it.")
+LIST_ITEM (U"@@Intro 2.1. Saving a sound to disk")
+LIST_ITEM (U"@@Intro 2.2. Viewing and editing a sound")
 MAN_END
 
 MAN_BEGIN (U"Intro 2.1. Saving a sound to disk", U"ppgb", 20110131)
-INTRO (U"有几种不同的方法可以将声音写入磁盘。")
-NORMAL (U"首先，@SoundRecorder 录音机窗口的 @@File menu|文件菜单@ 包含了将录制声音的左声道、右声道或双声道保存为四种标准类型 "
-	"声音文件（WAV、AIFC、NeXT/Sun、NIST）中的任何一种的命令。这四种文件类型对 Praat 来说都一样好： "
-	"Praat 在每台计算机上都能同样好地处理它们。这四种类型中的前三种也将 "
-	"几乎被所有其他声音播放程序所识别。")
-NORMAL (U"其次，一旦您在 @@List of Objects|对象列表@ 中有了一个 @Sound 对象， "
-	"您就可以使用 @@Save menu|保存菜单@ 中的命令以多种格式保存它。 "
-	"同样，WAV、AIFF、AIFC、NeXT/Sun 和 NIST 格式都同样适用。")
-NORMAL (U"有关更多信息，请参阅 @@Sound files|声音文件@ 教程。")
+INTRO (U"There are several ways to write a sound to disk.")
+NORMAL (U"First, the @@File menu@ of the @SoundRecorder window contains commands to save the left "
+	"channel, the right channel, or both channels of the recorded sound to any of four standard types "
+	"of sound files (WAV, AIFC, NeXT/Sun, NIST). These four file types are all equally good for Praat: "
+	"Praat will handle them equally well on every computer. The first three of these types will "
+	"also be recognized by nearly all other sound-playing programs.")
+NORMAL (U"Then, once you have a @Sound object in the @@List of Objects@, "
+	"you can save it in several formats with the commands in the @@Save menu@. "
+	"Again, the WAV, AIFF, AIFC, NeXT/Sun, and NIST formats are equally fine.")
+NORMAL (U"For more information, see the @@Sound files@ tutorial.")
 MAN_END
 
 MAN_BEGIN (U"Intro 2.2. Viewing and editing a sound", U"ppgb", 20230202)   // 2023-06-08
-NORMAL (U"要查看对象列表中某个 @Sound 对象的波形图， "
-	"请选中该声音对象并点击 @@View & Edit@（查看与编辑）。屏幕上将弹出一个 @SoundEditor 窗口。 "
-	"您会看到波形图（如果是双声道立体声，则为上下两个波形图），以及可能位于其下方的分析图。 "
-	"您可以放大和滚动来详细查看声音的各个部分。 "
-	"您可以通过鼠标拖动来选定声音的某一部分。 "
-	"要播放声音的某一部分，可以单击其下方的任何控制条矩形。 "
-	"要将选中的声音部分移动到其他位置，可以使用 Edit（编辑）菜单中的 #Cut（剪切）和 #Paste（粘贴）命令。 "
-	"您可以同时为多个不同的声音打开编辑器窗口，然后在不同声音之间进行剪切、复制和粘贴， "
-	"这与您在文字处理或图像处理软件中操作文本 and 图片的方式完全一致。")
-NORMAL (U"如果您的音频文件长达数分钟或更久， "
-	"或者您希望同时查看并聆听立体声文件的两个声道， "
-	"您可能会更倾向于使用 @@Open long sound file...@（打开长音频文件...）。 "
-	"这将在列表中放入一个 @LongSound（长音频对象）对象。采用这种方式时，声音的绝大部分数据将保留在磁盘文件中， "
-	"每次播放或查看某一小段时，只会读取最多 60 秒的音频数据到内存中。 "
-	"若要更改这个 60 秒的限制（例如改为 500 秒）， "
-	"请选择 Praat 菜单中 ##Settings#（设置）子菜单下的 ##LongSound settings...#（长音频设置...）。")
+NORMAL (U"To see the wave form of a @Sound that is in the list of objects, "
+	"select that Sound and click @@View & Edit@. A @SoundEditor window will appear on your screen. "
+	"You see a waveform (or two waveforms, if you have a stereo sound) and probably some “analyses” below it. "
+	"You can zoom in and scroll to see the various parts of the sound in detail. "
+	"You can select a part of the sound by dragging with the mouse. "
+	"To play a part of the sound, click in any of the rectangles below it. "
+	"To move a selected part of the sound to another location, use #Cut and #Paste from the Edit menu. "
+	"You can open sound windows for more than one sound, and then cut, copy, and paste between the sounds, "
+	"just as you are used to doing with text and pictures in word processing programs.")
+NORMAL (U"If your sound file is longer than a couple of minutes, "
+	"or if you want to see and listen to both channels of a stereo sound, "
+	"you may prefer to open it with @@Open long sound file...@. "
+	"This puts a @LongSound object into the list. In this way, most of the sound will stay in the file on disk, "
+	"and at most 60 seconds will be read into memory each time you play or view a part of it. "
+	"To change these 60 seconds to something else, e.g. 500 seconds, "
+	"choose ##LongSound settings...# from the #Settings submenu of the Praat menu.")
 MAN_END
 
 MAN_BEGIN (U"Intro 3. Spectral analysis", U"ppgb", 20070905)
-INTRO (U"本节介绍如何分析现有声音的频谱内容。 "
-	"您将学习如何使用%spectrograms（声谱图）和%%spectral slices%（频谱切片）。")
-LIST_ITEM (U"@@Intro 3.1. Viewing a spectrogram|Intro 3.1. 查看声谱图@")
-LIST_ITEM (U"@@Intro 3.2. Configuring the spectrogram|Intro 3.2. 设置声谱图参数@")
-LIST_ITEM (U"@@Intro 3.3. Querying the spectrogram|Intro 3.3. 查询声谱图信息@")
-LIST_ITEM (U"@@Intro 3.4. Printing the spectrogram|Intro 3.4. 打印声谱图@")
-LIST_ITEM (U"@@Intro 3.5. The Spectrogram object|Intro 3.5. Spectrogram 对象@")
-LIST_ITEM (U"@@Intro 3.6. Viewing a spectral slice|Intro 3.6. 查看频谱切片@")
-LIST_ITEM (U"@@Intro 3.7. Configuring the spectral slice|Intro 3.7. 设置频谱切片参数@")
-LIST_ITEM (U"@@Intro 3.8. The Spectrum object|Intro 3.8. Spectrum 对象@")
+INTRO (U"This section describes how you can analyse the spectral content of an existing sound. "
+	"You will learn how to use %spectrograms and %%spectral slices%.")
+LIST_ITEM (U"@@Intro 3.1. Viewing a spectrogram")
+LIST_ITEM (U"@@Intro 3.2. Configuring the spectrogram")
+LIST_ITEM (U"@@Intro 3.3. Querying the spectrogram")
+LIST_ITEM (U"@@Intro 3.4. Printing the spectrogram")
+LIST_ITEM (U"@@Intro 3.5. The Spectrogram object")
+LIST_ITEM (U"@@Intro 3.6. Viewing a spectral slice")
+LIST_ITEM (U"@@Intro 3.7. Configuring the spectral slice")
+LIST_ITEM (U"@@Intro 3.8. The Spectrum object")
 MAN_END
 
 MAN_BEGIN (U"Intro 3.1. Viewing a spectrogram", U"ppgb", 20110128)  // 2023-06-08
-INTRO (U"要查看声音频谱内容随时间的变化， "
-	"请在对象列表中选择一个 @Sound 或 @LongSound 对象，然后选择 @@View & Edit@。 "
-	"屏幕上将弹出一个 @SoundEditor 或 @LongSoundEditor 窗口。 "
-	"在此窗口的整个下半部分，您将看到一个灰度图像，它被称为%spectrogram（声谱图）。 "
-	"如果未显示声谱图，请从 Spectrogram（声谱图）菜单中选择 @@Show spectrogram@（显示声谱图）。")
-NORMAL (U"声谱图是声音的@@spectro-temporal representation|时频表示@。 "
-	"声谱图的水平方向表示@@time|时间@，垂直方向表示@@frequency|频率@。 "
-	"声谱图的时间轴与波形图完全一致，因此声谱图会随着您的缩放和滚动操作而联动。 "
-	"在声谱图的左侧，您可以看到频率刻度。声谱图底部的频率通常是 0 Hz（赫兹，每秒周期数），顶部的常见频率上限值是 5000 Hz。")
-NORMAL (U"声谱图中颜色较深的部分表示能量密度较高，颜色较浅的部分表示能量密度较低。 "
-	"如果声谱图在 1.2 秒左右且频率为 4000 Hz 处有一块深色区域， "
-	"这意味着声音在那个时刻的该高频段含有大量能量。 "
-	"有关语音声谱图的更多实例，请参阅 @@Ladefoged (2001)@ 的教科书以及 "
-	"@@Ladefoged & Maddieson (1996)@ 的参考著作。")
-NORMAL (U"要查看声谱图某一部分所对应的具体时间和频率， "
-	"只需在声谱图中单击，您就会看到垂直的时间光标在波形图上方显示时间， "
-	"水平的频率光标在声谱图左侧显示频率。 "
-	"这是寻找元音%formant（共振峰）频率或摩擦音主要频谱峰值的方法之一。")
-ENTRY (U"哎呀，边缘怎么有白色的垂直条纹？")
-NORMAL (U"这是正常现象。频谱分析需要一定长度的%%analysis window%（分析窗）。 "
-	"例如，如果 Praat 想要计算 1.342 秒处的频谱，它需要包含该时间点周围 10 毫秒窗口内的信号信息， "
-	"即 Praat 会使用 1.337 到 1.347 秒之间的所有信号信息。但在声音的最边缘， "
-	"这些信息是不可用的： "
-	"如果声音的时间跨度是 0 到 1.8 秒，那么在 0 到 0.005 秒之间或 1.795 到 1.800 秒之间就无法计算频谱。 "
-	"因此会出现白色条纹。如果您在刚打开声音时没有立即看到它们，可以放大声音的开头或结尾部分查看。")
-NORMAL (U"当您放大声音的中间部分（或任何远离边缘的地方）时，这些白色条纹就会消失。 "
-	"例如，您会突然只看到 0.45 到 1.35 秒之间的时间段。 "
-	"但 Praat 并没有忘记此时窗边缘之外的信号是什么样的。 "
-	"为了显示 0.45 到 1.35 秒的声谱图，Praat 会使用波形图中 0.445 到 1.355 秒之间的信号信息， "
-	"如果这部分信息可用，您就不会在视窗边缘看到白色条纹。")
-ENTRY (U"哎呀，我滚动时它会发生变化！")
-NORMAL (U"这也是正常现象，尤其是在视窗较长时。如果您的可见时间窗口长达 20 秒， "
-	"且该窗口在水平方向上占用了 1000 个屏幕像素， "
-	"那么您可能会认为每个一像素宽的垂直线应该代表 20 毫秒声音的频谱。 "
-	"但出于计算速度的考虑，Praat 只会显示这 20 毫秒中心附近那部分声音的频谱， "
-	"而不是这 20 毫秒内所有频谱的平均值或总和。 "
-	"这种对底层声谱图的%undersampling（欠采样）与绘制波形图时的情况不同。 "
-	"在波形图中，垂直的黑线会连接落入同一个屏幕像素内的所有采样点的最小 and 最大振幅。 "
-	"但我们无法对声谱图做类似的处理。由于滚动是按固定时间步长（即可见窗口时长的 5%）进行的， "
-	"而不是按整像素进行的，因此每次滚动时像素的中心都会落入声谱图的不同部分。 "
-	"从而导致了这种视觉上的变化。如果您的可见窗口短于几秒钟， "
-	"滚动声谱图看起来就会平滑得多。")
-NORMAL (U"声谱图的亮度/黑度在您滚动时也会发生变化，因为系统会将当前可见部分中能量最高的地方定义为黑色。 "
-	"当信号中能量非常高的一部分滚动到视窗外时，声谱图的其余部分就会变深。 "
-	"下一节将介绍如何关闭此自动调整功能。")
+INTRO (U"To see the spectral content of a sound as a function of time, "
+	"select a @Sound or @LongSound object and choose @@View & Edit@. "
+	"A @SoundEditor or @LongSoundEditor window will appear on your screen. "
+	"In the entire bottom half of this window you will see a greyish image, which is called a %spectrogram. "
+	"If you do not see it, choose @@Show spectrogram@ from the Spectrogram menu.")
+NORMAL (U"The spectrogram is a @@spectro-temporal representation@ of the sound. "
+	"The horizontal direction of the spectrogram represents @time, the vertical direction represents @frequency. "
+	"The time scale of the spectrogram is the same as that of the waveform, so the spectrogram reacts "
+	"to your zooming and scrolling. "
+	"To the left of the spectrogram, you see the frequency scale. The frequency at the bottom of the spectrogram "
+	"is usually 0 Hz (hertz, cps, cycles per second), and a common value for the frequency at the top is 5000 Hz.")
+NORMAL (U"Darker parts of the spectrogram mean higher energy densities, lighter parts mean lower energy densities. "
+	"If the spectrogram has a dark area around a time of 1.2 seconds and a frequency of 4000 Hz, "
+	"this means that the sound has lots of energy for those high frequencies at that time. "
+	"For many examples of spectrograms of speech sounds, see the textbook by @@Ladefoged (2001)@ and "
+	"the reference work by @@Ladefoged & Maddieson (1996)@.")
+NORMAL (U"To see what time and frequency a certain part of the spectrogram is associated with, "
+	"just click in the spectrogram and you will see the vertical time cursor showing the time above "
+	"the waveform and the horizontal frequency cursor showing the frequency to the left of the spectrogram. "
+	"This is one of the ways to find the %formant frequencies for vowels, or the main spectral peaks "
+	"for fricatives.")
+ENTRY (U"Hey, there are white vertical stripes at the edges!")
+NORMAL (U"This is normal. Spectral analysis requires an %%analysis window% of a certain duration. "
+	"For instance, if Praat wants to know the spectrum at 1.342 seconds, it needs to include information "
+	"about the signal in a 10-milliseconds window around this time point, i.e., Praat will use "
+	"signal information about all times between 1.337 and 1.347 seconds. At the very edges of the sound, "
+	"this information is not available: "
+	"if the sound runs from 0 to 1.8 seconds, no spectrum can be computed between 0 and 0.005 "
+	"seconds or between 1.795 and 1.800 seconds. Hence the white stripes. If you do not see them "
+	"immediately when you open the sound, zoom in on the beginning or end of the sound.")
+NORMAL (U"When you zoom in on the middle of the sound (or anywhere not near the edges), the white stripes vanish. "
+	"Suddenly you see only the time stretch between 0.45 and 1.35 seconds, for instance. "
+	"But Praat did not forget what the signal looks like just outside the edges of this time window. "
+	"To display a spectrogram from 0.45 to 1.35 seconds, Praat will use information from the wave form "
+	"between 0.445 and 1.355 seconds, and if this is available, you will see no white stripes at the edges of the window.")
+ENTRY (U"Hey, it changes when I scroll!")
+NORMAL (U"This is normal as well, especially for long windows. If your visible time window is 20 seconds long, "
+	"and the window takes up 1000 screen pixels horizontally, "
+	"then you might think that every one-pixel-wide vertical line should represent the spectrum of 20 milliseconds of sound. "
+	"But for reasons of computation speed, Praat will only show the spectrum of the part of the sound "
+	"that lies around the centre of those 20 milliseconds, "
+	"not the average or sum of all the spectra in those 20 milliseconds. "
+	"This %undersampling of the underlying spectrogram is different from what happens in the drawing of the wave form, "
+	"where a vertical black line connects the minimum and maximum amplitude of all the samples that fall inside a "
+	"screen pixel. We cannot do something similar for spectrograms. And since scrolling goes by fixed time steps "
+	"(namely, 5 percent of the duration of the visible window), rather than by a whole number of screen pixels, "
+	"the centres of the pixels will fall in different parts of the spectrogram with each scroll. "
+	"Hence the apparent changes. If your visible window is shorter than a couple of seconds, "
+	"the scrolling spectrogram will appear much smoother.")
+NORMAL (U"The darkness of the spectrogram will also change when you scroll, because the visible part with the most "
+	"energy is defined as black. When a very energetic part of the signal scrolls out of view, the spectrogram "
+	"will turn darker. The next section will describe a way to switch this off.")
 MAN_END
 
 MAN_BEGIN (U"Intro 3.2. Configuring the spectrogram", U"ppgb", 20220907)
-NORMAL (U"通过选择 Spectrogram（声谱图）菜单中的 @@Spectrogram settings...@（声谱图设置...）， "
-	"您可以决定声谱图的计算和显示方式。 "
-	"这些设置将在不同的 Praat 运行周期中被记录。 "
-	"所有这些设置都具有默认的标准值（“出厂设置”），在点击 ##Standards#（标准值）时就会恢复。")
-TERM (U"%%View range%（显示频率范围，Hz）")
-DEFINITION (U"要显示的频率范围。标准值是底部 0 Hz，顶部 5000 Hz。 "
-	"如果此最大频率高于声音对象的奈奎斯特频率（Nyquist frequency，即其采样频率的一半）， "
-	"则声谱图中的某些值将为零，且更高的频率将绘制为白色。 "
-	"如果您以 44100 Hz 录制一段声音，并将显示范围设置为 0 Hz 到 25000 Hz，您就可以看到这种现象。")
-TERM (U"%%Window length%（窗长度）")
-DEFINITION (U"分析窗的持续时间。如果是 0.005 秒（标准值）， "
-	"Praat 会在每一帧中使用该帧中心前 0.0025 秒和后 0.0025 秒之间的那部分声音信号 "
-	"（对于高斯窗，Praat 实际上使用的比这稍微多一点）。 "
-	"窗长度决定了频谱分析的%带宽（bandwidth）， "
-	"即纯正弦波声谱图中水平线的宽度（见下文）。 "
-	"对于高斯窗，-3 dB 带宽为 2*sqrt(6*ln(2))/(\\pi*%%Window length%)， "
-	"或 1.2982804 / %%Window length%。 "
-	"要获得“宽带”声谱图（带宽为 260 Hz），请保持 5 毫秒的标准窗长度； "
-	"要获得“窄带”声谱图（带宽为 43 Hz），请将其设置为 30 毫秒（0.03 秒）。 "
-	"其他窗口形状会给出略微不同的数值。")
-TERM (U"%%Dynamic range%（动态范围，dB）")
-DEFINITION (U"所有比最大值低 %%Dynamic range% dB 以上的值（可能是在动态压缩之后， "
-	"参见 @@Advanced spectrogram settings...@（高级声谱图设置）） "
-	"都将绘制为白色。介于两者之间的值则具有相应的灰色阴影。因此，如果声谱图中的最高峰值 "
-	"高度为 30 dB/Hz，且动态范围为 50 dB（这是标准值）， "
-	"那么低于 -20 dB/Hz 的值将绘制为白色，而介于 -20 dB/Hz 和 30 dB/Hz 之间的值将绘制为 "
-	"各种不同深浅的灰色。")
-ENTRY (U"带宽（The bandwidth）")
-NORMAL (U"要查看窗长度如何影响带宽， "
-	"首先使用 @@Create Sound from formula...@ 通过公式创建一个 1000 Hz 的正弦波， "
-	"在公式框中输入 `1/2 * sin (2*pi*1000*x)`，然后点击 ##View & Edit#。 "
-	"声谱图将显示一条水平黑线。 "
-	"您现在可以在声谱图设置中改变窗长度，并观察线条的粗细如何变化。 "
-	"如果增加窗长度，线条会变细。 "
-	"显然，如果分析窗包含该波形的更多周期， "
-	"声谱图就能够以更高的精度告诉我们该波形的频率。")
-NORMAL (U"为了更精确地观察这一点，请创建一个频率分别为 1000 Hz 和 1200 Hz 的两个正弦波之和。 "
-	"公式为 `1/4 * sin (2*pi*1000*x) + 1/4 * sin (2*pi*1200*x)`。在编辑器中， "
-	"如果分析窗很短（5 毫秒），您将看到单条粗谱带；如果分析窗较长（30 毫秒）， "
-	"您将看到两条分离的谱带。显然，频率分辨率会随着分析窗的增长而变好。")
-NORMAL (U"那为什么我们不一直使用长分析窗呢？答案是它们的时间分辨率较差。 "
-	"要观察这一点，请创建一个由两个正弦波和两个短脉冲（clicks）组成的声音。公式为 "
-	"`0.02*(sin(2*pi*1000*x)+sin(2*pi*1200*x)) + (col=10000)+(col=10200)`。 "
-	"如果查看这段声音，您会发现如果分析窗较长，两个脉冲在时间上会重叠； "
-	"而如果分析窗较短，正弦波在频率上会重叠。 "
-	"显然，在时间分辨率和频率分辨率之间存在着权衡关系。 "
-	"人们无法同时极其精确地获知时间和频率。")
-ENTRY (U"高级设置（Advanced settings）")
-NORMAL (U"Spectrogram（声谱图）菜单中还包含了 @@Advanced spectrogram settings...@（高级声谱图设置...）。")
+NORMAL (U"With @@Spectrogram settings...@ from the #Spectrogram menu, "
+	"you can determine how the spectrogram is computed and how it is displayed. "
+	"These settings will be remembered across Praat sessions. "
+	"All these settings have standard values (\"factory settings\"), which appear "
+	"when you click ##Standards#.")
+TERM (U"%%View range% (Hz)")
+DEFINITION (U"the range of frequencies to display. The standard is 0 Hz at the bottom and 5000 Hz at the top. "
+	"If this maximum frequency is higher than the Nyquist frequency of the Sound "
+	"(which is half its sampling frequency), some values in the spectrogram will be zero, and the higher "
+	"frequencies will be drawn in white. You can see this if you record a Sound at 44100 Hz and set the "
+	"view range from 0 Hz to 25000 Hz.")
+TERM (U"%%Window length")
+DEFINITION (U"the duration of the analysis window. If this is 0.005 seconds (the standard), "
+	"Praat uses for each frame the part of the sound that lies between 0.0025 seconds before "
+	"and 0.0025 seconds after the centre of that frame "
+	"(for Gaussian windows, Praat actually uses a bit more than that). "
+	"The window length determines the %bandwidth of the spectral analysis, "
+	"i.e. the width of the horizontal line in the spectrogram of a pure sine wave (see below). "
+	"For a Gaussian window, the -3 dB bandwidth is 2*sqrt(6*ln(2))/(\\pi*%%Window length%), "
+	"or 1.2982804 / %%Window length%. "
+	"To get a “broad-band” spectrogram (bandwidth 260 Hz), keep the standard window length of 5 ms; "
+	"to get a “narrow-band” spectrogram (bandwidth 43 Hz), set it to 30 ms (0.03 seconds). "
+	"The other window shapes give slightly different values.")
+TERM (U"%%Dynamic range% (dB)")
+DEFINITION (U"All values that are more than %%Dynamic range% dB below the maximum (perhaps after dynamic compression, "
+	"see @@Advanced spectrogram settings...@) "
+	"will be drawn in white. Values in-between have appropriate shades of grey. Thus, if the highest "
+	"peak in the spectrogram has a height of 30 dB/Hz, and the dynamic range is 50 dB (which is the standard value), "
+	"then values below -20 dB/Hz will be drawn in white, and values between -20 dB/Hz and 30 dB/Hz will be drawn "
+	"in various shades of grey.")
+ENTRY (U"The bandwidth")
+NORMAL (U"To see how the window length influences the bandwidth, "
+	"first create a 1000-Hz sine wave with @@Create Sound from formula...@ "
+	"by typing `1/2 * sin (2*pi*1000*x)` as the formula, then click ##View & Edit#. "
+	"The spectrogram will show a horizontal black line. "
+	"You can now vary the window length in the spectrogram settings and see how the thickness "
+	"of the lines varies. The line gets thinner if you raise the window length. "
+	"Apparently, if the analysis window comprises more periods of the wave, "
+	"the spectrogram can tell us the frequency of the wave with greater precision.")
+NORMAL (U"To see this more precisely, create a sum of two sine waves, with frequencies of 1000 and 1200 Hz. "
+	"the formula is `1/4 * sin (2*pi*1000*x) + 1/4 * sin (2*pi*1200*x)`. In the editor, you will see "
+	"a single thick band if the analysis window is short (5 ms), and two separate bands if the analysis "
+	"window is long (30 ms). Apparently, the frequency resolution gets better with longer analysis windows.")
+NORMAL (U"So why don't we always use long analysis windows? The answer is that their time resolution is poor. "
+	"To see this, create a sound that consists of two sine waves and two short clicks. The formula is "
+	"`0.02*(sin(2*pi*1000*x)+sin(2*pi*1200*x)) + (col=10000)+(col=10200)`. "
+	"If you view this sound, you can see that the two clicks will overlap "
+	"in time if the analysis window is long, and that the sine waves overlap in frequency if the "
+	"analysis window is short. Apparently, there is a trade-off between time resolution and "
+	"frequency resolution. One cannot know both the time and the frequency with great precision.")
+ENTRY (U"Advanced settings")
+NORMAL (U"The Spectrogram menu also contains @@Advanced spectrogram settings...@.")
 MAN_END
 
 MAN_BEGIN (U"Advanced spectrogram settings...", U"ppgb", 20120531)
-ENTRY (U"优化 (Optimization)")
-TERM (U"%%时间步数%")
-DEFINITION (U"Praat 在整个时间窗口内计算声谱图的最大点数。如果您的屏幕宽度不超过 1200 像素，那么标准值 1000 就足够合适了，因为在每个 1 像素宽的垂直线上计算超过一个频谱是没有意义的。如果您的屏幕非常宽，将此数值提高到 1500 可能会看到显示效果有所改善。")
-TERM (U"%%频率步数%")
-DEFINITION (U"Praat 沿频率轴计算频谱的最大点数。如果您的屏幕高度不超过 768 像素，那么标准值 250 是合适的，因为在每个 1 像素高的水平线上计算超过一个频谱是没有意义的。如果您的屏幕非常高，将此数值调高可能会看到显示效果有所改善。")
-NORMAL (U"出于计算速度的考虑，Praat 可能会决定改变实际的时间步长和频率步长。这是因为时间步长不需要小于窗长度的 1/(8\\Vr\\pi)，且频率步长不需要小于窗长度倒数的 (\\Vr\\pi)/8。例如，如果窗长度是 5 毫秒，则实际的时间步长永远不会小于 5/(8\\Vr\\pi) = 0.353 毫秒，实际的频率步长永远不会小于 (\\Vr\\pi)/8/0.005 = 44.31 赫兹。")
-ENTRY (U"声谱图分析设置")
-TERM (U"%%分析方法")
-DEFINITION (U"目前在该窗口中只有一种用于从声音计算频谱的方法：傅里叶变换。")
-TERM (U"%%窗形状")
-DEFINITION (U"分析窗的形状。为了计算（例如）3.850 秒处的频谱，靠近 3.850 秒的采样点被赋予比更远处的采样点更大的权重。每个采样点对频谱贡献的相对程度由窗形状决定。您可以选择：Gaussian（高斯窗）、Square（无/矩形窗）、Hamming（升余弦平方窗）、Bartlett（三角形窗）、Welch（抛物线窗）和 Hanning（余弦平方窗）。高斯窗更为优越，因为在声谱图中它不会产生%旁瓣（见下文）；但它的分析速度要比其他窗形状慢 2 倍，因为它的分析实际上是在每帧两倍数量的采样点上执行的。")
-ENTRY (U"旁瓣；有人想赢一块蛋糕吗？")
-NORMAL (U"高斯窗是我们唯一可以认真考虑作为分析窗候选的形状。要观察这一点，请先使用 @@Create Sound from formula...|从公式创建声音...@ 创建一个 1000 Hz 的正弦波，在公式栏输入 `1/2 * sin (2*pi*1000*x)`，然后点击 ##View & Edit#。如果窗形状是高斯窗，声谱图将显示为一条水平黑线。如果是其他任何窗形状，声谱图都会显示许多水平的灰色线条（%旁瓣%），它们不代表信号中存在的任何真实成分，只是窗形状引起的伪影（artifacts）。")
-NORMAL (U"我们包含其他这些窗形状纯粹是出于教学目的，以及因为在计算机像现在这样快速之前，其他软件传统上常使用 Hanning 和 Hamming 窗（使用这些窗计算声谱图的速度快一倍）。目前仍有一些软件在使用这些较差的窗形状，您很可能会遇到一些声称高斯窗有缺点的人。我们向这些人承诺：如果他们能提供使用 Hanning 或 Hamming 窗分析效果优于高斯窗的声音，我们将赠送他们一块大蛋糕。而反过来的例子非常容易找到——我们刚才就见证了一个。")
-ENTRY (U"声谱图黑度设置")
-TERM (U"%%自动缩放%")
-TERM (U"%%最大值% (dB/Hz)")
-DEFINITION (U"声谱图中能量高于%最大值%（预加重之后）的所有部分都将绘制为黑色。标准最大值是 100 dB/Hz，但如果开启了%自动缩放（默认即为开启），Praat 将会改用声谱图当前可见部分的最大值；这可以确保窗口显示效果良好，但这也意味着当您滚动声谱图时，某一部分的黑度可能会发生变化。")
-TERM (U"%%预加重% (dB/倍频程)")
-DEFINITION (U"决定高通滤波器的陡度，即在绘制前，高频能量相比于低频能量被提升了多少。由于人类元音的频谱斜率大约为每倍频程 -6 dB，因此该设置的标准值为每倍频程 +6 dB，从而使频谱变平坦，并使高频共振峰看起来和低频共振峰一样清晰。当您提高预加重值时，1000 Hz 以上的频段会变深（变黑），1000 Hz 以下的频段会变浅（变白）。")
-TERM (U"%%动态压缩")
-DEFINITION (U"决定在绘制前应该将微弱的频谱增强多少。通常，该参数在 0 到 1 之间。如果为 0（标准值），则没有 dynamic compression（动态压缩）。如果为 1，则所有频谱都将被绘制得同样强，即它们都会包含被绘制为黑色的频率成分。例如，如果该参数为 0.4，且全局最大值为 80 dB，那么对于最大值仅为 20 dB 的频谱（如果动态范围是 50 dB，这部分通常会绘制为全白），其能量将被提升 0.4 * (80 - 20) = 24 dB，使其最大值在 44 dB 处显示（从而使该帧在屏幕上可见）。")
+ENTRY (U"Optimization")
+TERM (U"%%Number of time steps%")
+DEFINITION (U"the maximum number of points along the time window for which Praat has to compute "
+	"the spectrum. If your screen is not wider than 1200 pixels, then the standard of 1000 is "
+	"appropriate, since there is no point in computing more than one spectrum per one-pixel-wide vertical line. "
+	"If you have a really wide screen, you may see improvement if you raise this number to 1500.")
+TERM (U"%%Number of frequency steps%")
+DEFINITION (U"the maximum number of points along the frequency axis for which Praat has to compute "
+	"the spectrum. If your screen is not taller than 768 pixels, then the standard of 250 is "
+	"appropriate, since there is no point in computing more than one spectrum per one-pixel-height horizontal line. "
+	"If you have a really tall screen, you may see improvement if you raise this number.")
+NORMAL (U"For purposes of computation speed, Praat may decide to change the time step and the frequency step. "
+	"This is because the time step never needs to be smaller than 1/(8\\Vr\\pi) of the window length, "
+	"and the frequency step never needs to be smaller than (\\Vr\\pi)/8 of the inverse of the window length. "
+	"For instance, if the window length is 5 ms, "
+	"the actual time step will never be less than 5/(8\\Vr\\pi) = 0.353 ms, "
+	"and the actual frequency step will never be less than (\\Vr\\pi)/8/0.005 = 44.31 Hz.")
+ENTRY (U"Spectrogram analysis settings")
+TERM (U"%%Method")
+DEFINITION (U"there is currently only one method available in this window for computing a spectrum from "
+	"a sound: the Fourier transform.")
+TERM (U"%%Window shape")
+DEFINITION (U"the shape of the analysis window. To compute the spectrum at, say, 3.850 seconds, "
+	"samples that lie close to 3.850 seconds are given more weight than samples further away. "
+	"The relative extent to which each sample contributes to the spectrum is given by the window shape. "
+	"You can choose from: Gaussian, Square (none, rectangular), Hamming (raised sine-squared), "
+	"Bartlett (triangular), Welch (parabolic), and Hanning (sine-squared). "
+	"The Gaussian window is superior, as it gives no %sidelobes in your spectrogram (see below); "
+	"it analyzes a factor of 2 slower than the other window shapes, "
+	"because the analysis is actually performed on twice as many samples per frame.")
+ENTRY (U"Sidelobes; anybody wants to win a cake?")
+NORMAL (U"The Gaussian window is the only shape that we can consider seriously as a candidate for "
+	"the analysis window. To see this, create a 1000-Hz sine wave with @@Create Sound from formula...@ "
+	"by typing `1/2 * sin (2*pi*1000*x)` as the formula, then click ##View & Edit#. "
+	"If the window shape is Gaussian, the spectrogram will show a horizontal black line. "
+	"If the window shape is anything else, the spectrogram will show many horizontal grey lines (%sidelobes), "
+	"which do not represent anything that is available in the signal. They are artifacts of the "
+	"window shapes.")
+NORMAL (U"We include these other window shapes only for pedagogical purposes "
+	"and because the Hanning and Hamming windows have traditionally been used in other programs before "
+	"computers were as fast as they are now (a spectrogram is computed twice as fast "
+	"with these other windows). Several other programs still use these inferior window shapes, and you are "
+	"likely to run into people who claim that the Gaussian window has disadvantages. "
+	"We promise such people a large cake if they can come up with sounds that look better "
+	"with Hanning or Hamming windows than with a Gaussian window. An example of the reverse is easy "
+	"to find; we have just seen one.")
+ENTRY (U"Spectrogram blackness settings")
+TERM (U"%%Autoscaling%")
+TERM (U"%%Maximum% (dB/Hz)")
+DEFINITION (U"all parts of the spectrogram that have a power above %maximum (after preemphasis) "
+	"will be drawn in black. The standard maximum is 100 dB/Hz, but if %autoscaling is on (which is the standard), "
+	"Praat will use the maximum of the visible part of the spectrogram instead; "
+	"this ensures that the window will always look well, but it also means that the blackness "
+	"of a certain part of the spectrogram will change as you scroll.")
+TERM (U"%%Preemphasis% (dB/octave)")
+DEFINITION (U"determines the steepness of a high-pass filter, "
+	"i.e., how much the power of higher frequencies will be raised before drawing, as compared to lower frequencies. "
+	"Since the spectral slope of human vowels is approximately -6 dB per octave, "
+	"the standard value for this setting is +6 dB per octave, "
+	"so that the spectrum is flattened and the higher formants look as strong as the lower ones. "
+	"When you raise the preemphasis, frequency bands above 1000 Hz will become darker, those below 1000 Hz will become lighter.")
+TERM (U"%%Dynamic compression")
+DEFINITION (U"determines how much stronger weak spectra should be made before drawing. "
+	"Normally, this parameter is between 0 and 1. If it is 0 (the standard value), there is no dynamic compression. "
+	"If it is 1, all spectra will be drawn equally strong, "
+	"i.e., all of them will contain frequencies that are drawn in black. "
+	"If this parameter is 0.4 and the global maximum is at 80 dB, then a spectrum with a maximum at 20 dB "
+	"(which will normally be drawn all white if the dynamic range is 50 dB), "
+	"will be raised by 0.4 * (80 - 20) = 24 dB, "
+	"so that its maximum will be seen at 44 dB (thus making this frame visible).")
 MAN_END
 
 MAN_BEGIN (U"Intro 3.3. Querying the spectrogram", U"ppgb", 20221202)
-NORMAL (U"如果您在声谱图内任意位置单击，将会出现一个光标十字交叉线， "
-	"并且您会在窗口顶部 and 左侧以红色字样看到对应的时间和频率值。 "
-	"要在信息窗口（@@Info window@）中显示时间， "
-	"请从 Spectrogram 菜单中选择 ##Get cursor#（获取光标位置）或按下 F6 键。 "
-	"要在信息窗口中显示频率， "
-	"请从 Spectrogram 菜单中选择 ##Get frequency#（获取频率）。")
-NORMAL (U"要查询光标十字交叉处的声谱图功率， "
-	"请从 Spectrum 菜单中选择 ##Get spectral power at cursor cross#（获取光标处频谱功率）或按下 F9 键。 "
-	"信息窗口将向您显示功率密度，以 Pascal^2/Hz 表示。")
+NORMAL (U"If you click anywhere inside the spectrogram, a cursor cross will appear, "
+	"and you will see the time and frequency in red at the top and to the left of the window. "
+	"To see the time in the Info window, "
+	"choose ##Get cursor# from the #Spectrogram menu or press the F6 key. "
+	"To see the frequency in the Info window, "
+	"choose ##Get frequency# from the #Spectrogram menu.")
+NORMAL (U"To query the power of the spectrogram at the cursor cross, "
+	"choose ##Get spectral power at cursor cross# from the #Spectrum menu or press the F9 key. "
+	"The Info window will show you the power density, expressed in Pascal^2/Hz.")
 MAN_END
 
 MAN_BEGIN (U"Intro 3.4. Printing the spectrogram", U"ppgb", 20220907)
-NORMAL (U"要打印声谱图，或者将其保存为 EPS 文件或复制到剪贴板以便插入到您的文字处理器中， "
-	"您首先必须将其绘制到图像窗口（@@Picture window@）中。 "
-	"您可以通过在 Sound 或 TextGrid 窗口的 Spectrogram 菜单中选择 ##Paint visible spectrogram...#（绘制可见声谱图...）来完成此操作。 "
-	"然后，您可以从图像窗口的 File（文件）菜单中进行打印、保存为 EPS 文件， "
-	"或复制到剪贴板（例如，以便在您的文字处理软件中进行粘贴）。")
+NORMAL (U"To print a spectrogram, or to put it in an EPS file or on the clipboard for inclusion in your word processor, "
+	"you first have to paint it into the @@Picture window@. "
+	"You do this by choosing ##Paint visible spectrogram...# "
+	"from the Spectrogram menu in the Sound or TextGrid window. "
+	"From the File menu in the Picture window, you can then print it, save it to an EPS file, "
+	"or copy it to the clipboard (to do Paste in your word processor, for instance).")
 MAN_END
 
 MAN_BEGIN (U"Intro 3.5. The Spectrogram object", U"ppgb", 20220907)
-NORMAL (U"要对声谱图进行更多操作，您可以在对象列表（@@List of Objects@）中创建一个 @Spectrogram（声谱图）对象。 "
-	"您可以通过在 Sound 或 TextGrid 窗口的 Spectrogram 菜单中选择 ##Extract visible spectrogram#（提取可见声谱图）来完成此操作， "
-	"也可以在列表中选中一个 Sound 对象，并从 Spectrum 菜单中选择 @@Sound: To Spectrogram...@（转换为声谱图...）。 "
-	"在上述任一情况下，列表中都会出现一个全新的 Spectrogram 对象。 "
-	"要将该 Spectrogram 对象绘制到图像窗口（@@Picture window@）， "
-	"请选中它并选择 @@Spectrogram: Paint...|Paint...@ 命令。 "
-	"从图像窗口中，您可以将其打印、保存为 EPS 文件或复制到剪贴板。 "
-	"在动态菜单（@@Dynamic menu|dynamic menu@）中还有许多其他命令可用。")
+NORMAL (U"To do more with spectrograms, you can create a @Spectrogram object in the @@List of Objects@. "
+	"You do this either by choosing ##Extract visible spectrogram# "
+	"from the Spectrogram menu in the Sound or TextGrid window, "
+	"or by selecting a Sound object in the list and choosing @@Sound: To Spectrogram...@ from the #Spectrum menu. "
+	"In either case, a new Spectrogram object will appear in the list. "
+	"To draw this Spectrogram object to the @@Picture window@, "
+	"select it and choose the @@Spectrogram: Paint...@ command. "
+	"From the Picture window, you can print it, save it to an EPS file, or copy it to the clipboard. "
+	"Many other commands are available in the @@dynamic menu@.")
 MAN_END
 
 MAN_BEGIN (U"Intro 3.6. Viewing a spectral slice", U"ppgb", 20220907)
-INTRO (U"通过选择 @SoundEditor 和 @TextGridEditor 中 Spectrogram 菜单下的 ##View spectral slice#（查看频谱切片）， "
-	"您可以查看时间光标处的即时频谱， "
-	"或者当前时间选区内的平均频谱。")
-ENTRY (U"光标处的频谱切片")
-NORMAL (U"如果您在 SoundEditor 或 TextGridEditor 窗口的波形图中任意位置单击， "
-	"该时间点上将出现一个光标。如果您随后选择 ##View spectral slice#， "
-	"Praat 会在对象窗口中创建一个名为 %slice 的 @Spectrum（频谱）对象，并在 @SpectrumEditor 窗口中将其显示出来。 "
-	"通过这种方式，您可以检查光标位置周围信号的频率内容。")
-ENTRY (U"选区内的频谱切片")
-NORMAL (U"如果您在 SoundEditor 或 TextGridEditor 窗口的波形图中拖动鼠标， "
-	"静态选择（@@time selection|时间选区@）将会出现。如果您随后选择 ##View spectral slice#， "
-	"Praat 同样会在对象窗口中创建一个名为 %slice 的 @Spectrum 对象，并在 @SpectrumEditor 窗口中将其显示。 "
-	"通过这种方式，您可以检查选区内信号的频率内容。")
+INTRO (U"With ##View spectral slice# from the #Spectrogram menu in the @SoundEditor and the @TextGridEditor, "
+	"you can see the frequency spectrum at the time cursor "
+	"or the average frequency spectrum in the time selection.")
+ENTRY (U"Spectral slice at the cursor")
+NORMAL (U"If you click anywhere in the wave form of the SoundEditor or TextGridEditor windows, "
+	"a cursor will appear at that time. If you then choose ##View spectral slice#, "
+	"Praat will create a @Spectrum object named %slice in the Objects window and show it in a @SpectrumEditor window. "
+	"In this way, you can inspect the frequency contents of the signal around the cursor position.")
+ENTRY (U"Spectral slice from a selection")
+NORMAL (U"If you drag the mouse through the wave form of the SoundEditor or TextGridEditor windows, "
+	"a @@time selection@ will appear. If you then choose ##View spectral slice#, "
+	"Praat will again create a @Spectrum object named %slice in the Objects window and show it in a @SpectrumEditor window. "
+	"In this way, you can inspect the frequency contents of the signal in the selection.")
 MAN_END
 
 
 MAN_BEGIN (U"Intro 3.7. Configuring the spectral slice", U"ppgb", 20110128)
-ENTRY (U"光标处的频谱切片")
-NORMAL (U"Praat 的具体操作取决于您的声谱图设置（Spectrogram settings）。 "
-	"假设%%window length%（窗长度）设置为 0.005 秒（5 毫秒）。 "
-	"如果%%window shape%（窗形状）不是高斯窗（Gaussian），Praat 会提取该声音信号中 "
-	"光标前 2.5 毫秒到光标后 2.5 毫秒之间的部分。 "
-	"然后，Praat 将这一段 5 毫秒长的信号与窗口形状相乘（加窗），再使用 @@Sound: To Spectrum...@（转换为频谱...）中的方法计算频谱， "
-	"计算出的频谱将放入对象窗口中并自动在编辑器窗口中打开。 "
-	"如果窗形状是高斯窗，Praat 会提取该声音信号中 "
-	"光标前 5 毫秒到光标后 5 毫秒之间的部分。此时的频谱计算将基于 "
-	"10 毫秒的“物理”窗长度，尽管“有效”窗长度仍然是 5 毫秒 "
-	"（详情请参阅 @@Intro 3.2. Configuring the spectrogram@）。")
-ENTRY (U"选区内的频谱切片")
-NORMAL (U"Praat 的具体操作同样取决于声谱图设置中的%%window shape%（窗形状）。 "
-	"假设您的选区是 50 毫秒长。Praat 会提取整个选区， "
-	"然后将这一段 50 毫秒长的信号与窗口形状相乘，计算频谱，再将其放入对象窗口中并在编辑器窗口中打开。 "
-	"这个过程等同于先选择 ##Extract windowed selection...#（提取加窗选区...）（设置%%relative duration%（相对持续时间）为 1.0）， "
-	"然后执行 ##To Spectrum...#（转换为频谱...）（开启 %fast 选项），最后点击 #Edit（编辑）。")
-NORMAL (U"如果选用高斯窗，Praat 仍将仅使用该选区，而不会将其持续时间翻倍。 "
-	"这意味着在这种情况下您看到的频谱将主要基于选区中心的一半， "
-	"而靠近边缘的信号能量在很大程度上会被忽略。")
+ENTRY (U"Spectral slice at the cursor")
+NORMAL (U"What Praat does precisely, depends on your Spectrogram settings. "
+	"Suppose that the %%window length% setting is 0.005 seconds (5 milliseconds). "
+	"If the %%window shape% is not Gaussian, Praat will extract the part of the sound "
+	"that runs from 2.5 milliseconds before the cursor to 2.5 ms after the cursor. "
+	"Praat then multiplies this 5 ms long signal by the window shape, then computes a spectrum "
+	"with the method of @@Sound: To Spectrum...@, which is put into the Objects window and opened in an editor window. "
+	"If the window shape is Gaussian, Praat will extract a part of the sound "
+	"that runs from 5 milliseconds before the cursor to 5 ms after the cursor. The spectrum will then be based "
+	"on a “physical” window length of 10 ms, although the “effective” window length is still 5 ms "
+	"(see @@Intro 3.2. Configuring the spectrogram@ for details).")
+ENTRY (U"Spectral slice from a selection")
+NORMAL (U"What Praat does precisely, again depends on the %%window shape% of your Spectrogram settings. "
+	"Suppose that your selection is 50 ms long. Praat will extract the entire selection, "
+	"then multiply this 50 ms long signal by the window shape, then compute a spectrum, put it into the Objects window and open it an editor window. "
+	"This procedure is equivalent to choosing ##Extract windowed selection...# (with a %%relative duration% of 1.0), "
+	"followed by ##To Spectrum...# (with %fast switched on), followed by #Edit.")
+NORMAL (U"If the window is Gaussian, Praat will still only use the selection, without doubling its duration. "
+	"This means that the spectrum that you see in this case will mainly be based on the centre half of the selection, "
+	"and the signal near the edges will be largely ignored.")
 MAN_END
 
 MAN_BEGIN (U"Intro 3.8. The Spectrum object", U"ppgb", 20030403)
-NORMAL (U"要计算整个声音的傅里叶频谱， "
-	"请选中一个 @Sound 对象，并选择 Spectrum 菜单下的 @@Sound: To Spectrum...|To Spectrum...@。 "
-	"一个新的 @Spectrum（频谱）对象将会出现在@@List of Objects|对象列表@中。 "
-	"若要查看、修改或聆听它的某些部分，请点击 @@View & Edit@。 "
-	"要打印它，请先选中它并执行相应的 #Draw（绘制）命令，将该 Spectrum 对象绘制到图像窗口（@@Picture window@）中。")
+NORMAL (U"To compute a Fourier frequency spectrum of an entire sound, "
+	"select a @Sound object and choose @@Sound: To Spectrum...|To Spectrum...@ from the #Spectrum menu. "
+	"A new @Spectrum object will appear in the @@List of Objects@. "
+	"To view or modify it (or listen to its parts), click @@View & Edit@. "
+	"To print it, choose one of the #Draw commands to draw the Spectrum object to the @@Picture window@ first.")
 MAN_END
 
 MAN_BEGIN (U"Intro 4. Pitch analysis", U"ppgb", 20070905)
-INTRO (U"本节介绍如何分析现有声音的音高曲线（音高轮廓）。")
-LIST_ITEM (U"@@Intro 4.1. Viewing a pitch contour|Intro 4.1. 查看音高曲线@")
-LIST_ITEM (U"@@Intro 4.2. Configuring the pitch contour|Intro 4.2. 设置音高曲线参数@")
-LIST_ITEM (U"@@Intro 4.3. Querying the pitch contour|Intro 4.3. 查询音高曲线信息@")
-LIST_ITEM (U"@@Intro 4.4. Printing the pitch contour|Intro 4.4. 打印音高曲线@")
-LIST_ITEM (U"@@Intro 4.5. The Pitch object|Intro 4.5. Pitch 对象@")
+INTRO (U"This section describes how you can analyse the pitch contour of an existing sound.")
+LIST_ITEM (U"@@Intro 4.1. Viewing a pitch contour")
+LIST_ITEM (U"@@Intro 4.2. Configuring the pitch contour")
+LIST_ITEM (U"@@Intro 4.3. Querying the pitch contour")
+LIST_ITEM (U"@@Intro 4.4. Printing the pitch contour")
+LIST_ITEM (U"@@Intro 4.5. The Pitch object")
 MAN_END
 
 MAN_BEGIN (U"Intro 4.1. Viewing a pitch contour", U"ppgb", 20110128)
-NORMAL (U"要查看现有声音随时间变化的音高曲线， "
-	"请在对象列表中选择一个 @Sound 或 @LongSound 对象，然后选择 @@View & Edit@。 "
-	"屏幕上将弹出一个 @SoundEditor 窗口。 "
-	"该窗口的下半部分将包含一条音高曲线，绘制为蓝色实线或一系列蓝色点。 "
-	"如果您没有看到音高曲线，请从 Pitch 菜单中选择 @@Show pitch@（显示音高）。")
-NORMAL (U"在窗口的右侧，您可能会看到三个以蓝色数字书写的音高数值： "
-	"在最下方，您会看到可视音高范围的下限（通常为 75 Hz）；在最上方， "
-	"您会看到音高范围的上限（通常为 600 Hz）；在两者之间的某个位置，您会看到光标处的即时音高值， "
-	"或者是当前选区内的平均音高。")
+NORMAL (U"To see the pitch contour of an existing sound as a function of time, "
+	"select a @Sound or @LongSound object and choose @@View & Edit@. "
+	"A @SoundEditor window will appear on your screen. "
+	"The bottom half of this window will contain a pitch contour, drawn as a blue line or as a sequence of blue dots. "
+	"If you do not see the pitch contour, choose @@Show pitch@ from the #Pitch menu.")
+NORMAL (U"To the right of the window, you may see three pitch values, written with blue digits: "
+	"at the bottom, you see the floor of the viewable pitch range, perhaps 75 Hz; at the top, "
+	"you see the ceiling of the pitch range, perhaps 600 Hz; and somewhere in between, you see the pitch value "
+	"at the cursor, or the average pitch in the selection.")
 MAN_END
 
 MAN_BEGIN (U"Intro 4.2. Configuring the pitch contour", U"ppgb", 20231115 /*20190331*/)  /*2024*/
-NORMAL (U"通过选择 Pitch 菜单中的 @@Pitch settings...@（音高设置...）， "
-	"您可以决定音高曲线的显示和计算方式。 "
-	"这些设置将在不同的 Praat 运行周期中被记录。 "
-	"所有这些设置都具有默认的标准值（“出厂设置”），点击 #Standards（标准值）按钮即可恢复。")
-ENTRY (U"%%Pitch floor and top%（音高分析范围下限与上限）设置")
-NORMAL (U"这是音高分析中最关键的设置。 "
-	"标准范围（对于滤波自相关分析法）是 50 到 800 Hz， "
-	"这意味着音高分析算法只会寻找并输出 50 到 800 Hz 之间的数值 "
-	"（且极少能探测到 400 到 800 Hz 之间的值）。 "
-	"您在此处设置的范围将显示在分析窗口的右侧。")
-NORMAL (U"您需要将该范围设置为适合您录音的发音人的数值， "
-	"因为不同发音人的音高范围差异极大。 "
-	"对于一些低沉的声音（例如成年男性的平均声线），您可能需要将下限设为 50 Hz，上限设为 600 Hz； "
-	"对于一些高亢的声音（例如成年女性的平均声线），100 到 800 Hz 的范围可能更为合适； "
-	"然而，在很多情况下，默认的 50 到 800 Hz 设置可以很好地适用于所有这些声音。 "
-	"但在极端情况下，例如一些儿童在尖叫时其音高可以接近 2000 Hz； "
-	"而在另一极端，吱嘎声（喉塞音/劈裂声/Creaky voice）的音高可能会低至 30 Hz； "
-	"如果您正在研究这些特殊的声音情况，您可能需要对该设置进行测试和微调。")
-NORMAL (U"以下是为什么必须提供这些范围设置的技术原因。如果音高下限设为 50 Hz， "
-	"音高分析算法需要一个 60 毫秒长的分析窗。 "
-	"即为了计算例如 0.850 秒处的基频（F0）， "
-	"Praat 需要提取并考虑声音信号中从 0.820 到 0.880 秒的部分。 "
-	"这 60 毫秒对应于 3 个最长的音高周期（3 / 50 = 0.060 秒）。 "
-	"如果您将音高下限降低到 25 Hz，分析窗将扩大到 120 毫秒 "
-	"（同样是 3 个最长音高周期），即必须提取并计算 0.790 到 0.910 秒之间的所有信号。 "
-	"这会导致声学细节的时间分辨率变差，难以观察到快速的 F0 变化。")
-NORMAL (U"因此，设置音高范围的下限是音高分析的一项硬性技术要求。 "
-	"如果您设置得太低，您将错失非常快速的 F0 变化；如果设置得太高， "
-	"您将错失非常低的 F0 基频值。对于儿童的声音，您通常可以使用 200 Hz 作为下限， "
-	"尽管使用 50 Hz 作为下限也仍然能为您提供与低沉声音相同的时间分辨率。")
-ENTRY (U"%%Units%（音高单位）设置")
-NORMAL (U"该设置决定了垂直音高刻度的单位。大多数人喜欢以赫兹（Hz）来查看音高范围， "
-	"但也有其他几种可选的单位（例如半音 semitones 等）。")
-ENTRY (U"显示范围与分析范围不同")
-NORMAL (U"通常，编辑器窗口中可视的音高范围等于分析算法可计算出的音高范围。 "
-	"如果您将分析范围设置为 50 到 800 Hz，那么您在编辑器窗口中看到的刻度也是 50 到 800 Hz。 "
-	"如果曲线中的音高值恰好落在 350 到 400 Hz 之间， "
-	"您可能希望将刻度局部放大到该 350-400 Hz 区域。 "
-	"您通常可以通过在 @@Pitch settings...@ 窗口中修改音高范围来达到此目的。 "
-	"但是，这样一来，分析算法本身的计算范围也改变了，导致曲线的形态可能发生改变。 "
-	"如果您不希望曲线发生改变，您可以将显示范围设置（%%View range%） "
-	"从 “0.0 (= auto)” - “0.0 (= auto)”（自动调整）修改为具体的数值，例如 “350” - “400”。")
-ENTRY (U"延伸阅读")
-NORMAL (U"有关更多详细信息，请参阅：")
-LIST_ITEM (U"@@how to choose a pitch analysis method|如何选择音高分析方法@")
-LIST_ITEM (U"@@pitch analysis by filtered autocorrelation|滤波自相关音高分析法@")
-LIST_ITEM (U"@@pitch analysis by raw cross-correlation|原始互相关音高分析法@")
-LIST_ITEM (U"@@pitch analysis by raw autocorrelation|原始自相关音高分析法@")
-LIST_ITEM (U"@@pitch analysis by filtered cross-correlation|滤波互相关音高分析法@")
+NORMAL (U"With @@Pitch settings...@ from the #Pitch menu, "
+	"you can determine how the pitch contour is displayed and how it is computed. "
+	"These settings will be remembered across Praat sessions. "
+	"All these settings have standard values (“factory settings”), which appear "
+	"when you click #Standards.")
+ENTRY (U"The %%pitch range% (%%pitch floor and top%) setting")
+NORMAL (U"This is the most important setting for pitch analysis. "
+	"The standard range (for filtered autocorrelation) is from 50 to 800 hertz, "
+	"which means that the pitch analysis method will only find values between 50 and 800 Hz "
+	"(and values between 400 and 800 Hz only rarely). "
+	"The range that you set here will be shown to the right of the analysis window.")
+NORMAL (U"You may have set the range to values appropriate for your speaker, "
+	"because speakers can vary enormously in their pitch ranges. "
+	"For some low-pitched (e.g. average male) voices, you might want to set the floor to 50 Hz, and the top to 600 Hz; "
+	"for some high-pitched (e.g. average female) voices, a range of 100-800 Hz might instead be appropriate; "
+	"however, it may well be the case that the standard setting of 50–800 Hz will work for all of these voices. "
+	"On the high side, however, some children can reach almost 2000 Hz when yelling; "
+	"on the low side, creaky voice can go as low as 30 Hz; "
+	"if you investigate such cases, you may therefore want to experiment with this setting.")
+NORMAL (U"Here is why you have to supply these settings. If the pitch floor is 50 Hz, "
+	"the pitch analysis method requires a 60-millisecond analysis window, "
+	"i.e., in order to measure the F0 at a time of, say, 0.850 seconds, "
+	"Praat needs to consider a part of the sound that runs from 0.820 to 0.880 seconds. "
+	"These 60 milliseconds correspond to 3 maximum pitch periods (3/50 = 0.060). "
+	"If you set the pitch floor down to 25 Hz, the analysis window will grow to 120 milliseconds "
+	"(which is again 3 maximum pitch periods), i.e., all times between 0.790 and 0.910 seconds will be considered. "
+	"This makes it less easy to see fast F0 changes.")
+NORMAL (U"So setting the floor of the pitch range is a technical requirement for the pitch analysis. "
+	"If you set it too low, you will miss very fast F0 changes, and if you set it too high, "
+	"you will miss very low F0 values. For children's voices you can often use 200 Hz, "
+	"although 50 Hz will still give you the same time resolution as you get for low-pitched voices.")
+ENTRY (U"The %units setting")
+NORMAL (U"This setting determines the units of the vertical pitch scale. Most people like to see the pitch range "
+	"in hertz, but there are several other possibilities.")
+ENTRY (U"View range different from analysis range")
+NORMAL (U"Normally, the range of pitch values that can be seen in the editor window is equal to the range of pitch values "
+	"that the analysis algorithm can determine. If you set the analysis range from 50 to 800 Hz, this will be the range "
+	"you see in the editor window as well. If the pitch values in the curve happen to be between 350 and 400 Hz, "
+	"you may want to zoom in to the 350-400 Hz pitch region. "
+	"You will usually do this by changing the pitch range in the @@Pitch settings...@ window. "
+	"However, the analysis range will also change in that case, so that the curve itself may change. "
+	"If you do not want that, you can change the %%View range% settings "
+	"from “0.0 (= auto)” - “0.0 (= auto)” to something else, perhaps “350” - “400”.")
+ENTRY (U"Further reading")
+NORMAL (U"For more details, see:")
+LIST_ITEM (U"@@how to choose a pitch analysis method@")
+LIST_ITEM (U"@@pitch analysis by filtered autocorrelation@")
+LIST_ITEM (U"@@pitch analysis by raw cross-correlation@")
+LIST_ITEM (U"@@pitch analysis by raw autocorrelation@")
+LIST_ITEM (U"@@pitch analysis by filtered cross-correlation@")
 MAN_END
 
 MAN_BEGIN (U"Time step settings...", U"ppgb", 20231115 /*20031003,20220814*/)
-INTRO (U"这是 @SoundEditor 和 @TextGridEditor 中 Analysis（分析）菜单下的一个命令， "
-	"用于决定基频、共振峰和音强连续测量之间的时间步长（测量时间间隔）。")
-ENTRY (U"自动时间步长")
-NORMAL (U"建议您将时间步长策略（%%Time step strategy%）设置为 #Automatic（自动）。 "
-	"这样，Praat 就会计算出值足够精确的音高、共振峰和音强数据，从而绘制出 "
-	"准确可靠的音高曲线、共振峰曲线和音强曲线。通常情况下，Praat 会在每个分析窗内 "
-	"计算 4 个值（“四倍过采样”）。")
-NORMAL (U"如 @@Sound: To Pitch (filtered ac)...@ 中所述， "
-	"Praat 进行音高分析的标准时间步长是 0.75 除以音高下限， "
-	"例如，如果音高下限为 50 Hz，则时间步长为 0.015 秒。 "
-	"采用这种方式，在 60 毫秒（即 3 / 50 Hz）长的分析窗内将会有 4 个音高测量点。")
-NORMAL (U"如 @@Sound: To Formant (burg)...@ 中所述，Praat 进行共振峰测量的标准时间步长是窗长度（%%Window length%）除以 4， "
-	"例如，如果窗长度为 0.025 秒，则步长为 6.25 毫秒。")
-NORMAL (U"如 @@Sound: To Intensity...@ 中所述，Praat 进行音强测量的标准时间步长是 0.8 除以音高下限， "
-	"例如，如果音高下限为 50 Hz，时间步长将为 16 毫秒。 "
-	"在此设置下，在 64 毫秒（即 3.2 / 50 Hz）长的音强分析窗内将会有 4 个音强测量点。")
-ENTRY (U"固定时间步长")
-NORMAL (U"您可以通过将时间步长策略（%%Time step strategy%）设置为 #Fixed（固定）来覆盖自动步长设置。 "
-	"此时，固定时间步长（%%Fixed time step%）参数将决定 Praat 实际采用的步长： "
-	"如果您将其设置为 0.001 秒，Praat 将会为每 1 毫秒都计算音高、共振峰和音强值。 "
-	"请注意，这会显著降低编辑器窗口的运行速度，因为该步长比自动时间步长的默认值要小得多（见上文）。")
-NORMAL (U"将时间步长增大至例如 0.1 秒可以加快编辑器窗口的响应速度， "
-	"但会降低音高、共振峰和音强曲线的精确度（由于发生了%欠采样%（undersampled））， "
-	"这会直接影响您的测量精度和脉冲点定位。")
-NORMAL (U"如果在每个分析窗内音高测量点少于 2.0 个， "
-	"Praat 将把音高曲线绘制为彼此分离的蓝色小圆盘形状， "
-	"而不是连续的蓝色实线，以此警告您发生了欠采样。 "
-	"例如，如果音高下限为 75 Hz，当时间步长大于 0.02 秒时，Praat 会将音高曲线绘制为离散的圆盘。")
-ENTRY (U"视窗自适应时间步长")
-NORMAL (U"覆盖标准时间步长的另一种方式是将时间步长策略（%%Time step strategy%）设置为 ##View-dependent#（视窗自适应）。 "
-	"此时，单视窗时间步数（%%Number of time steps per view%）参数将决定实际的时间步长： "
-	"如果您将其设置为 100，Praat 将在当前可见视窗内固定计算 100 个音高、共振峰和音强点。 "
-	"更具体地讲：如果您将视窗缩放至 3 秒，Praat 将在间隔 0.03 秒处为您显示共 100 个测量点（如果您靠近信号边缘，可能少于 100 个）。 "
-	"与固定时间步长设置相同，在发生欠采样时，Praat 会将音高绘制为离散的圆盘。 "
-	"如果您希望绘制音高曲线的速度不受缩放比例的影响，可以使用此设置。")
+INTRO (U"A command in the #Analysis menu of the @SoundEditor and @TextGridEditor "
+	"to determine the time interval between consecutive measurements "
+	"of pitch, formants, and intensity.")
+ENTRY (U"Automatic time steps")
+NORMAL (U"It is recommended that you set the %%Time step strategy% to #Automatic. "
+	"In this way, Praat computes just enough pitch, formant, and intensity values to draw "
+	"reliable pitch, formant, and intensity contours. In general, Praat will compute 4 values "
+	"within an analysis window (“four times oversampling”).")
+NORMAL (U"As described in @@Sound: To Pitch (filtered ac)...@, "
+	"Praat's standard time step for pitch analysis is 0.75 divided by the pitch floor, "
+	"e.g., if the pitch floor is 50 Hz, the time step will be 0.015 seconds. "
+	"In this way, there will be 4 pitch measurements within an analysis window, which is 3 / (50 Hz) = 60 milliseconds long.")
+NORMAL (U"As described in @@Sound: To Formant (burg)...@, Praat's standard time step for formant measurements is the %%Window length% divided by 4, "
+	"e.g. if the window length is 0.025 seconds, the time step will be 6.25 milliseconds.")
+NORMAL (U"As described in @@Sound: To Intensity...@, Praat's standard time step for intensity measurements is 0.8 divided by the pitch floor, "
+	"e.g. if the pitch floor is 50 Hz, the time step will be 16 milliseconds. "
+	"In this way, there will be 4 intensity measurements within an intensity analysis window, "
+	"which is 3.2 / (50 Hz) = 64 milliseconds long.")
+ENTRY (U"Fixed time step")
+NORMAL (U"You can override the automatic time step by setting the %%Time step strategy% to #Fixed. "
+	"The %%Fixed time step% setting then determines the time step that Praat will use: "
+	"if you set it to 0.001 seconds, Praat will compute pitch, formant, and intensity values for every millisecond. "
+	"Beware that this can slow down the editor window appreciably, because this step is much smaller "
+	"than usual values of the automatic time step (see above).")
+NORMAL (U"Enlarging the time step to e.g. 0.1 seconds will speed up the editor window "
+	"but may render the pitch, formant, and intensity curves less exact (they become %undersampled), "
+	"which will influence your measurements and the locations of the pulses.")
+NORMAL (U"If there are fewer than 2.0 pitch measurement points per analysis window, "
+	"Praat will draw the pitch curve as separate little blue disks "
+	"rather than as a continuous blue curve, in order to warn you of the undersampling. "
+	"E.g. if the pitch floor is 75 Hz, Praat will draw the pitch curve as disks if the time step is greater than 0.02 seconds.")
+ENTRY (U"View-dependent time step")
+NORMAL (U"Another way to override the standard time step is by setting the %%Time step strategy% to ##View-dependent#. "
+	"The %%Number of time steps per view% setting then determines the time step that Praat will use: "
+	"if you set it to 100, Praat will always compute 100 pitch, formant, and intensity values within the view window. "
+	"More precisely: if you zoom the view window to 3 seconds, Praat will show you 100 pitch, formant, and intensity points at distances "
+	"of 0.03 seconds (or fewer than 100, if you are near the left or right edge of the signal). "
+	"As with the %%Fixed time step% setting, Praat will draw the pitch as separate disks in case of undersampling. "
+	"You may want to use this setting if you want the pitch curve to be drawn equally fast independently of the degree "
+	"of zooming.")
 MAN_END
 
 MAN_BEGIN (U"Intro 4.3. Querying the pitch contour", U"ppgb", 20040614)
-NORMAL (U"通过选择 @SoundEditor 或 @TextGridEditor 中 Pitch 菜单下的 @@Get pitch@（获取音高）， "
-	"您可以获取关于光标处或当前选区内音高（基频）的信息。 "
-	"如果窗口内有可见的光标线，##Get pitch# 会在信息窗口（@@Info window@）中输出该时间点处的线性插值音高； "
-	"如果窗口内有选定的一段时间区域，##Get pitch# 会在信息窗口中输出当前选区可见部分内的平均音高； "
-	"否则，##Get pitch# 将输出整个声音对象当前可见部分的平均音高。")
+NORMAL (U"With @@Get pitch@ from the #Pitch menu in the @SoundEditor or @TextGridEditor, "
+	"you get information about the pitch at the cursor or in the selection. "
+	"If a cursor is visible in the window, ##Get pitch# writes to the @@Info window@ "
+	"the linearly interpolated pitch at that time; "
+	"if a time selection is visible inside the window, ##Get pitch# writes to the @@Info window@ "
+	"the mean (average) pitch in the visible part of that selection; "
+	"otherwise, ##Get pitch# writes the average pitch in the visible part of the sound.")
 MAN_END
 
 MAN_BEGIN (U"Intro 4.4. Printing the pitch contour", U"ppgb", 20070905)
-NORMAL (U"要打印音高曲线，或者将其保存为 EPS 文件或复制到剪贴板中以便插入到您的文字处理器中， "
-	"您必须首先将其绘制到图像窗口（@@Picture window@）中。 "
-	"您可以通过在 Sound 或 TextGrid 窗口的 Pitch 菜单中选择 ##Draw visible pitch contour...#（绘制可见音高曲线...）来完成此操作。 "
-	"然后，在图像窗口的 File（文件）菜单中，您可以对其进行打印、保存为 EPS 文件， "
-	"或复制到剪贴板中（例如，随后在您的文字处理软件中执行“粘贴”）。")
+NORMAL (U"To print a pitch contour, or to put it in an EPS file or on the clipboard for inclusion in your word processor, "
+	"you first have to draw it into the @@Picture window@. "
+	"You do this by choosing ##Draw visible pitch contour...# "
+	"from the Pitch menu in the Sound or TextGrid window. "
+	"From the File menu in the Picture window, you can then print it, save it to an EPS file, "
+	"or copy it to the clipboard (to do Paste in your word processor, for instance).")
 MAN_END
 
 MAN_BEGIN (U"Intro 4.5. The Pitch object", U"ppgb", 20110128)
-NORMAL (U"在 @SoundEditor 或 @TextGridEditor 窗口中可见的音高曲线， "
-	"可以作为一个单独的 @Pitch（音高）对象复制到对象列表（@@List of Objects@）中。为此， "
-	"请选择 Pitch 菜单下的 @@Extract visible pitch contour@（提取可见音高曲线）。")
-NORMAL (U"获取独立 Pitch 对象的另一种方法是在列表中选中一个 @Sound 对象， "
-	"然后选择 @@Sound: To Pitch...@（转换为音高...）（推荐方法）或者 @@Periodicity menu|周期性菜单@ 下的任何其他算法。")
-NORMAL (U"要查看和修改 Pitch 对象的内容，请在列表中选中它并点击 @@View & Edit@（查看与编辑）。 "
-	"这将在屏幕上打开一个 @PitchEditor（音高编辑器）窗口。")
-NORMAL (U"要将音高曲线保存到磁盘，请在列表中选择该 @Pitch 对象，然后执行 @@Save menu|保存菜单@ 中的命令。")
-NORMAL (U"稍后，您可以使用 @@Open menu|打开菜单@ 中的 @@Read from file...@（从文件读取...）重新读入保存的音高文件。")
-NORMAL (U"要将 @Pitch 对象绘制到图像窗口（@@Picture window@），请选中它并选择 @@Draw menu|绘制菜单@ 中的命令。 "
-	"在图像窗口中，您可以对其进行打印、保存为 EPS 文件，或复制到剪贴板中以便插入文字处理软件。")
+NORMAL (U"The pitch contour that is visible in the @SoundEditor or @TextGridEditor window, "
+	"can be copied as a separate @Pitch object to the @@List of Objects@. To do this, "
+	"choose @@Extract visible pitch contour@ from the #Pitch menu.")
+NORMAL (U"Another way to get a separate Pitch object is to select a @Sound object in the list "
+	"choose @@Sound: To Pitch...@ (preferred) or any of the other methods from the @@Periodicity menu@.")
+NORMAL (U"To view and modify the contents of a Pitch object, select it and choose @@View & Edit@. "
+	"This creates a @PitchEditor window on your screen.")
+NORMAL (U"To save a pitch contour to disk, select the @Pitch object in the list and choose one of the commands in the @@Save menu@.")
+NORMAL (U"Later on, you can read the saved file again with @@Read from file...@ from the @@Open menu@.")
+NORMAL (U"To draw a @Pitch object to the @@Picture window@, select it and choose any of the commands in the @@Draw menu@. "
+	"From the Picture window, you can print it, save it to an EPS file, or copy it to the clipboard for inclusion in your word processor.")
 MAN_END
 
 MAN_BEGIN (U"Advanced pulses settings...", U"ppgb", 20110220)
-INTRO (U"这是 @SoundEditor 或 @TextGridEditor 窗口中 Pulses 菜单下的一个命令。 "
-	"在修改高级脉冲设置之前，请确保您已经理解了 @@Voice|嗓音分析@ 教程的内容。")
-NORMAL (U"有关最大周期因子（##Maximum period factor#）设置的信息，请参阅 @@PointProcess: Get jitter (local)...@。 "
-	"在大多数情况下，默认设置是最好的。 "
-	"周期下限（##Period floor#）和周期上限（##Period ceiling#）参数是根据音高下限与上限（@@Pitch settings...@） "
-	"通过 @@Voice 2. Jitter|嗓音分析 2. 基频微扰@ 中给出的公式计算得出的。")
+INTRO (U"A command in the #Pulses menu of the @SoundEditor or @TextGridEditor windows. "
+	"Before changing the advanced pulses settings, make sure you understand "
+	"the @@Voice@ tutorial.")
+NORMAL (U"For information about the ##Maximum period factor# setting, see @@PointProcess: Get jitter (local)...@. "
+	"The standard setting is best in most cases. "
+	"The ##Period floor# and ##Period ceiling# settings derive from the pitch floor and pitch ceiling (@@Pitch settings...@), "
+	"according to a formula given in @@Voice 2. Jitter@.")
 MAN_END
 
 MAN_BEGIN (U"Intro 5. Formant analysis", U"ppgb", 20030316)
-INTRO (U"本节介绍如何分析现有声音的共振峰曲线（共振峰轮廓）。")
-LIST_ITEM (U"@@Intro 5.1. Viewing formant contours|Intro 5.1. 查看共振峰曲线@")
-LIST_ITEM (U"@@Intro 5.2. Configuring the formant contours|Intro 5.2. 设置共振峰曲线参数@")
-LIST_ITEM (U"@@Intro 5.3. Querying the formant contours|Intro 5.3. 查询共振峰曲线信息@")
-LIST_ITEM (U"@@Intro 5.4. The Formant object|Intro 5.4. Formant 对象@")
+INTRO (U"This section describes how you can analyse the formant contours of an existing sound.")
+LIST_ITEM (U"@@Intro 5.1. Viewing formant contours")
+LIST_ITEM (U"@@Intro 5.2. Configuring the formant contours")
+LIST_ITEM (U"@@Intro 5.3. Querying the formant contours")
+LIST_ITEM (U"@@Intro 5.4. The Formant object")
 MAN_END
 
 MAN_BEGIN (U"Intro 5.1. Viewing formant contours", U"ppgb", 20110128)
-NORMAL (U"要查看声音共振峰随时间的变化曲线，请在对象列表中选中一个 @Sound 或 @LongSound 对象，然后选择 @@View & Edit@。 "
-	"屏幕上将弹出一个 @SoundEditor 窗口。 "
-	"该窗口的分析绘图区域中会包含共振峰曲线，绘制为红色的散点。 "
-	"如果您没有看到共振峰，请从 Formant 菜单中选择 @@Show formant@（显示共振峰）。")
+NORMAL (U"To see the formant contours of a sound as functions of time, select a @Sound or @LongSound object and choose @@View & Edit@. "
+	"A @SoundEditor window will appear on your screen. "
+	"The analysis part of this window will contain formant contours, drawn as red speckles. "
+	"If you do not see the formant contours, choose @@Show formant@ from the #Formant menu.")
 MAN_END
 
 MAN_BEGIN (U"Intro 5.2. Configuring the formant contours", U"ppgb", 20030316)
-NORMAL (U"您可以通过 Formant 菜单进行设置的共振峰分析参数是非常重要的。 "
-	"对于女性的发音，您可能需要将最大频率设置为 5500 Hz； "
-	"对于男性的发音，则应将其设置为 5000 Hz。 "
-	"有关分析参数的更多信息，请参阅 @@Sound: To Formant (burg)...@。")
+NORMAL (U"The formant analysis parameters, with you can set with the #Formant menu, are important. "
+	"For a female voice, you may want to set the maximum frequency to 5500 Hz; "
+	"for a male voice, set it to 5000 Hz instead. "
+	"For more information about analysis parameters, see @@Sound: To Formant (burg)...@.")
 MAN_END
 
 MAN_BEGIN (U"Intro 5.3. Querying the formant contours", U"ppgb", 20040616)
-NORMAL (U"通过选择 @SoundEditor 或 @TextGridEditor 中 Formant 菜单下的 @@Get first formant@（获取第一共振峰）， "
-	"您可以获取光标处或选区内第一共振峰（F1）的信息。 "
-	"如果窗口中有可见的光标，##Get first formant# 会在信息窗口（@@Info window@）中输出该时间点处的线性插值第一共振峰频率。 "
-	"如果窗口中选定了某个时间段，##Get first formant# 会在信息窗口中输出该选区可见部分内的平均第一共振峰频率。 "
-	"获取第二共振峰（@@Get second formant@）及更高共振峰以此类推。")
+NORMAL (U"With @@Get first formant@ from the Formant menu in the @SoundEditor or @TextGridEditor, "
+	"you get information about the first formant at the cursor or in the selection. "
+	"If there is a cursor, ##Get first formant# writes to the @@Info window@ the linearly interpolated first formant at that time. "
+	"If there is a true selection, ##Get first formant# writes to the @@Info window@ the mean first formant in the visble part of that selection. "
+	"The same goes for @@Get second formant@ and so on.")
 MAN_END
 
 MAN_BEGIN (U"Intro 5.4. The Formant object", U"ppgb", 20030316)
-NORMAL (U"在 @SoundEditor 或 @TextGridEditor 窗口中可见的共振峰曲线， "
-	"可以作为一个单独的 @Formant（共振峰）对象复制到对象列表（@@List of Objects@）中。为此， "
-	"请选择 Formant 菜单下的 @@Extract visible formant contour@（提取可见共振峰曲线）。")
-NORMAL (U"获取独立 Formant 对象的另一种方法是在列表中选中一个 @Sound 对象， "
-	"然后选择 @@Sound: To Formant (burg)...@（Burg 算法转换共振峰...）（推荐方法）或者 @@Formants & LPC menu|共振峰与线性预测分析菜单@ 下的任何其他算法。")
-ENTRY (U"将共振峰曲线保存到磁盘")
-NORMAL (U"要将共振峰曲线数据保存到磁盘，请在列表中选择该 @Formant 对象，然后执行 @@Save menu|保存菜单@ 中的命令。")
-NORMAL (U"稍后，您可以使用 @@Open menu|打开菜单@ 中的 @@Read from file...@（从文件读取...）重新读入保存的共振峰文件。")
-ENTRY (U"绘制共振峰曲线")
-NORMAL (U"要将 @Formant 对象绘制到图像窗口（@@Picture window@），请选中它并选择 @@Draw menu|绘制菜单@ 中的命令。 "
-	"在图像窗口中，您可以对其进行打印、保存为 EPS 文件，或复制到剪贴板中以便插入文字处理软件。")
+NORMAL (U"The formant contours that are visible in the @SoundEditor or @TextGridEditor window, "
+	"can be copied as a separate @Formant object to the @@List of Objects@. To do this, "
+	"choose @@Extract visible formant contour@ from the Formant menu.")
+NORMAL (U"Another way to get a separate Formant object is to select a @Sound object in the list "
+	"choose @@Sound: To Formant (burg)...@ (preferred) or any of the other methods "
+	"from the @@Formants & LPC menu@.")
+ENTRY (U"Saving formant contours to disk")
+NORMAL (U"To save formant contours to disk, select the @Formant object in the list and choose one of the commands in the @@Save menu@.")
+NORMAL (U"Later on, you can read the saved file again with @@Read from file...@ from the @@Open menu@.")
+ENTRY (U"Drawing formant contours")
+NORMAL (U"To draw a @Formant object to the @@Picture window@, select it and choose any of the commands in the @@Draw menu@. "
+	"From the Picture window, you can print it, save it to an EPS file, or copy it to the clipboard for inclusion in your word processor.")
 MAN_END
 
 MAN_BEGIN (U"Intro 6. Intensity analysis", U"ppgb", 20030316)
-INTRO (U"本节介绍如何分析现有声音的音强曲线（强度轮廓/能量曲线）。")
-LIST_ITEM1 (U"@@Intro 6.1. Viewing an intensity contour|Intro 6.1. 查看音强曲线@")
-LIST_ITEM1 (U"@@Intro 6.2. Configuring the intensity contour|Intro 6.2. 设置音强曲线参数@")
-LIST_ITEM1 (U"@@Intro 6.3. Querying the intensity contour|Intro 6.3. 查询音强曲线信息@")
-LIST_ITEM1 (U"@@Intro 6.4. The Intensity object|Intro 6.4. Intensity 对象@")
+INTRO (U"This section describes how you can analyse the intensity contour of an existing sound.")
+LIST_ITEM1 (U"@@Intro 6.1. Viewing an intensity contour")
+LIST_ITEM1 (U"@@Intro 6.2. Configuring the intensity contour")
+LIST_ITEM1 (U"@@Intro 6.3. Querying the intensity contour")
+LIST_ITEM1 (U"@@Intro 6.4. The Intensity object")
 MAN_END
 
 MAN_BEGIN (U"Intro 6.1. Viewing an intensity contour", U"ppgb", 20110128)
-INTRO (U"要查看声音音强随时间的变化曲线，请在对象列表中选中一个 @Sound 或 @LongSound 对象，然后选择 @@View & Edit@。 "
-	"屏幕上将弹出一个 @SoundEditor 窗口。 "
-	"该窗口的分析绘图区域中会包含一条音强曲线，绘制为黄色或绿色的实线 "
-	"（如果未显示，请从 Intensity 菜单中选择 ##Show intensity#（显示音强））。 "
-	"该操作在 @TextGridEditor 中同样适用。")
+INTRO (U"To see the intensity contour of a sound as a function of time, select a @Sound or @LongSound object and choose @@View & Edit@. "
+	"A @SoundEditor window will appear on your screen. "
+	"The analysis part of this window will contain an intensity contour, drawn as a yellow or green line "
+	"(choose ##Show intensity# from the #Intensity menu if it is not visible). "
+	"This also works in the @TextGridEditor.")
 MAN_END
 
 MAN_BEGIN (U"Intro 6.2. Configuring the intensity contour", U"ppgb", 20041123)   // 2023
-INTRO (U"通过选择 Intensity 菜单中的 ##Intensity settings...#（音强设置...）， "
-	"您可以控制音强曲线的计算和显示方式。")
-ENTRY (U"显示范围")
+INTRO (U"With ##Intensity settings...# from the #Intensity menu, "
+	"you can control how the intensity contour is computed and how it is shown.")
+ENTRY (U"The view range")
 NORMAL (U"By changing these two numbers you can set the vertical scale. "
 	"The standard setting is from 50 to 100 dB, but if you are interested in the power of the background noise "
 	"you may want to set it to the range from 0 to 100 dB.")
-ENTRY (U"均值计算方法")
-NORMAL (U"均值计算发生在您选定了一段时间区域（而不是将光标放在单一时间点）时。 "
-	"音强曲线左侧或右侧显示的绿色 dB 数值将指示当前选区内的平均音强。 "
-	"这与您从 Intensity 菜单中选择 ##Get intensity#（获取音强）时获得的值相同。 "
-	"您可以选择适用于 @@Intensity: Get mean...@（获取平均音强...）的三种均值计算方法中的任何一种， "
-	"或者选择该选区内的中位数（#median）音强。")
-ENTRY (U"音高下限设置")
-NORMAL (U"音强曲线是经过%平滑（smoothed）处理的，因为您通常不希望音强曲线随着音高周期内部的微小强度变化而上下起伏。 "
-	"为了避免这种与基频周期同步的波动，每个时间点处的音强值都是对其周围许多邻近时间点进行加权平均计算出来的。 "
-	"加权是通过高斯（“双 Kaiser”）窗实现的，其窗的持续时间由 "
-	"##Pitch floor#（音高下限）设置决定（参见 @@Intro 4.2. Configuring the pitch contour@）。 "
-	"如果您希望看到比平常更多的细节，可以提高音高下限；若希望获得比平常更多的平滑效果，可以降低音高下限。 "
-	"有关更多信息，请参阅 @@Sound: To Intensity...@。")
-ENTRY (U"是否减去平均气压（直流分量）？")
-NORMAL (U"许多麦克风、麦克风前置放大器或录音系统中的其他硬件组件， "
-	"可能会在空气压力信号中添加一个恒定的偏移量（即%%DC 偏移/直流分量%）。 "
-	"您可以在波形图的静音区域中观察到这一现象， "
-	"此时静音处的平均振幅并不是零，而是围绕某个非零值小幅波动。 "
-	"通常您不会把这个恒定偏移的静态压力计算进声学能量，即音强曲线不应该 "
-	"计入此恒定压力所对应的能量。 "
-	"如果您开启了 ##Subtract mean pressure#（减去平均气压）开关（默认设置也是开启的）， "
-	"Praat 在计算每个时间点处的音强值时，会先减去该时间点周围的平均气压， "
-	"然后再应用高斯窗进行加权计算。")
+ENTRY (U"The averaging method")
+NORMAL (U"Averaging is what occurs if you make a @@time selection@ (rather than setting the cursor at a single time). "
+	"The green number in dB to the left or right side of the intensity contour will show the average "
+	"intensity in the selection. The same value is what you get when choosing ##Get intensity# from "
+	"the #Intensity menu. You can choose any of the three averaging methods "
+	"available for @@Intensity: Get mean...@, or choose for the #median value in the selection.")
+ENTRY (U"Pitch floor")
+NORMAL (U"The intensity curve is %smoothed, since you usually do not want the intensity curve to go up and down with "
+	"the intensity variations within a pitch period. To avoid such pitch-synchronous variations, "
+	"the intensity at every time point is a weighted average over many neighbouring time points. "
+	"The weighting is performed by a Gaussian (“double Kaiser”) window that has a duration that is determined by the "
+	"##Pitch floor# setting (see @@Intro 4.2. Configuring the pitch contour@). "
+	"To see more detail than usual, raise the pitch floor; to get more smoothing than usual, lower it. "
+	"For more information, see @@Sound: To Intensity...@.")
+ENTRY (U"Subtract mean pressure or not?")
+NORMAL (U"Many microphones, microphone preamplifiers, or other components in the recording system "
+	"can add a constant level to the air pressure (a %%DC offset%). "
+	"You can see this at quiet locations in the wave form, "
+	"where the average pressure is not zero but the background noise hovers about some non-zero value. "
+	"You will usually not want to take this constant pressure seriously, i.e. the intensity curve should "
+	"normally not take into account the energy provided by this constant pressure level. "
+	"If you switch on the ##Subtract mean pressure# switch (whose standard setting is also on), "
+	"the intensity value at a time point is computed by first subtracting the mean pressure around this point, "
+	"and then applying the Gaussian window.")
 MAN_END
 
 MAN_BEGIN (U"Intro 6.3. Querying the intensity contour", U"ppgb", 20041123)
-INTRO (U"要查询光标处的音强值，或当前选区可见部分内的平均音强值， "
-	"请从 Intensity 菜单中选择 ##Get intensity#（获取音强）或按下 F11 键。您将在信息窗口中获得与音强曲线左侧或右侧显示的绿色数值相同的 dB 值，但包含更多的小数位数。")
+INTRO (U"To ask for the intensity at the cursor, or the average intensity in the visible part of the selection, "
+	"choose ##Get intensity# from the #Intensity menu or press the F11 key. You get the same value in dB that is visible "
+	"to the left or right side of the intensity curve, but with more digits.")
 MAN_END
 
 MAN_BEGIN (U"Intro 6.4. The Intensity object", U"ppgb", 20041123)
-NORMAL (U"要打印音强曲线，或者将其保存为 EPS 文件或复制到剪贴板中以便插入到您的文字处理器中， "
-	"您必须首先在对象列表（@@List of Objects@）中创建一个 @Intensity（音强）对象。 "
-	"您可以通过在 SoundEditor 或 TextGridEditor 窗口的 Intensity 菜单中选择 ##Extract visible intensity contour#（提取可见音强曲线）， "
-	"或者在列表中选中一个 Sound 对象并选择 @@Sound: To Intensity...@（转换为音强...）来完成此操作。 "
-	"在上述任一情况下，列表中都会出现一个全新的 Intensity 对象。 "
-	"要将该 Intensity 对象绘制到图像窗口（@@Picture window@），请选中它并选择 ##Draw...#（绘制...）命令。 "
-	"从图像窗口中，您可以将其打印、保存为 EPS 文件，或直接复制到剪贴板。")
+NORMAL (U"To print an intensity contour, or to put it in an EPS file or on the clipboard for inclusion in your word processor, "
+	"you first have to create an @Intensity object in the @@List of Objects@. "
+	"You do this either by choosing ##Extract visible intensity contour# "
+	"from the #Intensity menu in the SoundEditor or TextGridEditor window, "
+	"or by selecting a Sound object in the list and choosing @@Sound: To Intensity...@. "
+	"In either case, a new Intensity object will appear in the list. "
+	"To draw the Intensity object to the @@Picture window@, select it and choose ##Draw...#. "
+	"From the Picture window, you can print it, save it to an EPS file, or copy it to the clipboard.")
 MAN_END
 
 MAN_BEGIN (U"Intro 7. Annotation", U"ppgb", 20110129)
-INTRO (U"您可以对现有的 @Sound 对象和声音文件（@LongSound 对象）进行标注。")
-NORMAL (U"标注的数据将保存在一个 @TextGrid（文本网格）对象中。该对象与声音对象是相互分离的， "
-	"这意味着在对象列表中您通常会看到两个对象：一个 Sound 或 LongSound 对象， "
-	"以及一个 TextGrid 对象。")
-ENTRY (U"创建 TextGrid")
-NORMAL (U"您可以通过选中 Sound 或 LongSound，然后选择 #Annotate 菜单下的 @@Sound: To TextGrid...@（转换为 TextGrid...） "
-	"或 @@LongSound: To TextGrid...@（转换为 TextGrid...）来创建新的空白 TextGrid 对象（当您选中 Sound 或 LongSound 时，该菜单会出现在对象窗口中）。 "
-	"通过这种方式，@TextGrid 的时间范围将自动与声音的时间范围完全相同。 "
-	"（相比之下，如果您从 @@New menu|新建菜单@ 中选择 @@Create TextGrid...@（创建 TextGrid...）， "
-	"则必须自行手动输入指定的时间范围。）")
-NORMAL (U"在创建 TextGrid 时，您需要指定层级（%tiers（层级））的名称。例如，如果您想将 "
-	"声音切分为单词（words）和音素（phonemes），您可能需要创建两个层级，并命名为 "
-	"\"words\" 和 \"phonemes\"（您稍后可以轻松添加、移除和重命名层级）。 "
-	"由于这两个层级都是%%interval tiers%（区间层级）（因为您是对单词和音素边界之间的区间进行标注， "
-	"而不是对边界本身进行标注），因此在层级名称（%%Tier names%）中指定 \"phonemes words\"， "
-	"并保持点层级（%%Point tiers%）为空。")
-ENTRY (U"查看与编辑")
-NORMAL (U"您可以单独编辑一个 TextGrid 对象，但通常您也希望在编辑器窗口中同时看到对应的 "
-	"声音信号。为实现这一点，请在列表中同时选中 Sound（或 LongSound）和 "
-	"TextGrid 对象，然后点击 @@View & Edit@。屏幕上将弹出一个 @TextGridEditor 窗口。 "
-	"与 Sound 编辑器类似，TextGrid 编辑器也会向您显示声谱图、音高曲线、共振峰曲线和音强曲线。 "
-	"该编辑器允许您添加、移除和编辑标注、边界线以及层级。在 TextGridEditor 的 Help（帮助）菜单下， "
-	"您可以找到 @TextGridEditor 的手册页。强烈建议您通读该页，因为它会向您展示 "
-	"如何快速缩放（拖动鼠标）、播放（单击相应的控制矩形）以及编辑标注（直接键入即可）。")
-ENTRY (U"保存")
-NORMAL (U"您通常会使用 @@Save as text file...@（保存为文本文件...） "
-	"或 @@Save as short text file...@（保存为短文本文件...）将 TextGrid 写入磁盘。 "
-	"虽然 @@Save as binary file...@（保存为二进制文件...）也同样有效，但其他两种格式 "
-	"生成的文件可以使用任何普通的文本编辑器打开并直接阅读。")
-NORMAL (U"无论您如何保存，稍后都可以使用 @@Read from file...@（从文件读取...）将 TextGrid 重新读取到 Praat 中。")
+INTRO (U"You can annotate existing @Sound objects and sound files (@LongSound objects).")
+NORMAL (U"The labelling data will reside in a @TextGrid object. This object is separate "
+	"from the sound, which means that you will often see two objects in the list: a Sound or LongSound, "
+	"and a TextGrid.")
+ENTRY (U"Creating a TextGrid")
+NORMAL (U"You create a new empty TextGrid from the Sound or LongSound with @@Sound: To TextGrid...@ "
+	"or @@LongSound: To TextGrid...@ from the #Annotate menu (which shows up in the Objects window if you select a Sound or LongSound). In this way, the time domain "
+	"of the @TextGrid will automatically equal that of the sound (if you choose @@Create TextGrid...@ from "
+	"the @@New menu@ instead, you will have to supply the time domain by yourself).")
+NORMAL (U"When you create a TextGrid, you specify the names of the %tiers. For instance, if you want to segment "
+	"the sound into words and into phonemes, you may want to create two tiers and call them "
+	"\"words\" and \"phonemes\" (you can easily add, remove, and rename tiers later). "
+	"Since both of these tiers are %%interval tiers% (you label the intervals between the word and phoneme "
+	"boundaries, not the boundaries themselves), you specify \"phonemes words\" for %%Tier names%, "
+	"and you leave the %%Point tiers% empty.")
+ENTRY (U"View and edit")
+NORMAL (U"You can edit a TextGrid object all by itself, but you will normally want to see "
+	"the sound in the editor window as well. To achieve this, you select both the Sound (or LongSound) and "
+	"the TextGrid, and click @@View & Edit@. A @TextGridEditor will appear on your screen. "
+	"Like the Sound editor, the TextGrid editor will show you a spectrogram, a pitch contour, a formant contour, "
+	"and an intensity contour. This editor will allow "
+	"you to add, remove, and edit labels, boundaries, and tiers. Under Help in the TextGridEditor, you will "
+	"find the @TextGridEditor manual page. You are strongly advised to read it, because it will show you "
+	"how you can quickly zoom (drag the mouse), play (click a rectangle), or edit a label (just type).")
+ENTRY (U"Save")
+NORMAL (U"You will normally write the TextGrid to disk with @@Save as text file...@ "
+	"or @@Save as short text file...@. It is true that @@Save as binary file...@ will also work, but the others "
+	"give you a file you can read with any text editor.")
+NORMAL (U"However you saved it, you can read the TextGrid into Praat later with @@Read from file...@.")
 MAN_END
 
 MAN_BEGIN (U"Intro 8. Manipulation", U"ppgb", 20021212) //2025
-LIST_ITEM (U"@@Intro 8.1. Manipulation of pitch|Intro 8.1. 操控音高@")
-LIST_ITEM (U"@@Intro 8.2. Manipulation of duration|Intro 8.2. 操控时长@")
-LIST_ITEM (U"@@Intro 8.3. Manipulation of intensity|Intro 8.3. 操控音强@")
-LIST_ITEM (U"@@Intro 8.4. Manipulation of formants|Intro 8.4. 操控共振峰@")
+LIST_ITEM (U"@@Intro 8.1. Manipulation of pitch")
+LIST_ITEM (U"@@Intro 8.2. Manipulation of duration")
+LIST_ITEM (U"@@Intro 8.3. Manipulation of intensity")
+LIST_ITEM (U"@@Intro 8.4. Manipulation of formants")
 MAN_END
 
 MAN_BEGIN (U"Intro 8.1. Manipulation of pitch", U"ppgb", 20220814)
-INTRO (U"要修改现有 @Sound 对象的音高曲线， "
-	"请选中该 @Sound 对象，然后点击 ##To Manipulation#（转换为 Manipulation 对象）。 "
-	"列表中随后将出现一个 @Manipulation（声音操控）对象。 "
-	"您可以选中它并点击 @@View & Edit@ 以打开 @ManipulationEditor 操控编辑器窗口， "
-	"它将把音高曲线（@PitchTier）显示为一系列粗蓝色点。 "
-	"为了减少点的数量，您可以从 Pitch 菜单中选择 ##Stylize pitch (2 st)#（音高简捷化/平滑化）； "
-	"这样您就可以在时间-音高区域内轻松地拖动这些点 "
-	"（按住 Option 键/Alt 键可限制拖动方向仅为垂直移动，按住 Command 键/Ctrl 键可限制为仅水平移动）。")
-NORMAL (U"如果您单击窗口下方的任何播放条矩形 "
-	"（或者选择 Play 菜单下的任何命令）， "
-	"您就可以聆听修改后的声音。通过按住 Shift 键播放，您将听到 "
-	"原始声音。")
-NORMAL (U"要将修改后的声音生成为一个单独的声音对象， "
-	"请选择 File 菜单下的 ##Publish resynthesis#（输出重合成声音）。")
-NORMAL (U"如果您同时也修改了时长曲线（参见 @@Intro 8.2. Manipulation of duration@）， "
-	"合成的声音将同时基于修改后的音高与时长。")
-ENTRY (U"复制/克隆音高曲线")
-NORMAL (U"如果您想将一个 Manipulation 对象的音高曲线用作另一个 Manipulation 对象的音高曲线， "
-	"您可以首先选中第一个 Manipulation 对象并选择 ##Extract pitch tier#（提取音高层）， "
-	"然后将生成的 PitchTier 对象和另一个 Manipulation 对象同时选中 "
-	"（...）并选择 ##Replace pitch tier#（替换音高层）。")
-NORMAL (U"如果你想直接克隆，可以先点击 PitchTier，然后按住 @@Command-click|Ctrl 键单击@ Manipulation，然后选择 ##Replace pitch tier#。")
-ENTRY (U"精确地操控音高")
-NORMAL (U"如果您极其清楚自己想要什么样的音高曲线， "
-	"您可以通过 New 菜单中的 @@Create PitchTier...@（创建 PitchTier...）来新建一个空白的 PitchTier， "
-	"然后使用 @@PitchTier: Add point...@（添加点）命令在其上添加音高点。")
-NORMAL (U"例如，假设您希望音高在 1 秒内从 350 Hz 降到 150 Hz。 "
-	"您先创建 PitchTier，然后在 0 秒处添加一个 350 Hz 的点， "
-	"在 1 秒处添加一个 150 Hz 的点。 "
-	"之后您就可以按上述方式将该 PitchTier 放入一个 Manipulation 对象中进行合成。")
+INTRO (U"To modify the pitch contour of an existing @Sound object, "
+	"you select this @Sound and click ##To Manipulation#. "
+	"A @Manipulation object will then appear in the list. "
+	"You can then click @@View & Edit@ to raise a @ManipulationEditor, "
+	"which will show the pitch contour (@PitchTier) as a series of thick blue dots. "
+	"To reduce the number of dots, choose ##Stylize pitch (2 st)# "
+	"from the #Pitch menu; it will then be easy to drag the dots "
+	"around the time–pitch area (press the Option key to restrict dragging to vertical, "
+	"and the Command key to restrict dragging to horizontal; mnemonics: Uption, Come Later).")
+NORMAL (U"If you click any of the rectangles "
+	"(or choose any of the commands from the #Play menu), "
+	"you will hear the modified sound. By shift-clicking, you will hear "
+	"the original sound.")
+NORMAL (U"To get the modified sound as a separate object, "
+	"choose ##Publish resynthesis# from the @@File menu@.")
+NORMAL (U"If you modify the duration curve as well (see @@Intro 8.2. Manipulation of duration@), "
+	"the modified sound will be based on the modified pitch and duration.")
+ENTRY (U"Cloning a pitch contour")
+NORMAL (U"To use the pitch contour of one Manipulation object as the pitch contour of another Manipulation object, "
+	"you first choose ##Extract pitch tier# for the first Manipulation object, "
+	"then select the resulting PitchTier object together with the other Manipulation object "
+	"(e.g. by a click on the PitchTier and a @@Command-click@ on the Manipulation), "
+	"and choose ##Replace pitch tier#.")
+ENTRY (U"Precise manipulation of pitch")
+NORMAL (U"If you know exactly what pitch contour you want, "
+	"you can create an empty PitchTier with @@Create PitchTier...@ from the New menu, "
+	"then add points with @@PitchTier: Add point...@.")
+NORMAL (U"For instance, suppose you want to have a pitch that falls from 350 to 150 Hz in one second. "
+	"You create the PitchTier, then add a point at 0 seconds and a frequency of 350 Hz, "
+	"and a point at 1 second with a frequency of 150 Hz. "
+	"You can put this PitchTier into a Manipulation object in the way described above.")
 MAN_END
 
 MAN_BEGIN (U"Intro 8.2. Manipulation of duration", U"ppgb", 20200901)
-INTRO (U"您可以使用 Praat 来修改现有声音中各个部分的相对时长（持续时间）。")
-NORMAL (U"首先，您选中一个 @Sound 对象并点击 ##To Manipulation#。 "
-	"列表中随后将出现一个 @Manipulation 对象。 "
-	"然后您可以点击 @@View & Edit@ 来打开 @ManipulationEditor 编辑器窗口， "
-	"该窗口中会显示一条空白的 @DurationTier（时长层）。 "
-	"您可以通过在 Dur 菜单中选择 ##Add duration point at cursor#（在光标处添加时长点）来为该层级添加目标。 "
-	"这些目标将显示为蓝色的点，您可以在时长区域中轻松地拖动它们。")
-NORMAL (U"如果您单击窗口下方的任何播放条矩形 "
-	"（或者选择 Play 菜单下的任何命令）， "
-	"您就可以聆听修改后的声音。通过按住 Shift 键播放，您将听到 "
-	"原始声音。")
+INTRO (U"You can use Praat to modify the relative durations in an existing sound.")
+NORMAL (U"First, you select a @Sound object and click \"To Manipulation\". "
+	"A @Manipulation object will then appear in the list. "
+	"You can then click @@View & Edit@ to raise a @ManipulationEditor, "
+	"which will show an empty @DurationTier. "
+	"You can add targets to this tier by choosing \"Add duration point at cursor\" "
+	"from the \"Dur\" menu. The targets will show up as blue dots, which you can easily drag "
+	"around the duration area.")
+NORMAL (U"If you click any of the rectangles "
+	"(or choose any of the commands from the @Play menu), "
+	"you will hear the modified sound. By shift-clicking, you will hear "
+	"the original sound.")
 NORMAL (U"To get the modified sound as a separate object, "
 	"choose ##Publish resynthesis# from the @@File menu@.")
-NORMAL (U"如果您同时也修改了音高曲线（参见 @@Intro 8.1. Manipulation of pitch@）， "
-	"合成的声音将同时基于修改后的时长和音高。")
-ENTRY (U"精确地操控时长")
-NORMAL (U"如果您极其精确地知道需要修改的时间点和相对时长比例，建议编写脚本（参见 @Scripting）。 "
-	"例如，假设您有一段 355 毫秒长的声音，您希望将前 85 毫秒缩短为 70 毫秒， "
-	"而将剩余的 270 毫秒缩短为 200 毫秒。")
-NORMAL (U"在前 85 毫秒内，您的相对时长比例应该是 70/85， "
-	"在最后的 270 毫秒内，比例应该是 200/270。 "
-	"DurationTier（时长层）采用的是线性插值，因此它只能近似地逼近这些精确的时间点， "
-	"但幸运的是，您可以达到任意想要的逼近精度：")
+NORMAL (U"If you modify the pitch curve as well (see @@Intro 8.1. Manipulation of pitch@), "
+	"the modified sound will be based on the modified duration and pitch.")
+ENTRY (U"Precise manipulation of duration")
+NORMAL (U"If you know exactly the times and relative durations, it is advisable to write a script (see @Scripting). "
+	"Suppose, for instance, that you have a 355-ms piece of sound, and you want to shorten the first 85 ms to 70 ms, "
+	"and the remaining 270 ms to 200 ms.")
+NORMAL (U"In your first 85 ms, your relative duration should be 70/85, "
+	"and during the last 270 ms, it should be 200/270. "
+	"The DurationTier does linear interpolation, so it can only approximate these precise times, "
+	"but fortunately to any precision you like:")
 CODE (U"Create DurationTier: \"shorten\", 0, 0.085 + 0.270")
 CODE (U"Add point: 0.000, 70/85")
 CODE (U"Add point: 0.084999, 70/85")
 CODE (U"Add point: 0.085001, 200/270")
 CODE (U"Add point: 0.355, 200/270")
-NORMAL (U"要将该 DurationTier 放回 Manipulation 对象中，请在列表中同时选中这两个对象 "
-	"（例如，先单击 DurationTier，然后按住 @@Command-click|Ctrl 键单击@ Manipulation 对象）， "
-	"最后选择 ##Replace duration tier#（替换时长层）。")
+NORMAL (U"To put this DurationTier back into a Manipulation object, you select the two objects together "
+	"(e.g. a click on the DurationTier and a @@Command-click@ on the Manipulation), "
+	"and choose ##Replace duration tier#.")
 MAN_END
 
 MAN_BEGIN (U"Intro 8.3. Manipulation of intensity", U"ppgb", 20110128)
-INTRO (U"您可以修改现有声音的音强曲线（强度轮廓）。")
-NORMAL (U"尽管声音的音高和时长可以使用 @ManipulationEditor 进行修改 "
-	"（参见 @@Intro 8.1. Manipulation of pitch@ 与 @@Intro 8.2. Manipulation of duration@）， "
-	"但强度曲线（音强）的修改方式会有所不同。")
-NORMAL (U"您可以通过 @@New menu|新建菜单@ 中的 @@Create IntensityTier...@（创建 IntensityTier...）命令来新建一个 @IntensityTier（音强层）。 "
-	"然后通过 @@View & Edit@ 在该层级上添加点。 "
-	"之后，您可以通过在列表中同时选中 @Sound 对象和 IntensityTier 对象， "
-	"然后点击 @@Sound & IntensityTier: Multiply|Multiply@（相乘）来将该层与声音进行“乘法”合成。 "
-	"IntensityTier 中的点代表以 dB 为单位的相对强度； "
-	"因此，声音中的声压值将乘以 10^^(dB/20)^。")
-NORMAL (U"除了 IntensityTier，您也可以使用 @AmplitudeTier（振幅层）； "
-	"当您为选中的 Sound 和 AmplitudeTier 对象点击 #Multiply（相乘）时， "
-	"声音中的声压值将直接乘以 AmplitudeTier 中的值。")
+INTRO (U"You can modify the intensity contour of an existing sound.")
+NORMAL (U"While the pitch and duration of a sound can be modified with the @ManipulationEditor "
+	"(see @@Intro 8.1. Manipulation of pitch@ and @@Intro 8.2. Manipulation of duration@), "
+	"the modification of the intensity curve is done in a different way.")
+NORMAL (U"You can create an @IntensityTier with the command @@Create IntensityTier...@ "
+	"from the @@New menu@. With @@View & Edit@, you can add points to this tier. "
+	"You can then \"multiply\" this tier with a sound, by selecting the @Sound and the "
+	"IntensityTier together and clicking @@Sound & IntensityTier: Multiply|Multiply@. "
+	"The points in the IntensityTier represent relative intensities in dB; "
+	"therefore, the sound pressure values in the Sound are multiplied by 10^^(dB/20)^.")
+NORMAL (U"Instead of an IntensityTier, you can use an @AmplitudeTier; "
+	"when you click #Multiply for a selected Sound and AmplitudeTier, "
+	"the sound pressure values in the Sound are directly multiplied by the values in the AmplitudeTier.")
 MAN_END
 
 MAN_BEGIN (U"Intro 8.4. Manipulation of formants", U"ppgb", 20010408)
-INTRO (U"操控共振峰曲线的过程无法像操控音高、时长或音强曲线那样简单直接。 "
-	"有关如何在 Praat 中修改共振峰的详细解释，请参阅 @@Source-filter synthesis@（源-滤波器合成）教程。")
+INTRO (U"The manipulation of formant contours cannot be as straightforward as the manipulation "
+	"of pitch, duration, or intensity contours. See the @@Source-filter synthesis@ tutorial "
+	"for an explanation of how formants can be modified in Praat.")
 MAN_END
 
 
@@ -1199,27 +1352,29 @@ sparrow, meerkat, [fruit] bat, lion, parrot, red deer, sperm whale, [bearded] se
 */
 
 MAN_BEGIN (U"Labelling", U"ppgb", 20010408)
-INTRO (U"参见 @@Intro 7. Annotation|Intro 7. 标注@。")
+INTRO (U"See @@Intro 7. Annotation@.")
 MAN_END
 
 MAN_BEGIN (U"List of Objects", U"ppgb", 20210228)
-INTRO (U"位于 @@Objects window|对象窗口@ 左半侧的列表区域。")
-ENTRY (U"主要作用")
-NORMAL (U"当您在该列表中选中一个或多个数据对象时，右侧的 @@Dynamic menu|动态菜单@ 会实时更新并显示适用于当前选中对象的所有可用操作按钮。")
-ENTRY (U"如何选择对象")
-NORMAL (U"* 选择单个对象：直接在列表中单击该对象，这会同时取消选中之前选中的其他所有对象。")
-NORMAL (U"* 连续选择多个对象：在列表上按住鼠标左键并拖动，或者使用按住 Shift 键并点击（Shift-click）。")
-NORMAL (U"* 增减选择特定对象：按住 Command/Ctrl 键并点击该对象（@@Command-click|Ctrl 键单击@），可以在不影响其他已选对象的情况下，单独添加或取消选中它。")
+INTRO (U"A list in the left-hand part of the @@Objects window@.")
+ENTRY (U"Purpose")
+NORMAL (U"If you select one or more @objects in this list, "
+	"the possible actions that you can perform with the selected objects "
+	"will appear in the @@Dynamic menu@.")
+ENTRY (U"How to select objects")
+NORMAL (U"To select one object (and deselect all the others), click on the object.")
+NORMAL (U"To extend the selection, drag the mouse or use Shift-click.")
+NORMAL (U"To change the selection of one object (without changing the others), use @@Command-click@.")
 MAN_END
 
 MAN_PAGES_BEGIN
 R"~~~(
 ################################################################################
 "New menu"
-© Paul Boersma 2016,2023
+© Paul Boersmma 2016,2023
 
-##New# 菜单是 @@Objects window|对象窗口@ 中的主菜单之一。
-您可以使用此菜单从零开始创建新的数据对象。该菜单包含以下常用命令：
+The ##New menu# is one of the menus in the @@Objects window@.
+You use this menu to create new objects from scratch. It contains the following commands:
 
 • @@Record mono Sound...
 • @@Record stereo Sound...
@@ -1326,42 +1481,47 @@ R"~~~(
 		• ##Create PatternList...
 		• ##Create Categories...
 
-若要通过读取磁盘文件来创建新对象，请改用 @@Open menu|Open（打开）菜单@。
-另外，通常也可以通过已有的对象来派生新对象，这类命令一般以 ##To# 开头（例如 To Pitch... 等）。
+To create new objects from files on disk, use the @@Open menu@ instead.
+Objects can also often be created from other objects, with commands that start with ##To#.
 ################################################################################
 )~~~"
 MAN_PAGES_END
 
 MAN_BEGIN (U"Objects window", U"ppgb", 20230325)
-INTRO (U"Praat 程序中的两个主窗口之一。")
+INTRO (U"One of the two main windows in the Praat program.")
 ENTRY (U"Subdivision")
-LIST_ITEM (U"左侧部分：@@List of Objects|对象列表@。")
-LIST_ITEM (U"右侧部分：@@Dynamic menu|动态菜单@。")
+LIST_ITEM (U"To the left: the @@List of Objects@.")
+LIST_ITEM (U"To the right: the @@Dynamic menu@.")
 ENTRY (U"Fixed buttons")
-NORMAL (U"对象列表下方显示有以下几个常用固定按钮：")
-LIST_ITEM (U"• @@Rename...|重命名...@")
-LIST_ITEM (U"• @@Info|信息@")
-LIST_ITEM (U"• @@Copy...|复制...@")
-LIST_ITEM (U"• @@Remove|移除@")
-LIST_ITEM (U"• @@Inspect|检查/查看结构@")
+NORMAL (U"The following buttons appear below the List of Objects:")
+LIST_ITEM (U"• @@Rename...")
+LIST_ITEM (U"• @@Info")
+LIST_ITEM (U"• @@Copy...")
+LIST_ITEM (U"• @@Remove")
+LIST_ITEM (U"• @@Inspect")
 ENTRY (U"Menus")
-LIST_ITEM (U"对象窗口的菜单栏包含几个固定的菜单：Praat、New（新建）、Open（打开）和 Help（帮助）菜单。此外还包含 Save（保存）菜单，由于 Save 菜单中的命令会根据当前所选对象的类型发生动态变化，因此在逻辑上它也属于右侧动态菜单的一部分。")
+LIST_ITEM (U"The Objects window contains several fixed menus: "
+	"the #Praat, #New, #Open, and #Help menus. "
+	"It also contains the @@Save menu@, whose contents vary with the kinds of selected objects, "
+	"and must, therefore, be considered part of the dynamic menu.")
 ENTRY (U"The Praat menu")
-LIST_ITEM (U"• @@New Praat script@：创建一个空白的 @@ScriptEditor|脚本编辑器@")
-LIST_ITEM (U"• @@New Praat notebook@：创建一个空白的 @@NotebookEditor|笔记本编辑器@")
-LIST_ITEM (U"• @@Open Praat script...@：从磁盘打开一个脚本并使用 @@ScriptEditor|脚本编辑器@ 展示")
-LIST_ITEM (U"• @@Open Praat notebook...@：从磁盘打开一个笔记本并使用 @@NotebookEditor|笔记本编辑器@ 展示")
-LIST_ITEM (U"• The ##Goodies submenu#：用于运行一些不依赖于特定选中对象且不创建新对象的辅助工具（例如调用 Calculator 计算器）。")
-LIST_ITEM (U"• The ##Settings submenu#：用于进行程序全局配置，例如配置音频输入和输出设备的参数。")
-LIST_ITEM (U"• ##Buttons...#：打开 @@ButtonEditor|按钮编辑器@，用于定制菜单和按钮显示。")
-LIST_ITEM (U"• (##Add menu command...#)")
-LIST_ITEM (U"• (##Add action command...#)")
-LIST_ITEM (U"• @@Quit@")
+LIST_ITEM (U"• @@New Praat script@: creates an empty @@ScriptEditor@")
+LIST_ITEM (U"• @@New Praat notebook@: creates an empty @@NotebookEditor@")
+LIST_ITEM (U"• @@Open Praat script...@: creates a @@ScriptEditor@ with a script from disk")
+LIST_ITEM (U"• @@Open Praat notebook...@: creates a @@NotebookEditor@ with a notebook from disk")
+LIST_ITEM (U"• The ##Goodies submenu#: for doing things (like using the Calculator) "
+	"that do not create new objects and do not depend on the kinds of selected objects.")
+LIST_ITEM (U"• The ##Settings submenu#: for program-wide preferences, "
+	"like audio input and output settings.")
+LIST_ITEM (U"• ##Buttons...#: raises a @@ButtonEditor@")
+LIST_ITEM (U"• (@@Add menu command...@)")
+LIST_ITEM (U"• (@@Add action command...@)")
+LIST_ITEM (U"• @@Quit")
 ENTRY (U"Other menus")
-LIST_ITEM (U"• @@New menu|New（新建）菜单@：用于从零开始创建各种类型的新数据对象。")
-LIST_ITEM (U"• @@Open menu|Open（打开）菜单@：用于将磁盘文件读入到内存中，生成数据对象。")
-LIST_ITEM (U"• @@Save menu|Save（保存）菜单@：用于将内存中的数据对象写入保存至磁盘。")
-LIST_ITEM (U"• The ##Help menu#：用于查看参考手册。")
+LIST_ITEM (U"• The @@New menu@: for creating objects from scratch.")
+LIST_ITEM (U"• The @@Open menu@: for reading objects from file into memory.")
+LIST_ITEM (U"• The @@Save menu@: for writing objects from memory to file.")
+LIST_ITEM (U"• The ##Help menu#: for viewing the manual.")
 MAN_END
 
 MAN_BEGIN (U"Periodicity menu", U"ppgb", 20240722 /*20010417, 20231115*/)
@@ -1377,7 +1537,7 @@ LIST_ITEM (U"@@Sound: To Harmonicity (ac)...")
 MAN_END
 
 MAN_BEGIN (U"Pitch menu", U"ppgb", 20221202)
-INTRO (U"位于 @SoundEditor 或 @TextGridEditor 中的菜单。")
+INTRO (U"A menu in the @SoundEditor or @TextGridEditor.")
 MAN_END
 
 MAN_BEGIN (U"Play", U"ppgb", /*20021212*/ 20220814)
@@ -1390,153 +1550,163 @@ NORMAL (U"A Play button is also available in the @SoundRecorder window "
 MAN_END
 
 MAN_BEGIN (U"Query submenu", U"ppgb", 20221202)
-INTRO (U"在您选中几乎任何类型的对象时，显示在 @@Objects window|对象窗口@ 右侧的子菜单。")
-INTRO (U"查询命令可以为您提供关于对象的信息。")
-NORMAL (U"大多数查询命令以单词 #%Get（获取）或有时以 #%Count（计数）开头。 "
-	"您可以在两个地方找到这些命令：在选中列表中的 @@Objects|对象@ 后通常会出现在右侧的 @@Query submenu|Query（查询）子菜单@， "
-	"以及各个编辑器（@editors，例如 @@Pitch menu|音高菜单@、@@Formants menu|共振峰菜单@ 或 @@Spectrogram menu|声谱图菜单@）菜单的查询部分。")
-ENTRY (U"行为")
-NORMAL (U"如果您点击查询命令，答案将写入信息窗口（@@Info window|Info window@）。")
-ENTRY (U"脚本编写")
-NORMAL (U"在脚本中，您仍可以使用查询命令将信息写入信息窗口， "
-	"但您也可以使用任何查询 command 将信息直接存入变量 "
-	"（参见 @@Scripting 6.3. Query commands|Scripting 6.3. 查询命令@）。在这种情况下，数值将不会写入信息窗口。")
-ENTRY (U"链接到此页面的其他页面")
-ENTRY (U"Praat 程序中的查询命令")
-LIST_ITEM (U"@@FAQ: Pitch analysis|FAQ: 音高分析@")
-LIST_ITEM (U"@@Formulas 8. Attributes of objects|Formulas 8. 对象的属性@")
-LIST_ITEM (U"@@OT learning 7. Learning from overt forms|OT 学习 7. 从表层形式中学习@")
-LIST_ITEM (U"@@Script for listing F0 statistics|用于列出 F0 统计数据的脚本@")
-LIST_ITEM (U"@@Scripting 3.3. Numeric queries|Scripting 3.3. 数值查询@")
-LIST_ITEM (U"@@Scripting 3.5. String queries|Scripting 3.5. 字符串查询@")
-LIST_ITEM (U"@@Scripting 6.2. Writing to the Info window|Scripting 6.2. 写入信息窗口@")
-LIST_ITEM (U"@@time domain|时间域@")
-LIST_ITEM (U"@@Voice 6. Automating voice analysis with a script|嗓音 6. 使用脚本自动进行嗓音分析@")
-NORMAL (U"Praat 程序中至少包含以下查询命令：")
+INTRO (U"A submenu that appears in the @@Objects window@ if you select an object of almost any type.")
+INTRO (U"Query commands give you information about objects.")
+NORMAL (U"Most query commands start with the word #%Get or sometimes the word #%Count. "
+	"You will find these commands in two places: under the @@Query submenu@ that usually appears if you "
+	"select an @@Objects|object@ in the list, and in the query parts of several menus of the @editors "
+	"(such as the @@Pitch menu@, the @@Formants menu@ or the @@Spectrogram menu@.")
+ENTRY (U"Behaviour")
+NORMAL (U"If you click a query command, the answer will be written to the @@Info window@.")
+ENTRY (U"Scripting")
+NORMAL (U"In a script, you can still use query commands to write the information to the Info window "
+	"but you can also use any query command to put the information into a variable. "
+	"(see @@Scripting 6.3. Query commands@). In such a case, the value will not be written into the Info window.")
+ENTRY (U"Some pages that link here")
+ENTRY (U"Query commands in the Praat program")
+LIST_ITEM (U"@@FAQ: Pitch analysis")
+LIST_ITEM (U"@@Formulas 8. Attributes of objects")
+LIST_ITEM (U"@@OT learning 7. Learning from overt forms")
+LIST_ITEM (U"@@Script for listing F0 statistics")
+LIST_ITEM (U"@@Scripting 3.3. Numeric queries")
+LIST_ITEM (U"@@Scripting 3.5. String queries")
+LIST_ITEM (U"@@Scripting 6.2. Writing to the Info window")
+LIST_ITEM (U"@@time domain")
+LIST_ITEM (U"@@Voice 6. Automating voice analysis with a script")
+NORMAL (U"The Praat program contains at least the following query commands:")
 MAN_END
 
 MAN_BEGIN (U"Quit", U"ppgb", 20050822)
-INTRO (U"@@Praat menu|Praat 菜单@ 中的命令之一。")
-ENTRY (U"目的")
-NORMAL (U"退出并离开程序。")
-ENTRY (U"行为")
-NORMAL (U"所有未保存到磁盘文件中的 @objects 对象都将丢失。 "
-	"但是，基于文件的对象（如大型词典）会被正确保存。")
-ENTRY (U"用法")
-NORMAL (U"要在退出前将数据保存到磁盘文件，请从 @@Save menu|Save 菜单@ 中选择相应的命令。")
+INTRO (U"One of the commands in the @@Praat menu@.")
+ENTRY (U"Purpose")
+NORMAL (U"To leave the program.")
+ENTRY (U"Behaviour")
+NORMAL (U"All @objects not written to a file will be lost. "
+	"However, file-based objects (like large lexica) will be saved correctly.")
+ENTRY (U"Usage")
+NORMAL (U"To save your data to a disk file before quitting, choose a command from the @@Save menu@.")
 MAN_END
 
 MAN_BEGIN (U"Read from file...", U"ppgb", 20111018)
-INTRO (U"@@Open menu|Open 菜单@ 中的命令之一。")
-ENTRY (U"目的")
-NORMAL (U"从磁盘文件中读取一个或多个 @objects 数据对象。")
-ENTRY (U"行为")
-NORMAL (U"可以识别多种类型的文件：")
-LIST_ITEM (U"1. 结构如 @@Save as text file...|Save as text file...@ 中所述的文本文件； "
-	"这些文件可以包含任何类型的对象，或者多个对象的集合。")
-LIST_ITEM (U"2. 使用 @@Save as binary file...|Save as binary file...@ 生成的二进制文件（任何类型）。")
-LIST_ITEM (U"3. LISP 文本格式的文件（仅适用于可以写入 LISP 文件的对象类型）。")
-LIST_ITEM (U"4. 能够被 Praat 内部库所识别的文件。 "
-	"例如，语音学库增加了对许多类型声音文件的识别器。")
-NORMAL (U"如果文件包含多个对象，这些对象将出现在列表中， "
-	"并且它们的名称将与使用 ##Save as text file...# 或 ##Save as binary file...# "
-	"保存它们时的名称完全一致。")
-ENTRY (U"示例")
-LIST_ITEM (U"• 如果文件仅包含一个 Pitch 对象并且文件名为 \"hallo.pit\"， "
-	"则对象列表中会出现一个名为 \"Pitch hallo\" 的对象。 "
-	"列表中可以存在多个具有相同名称的对象。")
-LIST_ITEM (U"• 如果文件包含一个名为 \"hallo\" 的 Pitch 类型对象， "
-	"以及一个名为 \"kromme\" 的 Polygon 类型对象， "
-	"则对象列表中会出现两个对象， "
-	"分别称为 \"Pitch hallo\" 和 \"Polygon kromme\".")
+INTRO (U"One of the commands in the @@Open menu@.")
+ENTRY (U"Purpose")
+NORMAL (U"To read one or more @objects from a file on disk.")
+ENTRY (U"Behaviour")
+NORMAL (U"Many kinds of files are recognized:")
+LIST_ITEM (U"1. Text files that are structured as described under @@Save as text file...@; "
+	"these can contain an object of any type, or a collection of objects.")
+LIST_ITEM (U"2. Files that were produced by @@Save as binary file...@ (any type).")
+LIST_ITEM (U"3. Files in a LISP text format (only for object types that can be written to a LISP file).")
+LIST_ITEM (U"4. Files that were made recognizable by the libraries built on Praat. "
+	"For instance, the phonetics library adds recognizers for many kinds of sound files.")
+NORMAL (U"If the file contains more than one object, these objects will appear in the list, "
+	"and their names will be the same as the names that they had "
+	"when they were saved with ##Save as text file...# or ##Save as binary file...#.")
+ENTRY (U"Examples")
+LIST_ITEM (U"• If the file contains only one Pitch object and is called \"hallo.pit\", "
+	"an object with the name \"Pitch hallo\" will appear in the list of objects. "
+	"You may have more objects with the same name.")
+LIST_ITEM (U"• If the file contains one object of type Pitch, named \"hallo\", "
+	"and one object of type Polygon, named \"kromme\", "
+	"there will appear two objects in the list, "
+	"called \"Pitch hallo\" and \"Polygon kromme\".")
 MAN_END
 
 MAN_BEGIN (U"Open menu", U"ppgb", 20110111)
-INTRO (U"@@Objects window|对象窗口@ 中的主菜单之一。")
-NORMAL (U"通过 Open 菜单，您可以将磁盘上的一个或多个文件读取到内存中。读取成功后，对应的数据对象将出现在左侧的 @@List of Objects|对象列表@ 中。")
-NORMAL (U"Open 菜单包含了通用的 @@Read from file...@（从文件读取...）命令，它可以自动识别大多数标准文件格式；此外还包含若干其他特定命令，用于读取非标准/无格式文件（例如 raw 原始声音数据），或者以特殊方式解析已知文件（例如从一个立体声音频文件中分别读取两个单声道声音对象）：")
+INTRO (U"One of the menus in the @@Objects window@.")
+NORMAL (U"With the Open menu, you read one or more @objects from a file on disk into memory. "
+	"The resulting object(s) will appear in the @@List of Objects@.")
+NORMAL (U"The Open menu contains the command @@Read from file...@, which recognizes most file types, "
+	"and perhaps several other commands for reading unrecognizable file types (e.g., raw sound data), "
+	"or for interpreting known file types in a different way "
+	"(e.g., reading two mono sounds from one stereo sound file):")
 MAN_END
 
 MAN_BEGIN (U"pause window", U"ppgb", 20230723)
-INTRO (U"由脚本弹出的、请求用户输入数据的窗口。")
-NORMAL (U"有关详细信息，请参阅 @@Scripting 6.6. Controlling the user|Scripting 6.6. 控制用户@。")
+INTRO (U"A window, popped up by a script, that asks the user for input.")
+NORMAL (U"For details, see @@Scripting 6.6. Controlling the user@.")
 MAN_END
 
 MAN_BEGIN (U"Remove", U"ppgb", 20021212)
-INTRO (U"@@Objects window|对象窗口@ 中的固定按钮之一。")
-NORMAL (U"您可以在选中列表中的一个或多个 @objects 对象后选择此命令。")
-NORMAL (U"选中的对象将永久从列表中消失， "
-	"并且它们所占用的计算机内存将被释放。")
-NORMAL (U"要在移除数据之前进行保存，请从 @@Save menu|Save 菜单@ 中选择相应的保存命令。")
+INTRO (U"One of the fixed buttons in the @@Objects window@.")
+NORMAL (U"You can choose this command after selecting one or more @objects in the list.")
+NORMAL (U"The selected objects will permanently disappear from the list, "
+	"and the computer memory that they occupied will be freed.")
+NORMAL (U"To save your data before removing, choose a command from the @@Save menu@.")
 MAN_END
 
 MAN_BEGIN (U"Rename...", U"ppgb", 20111018)
-INTRO (U"@@Objects window|对象窗口@ 中的固定按钮之一。")
-ENTRY (U"可用性")
-NORMAL (U"您可以在选择任意类型的一个对象后选择此命令。")
-ENTRY (U"目的")
-NORMAL (U"您可以给选中的对象起一个新的名称。")
-ENTRY (U"行为")
-NORMAL (U"如果您键入特殊符号或空格，对象窗口会用下划线代替它们。")
+INTRO (U"One of the fixed buttons in the @@Objects window@.")
+ENTRY (U"Availability")
+NORMAL (U"You can choose this command after selecting one object of any type.")
+ENTRY (U"Purpose")
+NORMAL (U"You can give the selected object a new name.")
+ENTRY (U"Behaviour")
+NORMAL (U"If you type special symbols or spaces, the Objects window will replace them with underscores.")
 MAN_END
 
 MAN_BEGIN (U"Save menu", U"ppgb", 20211015)
-INTRO (U"@@Objects window|对象窗口@ 中的菜单之一。")
-ENTRY (U"保存目的")
-NORMAL (U"通过 Save 菜单，您可以将内存中当前选中的一个或多个数据对象写入保存到磁盘文件中。保存的数据稍后可以使用 @@Open menu|Open（打开）菜单@ 下的命令（最常用的是 @@Read from file...@）重新加载回内存中。")
-ENTRY (U"典型用法：保存您的工作成果")
-NORMAL (U"在您点击 @Remove（移除）按钮或执行 @Quit（退出）命令关闭 Praat 之前，通常应该使用此菜单下的命令来妥善保存您的数据对象。")
-ENTRY (U"固定保存命令")
-NORMAL (U"如果当前没有选中任何对象，Save 菜单将显示为空。一旦选中了任意对象，该菜单中至少会提供以下几个通用的固定保存命令：")
-LIST_ITEM (U"• @@Save as text file...|保存为文本文件...@")
-LIST_ITEM (U"• @@Save as short text file...|保存为短文本文件...@")
-LIST_ITEM (U"• @@Save as binary file...|保存为二进制文件...@")
-ENTRY (U"动态保存命令")
-NORMAL (U"根据您当前选中的对象类型，Save 菜单中还会动态呈现一些专属于该类型的特有保存命令：")
+INTRO (U"One of the menus in the @@Objects window@.")
+ENTRY (U"Purpose")
+NORMAL (U"With the #Save menu, you write one or more selected @objects from memory to a file on disk. "
+	"The data can be read in again with one of the commands in the @@Open menu@ "
+	"(most often simply with @@Read from file...@).")
+ENTRY (U"Usage: save your work")
+NORMAL (U"You will often choose a command from this menu just before clicking the @Remove button "
+	"or choosing the @Quit command.")
+ENTRY (U"Fixed commands")
+NORMAL (U"If no object is selected, the #Save menu is empty. "
+	"If any object is selected, it will at least contain the following commands:")
+LIST_ITEM (U"• @@Save as text file...")
+LIST_ITEM (U"• @@Save as short text file...")
+LIST_ITEM (U"• @@Save as binary file...")
+ENTRY (U"Dynamic commands")
+NORMAL (U"Depending on the type of the selected object, the following commands may be available "
+	"in the #Save menu:")
 MAN_END
 
 MAN_BEGIN (U"Save as binary file...", U"ppgb", 20110129)
-INTRO (U"@@Save menu|Save 菜单@ 中的命令之一。")
-ENTRY (U"可用性")
-NORMAL (U"您可以在选择一个或多个 @objects 对象后选择此命令。")
-ENTRY (U"行为")
-NORMAL (U"对象窗口将询问您文件名。 "
-	"在您点击 OK 之后，选中的对象将被写入磁盘上的二进制文件中。")
-ENTRY (U"用法")
-NORMAL (U"此文件可以使用 @@Read from file...|Read from file...@ 重新读取。")
-ENTRY (U"文件格式")
-NORMAL (U"这些文件采用设备无关的二进制格式， "
-	"可以在任何机器上进行写入和读取。")
+INTRO (U"One of the commands in the @@Save menu@.")
+ENTRY (U"Availability")
+NORMAL (U"You can choose this command after selecting one or more @objects.")
+ENTRY (U"Behaviour")
+NORMAL (U"The Objects window will ask you for a file name. "
+	"After you click OK, the objects will be written to a binary file on disk.")
+ENTRY (U"Usage")
+NORMAL (U"The file can be read again with @@Read from file...@.")
+ENTRY (U"File format")
+NORMAL (U"These files are in a device-independent binary format, "
+	"and can be written and read on any machine.")
 MAN_END
 
 MAN_BEGIN (U"Save as short text file...", U"ppgb", 20110129)
-INTRO (U"@@Save menu|Save 菜单@ 中的命令之一。")
-ENTRY (U"可用性")
-NORMAL (U"您可以在选择一个或多个 @objects 对象后选择此命令。")
-ENTRY (U"行为")
-NORMAL (U"对象窗口将向您询问文件名。 "
-	"在您点击 OK 后，选中的对象将被写入磁盘上的文本文件中。")
-ENTRY (U"文件格式")
-NORMAL (U"该格式比 @@Save as text file...|Save as text file...@ 中描述的格式短得多。 "
-	"大多数注释都消失了，并且通常每行只有一项数据。")
-NORMAL (U"该文件可以使用通用的 @@Read from file...|Read from file...@ 重新读取。")
+INTRO (U"One of the commands in the @@Save menu@.")
+ENTRY (U"Availability")
+NORMAL (U"You can choose this command after selecting one or more @objects.")
+ENTRY (U"Behaviour")
+NORMAL (U"The Objects window will ask you for a file name. "
+	"After you click OK, the objects will be written to a text file on disk.")
+ENTRY (U"File format")
+NORMAL (U"The format is much shorter than the one described at @@Save as text file...@. "
+	"Most of the comments are gone, and there is normally one piece of data per line.")
+NORMAL (U"The file can be read again with the all-purpose @@Read from file...@.")
 MAN_END
 
 MAN_BEGIN (U"Save as text file...", U"ppgb", 20110129)
-INTRO (U"@@Save menu|Save 菜单@ 中的命令之一。")
-ENTRY (U"可用性")
-NORMAL (U"您可以在选择一个或多个 @objects 对象后选择此命令。")
-ENTRY (U"行为")
-NORMAL (U"对象窗口将询问您文件名。 "
-	"在您点击 OK 之后，选中的对象将被写入磁盘上的文本文件中。")
-ENTRY (U"文件格式")
-NORMAL (U"如果您只选择了一个对象，例如 Pitch 类型的对象， "
-	"文件将以以下几行开始：")
+INTRO (U"One of the commands in the @@Save menu@.")
+ENTRY (U"Availability")
+NORMAL (U"You can choose this command after selecting one or more @objects.")
+ENTRY (U"Behaviour")
+NORMAL (U"The Objects window will ask you for a file name. "
+	"After you click OK, the objects will be written to a text file on disk.")
+ENTRY (U"File format")
+NORMAL (U"If you selected a single object, e.g., of type Pitch, "
+	"the file will start with the lines:")
 CODE (U"File type = \"ooTextFile\"")
 CODE (U"Object class = \"Pitch\"")
-NORMAL (U"在此之后，音高（Pitch）数据将紧随其后。")
-LIST_ITEM (U"如果您选中了多个对象，例如 “Pitch hallo” 和 “Polygon kromme”， "
-	"该文件将看起来像：")
+NORMAL (U"After this, the pitch data will follow.")
+LIST_ITEM (U"If you selected more than one object, e.g., “Pitch hallo” and “Polygon kromme”, "
+	"the file will look like:")
 CODE (U"File type = \"ooTextFile\"")
 CODE (U"Object class = \"Collection\"")
 CODE (U"size = 2")
@@ -1549,44 +1719,44 @@ CODE (U"    item [2]:")
 CODE (U"        class = \"Polygon\"")
 CODE (U"        name = \"kromme\"")
 CODE (U"        (polygon data...)")
-NORMAL (U"该文件可以使用 @@Read from file...|Read from file...@ 重新读取， "
-	"顺便说一句，重新读取并不需要上述示例中的冗长格式。 "
-	"以下最简格式也将被正确读取：")
+NORMAL (U"The file can be read again with @@Read from file...@, "
+	"which, by the way, does not need the verbosity of the above example. "
+	"The following minimal format will also be read correctly:")
 CODE (U"\"ooTextFile\"")
 CODE (U"\"Collection\"  2")
 CODE (U"\"Pitch\"  \"hallo\"  (pitch data...)")
 CODE (U"\"Polygon\"  \"kromme\"  (polygon data...)")
-NORMAL (U"因此，所有不是独立数字、也不包含在双引号或 < > 中的文本， "
-	"均被视为注释，在同一行感叹号（“!”）之后的任何文本也是如此。")
+NORMAL (U"Thus, all text that is not a free-standing number and is not enclosed in double quotes or < >, "
+	"is considered a comment, as is all text following an exclamation mark (“!”) on the same line.")
 MAN_END
 
 MAN_BEGIN (U"Segmentation", U"ppgb", 20010408)
-INTRO (U"参见 @@Intro 7. Annotation|Intro 7. 标注@。")
+INTRO (U"See @@Intro 7. Annotation@.")
 MAN_END
 
 MAN_BEGIN (U"Show formant", U"ppgb", 20030316)
-INTRO (U"@SoundEditor 和 @TextGridEditor 的 Formant（共振峰）菜单中的命令之一。")
-NORMAL (U"参见 @@Intro 5. Formant analysis|Intro 5. 共振峰分析@。")
+INTRO (U"One of the commands in the Formant menu of the @SoundEditor and the @TextGridEditor.")
+NORMAL (U"See @@Intro 5. Formant analysis@.")
 MAN_END
 
 MAN_BEGIN (U"Show intensity", U"ppgb", 20030316)
-INTRO (U"@SoundEditor 和 @TextGridEditor 的 Intensity（音强）菜单中的命令之一。")
-NORMAL (U"参见 @@Intro 6. Intensity analysis|Intro 6. 音强分析@。")
+INTRO (U"One of the commands in the Intensity menu of the @SoundEditor and the @TextGridEditor.")
+NORMAL (U"See @@Intro 6. Intensity analysis@.")
 MAN_END
 
 MAN_BEGIN (U"Show pitch", U"ppgb", 20030316)
-INTRO (U"@SoundEditor 和 @TextGridEditor 的 Pitch（音高）菜单中的命令之一。")
-NORMAL (U"参见 @@Intro 4. Pitch analysis|Intro 4. 音高分析@。")
+INTRO (U"One of the commands in the Pitch menu of the @SoundEditor and the @TextGridEditor.")
+NORMAL (U"See @@Intro 4. Pitch analysis@.")
 MAN_END
 
 MAN_BEGIN (U"Show pulses", U"ppgb", 20030316)
-INTRO (U"@SoundEditor 和 @TextGridEditor 的 Pulses（脉冲点）菜单中的命令之一。")
-NORMAL (U"参见 @Voice。")
+INTRO (U"One of the commands in the Pulses menu of the @SoundEditor and the @TextGridEditor.")
+NORMAL (U"See @Voice.")
 MAN_END
 
 MAN_BEGIN (U"Show spectrogram", U"ppgb", 20030316)
-INTRO (U"@SoundEditor 和 @TextGridEditor 的 Spectrogram（声谱图）菜单中的命令之一。")
-NORMAL (U"参见 @@Intro 3. Spectral analysis|Intro 3. 声谱分析@。")
+INTRO (U"One of the commands in the Spectrogram menu of the @SoundEditor and the @TextGridEditor.")
+NORMAL (U"See @@Intro 3. Spectral analysis@.")
 MAN_END
 
 MAN_PAGES_BEGIN
@@ -2019,96 +2189,96 @@ for instance with the @ManipulationEditor.
 MAN_PAGES_END
 
 MAN_BEGIN (U"Spectrogram menu", U"ppgb", 20221202)
-INTRO (U"位于 @SoundEditor 或 @TextGridEditor 中的菜单。")
+INTRO (U"A menu in the @SoundEditor or @TextGridEditor.")
 MAN_END
 
 MAN_BEGIN (U"Spectrogram settings...", U"ppgb", 20221202)
-INTRO (U"@SoundEditor 和 @TextGridEditor 窗口 @@Spectrogram menu|Spectrogram 菜单@ 中的命令。 "
-	"参见 @@Intro 3.2. Configuring the spectrogram|Intro 3.2. 设置声谱图参数@。")
+INTRO (U"A command in the @@Spectrogram menu@ of the @SoundEditor and @TextGridEditor windows. "
+	"See @@Intro 3.2. Configuring the spectrogram@.")
 MAN_END
 
 MAN_BEGIN (U"Technical", U"ppgb", 20120915)
-INTRO (U"@@Praat menu|Praat 菜单@ 下的一个子菜单标题。")
+INTRO (U"The title of a submenu of the @@Praat menu@.")
 MAN_END
 
 MAN_BEGIN (U"Types of objects", U"ppgb", 20190928)
-INTRO (U"Praat 包含以下类型的对象和编辑器（@Editors）。 "
-	"有关入门说明和教程，请参阅 @Intro。")
-NORMAL (U"通用目的：")
-LIST_ITEM (U"• @Matrix: 采样后的双变量实值函数")
-LIST_ITEM (U"• @Polygon: 多边形")
-LIST_ITEM (U"• @PointProcess: 点过程（@PointEditor）")
-LIST_ITEM (U"• @Sound: 采样后的连续声波信号（@SoundEditor, @SoundRecorder, @@Sound files|声音文件@）")
-LIST_ITEM (U"• @LongSound: 基于磁盘长音频文件的数据流（@LongSoundEditor）")
-LIST_ITEM (U"• @Strings: 字符串列表")
-LIST_ITEM (U"• @Distributions, @PairDistribution: 分布与配对分布")
-LIST_ITEM (U"• @Table, @TableOfReal: 数据表与实数表")
-LIST_ITEM (U"• @Permutation: 排列")
-LIST_ITEM (U"• @ParamCurve: 参数曲线")
-NORMAL (U"周期性/基频分析：")
-LIST_ITEM (U"• 教程：")
-LIST_ITEM1 (U"• @@Intro 4. Pitch analysis|Intro 4. 音高分析@")
-LIST_ITEM1 (U"• @@Intro 6. Intensity analysis|Intro 6. 音强分析@")
-LIST_ITEM1 (U"• @Voice (jitter, shimmer, noise)（嗓音分析：基频微扰、振幅微扰、噪声比例）")
-LIST_ITEM (U"• @Pitch: 生理基频、声学周期性或感知音高（@PitchEditor）")
-LIST_ITEM (U"• @Harmonicity: 谐噪比（周期度）")
-LIST_ITEM (U"• @Intensity, @IntensityTier: 音强曲线/强度层")
-LIST_ITEM (U"• @Electroglottogram: 声带电控图")
-NORMAL (U"声谱/频谱分析：")
-LIST_ITEM (U"• 教程：")
-LIST_ITEM1 (U"• @@Intro 3. Spectral analysis|Intro 3. 声谱分析@")
-LIST_ITEM1 (U"• @@Intro 5. Formant analysis|Intro 5. 共振峰分析@")
-LIST_ITEM (U"• @Spectrum: 复数等间隔频率谱（@SpectrumEditor）")
-LIST_ITEM (U"• @Ltas: 长期平均频谱")
-LIST_ITEM (U"• 时频分析：@Spectrogram (声谱图), @BarkSpectrogram (Bark声谱图), @MelSpectrogram (Mel声谱图)")
-LIST_ITEM (U"• @Formant: 声学共振峰轨迹")
-LIST_ITEM (U"• @LPC: 线性预测编码系数随时间的变化")
-LIST_ITEM (U"• @Cepstrum, @CC, @LFCC, @MFCC: 倒谱及相关系数")
-LIST_ITEM (U"• @Excitation: 基底膜兴奋模式")
-LIST_ITEM (U"• @Excitations: #Excitation 对象的集合")
-LIST_ITEM (U"• @Cochleagram: 耳蜗兴奋模式随时间的变化")
-NORMAL (U"标注与切分（参见 @@Intro 7. Annotation|Intro 7. 标注@）：")
-LIST_ITEM (U"• @TextGrid (文本网格标注，@TextGridEditor)")
-NORMAL (U"听辨实验：")
-LIST_ITEM (U"• @ExperimentMFC: 多项选择强制听辨实验")
-NORMAL (U"声音操控与重合成：")
-LIST_ITEM (U"• 教程：")
-LIST_ITEM1 (U"• @@Intro 8.1. Manipulation of pitch|Intro 8.1. 操控音高@")
-LIST_ITEM1 (U"• @@Intro 8.2. Manipulation of duration|Intro 8.2. 操控时长@")
-LIST_ITEM1 (U"• @@Intro 8.3. Manipulation of intensity|Intro 8.3. 操控音强@")
-LIST_ITEM1 (U"• @@Filtering|滤波处理@")
-LIST_ITEM1 (U"• @@Source-filter synthesis|源-滤波器合成@")
-LIST_ITEM (U"• @PitchTier: 音高层（@PitchTierEditor）")
-LIST_ITEM (U"• @Manipulation (操控对象，@ManipulationEditor): 基于 @@overlap-add|重叠相加法@")
-LIST_ITEM (U"• @DurationTier: 时长层")
-LIST_ITEM (U"• @FormantGrid: 共振峰网格")
-NORMAL (U"发音合成（参见 @@Articulatory synthesis|发音合成@ 教程）：")
-LIST_ITEM (U"• @Speaker: 模拟女性、男性或儿童的声道与发音特征")
-LIST_ITEM (U"• #Articulation: 发音规格快照（肌肉活动）")
-LIST_ITEM (U"• @Artword: 发音目标随时间的变化")
-LIST_ITEM (U"• (@VocalTract: 声道面积函数)")
-NORMAL (U"神经网络包：")
-LIST_ITEM (U"• @FFNet: 前馈神经网络")
-LIST_ITEM (U"• @PatternList: 模式列表")
-LIST_ITEM (U"• @Categories: 分类类别（#CategoriesEditor）")
-NORMAL (U"数值与统计分析：")
-LIST_ITEM (U"• @Eigen: 特征向量与特征值")
-LIST_ITEM (U"• @Polynomial, @Roots, @ChebyshevSeries, @LegendreSeries, @ISpline, @MSpline: 多项式与各类曲线/样条")
-LIST_ITEM (U"• @Covariance: 协方差矩阵")
-LIST_ITEM (U"• @Confusion: 混淆矩阵")
-LIST_ITEM (U"• @@Discriminant analysis|判别分析@: @Discriminant")
-LIST_ITEM (U"• @@Principal component analysis|主成分分析@: @PCA")
+INTRO (U"Praat contains the following types of objects and @Editors. "
+	"For an introduction and tutorials, see @Intro.")
+NORMAL (U"General purpose:")
+LIST_ITEM (U"• @Matrix: a sampled real-valued function of two variables")
+LIST_ITEM (U"• @Polygon")
+LIST_ITEM (U"• @PointProcess: a point process (@PointEditor)")
+LIST_ITEM (U"• @Sound: a sampled continuous process (@SoundEditor, @SoundRecorder, @@Sound files@)")
+LIST_ITEM (U"• @LongSound: a file-based version of a sound (@LongSoundEditor)")
+LIST_ITEM (U"• @Strings")
+LIST_ITEM (U"• @Distributions, @PairDistribution")
+LIST_ITEM (U"• @Table, @TableOfReal")
+LIST_ITEM (U"• @Permutation")
+LIST_ITEM (U"• @ParamCurve")
+NORMAL (U"Periodicity analysis:")
+LIST_ITEM (U"• Tutorials:")
+LIST_ITEM1 (U"• @@Intro 4. Pitch analysis")
+LIST_ITEM1 (U"• @@Intro 6. Intensity analysis")
+LIST_ITEM1 (U"• @Voice (jitter, shimmer, noise)")
+LIST_ITEM (U"• @Pitch: articulatory fundamental frequency, acoustic periodicity, or perceptual pitch (@PitchEditor)")
+LIST_ITEM (U"• @Harmonicity: degree of periodicity")
+LIST_ITEM (U"• @Intensity, @IntensityTier: intensity contour")
+LIST_ITEM (U"• @Electroglottogram")
+NORMAL (U"Spectral analysis:")
+LIST_ITEM (U"• Tutorials:")
+LIST_ITEM1 (U"• @@Intro 3. Spectral analysis")
+LIST_ITEM1 (U"• @@Intro 5. Formant analysis")
+LIST_ITEM (U"• @Spectrum: complex-valued equally spaced frequency spectrum (@SpectrumEditor)")
+LIST_ITEM (U"• @Ltas: long-term average spectrum")
+LIST_ITEM (U"• Spectro-temporal: @Spectrogram, @BarkSpectrogram, @MelSpectrogram")
+LIST_ITEM (U"• @Formant: acoustic formant contours")
+LIST_ITEM (U"• @LPC: coefficients of Linear Predictive Coding, as a function of time")
+LIST_ITEM (U"• @Cepstrum, @CC, @LFCC, @MFCC (cepstral coefficients)")
+LIST_ITEM (U"• @Excitation: excitation pattern of basilar membrane")
+LIST_ITEM (U"• @Excitations: an ensemble of #Excitation objects")
+LIST_ITEM (U"• @Cochleagram: excitation pattern as a function of time")
+NORMAL (U"Labelling and segmentation (see @@Intro 7. Annotation@):")
+LIST_ITEM (U"• @TextGrid (@TextGridEditor)")
+NORMAL (U"Listening experiments:")
+LIST_ITEM (U"• @ExperimentMFC")
+NORMAL (U"Manipulation of sound:")
+LIST_ITEM (U"• Tutorials:")
+LIST_ITEM1 (U"• @@Intro 8.1. Manipulation of pitch")
+LIST_ITEM1 (U"• @@Intro 8.2. Manipulation of duration")
+LIST_ITEM1 (U"• @@Intro 8.3. Manipulation of intensity")
+LIST_ITEM1 (U"• @@Filtering")
+LIST_ITEM1 (U"• @@Source-filter synthesis")
+LIST_ITEM (U"• @PitchTier (@PitchTierEditor)")
+LIST_ITEM (U"• @Manipulation (@ManipulationEditor): @@overlap-add@")
+LIST_ITEM (U"• @DurationTier")
+LIST_ITEM (U"• @FormantGrid")
+NORMAL (U"Articulatory synthesis (see the @@Articulatory synthesis@ tutorial):")
+LIST_ITEM (U"• @Speaker: speaker characteristics of a woman, a man, or a child")
+LIST_ITEM (U"• #Articulation: snapshot of articulatory specifications (muscle activities)")
+LIST_ITEM (U"• @Artword: articulatory target specifications as functions of time")
+LIST_ITEM (U"• (@VocalTract: area function)")
+NORMAL (U"Neural net package:")
+LIST_ITEM (U"• @FFNet: feed-forward neural net")
+LIST_ITEM (U"• @PatternList")
+LIST_ITEM (U"• @Categories: for classification (#CategoriesEditor)")
+NORMAL (U"Numerical and statistical analysis:")
+LIST_ITEM (U"• @Eigen: eigenvectors and eigenvalues")
+LIST_ITEM (U"• @Polynomial, @Roots, @ChebyshevSeries, @LegendreSeries, @ISpline, @MSpline")
+LIST_ITEM (U"• @Covariance: covariance matrix")
+LIST_ITEM (U"• @Confusion: confusion matrix")
+LIST_ITEM (U"• @@Discriminant analysis@: @Discriminant")
+LIST_ITEM (U"• @@Principal component analysis@: @PCA")
 LIST_ITEM (U"• @Correlation, @ClassificationTable, @SSCP")
-LIST_ITEM (U"• @DTW: 动态时间规整")
-NORMAL (U"@@Multidimensional scaling|多维尺度分析@：")
-LIST_ITEM (U"• @Configuration (配置，包括 @Salience)")
-LIST_ITEM (U"• @@Kruskal analysis|Kruskal 分析@: @Dissimilarity (@Weight), @Similarity")
-LIST_ITEM (U"• @@INDSCAL analysis|INDSCAL 分析@: @Distance, @ScalarProduct")
-LIST_ITEM (U"• @@Correspondence analysis|对应分析@: @ContingencyTable")
-NORMAL (U"优选论学习（参见 @@OT learning|OT 学习@ 教程）")
-LIST_ITEM (U"• @OTGrammar (OT语法，@OTGrammarEditor）")
-NORMAL (U"辅助事务")
-LIST_ITEM (U"• @WordList (词表), @SpellingChecker (拼写检查器)")
+LIST_ITEM (U"• @DTW: dynamic time warping")
+NORMAL (U"@@Multidimensional scaling@:")
+LIST_ITEM (U"• @Configuration (@Salience)")
+LIST_ITEM (U"• @@Kruskal analysis@: @Dissimilarity (@Weight), @Similarity")
+LIST_ITEM (U"• @@INDSCAL analysis@: @Distance, @ScalarProduct")
+LIST_ITEM (U"• @@Correspondence analysis@: @ContingencyTable")
+NORMAL (U"Optimality-theoretic learning (see the @@OT learning@ tutorial)")
+LIST_ITEM (U"• @OTGrammar (@OTGrammarEditor)")
+NORMAL (U"Bureaucracy")
+LIST_ITEM (U"• @WordList, @SpellingChecker")
 MAN_END
 
 MAN_PAGES_BEGIN

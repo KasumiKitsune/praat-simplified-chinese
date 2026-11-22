@@ -239,7 +239,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
-            USER_HEADER_SEARCH_PATHS="$PWD/fon $PWD/dwtools $PWD/sys" \
+            USER_HEADER_SEARCH_PATHS="$PWD/fon $PWD/dwtools $PWD/sys $PWD/melder" \
             build
 
       - name: Prepare release package

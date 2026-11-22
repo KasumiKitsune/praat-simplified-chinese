@@ -915,8 +915,12 @@ NORMAL (U"The values are computed as the sum of the squares of the real and imag
 MAN_END
 
 MAN_BEGIN (U"SpectrumEditor", U"ppgb", 20030316)
-INTRO (U"Praat 中的@@Editors|编辑器@之一。它允许您查看、缩放和播放 @@Spectrum|Spectrum@（频谱）对象。")
-NORMAL (U"点击绘制区域上方或下方的（最多）8 个播放条矩形，可以播放从该 @@Spectrum|Spectrum@ 经过滤波器滤波的部分所合成的 @@Sound|Sound@（声音）。您也可以将通过 @@frequency selection|频率选择@ 滤波后的 Spectrum 复制到对象列表中，或者将由此 Spectrum 合成的 Sound 复制到列表中。")
+INTRO (U"One of the @editors in Praat. It allows you to view, "
+	"zoom, and play a @Spectrum object.")
+NORMAL (U"Clicking on one of the (maximally) 8 rectangles above or below the drawing area "
+	"lets you play a @Sound that is synthesized from a band-filtered part of the @Spectrum. "
+	"You can also copy the Spectrum, band-filtered with the @@frequency selection@, "
+	"or the Sound synthesized from this Spectrum, to the list of objects.")
 MAN_END
 
 }

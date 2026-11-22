@@ -1,0 +1,53 @@
+# zh_alias	en_canonical
+绘制	Draw
+选择	Select
+放大	Zoom in
+缩小	Zoom out
+返回	Back
+修改	Modify
+分析	Analyse
+合并	Combine
+打开	Open
+声音	Sound
+标签	Label
+区间	Interval
+层	Tier
+左	Left
+右	Right
+行	Row
+列	Column
+共振峰	Formant
+音强	Intensity
+脉冲	Pulses
+删除	Delete
+播放	Play
+绘制...	Draw...
+缩放...	Scale...
+开始时间	Start time
+结束时间	End time
+平均	Average
+协方差	Covariance
+相关	Correlation
+浊音化	Voicing
+送气	Aspiration
+语言设置	Language settings
+按住录音	Hold to Record
+起始频率 (Hz)	From frequency (Hz)
+终止频率 (Hz)	To frequency (Hz)
+点线	Dotted line
+绘制散点图...	Draw scatter plot...
+获取开始时间	Get start time
+获取结束时间	Get end time
+获取选区起点	Get start of selection
+转为 TextGrid	To TextGrid
+特征值与特征向量	Eigenvalues and eigenvectors
+声音: 降噪	Sound: Remove noise
+声音: 降噪...	Sound: Remove noise...
+无法撤销	Cannot undo
+无法重做	Cannot redo
+0 (= 自动)	0 (= automatic)
+绘制声谱图到图像窗口：	Draw spectrogram to picture window:
+获取列标准差	Get column standard deviation
+最大候选音高数量	Max. number of candidates
+批量重命名...	Batch rename...
+● 录音中...	● Recording...

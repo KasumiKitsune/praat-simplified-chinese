@@ -2385,11 +2385,17 @@ static void UiField_argToValue (UiField me, Stackel arg, Interpreter /* interpre
 		{
 			if (arg -> which == Stackel_STRING) {
 				if (my type == _kUiField_type::CHANNEL_) {
-					if (str32equ (arg -> getString(), U"All") || str32equ (arg -> getString(), U"Average")) {
+					conststring32 chStr = arg -> getString();
+					if (str32equ (chStr, U"All") || str32equ (chStr, U"Average") ||
+						str32equ (chStr, U"全部") || str32equ (chStr, U"平均")) {
 						my integerValue = 0;
-					} else if (str32equ (arg -> getString(), U"Left") || str32equ (arg -> getString(), U"Mono")) {
+					} else if (str32equ (chStr, U"Left") || str32equ (chStr, U"Mono") ||
+						str32equ (chStr, U"左") || str32equ (chStr, U"左声道") || str32equ (chStr, U"左聲道") ||
+						str32equ (chStr, U"单声道") || str32equ (chStr, U"單聲道")) {
 						my integerValue = 1;
-					} else if (str32equ (arg -> getString(), U"Right") || str32equ (arg -> getString(), U"Stereo")) {
+					} else if (str32equ (chStr, U"Right") || str32equ (chStr, U"Stereo") ||
+						str32equ (chStr, U"右") || str32equ (chStr, U"右声道") || str32equ (chStr, U"右聲道") ||
+						str32equ (chStr, U"立体声") || str32equ (chStr, U"立體聲")) {
 						my integerValue = 2;
 					} else {
 						Melder_throw (U"Channel argument “", my name.get(),
@@ -2516,9 +2522,9 @@ static void UiField_argToValue (UiField me, Stackel arg, Interpreter /* interpre
 		case _kUiField_type::BOOLEAN_:
 		{
 			if (arg -> which == Stackel_STRING) {
-				if (str32equ (arg -> getString(), U"no") || str32equ (arg -> getString(), U"off")) {
+				if (str32equ (arg -> getString(), U"no") || str32equ (arg -> getString(), U"off") || str32equ (arg -> getString(), U"否")) {
 					my integerValue = 0;
-				} else if (str32equ (arg -> getString(), U"yes") || str32equ (arg -> getString(), U"on")) {
+				} else if (str32equ (arg -> getString(), U"yes") || str32equ (arg -> getString(), U"on") || str32equ (arg -> getString(), U"是")) {
 					my integerValue = 1;
 				} else {
 					Melder_throw (U"Boolean argument “", my name.get(),
@@ -2540,10 +2546,15 @@ static void UiField_argToValue (UiField me, Stackel arg, Interpreter /* interpre
 				Melder_throw (U"Option argument “", my name.get(), U"” should be a string, not ", arg -> whichText(), U".");
 			if (my getValueFunction) {
 				int value = my getValueFunction (arg -> getString());
+				if (value == -1) {
+					conststring32 aliasEn = Melder_i18n_resolveScriptAlias (arg -> getString());
+					if (aliasEn)
+						value = my getValueFunction (aliasEn);
+				}
 				if (value == -1)
 					my integerValue = 0;   // zero
 				else
-					my integerValue = my getValueFunction (arg -> getString()) + my subtract;   // 1 or greater
+					my integerValue = value + my subtract;   // 1 or greater
 			} else {
 				my integerValue = 0;
 				for (int i = 1; i <= my options.size; i ++) {
@@ -2559,6 +2570,18 @@ static void UiField_argToValue (UiField me, Stackel arg, Interpreter /* interpre
 						UiOption b = my options.at [i];
 						if (Melder_equ_firstCharacterCaseInsensitive (arg -> getString(), b -> name.get()))
 							my integerValue = i;
+					}
+				}
+				if (my integerValue == 0) {
+					/*
+						Layer 3 bilingual fallback: match localized Chinese option text unambiguously within this field.
+					*/
+					for (int i = 1; i <= my options.size; i ++) {
+						UiOption b = my options.at [i];
+						if (Melder_i18n_matchesTranslation (arg -> getString(), b -> name.get())) {
+							my integerValue = i;
+							break;
+						}
 					}
 				}
 			}
@@ -2770,10 +2793,15 @@ static void UiField_stringToValue (UiField me, conststring32 string, Interpreter
 		{
 			if (my getValueFunction) {
 				int value = my getValueFunction (string);
+				if (value == -1) {
+					conststring32 aliasEn = Melder_i18n_resolveScriptAlias (string);
+					if (aliasEn)
+						value = my getValueFunction (aliasEn);
+				}
 				if (value == -1)
 					my integerValue = 0;   // zero
 				else
-					my integerValue = my getValueFunction (string) + my subtract;   // 1 or greater
+					my integerValue = value + my subtract;   // 1 or greater
 			} else {
 				my integerValue = 0;
 				for (int i = 1; i <= my options.size; i ++) {
@@ -2789,6 +2817,15 @@ static void UiField_stringToValue (UiField me, conststring32 string, Interpreter
 						UiOption b = my options.at [i];
 						if (Melder_equ_firstCharacterCaseInsensitive (string, b -> name.get()))
 							my integerValue = i;
+					}
+				}
+				if (my integerValue == 0) {
+					for (int i = 1; i <= my options.size; i ++) {
+						UiOption b = my options.at [i];
+						if (Melder_i18n_matchesTranslation (string, b -> name.get())) {
+							my integerValue = i;
+							break;
+						}
 					}
 				}
 			}

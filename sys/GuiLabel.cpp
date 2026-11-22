@@ -149,6 +149,7 @@ GuiLabel GuiLabel_create (GuiForm parent, int left, int right, int top, int bott
 		else
 			[label setFont: theMacGuiNormalLabelFont ()];
 	#endif
+	GuiI18n_bind (me.get(), GuiI18nKind::Label, labelText);
 	return me.releaseToAmbiguousOwner();
 }
 
@@ -161,6 +162,7 @@ GuiLabel GuiLabel_createShown (GuiForm parent, int left, int right, int top, int
 }
 
 void GuiLabel_setText (GuiLabel me, conststring32 text /* cattable */) {
+	GuiI18n_bind (me, GuiI18nKind::Label, text);
 	conststring32 translatedText = praat_translate (text);
 	#if gtk
 		gtk_label_set_text (GTK_LABEL (my d_widget), Melder_peek32to8 (translatedText));

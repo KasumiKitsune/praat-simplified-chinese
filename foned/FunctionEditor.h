@@ -203,9 +203,9 @@ Thing_define (FunctionEditor, Editor) {
 	virtual const char *v_format_long () { return u8"%f"; }
 	virtual conststring32 v_format_units_long () { return U"seconds"; }
 	virtual conststring32 v_format_units_short () { return U"s"; }
-	virtual const char *v_format_totalDuration () { return g_language_choice == 0 ? "Total duration %f seconds" : u8"总时长 %f 秒"; }
-	virtual const char *v_format_window () { return g_language_choice == 0 ? "Visible part %f seconds" : u8"可见部分 %f 秒"; }
-	virtual const char *v_format_selection () { return g_language_choice == 0 ? "%f (%.3f / s)" : u8"%f (%.3f / 秒)"; }
+	virtual const char *v_format_totalDuration () { return "Total duration %f seconds"; }
+	virtual const char *v_format_window () { return "Visible part %f seconds"; }
+	virtual const char *v_format_selection () { return "%f (%.3f / s)"; }
 	virtual int v_fixedPrecision_long () { return 6; }
 	virtual bool v_hasText () { return false; }
 	virtual void v_play (double /* startTime */, double /* endTime */) { }
