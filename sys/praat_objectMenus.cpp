@@ -326,6 +326,7 @@ void praat_languageChanged () {
 	praat_picture_languageChanged ();
 	praat_refreshObjectsWindowLanguage ();
 	PreferencesDialog_languageChanged ();
+	praat_chineseAbout_languageChanged ();
 	Editors_languageChanged ();
 	for (integer i = 1; i <= praat_getNumberOfMenuCommands (); i ++) {
 		Praat_Command command = praat_getMenuCommand (i);
@@ -366,6 +367,12 @@ GuiMenu praat_objects_resolveMenu (conststring32 menu) {
 DIRECT (PRAAT__About) {
 	PRAAT
 		praat_showLogo ();
+	PRAAT_END
+}
+
+DIRECT (PRAAT__AboutChineseEdition) {
+	PRAAT
+		praat_showChineseAbout ();
 	PRAAT_END
 }
 
@@ -1117,6 +1124,8 @@ void praat_addMenus (GuiWindow window) {
 	MelderString_append (& itemTitle_about, U"About ", Melder_upperCaseAppName());
 	praat_addMenuCommand (U"Objects", U"Praat", itemTitle_about.string, nullptr, GuiMenu_UNHIDABLE,
 			PRAAT__About);
+	praat_addMenuCommand (U"Objects", U"Praat", U"About Chinese Edition...", nullptr, GuiMenu_UNHIDABLE | GuiMenu_NO_API,
+			PRAAT__AboutChineseEdition);
 	#ifdef macintosh
 		#if cocoa
 			/*
@@ -1253,6 +1262,8 @@ void praat_addMenus2 () {
 			nullptr, 'M' | GuiMenu_NO_API, PRAAT__SearchManual);
 	praat_addMenuCommand (U"Objects", U"ApplicationHelp", itemTitle_about.string,
 			nullptr, GuiMenu_UNHIDABLE, PRAAT__About);
+	praat_addMenuCommand (U"Objects", U"ApplicationHelp", U"About Chinese Edition...",
+			nullptr, GuiMenu_UNHIDABLE | GuiMenu_NO_API, PRAAT__AboutChineseEdition);
 
 	Gui_setOpenDocumentCallback (cb_openDocument, cb_finishedOpeningDocuments);
 }
