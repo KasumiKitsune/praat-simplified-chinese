@@ -361,22 +361,45 @@ NORMAL (U"The time domain of the resulting PitchTier is a union of the domains o
 MAN_END
 
 MAN_BEGIN (U"PitchEditor", U"ppgb", /*20110808 20220814 20231115*/ 20240722)
-INTRO (U"Praat 中的@@Editors|编辑器@之一，用于查看和修改 @@Pitch|Pitch@（音高）对象。")
-ENTRY (U"音高编辑器显示的内容")
-NORMAL (U"在 PitchEditor 窗口中，您将看到以下特征：")
-LIST_ITEM (U"\\bu 散布在整个绘图区域的 0 到 9 之间的数字。它们的位置表示音高%%candidates%（候选值），每个时间帧都有好几个候选值。数字本身代表该候选值的优度乘以 10。例如，如果您在（1.23 秒，189 赫兹）的位置看到一个“9”，这意味着在 1.23 秒的时间帧处，有一个值为 189 赫兹的音高候选值，且其优度为 0.9。根据计算 @@Pitch|Pitch@ 对象的方法不同，0.9 这个数值可能是自相关峰、互相关峰或频谱峰的相对高度。")
-LIST_ITEM (U"\\bu 一条由红色圆盘组成的%%path%（路径）。这些圆盘表示穿过候选值的最佳路径，即我们对音高曲线最佳的猜测。该路径通常由音高提取算法调用的%%path finder%（路径寻找器）确定，您也可以手动更改该路径。路径寻找器会考虑每个候选值的优度、该帧中声音的音强、浊音-清音（有声-无声）过渡以及频率跳变。它还会确定每个帧是浊音还是清音。")
-LIST_ITEM (U"\\bu 位于绘图区域底部的%%##voicelessness bar%#（无声/清音指示条）。如果某帧中没有合适的音高候选值，该帧将被视为清音，在无声条中显示为蓝色矩形。")
-LIST_ITEM (U"\\bu 沿顶部显示的一行 0 到 9 之间的数字。这代表每个帧中声音的相对音强。")
-ENTRY (U"移动标记")
-NORMAL (U"若要移动光标或选区的起点/终点，请使用 @@time selection|时间选择@ 机制。")
-ENTRY (U"更改路径")
-NORMAL (U"若要手动更改候选路径，请直接在您选择的候选值上点击。更改将立即影响您正在编辑的 Pitch 对象。若要将浊音帧变为清音，请在无声条中点击。")
-NORMAL (U"若要自动更改路径，请从 #Edit 菜单中选择 ##Path finder...#（路径寻找器...）；这与在 @@Sound: To Pitch (filtered autocorrelation)...|Sound: To Pitch (filtered autocorrelation)...@ 或 @@Sound: To Pitch (raw autocorrelation)...|Sound: To Pitch (raw autocorrelation)...@ 命令窗口中输入不同的数值具有相同的效果，但由于不需要重新确定候选值，所以运行速度要快得多。")
-ENTRY (U"重合成")
-NORMAL (U"若要哼唱音高曲线的任何部分，请点击数据区域下方或上方的其中一个按钮（这些按钮通常有 1 到 8 个），或使用 #Play 菜单中的命令。")
-ENTRY (U"更改上限（Ceiling）")
-NORMAL (U"若要更改音高上限而非路径，请从 #Edit 菜单中选择 ##Change ceiling...#（更改上限...）；如果新的上限低于旧的上限，一些以前有声（浊音）的帧可能会变成无声（清音）；如果新的上限高于旧的上限，一些以前无声的帧可能会变成有声。")
+INTRO (U"One of the @Editors in Praat, for viewing and modifying a @Pitch object.")
+ENTRY (U"What the Pitch editor shows")
+NORMAL (U"In the window of the PitchEditor, you will see the following features:")
+LIST_ITEM (U"\\bu Digits between 0 and 9 scattered all over the drawing area. Their locations represent "
+	"the pitch %#candidates, of which there are several for every time frame. The digits themselves "
+	"represent the goodness of a candidate, multiplied by ten. For instance, if you see a \"9\" "
+	"at the location (1.23 seconds, 189 hertz), this means that in the time frame at 1.23 seconds, "
+	"there is a pitch candidate with a value of 189 hertz, and its goodness is 0.9. "
+	"The number 0.9 may be the relative height of an autocorrelation peak, a cross-correlation peak, "
+	"or a spectral peak, depending on the method by which the Pitch object was computed.")
+LIST_ITEM (U"\\bu A %#path of red disks. These disks represent the best path through the candidates, "
+	"i.e. our best guess at what the pitch contour is. The path will usually have been determined "
+	"by the %%path finder%, which was called by the pitch-extraction algorithm, and you can change "
+	"the path manually. The path finder takes into account the goodness of each candidate, "
+	"the intensity of the sound in the frame, voiced-unvoiced transitions, and frequency jumps. "
+	"It also determines whether each frame is voiced or unvoiced.")
+LIST_ITEM (U"\\bu A %%##voicelessness bar%# at the bottom of the drawing area. If there is no suitable "
+	"pitch candidate in a frame, the frame is considered voiceless, which is shown as a blue rectangle "
+	"in the voicelessness bar.")
+LIST_ITEM (U"\\bu A line of digits between 0 and 9 along the top. These represent the relative intensity "
+	"of the sound in each frame.")
+ENTRY (U"Moving the marks")
+NORMAL (U"To move the cursor hair or the beginning or end of the selection, "
+	"use the @@time selection@ mechanism.")
+ENTRY (U"Changing the path")
+NORMAL (U"To change the path through the candidates manually, click on the candidates of your choice. "
+	"The changes will immediately affect the Pitch object that you are editing. To make a voiced frame "
+	"voiceless, click in the voicelessness bar.")
+NORMAL (U"To change the path automatically, choose ##Path finder...# from the #Edit menu; "
+	"this will have the same effect as filling in different values in "
+	"the @@Sound: To Pitch (filtered autocorrelation)...@ or @@Sound: To Pitch (raw autocorrelation)...@ command window, "
+	"but is much faster because the candidates do not have to be determined again.")
+ENTRY (U"Resynthesis")
+NORMAL (U"To hum any part of the pitch contour, click one of the buttons "
+	"below or above the data area (there can be 1 to 8 of these buttons), or use a command from the #Play menu.")
+ENTRY (U"Changing the ceiling")
+NORMAL (U"To change the ceiling, but not the path, choose ##Change ceiling...# from the #Edit menu; "
+	"if the new ceiling is lower than the old ceiling, some formerly voiced frames may become unvoiced; "
+	"if the new ceiling is higher than the old ceiling, some formerly unvoiced frames may become voiced.")
 MAN_END
 
 MAN_BEGIN (U"PitchTier", U"ppgb", 20101230) // 20251229
@@ -549,18 +572,23 @@ NORMAL (U"Points are generated along the entire time domain of the #PitchTier, "
 MAN_END
 
 MAN_BEGIN (U"PitchTierEditor", U"ppgb", /*20110128 20220814*/ 20230608)
-INTRO (U"Praat 中的@@Editors|编辑器@之一，用于查看和操纵 @@PitchTier|PitchTier@（音高层）对象，该对象可选与 @@Sound|Sound@（声音）对象同时显示。")
-ENTRY (U"数据对象")
-NORMAL (U"该编辑器显示：")
-LIST_ITEM (U"\\bu 如果您在点击 ##View & Edit# 之前，同时选中了 Sound 对象 and PitchTier 对象，则会显示该 @@Sound|Sound@（声音）对象。")
-LIST_ITEM (U"\\bu @@PitchTier|PitchTier@：以蓝色线条连接的蓝色圆点。")
-ENTRY (U"播放")
-NORMAL (U"若要播放（一部分）%%resynthesized%（重合成）声音：请@@Click|单击@绘制区域下方和上方的 8 个播放按钮中的任何一个，或者从 Play（播放）菜单中选择命令。")
-NORMAL (U"若要播放%%original%（原始）声音，请使用 @@Shift-click|Shift-单击@。")
-ENTRY (U"添加点")
-NORMAL (U"在所需的时间位置@@Click|单击@，然后选择 ##Add point at cursor#（在光标处添加点）或键入 @@Keyboard shortcuts|Command-P@。")
-ENTRY (U"移除点")
-NORMAL (U"若要移除一个或多个音高点，请进行 @@time selection|时间选择@ 并从 ##Point# 菜单中选择 ##Remove point(s)#（移除点）。如果没有进行选择，则移除最靠近光标的点。")
+INTRO (U"One of the @Editors in Praat, for viewing and manipulating a @PitchTier object, "
+	"which is optionally shown together with a @Sound object.")
+ENTRY (U"Objects")
+NORMAL (U"The editor shows:")
+LIST_ITEM (U"\\bu The @Sound, if you selected a Sound object together with the PitchTier object "
+	"before you clicked ##View & Edit#.")
+LIST_ITEM (U"\\bu The @PitchTier: blue points connected with blue lines.")
+ENTRY (U"Playing")
+NORMAL (U"To play (a part of) the %resynthesized sound: "
+	"@click any of the 8 buttons below and above the drawing area, or choose a command from the Play menu.")
+NORMAL (U"To play the %original sound instead, use @@Shift-click@.")
+ENTRY (U"Adding a point")
+NORMAL (U"@Click at the desired time location, and choose ##Add point at cursor# or type @@Keyboard shortcuts|Command-P@.")
+ENTRY (U"Removing points")
+NORMAL (U"To remove one or more pitch points, "
+	"make a @@time selection@ and choose ##Remove point(s)# from the ##Point# menu. "
+	"If there is no selection, the point nearest to the cursor is removed.")
 MAN_END
 
 MAN_BEGIN (U"PointProcess: To PitchTier...", U"ppgb", 19970402)

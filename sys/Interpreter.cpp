@@ -1285,10 +1285,35 @@ static bool isCommand (conststring32 string) {
 	if (str32nequ (p, U"demo ", 5))
 		return true;
 	/*
-		Otherwise, things that start with nonupper case are formulas.
+		Otherwise, things that start with nonupper case are formulas,
+		except localized Chinese command aliases (Layer 3 bilingual script routing).
 	*/
-	if (! Melder_isUpperCaseLetter (*p))
+	if (! Melder_isUpperCaseLetter (*p)) {
+		if (*p >= 0x80) {
+			char32 cmdBuf [200];
+			size_t len = 0;
+			const char32 *q = p;
+			while (*q && len + 4 < 200) {
+				if (*q == U':' || *q == U'\uff1a') {
+					cmdBuf [len ++] = U'.';
+					cmdBuf [len ++] = U'.';
+					cmdBuf [len ++] = U'.';
+					break;
+				}
+				if (*q == U'.' && q [1] == U'.' && q [2] == U'.') {
+					cmdBuf [len ++] = U'.';
+					cmdBuf [len ++] = U'.';
+					cmdBuf [len ++] = U'.';
+					break;
+				}
+				cmdBuf [len ++] = *q ++;
+			}
+			cmdBuf [len] = U'\0';
+			if (Melder_i18n_resolveScriptAlias (cmdBuf) != nullptr)
+				return true;
+		}
 		return false;
+	}
 	/*
 		The remaining possibility is things that start with upper case.
 		If they contain an underscore, they are object names, hence we must have a formula.
@@ -2433,7 +2458,7 @@ void Interpreter_resume (Interpreter me) {
 				}
 				trace (U"going to parse line ", my lineNumber, U": ", command2.string);
 				c0 = command2.string [0];   // resume in order to allow things like 'c$' = 5
-				if ((! Melder_isLetter (c0) || Melder_isUpperCaseLetter (c0)) && c0 != U'@' &&
+				if ((! Melder_isLetter (c0) || Melder_isUpperCaseLetter (c0) || (c0 >= 0x80 && isCommand (command2.string))) && c0 != U'@' &&
 						! (c0 == U'.' && Melder_isLetter (command2.string [1]) && ! Melder_isUpperCaseLetter (command2.string [1])))
 				{
 					(void) praat_executeCommand (me, command2.string);

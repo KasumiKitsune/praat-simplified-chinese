@@ -59,7 +59,14 @@ bool Melder_hasError () {
 }
 
 bool Melder_hasError (conststring32 partialError) {
-	return !! str32str (theErrorBuffer, partialError);
+	if (str32str (theErrorBuffer, partialError))
+		return true;
+	if (g_melder_translate && partialError && *partialError) {
+		conststring32 translated = g_melder_translate (partialError);
+		if (translated && translated != partialError && str32str (theErrorBuffer, translated))
+			return true;
+	}
+	return false;
 }
 
 #define CRASH_SEMAPHORE  U" will crash. Please notify the authors ("
@@ -101,7 +108,7 @@ void Melder_appendError_noLine (const MelderArg& arg) {
 	} else {
 		theMelder_error_threadId = Melder_thisThread_getUniqueID ();
 	}
-	MelderError__appendOneString (g_melder_translate ? g_melder_translate (arg._arg) : arg._arg);
+	MelderError__appendOneString (arg._arg);
 }
 
 void Melder_flushError () {

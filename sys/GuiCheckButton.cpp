@@ -305,6 +305,7 @@ GuiCheckButton GuiCheckButton_create (GuiForm parent, int left, int right, int t
 			[checkButton setState: NSOnState];
 		}
 	#endif
+	GuiI18n_bind (me.get(), GuiI18nKind::CheckButton, buttonText);
 	return me.releaseToAmbiguousOwner();
 }
 
@@ -342,6 +343,7 @@ void GuiCheckButton_setValue (GuiCheckButton me, bool value) {
 }
 
 void GuiCheckButton_setText (GuiCheckButton me, conststring32 text /* cattable */) {
+	GuiI18n_bind (me, GuiI18nKind::CheckButton, text);
 	conststring32 translatedText = praat_translate (text);
 	#if gtk
 		gtk_button_set_label (GTK_BUTTON (my d_widget), Melder_peek32to8 (translatedText));

@@ -363,6 +363,8 @@ static void drawBackgroundAndData (FunctionEditor me) {
 				}
 			}
 			const int prec = my v_fixedPrecision_long ();
+			if (g_language_choice != 0 && (i == 0 || i == 1 || i == 7))
+				format = Melder_peek32to8 (Melder_tr (Melder_peek8to32_u (format)));
 			char dynFormat [128];
 			const char *pPctF = strstr (format, "%f");
 			if (pPctF) {

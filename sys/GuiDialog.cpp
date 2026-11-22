@@ -71,7 +71,6 @@ static void gui_blocking_dialog_cb_close (GuiDialog me) {
 GuiDialog GuiDialog_create (GuiWindow parent, int x, int y, int width, int height,
 	conststring32 title, GuiShell_GoAwayCallback goAwayCallback, Thing goAwayBoss, GuiDialog_Modality modality)
 {
-	conststring32 translatedTitle = praat_translate (title);
 	autoGuiDialog me = Thing_new (GuiDialog);
 	my d_parent = parent;
 	if (modality == GuiDialog_Modality::BLOCKING) {
@@ -112,20 +111,20 @@ GuiDialog GuiDialog_create (GuiWindow parent, int x, int y, int width, int heigh
 		g_signal_connect (G_OBJECT (my d_widget), "destroy", G_CALLBACK (_GuiGtkDialog_destroyCallback), me.get());
 		g_signal_connect (G_OBJECT (my d_widget), "size-allocate", G_CALLBACK (_GuiGtkDialog_resizeCallback), me.get());
 		#if defined (chrome)
-			my chrome_surrogateShellTitleLabelWidget = gtk_label_new (Melder_peek32to8 (translatedTitle));
+			my chrome_surrogateShellTitleLabelWidget = gtk_label_new (Melder_peek32to8 (praat_translate (title)));
 			gtk_widget_set_size_request (GTK_WIDGET (my chrome_surrogateShellTitleLabelWidget), width, 31 /*Machine_getTextHeight()*/);
 			gtk_misc_set_alignment (GTK_MISC (my chrome_surrogateShellTitleLabelWidget), 0.5, 0.0);
 			//gtk_widget_set_xalign (GTK_WIDGET (my chrome_surrogateShellTitleLabelWidget), 0.5);
 			gtk_fixed_put (GTK_FIXED (my d_widget), GTK_WIDGET (my chrome_surrogateShellTitleLabelWidget), 0 /*8*/, 0);
 			gtk_widget_show (GTK_WIDGET (my chrome_surrogateShellTitleLabelWidget));
 		#endif
-		GuiShell_setTitle (me.get(), translatedTitle);
+		GuiShell_setTitle (me.get(), title);
 	#elif motif
 		my d_xmShell = XmCreateDialogShell (/*parent ? parent -> d_widget :*/ nullptr, "dialogShell", nullptr, 0);
 		XtVaSetValues (my d_xmShell, XmNdeleteResponse, my d_goAwayCallback ? XmDO_NOTHING : XmUNMAP, XmNx, x, XmNy, y, nullptr);
 		if (my d_goAwayCallback)
 			XmAddWMProtocolCallback (my d_xmShell, 'delw', _GuiMotifDialog_goAwayCallback, (char *) me.get());
-		GuiShell_setTitle (me.get(), translatedTitle);
+		GuiShell_setTitle (me.get(), title);
 		my d_widget = XmCreateForm (my d_xmShell, "dialog", nullptr, 0);
 		XtVaSetValues (my d_widget, XmNwidth, (Dimension) width, XmNheight, (Dimension) height, nullptr);
 		_GuiObject_setUserData (my d_widget, me.get());
@@ -145,7 +144,7 @@ GuiDialog GuiDialog_create (GuiWindow parent, int x, int y, int width, int heigh
 			defer: false
 		];
 		[my d_cocoaShell   setMinSize: NSMakeSize (500.0, 500.0)];   // BUG: should not be needed
-		[my d_cocoaShell   setTitle: (NSString *) Melder_peek32toCfstring (translatedTitle)];
+		GuiShell_setTitle (me.get(), title);
 		//[my d_cocoaShell   makeKeyAndOrderFront: nil];
 		//[my d_cocoaShell   layoutIfNeeded];
 		[my d_cocoaShell   setDistinctiveBackGround];

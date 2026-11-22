@@ -151,6 +151,8 @@ GuiOptionMenu GuiOptionMenu_createShown (GuiForm parent, int left, int right, in
 #endif
 
 void GuiOptionMenu_addOption (GuiOptionMenu me, conststring32 text) {
+	my d_i18nOptionCount ++;
+	GuiI18n_bindOption (me, my d_i18nOptionCount, text);
 	text = praat_translate (text);
 	#if gtk
 		gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (my d_widget), Melder_peek32to8 (text));
@@ -166,6 +168,7 @@ void GuiOptionMenu_addOption (GuiOptionMenu me, conststring32 text) {
 }
 
 void GuiOptionMenu_setOptionText (GuiOptionMenu me, int optionPosition, conststring32 text) {
+	GuiI18n_bindOption (me, optionPosition, text);
 	text = praat_translate (text);
 	#if gtk
 		gtk_combo_box_text_remove (GTK_COMBO_BOX_TEXT (my d_widget), optionPosition - 1);

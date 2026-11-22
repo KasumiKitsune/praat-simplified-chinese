@@ -417,7 +417,7 @@ static void showStructMember (
 	unsigned char *memberAddress = (unsigned char *) structAddress + memberDescription -> offset;
 	if (type == inheritwa) {
 		GuiLabel_setText (fieldData -> label,
-			Melder_cat (g_language_choice == 0 ? U"class part \"" : U"类部分 \"", memberDescription -> name, U"\":"));
+			Melder_cat (U"Class part \"", memberDescription -> name, U"\":"));
 	} else {
 		GuiLabel_setText (fieldData -> label,
 			Melder_cat (U"   ", strip_d (memberDescription -> name),

@@ -165,18 +165,23 @@ then sorts the new array just once, which is again %O(%N · log %N).
 MAN_PAGES_END
 
 MAN_BEGIN (U"PointEditor", U"ppgb", /*20110128 20220814*/ 20230608)
-INTRO (U"Praat 中的@@Editors|编辑器@之一，用于查看和操纵 @@PointProcess|PointProcess@（点标记过程）对象，该对象可选与 @@Sound|Sound@（声音）对象同时显示。")
-ENTRY (U"数据对象")
-NORMAL (U"该编辑器显示：")
-LIST_ITEM (U"• 如果您在点击 ##View & Edit# 之前，同时选中了 Sound 对象和 PointProcess 对象，则会显示该 @@Sound|Sound@（声音）对象。")
-LIST_ITEM (U"• @@PointProcess|PointProcess@：垂直蓝色线条代表各个点。")
-ENTRY (U"播放")
-NORMAL (U"若要播放（一部分）%%resynthesized%（重合成）声音（脉冲序列）：请@@Click|单击@绘制区域下方和上方的 8 个播放按钮中的任何一个，或者从 Play（播放）菜单中选择命令。")
-NORMAL (U"若要播放%%original%（原始）声音，请使用 @@Shift-click|Shift-单击@。")
-ENTRY (U"添加点")
-NORMAL (U"在所需的时间位置@@Click|单击@，然后选择 ##Add point at cursor#（在光标处添加点）或键入 @@Keyboard shortcuts|Command-P@。")
-ENTRY (U"移除点")
-NORMAL (U"若要移除一个或多个点，请进行 @@time selection|时间选择@ 并从 ##Point# 菜单中选择 ##Remove point(s)#（移除点）。如果没有进行选择，则移除最靠近光标的点。")
+INTRO (U"One of the @Editors in Praat, for viewing and manipulating a @PointProcess object, "
+	"which is optionally shown together with a @Sound object.")
+ENTRY (U"Objects")
+NORMAL (U"The editor shows:")
+LIST_ITEM (U"• The @Sound, if you selected a Sound object together with the PointProcess object "
+	"before you clicked ##View & Edit#.")
+LIST_ITEM (U"• The @PointProcess; vertical blue lines represent the points.")
+ENTRY (U"Playing")
+NORMAL (U"To play (a part of) the %resynthesized sound (pulse train): "
+	"@click any of the 8 buttons below and above the drawing area, or choose a command from the Play menu.")
+NORMAL (U"To play the %original sound instead, use @@Shift-click@.")
+ENTRY (U"Adding a point")
+NORMAL (U"@Click at the desired time location, and choose \"Add point at cursor\" or type @@Keyboard shortcuts|Command-P@.")
+ENTRY (U"Removing points")
+NORMAL (U"To remove one or more points, "
+	"make a @@time selection@ and choose ##Remove point(s)# from the ##Point# menu. "
+	"If there is no selection, the point nearest to the cursor is removed.")
 MAN_END
 
 MAN_BEGIN (U"PointProcess", U"ppgb", 20110128)   // 20230531

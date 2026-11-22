@@ -391,6 +391,7 @@ GuiRadioButton GuiRadioButton_create (GuiForm parent, int left, int right, int t
 		my d_previous -> d_next = me.get();
 	}
 	latestRadioButton = me.get();
+	GuiI18n_bind (me.get(), GuiI18nKind::RadioButton, buttonText);
 	trace (U"end");
 	return me.releaseToAmbiguousOwner();
 }
@@ -444,6 +445,22 @@ void GuiRadioButton_set (GuiRadioButton me) {
 		}
 	#endif
 	trace (U"exit");
+}
+
+void GuiRadioButton_setText (GuiRadioButton me, conststring32 text /* cattable */) {
+	GuiI18n_bind (me, GuiI18nKind::RadioButton, text);
+	conststring32 translatedText = praat_translate (text);
+	#if gtk
+		gtk_button_set_label (GTK_BUTTON (my d_widget), Melder_peek32to8 (translatedText));
+	#elif motif
+		my d_widget -> name = Melder_dup_f (translatedText);
+		if (my d_widget -> window) {
+			SetWindowTextW (my d_widget -> window, Melder_peek32toW (_GuiWin_expandAmpersands (my d_widget -> name.get())));
+			InvalidateRect (my d_widget -> window, nullptr, FALSE);
+		}
+	#elif cocoa
+		[my d_cocoaRadioButton setTitle: (NSString *) Melder_peek32toCfstring (translatedText)];
+	#endif
 }
 
 /* End of file GuiRadioButton.cpp */

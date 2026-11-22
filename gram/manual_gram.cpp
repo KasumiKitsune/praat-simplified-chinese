@@ -1334,11 +1334,14 @@ INTRO (U"Causes the selected @OTGrammar object to process a number of input/outp
 MAN_END
 
 MAN_BEGIN (U"OTGrammarEditor", U"ppgb", 20030316)
-INTRO (U"Praat 中的@@Editors|编辑器@之一，用于查看和编辑 @@OTGrammar|OTGrammar@（优选论语法）对象中的语法。")
-NORMAL (U"相关示例请参见 @@OT learning|OT 学习@ 教程。")
-ENTRY (U"用法")
-NORMAL (U"如果您在研究变体，您最常使用的菜单命令可能是 ##Evaluate (noise 2.0)#（评估 (噪声 2.0)）命令，您可以从 #Edit 菜单中调用该命令，也可以按 @@Keyboard shortcuts|Command-2@。")
-NORMAL (U"该命令将使用当前的等级排列值执行新的评估。有一些随机噪声会被添加到等级排列值中，从而使约束的%%disharmonies%（不和谐度）发生改变。这可能会导致约束的等级顺序发生改变，进而可能会导致不同的候选项目在某些 tableau 中获胜。")
+INTRO (U"One of the @editors in Praat, for viewing and editing the grammar in an @OTGrammar object.")
+NORMAL (U"See the @@OT learning@ tutorial for examples.")
+ENTRY (U"Usage")
+NORMAL (U"The menu command that you will probably use most often if you investigate variation, "
+	"is the ##Evaluate (noise 2.0)# command, which you can invoke from the #Edit menu or by pressing @@Keyboard shortcuts|Command-2@.")
+NORMAL (U"This command performs a new evaluation with the current ranking values. Some noise is added to the "
+	"ranking values, so that the %#disharmonies of the constraint will change. This may cause a change in the "
+	"ranking order of the constraints, which in its turn may cause a different candidate to win in some tableaus.")
 MAN_END
 
 MAN_BEGIN (U"Robust Interpretive Parsing", U"ppgb", 20021105)
