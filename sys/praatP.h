@@ -130,6 +130,8 @@ Editor praat_findEditorFromString (conststring32 string);
 Editor praat_findEditorById (integer id);
 
 void praat_showLogo ();
+void praat_showChineseAbout ();
+void praat_chineseAbout_languageChanged ();
 
 /* Communication with praat_menuCommands.cpp: */
 void praat_menuCommands_exit_optimizeByLeaking ();

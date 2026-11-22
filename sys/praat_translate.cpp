@@ -392,6 +392,7 @@ static const std::unordered_map<std::u32string, std::u32string> g_translation_ma
 	{ U"AI Agent prompt has been copied to clipboard!\nYou can now paste (Ctrl+V) it directly into ChatGPT, Gemini, Deepseek, Doubao, etc.\n\n==================== Prompt Preview ====================\n\n", U"AI \u63d0\u793a\u8bcd\u5df2\u6210\u529f\u590d\u5236\u5230\u526a\u8d34\u677f\uff01\n\u60a8\u73b0\u5728\u53ef\u4ee5\u76f4\u63a5\u7c98\u8d34 (Ctrl+V) \u7ed9 ChatGPT\u3001Gemini\u3001Deepseek\u3001\u8c46\u5305 \u7b49 AI \u52a9\u624b\u3002\n\n==================== \u63d0\u793a\u8bcd\u5185\u5bb9\u9884\u89c8 ====================\n\n" },
 	{ U"AI settings", U"AI \u8bbe\u7f6e" },
 	{ U"AI settings...", U"AI \u8bbe\u7f6e..." },
+	{ U"About Chinese Edition...", U"\u5173\u4e8e\u4e2d\u6587\u7248..." },
 	{ U"About Praat", U"\u5173\u4e8e Praat" },
 	{ U"About special symbols", U"\u5173\u4e8e\u7279\u6b8a\u7b26\u53f7" },
 	{ U"About text styles", U"\u5173\u4e8e\u6587\u672c\u6837\u5f0f" },
