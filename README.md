@@ -23,6 +23,8 @@
 > 本仓库是语音学分析软件 **Praat** 的中文汉化/本地化版本。
 >
 > - **官方主页 (GitHub Pages)**：[https://kasumikitsune.github.io/praat-simplified-chinese/](https://kasumikitsune.github.io/praat-simplified-chinese/)
+> - **在线 TextGrid 可视化与编辑器**：[https://kasumikitsune.github.io/praat-simplified-chinese/textgrid-editor/](https://kasumikitsune.github.io/praat-simplified-chinese/textgrid-editor/)
+> - **技术规范文档**：[Praat `.TextGrid` 与 `.Collection` 文件格式规范](PRAAT_TEXTGRID_AND_COLLECTION_SPEC.md) · [TextGrid 可视化与交互编辑规范](TEXTGRID_VISUALIZATION_AND_EDITOR_SPEC.md)
 > - **源码仓库**：[KasumiKitsune/praat-simplified-chinese](https://github.com/KasumiKitsune/praat-simplified-chinese)
 > - **官方英文主页**：[praat.org](https://praat.org) / [GitHub 官方仓库](https://github.com/praat/praat)
 >
