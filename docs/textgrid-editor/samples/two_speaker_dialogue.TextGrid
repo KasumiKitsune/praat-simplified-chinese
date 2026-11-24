@@ -151,11 +151,11 @@ item []:
         intervals [10]:
             xmin = 3.715 
             xmax = 4.44 
-            text = "k\as\ng ts\^hai n\sw k\sw ts\^hɿ \rsɿ" 
+            text = "k\as\ng ts\^hai n\sw k\sw ts\^hɿ \s.ɿ" 
         intervals [11]:
             xmin = 4.44 
             xmax = 5.025 
-            text = "\rsɿ\-5" 
+            text = "\s.ɿ\-5" 
         intervals [12]:
             xmin = 5.025 
             xmax = 5.21 
@@ -163,7 +163,7 @@ item []:
         intervals [13]:
             xmin = 5.21 
             xmax = 5.545 
-            text = "xai \rsɿ" 
+            text = "xai \s.ɿ" 
         intervals [14]:
             xmin = 5.545 
             xmax = 5.74 
@@ -175,11 +175,11 @@ item []:
         intervals [16]:
             xmin = 6.585 
             xmax = 7.240413 
-            text = "\rsɿ tɕɥɛn \rs\sw t\sw" 
+            text = "\s.ɿ tɕɥɛn \s.\sw t\sw" 
         intervals [17]:
             xmin = 7.240413 
             xmax = 7.79 
-            text = "\rsɿ\-5" 
+            text = "\s.ɿ\-5" 
         intervals [18]:
             xmin = 7.79 
             xmax = 8.14 
